@@ -77,6 +77,17 @@ export const FilterSortControls = ({ state, onStateChange, onClear }: FilterSort
 
   const hasActiveFilters = state.stages.length > 0 || state.genres.length > 0 || state.minRating > 0;
 
+  const getGenreDisplayText = () => {
+    if (state.genres.length === 0) {
+      return "All Genres";
+    } else if (state.genres.length === 1) {
+      const selectedGenre = genres.find(g => g.id === state.genres[0]);
+      return selectedGenre?.name || "1 genre selected";
+    } else {
+      return `${state.genres.length} genres selected`;
+    }
+  };
+
   return (
     <div className="bg-white/10 backdrop-blur-md border border-purple-400/30 rounded-lg p-4 space-y-4">
       {/* Header with toggle */}
@@ -169,13 +180,7 @@ export const FilterSortControls = ({ state, onStateChange, onClear }: FilterSort
               <Select>
                 <SelectTrigger className="w-full bg-white/10 border-purple-400/30 text-purple-100">
                   <SelectValue>
-                    {state.genres.length === 0 ? (
-                      "All Genres"
-                    ) : state.genres.length === 1 ? (
-                      genres.find(g => g.id === state.genres[0])?.name || "1 genre selected"
-                    ) : (
-                      `${state.genres.length} genres selected`
-                    )}
+                    {getGenreDisplayText()}
                   </SelectValue>
                 </SelectTrigger>
                 <SelectContent className="bg-gray-800 border-purple-400/30">
