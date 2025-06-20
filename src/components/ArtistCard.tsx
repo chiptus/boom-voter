@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Star, Heart, X, ExternalLink, Play, Music, MapPin, Calendar, Eye, EyeOff } from "lucide-react";
+import { Star, Heart, X, ExternalLink, Play, Music, MapPin, Calendar, Eye, EyeOff, Edit } from "lucide-react";
 import { ArtistImageLoader } from "./ArtistImageLoader";
 import { EditArtistDialog } from "./EditArtistDialog";
 import { useToast } from "@/hooks/use-toast";

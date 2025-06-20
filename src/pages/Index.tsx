@@ -23,10 +23,14 @@ const Index = () => {
     fetchArtists();
   };
 
+  const handleAuthSuccess = () => {
+    setShowAuthDialog(false);
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900">
-        <FestivalHeader user={user} />
+        <FestivalHeader artistCount={0} />
         <div className="container mx-auto px-4 py-8">
           <div className="text-center text-white">Loading artists...</div>
         </div>
@@ -36,13 +40,20 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900">
-      <FestivalHeader user={user} />
+      <FestivalHeader artistCount={artists.length} />
       
       <div className="container mx-auto px-4 py-8">
         <div className="mb-8">
           <FilterSortControls 
-            filterSortState={filterSortState}
-            onUpdateState={updateUrlState}
+            state={filterSortState}
+            onStateChange={updateUrlState}
+            onClear={() => updateUrlState({ 
+              genre: '', 
+              stage: '', 
+              knowledge: '', 
+              vote: '', 
+              search: '' 
+            })}
           />
         </div>
 
@@ -96,6 +107,7 @@ const Index = () => {
       <AuthDialog 
         open={showAuthDialog}
         onOpenChange={setShowAuthDialog}
+        onSuccess={handleAuthSuccess}
       />
     </div>
   );
