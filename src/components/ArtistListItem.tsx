@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Star, Heart, X, ExternalLink, Play, Music, MapPin, Calendar } from "lucide-react";
+import { Star, Heart, X, ExternalLink, Play, Music, MapPin, Calendar, Eye, EyeOff } from "lucide-react";
 import { ArtistImageLoader } from "./ArtistImageLoader";
 import type { Artist } from "@/hooks/useArtists";
 
@@ -85,14 +85,18 @@ export const ArtistListItem = ({ artist, userVote, userKnowledge, onVote, onKnow
           </p>
         )}
 
-        {/* Knowledge Checkbox */}
+        {/* Knowledge Eye Icon */}
         <div className="flex items-center gap-2">
-          <Checkbox 
-            checked={userKnowledge || false}
-            onCheckedChange={handleKnowledgeToggle}
-            className="border-purple-400 data-[state=checked]:bg-purple-600"
-          />
-          <span className="text-purple-200 text-sm">I know this artist</span>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={handleKnowledgeToggle}
+            className={`p-1 h-8 w-8 ${userKnowledge ? 'text-purple-400 hover:text-purple-300' : 'text-purple-600 hover:text-purple-500'}`}
+            title={userKnowledge ? "I know this artist" : "Mark as known"}
+          >
+            {userKnowledge ? <Eye className="h-4 w-4" /> : <EyeOff className="h-4 w-4" />}
+          </Button>
+          <span className="text-purple-200 text-sm">{userKnowledge ? "Known" : "Unknown"}</span>
         </div>
 
         {/* Voting Buttons */}
@@ -197,14 +201,18 @@ export const ArtistListItem = ({ artist, userVote, userKnowledge, onVote, onKnow
             </div>
           </div>
           
-          {/* Artist Knowledge Checkbox */}
+          {/* Artist Knowledge Eye Icon */}
           <div className="flex items-center gap-2 mb-2">
-            <Checkbox 
-              checked={userKnowledge || false}
-              onCheckedChange={handleKnowledgeToggle}
-              className="border-purple-400 data-[state=checked]:bg-purple-600"
-            />
-            <span className="text-purple-200 text-sm">I know this artist</span>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={handleKnowledgeToggle}
+              className={`p-1 h-8 w-8 ${userKnowledge ? 'text-purple-400 hover:text-purple-300' : 'text-purple-600 hover:text-purple-500'}`}
+              title={userKnowledge ? "I know this artist" : "Mark as known"}
+            >
+              {userKnowledge ? <Eye className="h-4 w-4" /> : <EyeOff className="h-4 w-4" />}
+            </Button>
+            <span className="text-purple-200 text-sm">{userKnowledge ? "Known" : "Unknown"}</span>
           </div>
           
           {artist.description && (

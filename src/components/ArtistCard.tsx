@@ -4,7 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Star, Heart, X, ExternalLink, Play, Music, MapPin, Calendar } from "lucide-react";
+import { Star, Heart, X, ExternalLink, Play, Music, MapPin, Calendar, Eye, EyeOff } from "lucide-react";
 import { ArtistImageLoader } from "./ArtistImageLoader";
 import type { Artist } from "@/hooks/useArtists";
 
@@ -81,15 +81,19 @@ export const ArtistCard = ({ artist, userVote, userKnowledge, onVote, onKnowledg
            </div>
          </div>
          
-         {/* Artist Knowledge Checkbox */}
-         <div className="flex items-center gap-2 mb-3">
-           <Checkbox 
-             checked={userKnowledge || false}
-             onCheckedChange={handleKnowledgeToggle}
-             className="border-purple-400 data-[state=checked]:bg-purple-600"
-           />
-           <span className="text-purple-200 text-sm">I know this artist</span>
-         </div>
+          {/* Artist Knowledge Eye Icon */}
+          <div className="flex items-center gap-2 mb-3">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={handleKnowledgeToggle}
+              className={`p-1 h-8 w-8 ${userKnowledge ? 'text-purple-400 hover:text-purple-300' : 'text-purple-600 hover:text-purple-500'}`}
+              title={userKnowledge ? "I know this artist" : "Mark as known"}
+            >
+              {userKnowledge ? <Eye className="h-4 w-4" /> : <EyeOff className="h-4 w-4" />}
+            </Button>
+            <span className="text-purple-200 text-sm">{userKnowledge ? "Known" : "Unknown"}</span>
+          </div>
          
          {artist.description && (
            <CardDescription className="text-purple-200 text-sm leading-relaxed">
