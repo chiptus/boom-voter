@@ -14,36 +14,42 @@ export type Database = {
           added_by: string
           created_at: string
           description: string | null
+          estimated_date: string | null
           genre_id: string
           id: string
           image_url: string | null
           name: string
           soundcloud_url: string | null
           spotify_url: string | null
+          stage: string | null
           updated_at: string
         }
         Insert: {
           added_by: string
           created_at?: string
           description?: string | null
+          estimated_date?: string | null
           genre_id: string
           id?: string
           image_url?: string | null
           name: string
           soundcloud_url?: string | null
           spotify_url?: string | null
+          stage?: string | null
           updated_at?: string
         }
         Update: {
           added_by?: string
           created_at?: string
           description?: string | null
+          estimated_date?: string | null
           genre_id?: string
           id?: string
           image_url?: string | null
           name?: string
           soundcloud_url?: string | null
           spotify_url?: string | null
+          stage?: string | null
           updated_at?: string
         }
         Relationships: [

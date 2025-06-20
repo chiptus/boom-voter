@@ -26,6 +26,8 @@ export const AddArtistDialog = ({ open, onOpenChange, onSuccess }: AddArtistDial
   const [spotifyUrl, setSpotifyUrl] = useState("");
   const [soundcloudUrl, setSoundcloudUrl] = useState("");
   const [imageUrl, setImageUrl] = useState("");
+  const [stage, setStage] = useState("");
+  const [estimatedDate, setEstimatedDate] = useState("");
   const [genres, setGenres] = useState<MusicGenre[]>([]);
   const [loading, setLoading] = useState(false);
   const { toast } = useToast();
@@ -79,6 +81,8 @@ export const AddArtistDialog = ({ open, onOpenChange, onSuccess }: AddArtistDial
         spotify_url: spotifyUrl || null,
         soundcloud_url: soundcloudUrl || null,
         image_url: imageUrl || null,
+        stage: stage || null,
+        estimated_date: estimatedDate || null,
       });
 
     if (error) {
@@ -98,6 +102,8 @@ export const AddArtistDialog = ({ open, onOpenChange, onSuccess }: AddArtistDial
       setSpotifyUrl("");
       setSoundcloudUrl("");
       setImageUrl("");
+      setStage("");
+      setEstimatedDate("");
       onSuccess();
     }
     setLoading(false);
@@ -153,6 +159,27 @@ export const AddArtistDialog = ({ open, onOpenChange, onSuccess }: AddArtistDial
               onChange={(e) => setDescription(e.target.value)}
               placeholder="Tell us about this artist..."
               rows={3}
+            />
+          </div>
+
+          <div>
+            <Label htmlFor="artist-stage">Stage (Optional)</Label>
+            <Input
+              id="artist-stage"
+              type="text"
+              value={stage}
+              onChange={(e) => setStage(e.target.value)}
+              placeholder="e.g., Main Stage, Dance Temple, Chill Out Gardens"
+            />
+          </div>
+
+          <div>
+            <Label htmlFor="estimated-date">Estimated Performance Date (Optional)</Label>
+            <Input
+              id="estimated-date"
+              type="date"
+              value={estimatedDate}
+              onChange={(e) => setEstimatedDate(e.target.value)}
             />
           </div>
 

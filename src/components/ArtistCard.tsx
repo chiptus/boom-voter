@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { ThumbsUp, ThumbsDown, ExternalLink, Play, Music } from "lucide-react";
+import { ThumbsUp, ThumbsDown, ExternalLink, Play, Music, MapPin, Calendar } from "lucide-react";
 import { ArtistImageLoader } from "./ArtistImageLoader";
 import type { Artist } from "@/hooks/useArtists";
 
@@ -28,6 +28,14 @@ export const ArtistCard = ({ artist, userVote, onVote, onAuthRequired }: ArtistC
 
   const netVoteScore = getVoteCount(1) - getVoteCount(-1);
 
+  const formatDate = (dateString: string | null) => {
+    if (!dateString) return null;
+    return new Date(dateString).toLocaleDateString('en-US', {
+      month: 'short',
+      day: 'numeric'
+    });
+  };
+
   return (
     <Card className="bg-white/10 backdrop-blur-md border-purple-400/30 hover:bg-white/15 transition-all duration-300 overflow-hidden">
       <CardHeader className="pb-4">
@@ -46,6 +54,22 @@ export const ArtistCard = ({ artist, userVote, onVote, onAuthRequired }: ArtistC
                 {artist.music_genres.name}
               </Badge>
             )}
+            
+            {/* Stage and Date Information */}
+            <div className="flex flex-wrap gap-2 mb-2">
+              {artist.stage && (
+                <div className="flex items-center gap-1 text-sm text-purple-200">
+                  <MapPin className="h-3 w-3" />
+                  <span>{artist.stage}</span>
+                </div>
+              )}
+              {artist.estimated_date && (
+                <div className="flex items-center gap-1 text-sm text-purple-200">
+                  <Calendar className="h-3 w-3" />
+                  <span>{formatDate(artist.estimated_date)}</span>
+                </div>
+              )}
+            </div>
           </div>
           {netVoteScore !== 0 && (
             <div className={`text-sm font-semibold px-2 py-1 rounded ${
