@@ -4,6 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ThumbsUp, ThumbsDown, ExternalLink, Play, Music } from "lucide-react";
+import { ArtistImageLoader } from "./ArtistImageLoader";
 import type { Artist } from "@/hooks/useArtists";
 
 interface ArtistCardProps {
@@ -25,33 +26,40 @@ export const ArtistCard = ({ artist, userVote, onVote, onAuthRequired }: ArtistC
     return artist.votes.filter(vote => vote.vote_type === voteType).length;
   };
 
+  const netVoteScore = getVoteCount(1) - getVoteCount(-1);
+
   return (
-    <Card className="bg-white/10 backdrop-blur-md border-purple-400/30 hover:bg-white/15 transition-all duration-300">
+    <Card className="bg-white/10 backdrop-blur-md border-purple-400/30 hover:bg-white/15 transition-all duration-300 overflow-hidden">
       <CardHeader className="pb-4">
         {/* Artist Image */}
-        {artist.image_url && (
-          <div className="aspect-square w-full mb-4 overflow-hidden rounded-lg">
-            <img 
-              src={artist.image_url} 
-              alt={artist.name}
-              className="w-full h-full object-cover"
-              onError={(e) => {
-                e.currentTarget.src = '/placeholder.svg';
-              }}
-            />
-          </div>
-        )}
+        <ArtistImageLoader 
+          src={artist.image_url}
+          alt={artist.name}
+          className="aspect-square w-full mb-4 overflow-hidden rounded-lg"
+        />
         
-        <CardTitle className="text-white text-xl">{artist.name}</CardTitle>
+        <div className="flex items-start justify-between">
+          <div className="flex-1">
+            <CardTitle className="text-white text-xl mb-2">{artist.name}</CardTitle>
+            {artist.music_genres && (
+              <Badge variant="secondary" className="bg-purple-600/50 text-purple-100 mb-2">
+                {artist.music_genres.name}
+              </Badge>
+            )}
+          </div>
+          {netVoteScore !== 0 && (
+            <div className={`text-sm font-semibold px-2 py-1 rounded ${
+              netVoteScore > 0 ? 'text-green-400' : 'text-red-400'
+            }`}>
+              {netVoteScore > 0 ? '+' : ''}{netVoteScore}
+            </div>
+          )}
+        </div>
+        
         {artist.description && (
-          <CardDescription className="text-purple-200">
+          <CardDescription className="text-purple-200 text-sm leading-relaxed">
             {artist.description}
           </CardDescription>
-        )}
-        {artist.music_genres && (
-          <Badge variant="secondary" className="bg-purple-600/50 text-purple-100 w-fit">
-            {artist.music_genres.name}
-          </Badge>
         )}
       </CardHeader>
       
@@ -79,32 +87,34 @@ export const ArtistCard = ({ artist, userVote, onVote, onAuthRequired }: ArtistC
         </div>
 
         {/* External Links */}
-        <div className="flex flex-wrap gap-2">
-          {artist.spotify_url && (
-            <Button 
-              asChild 
-              size="sm"
-              className="bg-green-600 hover:bg-green-700"
-            >
-              <a href={artist.spotify_url} target="_blank" rel="noopener noreferrer">
-                <Play className="h-3 w-3 mr-1" />
-                Spotify
-              </a>
-            </Button>
-          )}
-          {artist.soundcloud_url && (
-            <Button 
-              asChild 
-              size="sm"
-              className="bg-orange-600 hover:bg-orange-700"
-            >
-              <a href={artist.soundcloud_url} target="_blank" rel="noopener noreferrer">
-                <Music className="h-3 w-3 mr-1" />
-                SoundCloud
-              </a>
-            </Button>
-          )}
-        </div>
+        {(artist.spotify_url || artist.soundcloud_url) && (
+          <div className="flex flex-wrap gap-2">
+            {artist.spotify_url && (
+              <Button 
+                asChild 
+                size="sm"
+                className="bg-green-600 hover:bg-green-700 text-xs"
+              >
+                <a href={artist.spotify_url} target="_blank" rel="noopener noreferrer">
+                  <Play className="h-3 w-3 mr-1" />
+                  Spotify
+                </a>
+              </Button>
+            )}
+            {artist.soundcloud_url && (
+              <Button 
+                asChild 
+                size="sm"
+                className="bg-orange-600 hover:bg-orange-700 text-xs"
+              >
+                <a href={artist.soundcloud_url} target="_blank" rel="noopener noreferrer">
+                  <Music className="h-3 w-3 mr-1" />
+                  SoundCloud
+                </a>
+              </Button>
+            )}
+          </div>
+        )}
 
         {/* View Details Button */}
         <Button asChild variant="outline" className="w-full border-purple-400 text-purple-400 hover:bg-purple-400 hover:text-white">

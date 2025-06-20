@@ -2,11 +2,12 @@
 import { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
-import { useToast } from "@/components/ui/use-toast";
+import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { ArrowLeft, ExternalLink, Music, ThumbsUp, ThumbsDown, Play } from "lucide-react";
+import { ArtistImageLoader } from "@/components/ArtistImageLoader";
 import type { Database } from "@/integrations/supabase/types";
 
 type Artist = Database["public"]["Tables"]["artists"]["Row"] & {
@@ -122,6 +123,8 @@ const ArtistDetail = () => {
     return artist.votes.filter(vote => vote.vote_type === voteType).length;
   };
 
+  const netVoteScore = artist ? getVoteCount(1) - getVoteCount(-1) : 0;
+
   if (loading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900 flex items-center justify-center">
@@ -166,13 +169,10 @@ const ArtistDetail = () => {
           <div className="lg:col-span-1">
             <Card className="bg-white/10 backdrop-blur-md border-purple-400/30">
               <CardContent className="p-6">
-                <img 
-                  src={artist.image_url || '/placeholder.svg'} 
+                <ArtistImageLoader 
+                  src={artist.image_url}
                   alt={artist.name}
-                  className="w-full rounded-lg shadow-lg"
-                  onError={(e) => {
-                    e.currentTarget.src = '/placeholder.svg';
-                  }}
+                  className="w-full aspect-square rounded-lg shadow-lg"
                 />
               </CardContent>
             </Card>
@@ -182,19 +182,32 @@ const ArtistDetail = () => {
           <div className="lg:col-span-2">
             <Card className="bg-white/10 backdrop-blur-md border-purple-400/30 h-full">
               <CardHeader>
-                <CardTitle className="text-3xl font-bold text-white">{artist.name}</CardTitle>
+                <div className="flex items-start justify-between">
+                  <div className="flex-1">
+                    <CardTitle className="text-3xl font-bold text-white mb-2">{artist.name}</CardTitle>
+                    <div className="flex flex-wrap gap-2 mb-4">
+                      {artist.music_genres && (
+                        <Badge variant="secondary" className="bg-purple-600/50 text-purple-100">
+                          {artist.music_genres.name}
+                        </Badge>
+                      )}
+                      {netVoteScore !== 0 && (
+                        <Badge variant="outline" className={`${
+                          netVoteScore > 0 
+                            ? 'border-green-400 text-green-400' 
+                            : 'border-red-400 text-red-400'
+                        }`}>
+                          Score: {netVoteScore > 0 ? '+' : ''}{netVoteScore}
+                        </Badge>
+                      )}
+                    </div>
+                  </div>
+                </div>
                 {artist.description && (
-                  <CardDescription className="text-purple-200 text-lg">
+                  <CardDescription className="text-purple-200 text-lg leading-relaxed">
                     {artist.description}
                   </CardDescription>
                 )}
-                <div className="flex flex-wrap gap-2 mt-4">
-                  {artist.music_genres && (
-                    <Badge variant="secondary" className="bg-purple-600/50 text-purple-100">
-                      {artist.music_genres.name}
-                    </Badge>
-                  )}
-                </div>
               </CardHeader>
               <CardContent>
                 {/* Voting */}
@@ -218,32 +231,34 @@ const ArtistDetail = () => {
                 </div>
 
                 {/* External Links */}
-                <div className="flex flex-wrap gap-4">
-                  {artist.spotify_url && (
-                    <Button 
-                      asChild 
-                      className="bg-green-600 hover:bg-green-700"
-                    >
-                      <a href={artist.spotify_url} target="_blank" rel="noopener noreferrer">
-                        <Play className="h-4 w-4 mr-2" />
-                        Open in Spotify
-                        <ExternalLink className="h-4 w-4 ml-2" />
-                      </a>
-                    </Button>
-                  )}
-                  {artist.soundcloud_url && (
-                    <Button 
-                      asChild 
-                      className="bg-orange-600 hover:bg-orange-700"
-                    >
-                      <a href={artist.soundcloud_url} target="_blank" rel="noopener noreferrer">
-                        <Music className="h-4 w-4 mr-2" />
-                        Open in SoundCloud
-                        <ExternalLink className="h-4 w-4 ml-2" />
-                      </a>
-                    </Button>
-                  )}
-                </div>
+                {(artist.spotify_url || artist.soundcloud_url) && (
+                  <div className="flex flex-wrap gap-4">
+                    {artist.spotify_url && (
+                      <Button 
+                        asChild 
+                        className="bg-green-600 hover:bg-green-700"
+                      >
+                        <a href={artist.spotify_url} target="_blank" rel="noopener noreferrer">
+                          <Play className="h-4 w-4 mr-2" />
+                          Open in Spotify
+                          <ExternalLink className="h-4 w-4 ml-2" />
+                        </a>
+                      </Button>
+                    )}
+                    {artist.soundcloud_url && (
+                      <Button 
+                        asChild 
+                        className="bg-orange-600 hover:bg-orange-700"
+                      >
+                        <a href={artist.soundcloud_url} target="_blank" rel="noopener noreferrer">
+                          <Music className="h-4 w-4 mr-2" />
+                          Open in SoundCloud
+                          <ExternalLink className="h-4 w-4 ml-2" />
+                        </a>
+                      </Button>
+                    )}
+                  </div>
+                )}
               </CardContent>
             </Card>
           </div>
