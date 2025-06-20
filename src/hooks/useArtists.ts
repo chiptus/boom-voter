@@ -165,6 +165,8 @@ export const useArtists = (filterSortState?: FilterSortState) => {
             user_id: user.id,
             artist_id: artistId,
             vote_type: voteType,
+          }, {
+            onConflict: 'user_id,artist_id'
           });
 
         if (error) {
