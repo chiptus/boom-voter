@@ -1,15 +1,16 @@
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
 import type { Database } from "@/integrations/supabase/types";
+import type { FilterSortState } from "./useUrlState";
 
 type Artist = Database["public"]["Tables"]["artists"]["Row"] & {
   music_genres: { name: string } | null;
   votes: { vote_type: number }[];
 };
 
-export const useArtists = () => {
+export const useArtists = (filterSortState?: FilterSortState) => {
   const [user, setUser] = useState<any>(null);
   const [artists, setArtists] = useState<Artist[]>([]);
   const [userVotes, setUserVotes] = useState<Record<string, number>>({});
@@ -206,9 +207,65 @@ export const useArtists = () => {
     setUserKnowledge({});
   };
 
+  // Calculate rating for an artist based on votes
+  const calculateRating = (artist: Artist): number => {
+    if (artist.votes.length === 0) return 0;
+    const totalScore = artist.votes.reduce((sum, vote) => sum + vote.vote_type, 0);
+    return totalScore / artist.votes.length;
+  };
+
+  // Filter and sort artists based on current state
+  const filteredAndSortedArtists = useMemo(() => {
+    if (!filterSortState) return artists;
+
+    let filtered = artists.filter(artist => {
+      // Stage filter
+      if (filterSortState.stages.length > 0 && artist.stage) {
+        if (!filterSortState.stages.includes(artist.stage)) return false;
+      }
+
+      // Genre filter
+      if (filterSortState.genres.length > 0 && artist.music_genres) {
+        if (!filterSortState.genres.includes(artist.genre_id)) return false;
+      }
+
+      // Rating filter
+      if (filterSortState.minRating > 0) {
+        const rating = calculateRating(artist);
+        if (rating < filterSortState.minRating) return false;
+      }
+
+      return true;
+    });
+
+    // Sort artists
+    filtered.sort((a, b) => {
+      switch (filterSortState.sort) {
+        case 'name-asc':
+          return a.name.localeCompare(b.name);
+        case 'name-desc':
+          return b.name.localeCompare(a.name);
+        case 'rating-desc':
+          return calculateRating(b) - calculateRating(a);
+        case 'popularity-desc':
+          return b.votes.length - a.votes.length;
+        case 'date-asc':
+          if (!a.estimated_date && !b.estimated_date) return 0;
+          if (!a.estimated_date) return 1;
+          if (!b.estimated_date) return -1;
+          return new Date(a.estimated_date).getTime() - new Date(b.estimated_date).getTime();
+        default:
+          return 0;
+      }
+    });
+
+    return filtered;
+  }, [artists, filterSortState]);
+
   return {
     user,
-    artists,
+    artists: filteredAndSortedArtists,
+    allArtists: artists,
     userVotes,
     userKnowledge,
     loading,

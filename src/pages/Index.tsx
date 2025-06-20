@@ -1,6 +1,7 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useArtists } from "@/hooks/useArtists";
+import { useUrlState } from "@/hooks/useUrlState";
 import { FestivalHeader } from "@/components/FestivalHeader";
 import { AuthActionButtons } from "@/components/AuthActionButtons";
 import { ArtistCard } from "@/components/ArtistCard";
@@ -10,12 +11,15 @@ import { AuthDialog } from "@/components/AuthDialog";
 import { AddArtistDialog } from "@/components/AddArtistDialog";
 import { AddGenreDialog } from "@/components/AddGenreDialog";
 import { ViewToggle } from "@/components/ViewToggle";
+import { FilterSortControls } from "@/components/FilterSortControls";
 import { Skeleton } from "@/components/ui/skeleton";
 
 const Index = () => {
+  const { state: urlState, updateUrlState, clearFilters } = useUrlState();
   const {
     user,
     artists,
+    allArtists,
     userVotes,
     userKnowledge,
     loading,
@@ -23,12 +27,20 @@ const Index = () => {
     handleKnowledgeToggle,
     signOut,
     fetchArtists,
-  } = useArtists();
+  } = useArtists(urlState);
 
   const [showAuthDialog, setShowAuthDialog] = useState(false);
   const [showAddArtist, setShowAddArtist] = useState(false);
   const [showAddGenre, setShowAddGenre] = useState(false);
-  const [view, setView] = useState<'grid' | 'list'>('list');
+
+  // Sync view state with URL
+  useEffect(() => {
+    updateUrlState({ view: urlState.view });
+  }, []);
+
+  const handleViewChange = (newView: 'grid' | 'list') => {
+    updateUrlState({ view: newView });
+  };
 
   const LoadingSkeleton = () => (
     <div className="space-y-4">
@@ -64,7 +76,7 @@ const Index = () => {
               onSignOut={signOut}
             />
             
-            <ViewToggle view={view} onViewChange={setView} />
+            <ViewToggle view={urlState.view} onViewChange={handleViewChange} />
           </div>
 
           <LoadingSkeleton />
@@ -110,13 +122,24 @@ const Index = () => {
             onSignOut={signOut}
           />
           
-          {artists.length > 0 && (
-            <ViewToggle view={view} onViewChange={setView} />
+          {allArtists.length > 0 && (
+            <ViewToggle view={urlState.view} onViewChange={handleViewChange} />
           )}
         </div>
 
+        {/* Filter and Sort Controls */}
+        {allArtists.length > 0 && (
+          <div className="mb-8">
+            <FilterSortControls
+              state={urlState}
+              onStateChange={updateUrlState}
+              onClear={clearFilters}
+            />
+          </div>
+        )}
+
         {/* Artists Display */}
-        {view === 'grid' ? (
+        {urlState.view === 'grid' ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {artists.map((artist) => (
               <ArtistCard
@@ -146,7 +169,20 @@ const Index = () => {
           </div>
         )}
 
-        {artists.length === 0 && !loading && <EmptyArtistsState />}
+        {allArtists.length === 0 && !loading && <EmptyArtistsState />}
+        
+        {/* Show message when filters result in no artists */}
+        {allArtists.length > 0 && artists.length === 0 && !loading && (
+          <div className="text-center py-12">
+            <p className="text-purple-200 text-lg mb-4">No artists match your current filters</p>
+            <button
+              onClick={clearFilters}
+              className="text-purple-400 hover:text-purple-300 underline"
+            >
+              Clear all filters
+            </button>
+          </div>
+        )}
       </div>
 
       <AuthDialog 
