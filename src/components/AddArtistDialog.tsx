@@ -23,6 +23,9 @@ export const AddArtistDialog = ({ open, onOpenChange, onSuccess }: AddArtistDial
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [genreId, setGenreId] = useState("");
+  const [spotifyUrl, setSpotifyUrl] = useState("");
+  const [soundcloudUrl, setSoundcloudUrl] = useState("");
+  const [imageUrl, setImageUrl] = useState("");
   const [genres, setGenres] = useState<MusicGenre[]>([]);
   const [loading, setLoading] = useState(false);
   const { toast } = useToast();
@@ -73,6 +76,9 @@ export const AddArtistDialog = ({ open, onOpenChange, onSuccess }: AddArtistDial
         description,
         genre_id: genreId,
         added_by: user.id,
+        spotify_url: spotifyUrl || null,
+        soundcloud_url: soundcloudUrl || null,
+        image_url: imageUrl || null,
       });
 
     if (error) {
@@ -89,6 +95,9 @@ export const AddArtistDialog = ({ open, onOpenChange, onSuccess }: AddArtistDial
       setName("");
       setDescription("");
       setGenreId("");
+      setSpotifyUrl("");
+      setSoundcloudUrl("");
+      setImageUrl("");
       onSuccess();
     }
     setLoading(false);
@@ -96,7 +105,7 @@ export const AddArtistDialog = ({ open, onOpenChange, onSuccess }: AddArtistDial
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-md">
+      <DialogContent className="sm:max-w-md max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Music className="h-5 w-5" />
@@ -144,6 +153,39 @@ export const AddArtistDialog = ({ open, onOpenChange, onSuccess }: AddArtistDial
               onChange={(e) => setDescription(e.target.value)}
               placeholder="Tell us about this artist..."
               rows={3}
+            />
+          </div>
+
+          <div>
+            <Label htmlFor="spotify-url">Spotify URL (Optional)</Label>
+            <Input
+              id="spotify-url"
+              type="url"
+              value={spotifyUrl}
+              onChange={(e) => setSpotifyUrl(e.target.value)}
+              placeholder="https://open.spotify.com/artist/..."
+            />
+          </div>
+
+          <div>
+            <Label htmlFor="soundcloud-url">SoundCloud URL (Optional)</Label>
+            <Input
+              id="soundcloud-url"
+              type="url"
+              value={soundcloudUrl}
+              onChange={(e) => setSoundcloudUrl(e.target.value)}
+              placeholder="https://soundcloud.com/..."
+            />
+          </div>
+
+          <div>
+            <Label htmlFor="image-url">Image URL (Optional)</Label>
+            <Input
+              id="image-url"
+              type="url"
+              value={imageUrl}
+              onChange={(e) => setImageUrl(e.target.value)}
+              placeholder="https://example.com/image.jpg"
             />
           </div>
           

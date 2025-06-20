@@ -16,7 +16,10 @@ export type Database = {
           description: string | null
           genre_id: string
           id: string
+          image_url: string | null
           name: string
+          soundcloud_url: string | null
+          spotify_url: string | null
           updated_at: string
         }
         Insert: {
@@ -25,7 +28,10 @@ export type Database = {
           description?: string | null
           genre_id: string
           id?: string
+          image_url?: string | null
           name: string
+          soundcloud_url?: string | null
+          spotify_url?: string | null
           updated_at?: string
         }
         Update: {
@@ -34,7 +40,10 @@ export type Database = {
           description?: string | null
           genre_id?: string
           id?: string
+          image_url?: string | null
           name?: string
+          soundcloud_url?: string | null
+          spotify_url?: string | null
           updated_at?: string
         }
         Relationships: [

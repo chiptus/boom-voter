@@ -14,31 +14,9 @@ type Artist = Database["public"]["Tables"]["artists"]["Row"] & {
   votes: { vote_type: number }[];
 };
 
-interface SpotifyArtist {
-  id: string;
-  name: string;
-  images: { url: string; height: number; width: number }[];
-  external_urls: { spotify: string };
-  genres: string[];
-  followers: { total: number };
-}
-
-interface SoundCloudTrack {
-  id: number;
-  title: string;
-  permalink_url: string;
-  artwork_url: string;
-  user: {
-    username: string;
-    permalink_url: string;
-  };
-}
-
 const ArtistDetail = () => {
   const { id } = useParams<{ id: string }>();
   const [artist, setArtist] = useState<Artist | null>(null);
-  const [spotifyData, setSpotifyData] = useState<SpotifyArtist | null>(null);
-  const [soundcloudData, setSoundcloudData] = useState<SoundCloudTrack[]>([]);
   const [userVote, setUserVote] = useState<number | null>(null);
   const [user, setUser] = useState<any>(null);
   const [loading, setLoading] = useState(true);
@@ -50,13 +28,6 @@ const ArtistDetail = () => {
       getUser();
     }
   }, [id]);
-
-  useEffect(() => {
-    if (artist) {
-      fetchSpotifyData();
-      fetchSoundCloudData();
-    }
-  }, [artist]);
 
   const getUser = async () => {
     const { data: { user } } = await supabase.auth.getUser();
@@ -104,50 +75,6 @@ const ArtistDetail = () => {
 
     if (!error && data) {
       setUserVote(data.vote_type);
-    }
-  };
-
-  const fetchSpotifyData = async () => {
-    if (!artist) return;
-    
-    try {
-      // This is a mock implementation - you'll need to implement actual Spotify API integration
-      console.log('Would fetch Spotify data for:', artist.name);
-      // Mock data for demonstration
-      setSpotifyData({
-        id: 'mock_id',
-        name: artist.name,
-        images: [{ url: '/placeholder.svg', height: 640, width: 640 }],
-        external_urls: { spotify: `https://open.spotify.com/search/${encodeURIComponent(artist.name)}` },
-        genres: [artist.music_genres?.name || 'Electronic'],
-        followers: { total: Math.floor(Math.random() * 100000) }
-      });
-    } catch (error) {
-      console.error('Error fetching Spotify data:', error);
-    }
-  };
-
-  const fetchSoundCloudData = async () => {
-    if (!artist) return;
-    
-    try {
-      // This is a mock implementation - you'll need to implement actual SoundCloud API integration
-      console.log('Would fetch SoundCloud data for:', artist.name);
-      // Mock data for demonstration
-      setSoundcloudData([
-        {
-          id: 1,
-          title: `${artist.name} - Latest Track`,
-          permalink_url: `https://soundcloud.com/search?q=${encodeURIComponent(artist.name)}`,
-          artwork_url: '/placeholder.svg',
-          user: {
-            username: artist.name,
-            permalink_url: `https://soundcloud.com/search?q=${encodeURIComponent(artist.name)}`
-          }
-        }
-      ]);
-    } catch (error) {
-      console.error('Error fetching SoundCloud data:', error);
     }
   };
 
@@ -240,9 +167,12 @@ const ArtistDetail = () => {
             <Card className="bg-white/10 backdrop-blur-md border-purple-400/30">
               <CardContent className="p-6">
                 <img 
-                  src={spotifyData?.images[0]?.url || '/placeholder.svg'} 
+                  src={artist.image_url || '/placeholder.svg'} 
                   alt={artist.name}
                   className="w-full rounded-lg shadow-lg"
+                  onError={(e) => {
+                    e.currentTarget.src = '/placeholder.svg';
+                  }}
                 />
               </CardContent>
             </Card>
@@ -262,11 +192,6 @@ const ArtistDetail = () => {
                   {artist.music_genres && (
                     <Badge variant="secondary" className="bg-purple-600/50 text-purple-100">
                       {artist.music_genres.name}
-                    </Badge>
-                  )}
-                  {spotifyData?.followers && (
-                    <Badge variant="outline" className="border-green-400 text-green-400">
-                      {spotifyData.followers.total.toLocaleString()} followers
                     </Badge>
                   )}
                 </div>
@@ -294,24 +219,24 @@ const ArtistDetail = () => {
 
                 {/* External Links */}
                 <div className="flex flex-wrap gap-4">
-                  {spotifyData && (
+                  {artist.spotify_url && (
                     <Button 
                       asChild 
                       className="bg-green-600 hover:bg-green-700"
                     >
-                      <a href={spotifyData.external_urls.spotify} target="_blank" rel="noopener noreferrer">
+                      <a href={artist.spotify_url} target="_blank" rel="noopener noreferrer">
                         <Play className="h-4 w-4 mr-2" />
                         Open in Spotify
                         <ExternalLink className="h-4 w-4 ml-2" />
                       </a>
                     </Button>
                   )}
-                  {soundcloudData.length > 0 && (
+                  {artist.soundcloud_url && (
                     <Button 
                       asChild 
                       className="bg-orange-600 hover:bg-orange-700"
                     >
-                      <a href={soundcloudData[0].permalink_url} target="_blank" rel="noopener noreferrer">
+                      <a href={artist.soundcloud_url} target="_blank" rel="noopener noreferrer">
                         <Music className="h-4 w-4 mr-2" />
                         Open in SoundCloud
                         <ExternalLink className="h-4 w-4 ml-2" />
@@ -323,36 +248,6 @@ const ArtistDetail = () => {
             </Card>
           </div>
         </div>
-
-        {/* Additional Content */}
-        {soundcloudData.length > 0 && (
-          <Card className="bg-white/10 backdrop-blur-md border-purple-400/30">
-            <CardHeader>
-              <CardTitle className="text-white">Latest Tracks</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {soundcloudData.map((track) => (
-                  <Card key={track.id} className="bg-white/5 border-purple-400/20 hover:bg-white/10 transition-all">
-                    <CardContent className="p-4">
-                      <h4 className="text-white font-semibold mb-2">{track.title}</h4>
-                      <Button 
-                        asChild 
-                        size="sm" 
-                        variant="outline" 
-                        className="border-orange-400 text-orange-400 hover:bg-orange-400 hover:text-white w-full"
-                      >
-                        <a href={track.permalink_url} target="_blank" rel="noopener noreferrer">
-                          Listen on SoundCloud
-                        </a>
-                      </Button>
-                    </CardContent>
-                  </Card>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-        )}
       </div>
     </div>
   );
