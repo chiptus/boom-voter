@@ -7,11 +7,14 @@ import { FestivalHeader } from "@/components/FestivalHeader";
 import { ViewToggle } from "@/components/ViewToggle";
 import { FilterSortControls } from "@/components/FilterSortControls";
 import { EmptyArtistsState } from "@/components/EmptyArtistsState";
+import { GroupSelector } from "@/components/GroupSelector";
+import { GroupManagementDialog } from "@/components/GroupManagementDialog";
 import { useArtists } from "@/hooks/useArtists";
 import { useUrlState } from "@/hooks/useUrlState";
 
 const Index = () => {
   const [showAuthDialog, setShowAuthDialog] = useState(false);
+  const [showGroupDialog, setShowGroupDialog] = useState(false);
   const { state: filterSortState, updateUrlState } = useUrlState();
   const { user, artists, userVotes, userKnowledge, loading, votingLoading, handleVote, handleKnowledgeToggle, fetchArtists } = useArtists(filterSortState);
 
@@ -56,9 +59,18 @@ const Index = () => {
         </div>
 
         <div className="flex justify-between items-center mb-6">
-          <h2 className="text-2xl font-bold text-white">
-            Artists ({artists.length})
-          </h2>
+          <div className="flex items-center space-x-4">
+            <h2 className="text-2xl font-bold text-white">
+              Artists ({artists.length})
+            </h2>
+            {user && (
+              <GroupSelector
+                selectedGroupId={filterSortState.groupId}
+                onGroupChange={(groupId) => updateUrlState({ groupId })}
+                onManageGroups={() => setShowGroupDialog(true)}
+              />
+            )}
+          </div>
           <ViewToggle 
             view={filterSortState.view} 
             onViewChange={(view) => updateUrlState({ view })} 
@@ -109,6 +121,13 @@ const Index = () => {
         onOpenChange={setShowAuthDialog}
         onSuccess={handleAuthSuccess}
       />
+
+      {user && (
+        <GroupManagementDialog
+          open={showGroupDialog}
+          onOpenChange={setShowGroupDialog}
+        />
+      )}
     </div>
   );
 };

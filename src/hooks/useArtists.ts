@@ -7,7 +7,7 @@ import type { FilterSortState } from "./useUrlState";
 
 type Artist = Database["public"]["Tables"]["artists"]["Row"] & {
   music_genres: { name: string } | null;
-  votes: { vote_type: number }[];
+  votes: { vote_type: number; user_id: string }[];
 };
 
 export const useArtists = (filterSortState?: FilterSortState) => {
@@ -69,14 +69,16 @@ export const useArtists = (filterSortState?: FilterSortState) => {
 
   const fetchArtists = async () => {
     console.log('Fetching artists...');
-    const { data, error } = await supabase
+    let query = supabase
       .from("artists")
       .select(`
         *,
         music_genres (name),
-        votes (vote_type)
+        votes (vote_type, user_id)
       `)
       .order("created_at", { ascending: false });
+
+    const { data, error } = await query;
 
     if (error) {
       console.error('Error fetching artists:', error);
@@ -255,11 +257,45 @@ export const useArtists = (filterSortState?: FilterSortState) => {
     return artist.votes.filter(vote => vote.vote_type >= 1).length;
   };
 
+  // Get group member IDs for filtering
+  const [groupMemberIds, setGroupMemberIds] = useState<string[]>([]);
+
+  useEffect(() => {
+    const fetchGroupMembers = async () => {
+      if (!filterSortState?.groupId) {
+        setGroupMemberIds([]);
+        return;
+      }
+
+      const { data, error } = await supabase
+        .from("group_members")
+        .select("user_id")
+        .eq("group_id", filterSortState.groupId);
+
+      if (!error && data) {
+        setGroupMemberIds(data.map(member => member.user_id));
+      }
+    };
+
+    fetchGroupMembers();
+  }, [filterSortState?.groupId]);
+
   // Filter and sort artists based on current state
   const filteredAndSortedArtists = useMemo(() => {
     if (!filterSortState) return artists;
 
-    let filtered = artists.filter(artist => {
+    let filtered = artists.map(artist => {
+      // Filter votes by group if groupId is selected
+      let filteredVotes = artist.votes;
+      if (filterSortState.groupId && groupMemberIds.length > 0) {
+        filteredVotes = artist.votes.filter(vote => groupMemberIds.includes(vote.user_id));
+      }
+
+      return {
+        ...artist,
+        votes: filteredVotes,
+      };
+    }).filter(artist => {
       // Stage filter
       if (filterSortState.stages.length > 0 && artist.stage) {
         if (!filterSortState.stages.includes(artist.stage)) return false;
@@ -301,7 +337,7 @@ export const useArtists = (filterSortState?: FilterSortState) => {
     });
 
     return filtered;
-  }, [artists, filterSortState]);
+  }, [artists, filterSortState, groupMemberIds]);
 
   return {
     user,

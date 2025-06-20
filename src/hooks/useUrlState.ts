@@ -9,6 +9,7 @@ export interface FilterSortState {
   genres: string[];
   minRating: number;
   view: 'grid' | 'list';
+  groupId?: string;
 }
 
 const defaultState: FilterSortState = {
@@ -17,6 +18,7 @@ const defaultState: FilterSortState = {
   genres: [],
   minRating: 0,
   view: 'list',
+  groupId: undefined,
 };
 
 export const useUrlState = () => {
@@ -29,6 +31,7 @@ export const useUrlState = () => {
       genres: searchParams.get('genres')?.split(',').filter(Boolean) || defaultState.genres,
       minRating: parseInt(searchParams.get('minRating') || '0') || defaultState.minRating,
       view: (searchParams.get('view') as 'grid' | 'list') || defaultState.view,
+      groupId: searchParams.get('groupId') || defaultState.groupId,
     };
   }, [searchParams]);
 
@@ -53,6 +56,9 @@ export const useUrlState = () => {
     }
     if (newState.view !== defaultState.view) {
       newParams.set('view', newState.view);
+    }
+    if (newState.groupId) {
+      newParams.set('groupId', newState.groupId);
     }
     
     setSearchParams(newParams, { replace: true });
