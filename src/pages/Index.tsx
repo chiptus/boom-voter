@@ -13,7 +13,7 @@ import { useUrlState } from "@/hooks/useUrlState";
 const Index = () => {
   const [showAuthDialog, setShowAuthDialog] = useState(false);
   const { state: filterSortState, updateUrlState } = useUrlState();
-  const { user, artists, userVotes, userKnowledge, loading, handleVote, handleKnowledgeToggle, fetchArtists } = useArtists(filterSortState);
+  const { user, artists, userVotes, userKnowledge, loading, votingLoading, handleVote, handleKnowledgeToggle, fetchArtists } = useArtists(filterSortState);
 
   const handleAuthRequired = () => {
     setShowAuthDialog(true);
@@ -75,6 +75,7 @@ const Index = () => {
                 artist={artist}
                 userVote={userVotes[artist.id]}
                 userKnowledge={userKnowledge[artist.id]}
+                votingLoading={votingLoading[artist.id]}
                 onVote={handleVote}
                 onKnowledgeToggle={handleKnowledgeToggle}
                 onAuthRequired={handleAuthRequired}
@@ -91,6 +92,7 @@ const Index = () => {
                 artist={artist}
                 userVote={userVotes[artist.id]}
                 userKnowledge={userKnowledge[artist.id]}
+                votingLoading={votingLoading[artist.id]}
                 onVote={handleVote}
                 onKnowledgeToggle={handleKnowledgeToggle}
                 onAuthRequired={handleAuthRequired}

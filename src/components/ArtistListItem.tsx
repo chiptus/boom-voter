@@ -12,6 +12,7 @@ interface ArtistListItemProps {
   artist: Artist;
   userVote?: number;
   userKnowledge?: boolean;
+  votingLoading?: boolean;
   onVote: (artistId: string, voteType: number) => Promise<{ requiresAuth: boolean }>;
   onKnowledgeToggle: (artistId: string) => Promise<{ requiresAuth: boolean }>;
   onAuthRequired: () => void;
@@ -19,7 +20,7 @@ interface ArtistListItemProps {
   user?: any;
 }
 
-export const ArtistListItem = ({ artist, userVote, userKnowledge, onVote, onKnowledgeToggle, onAuthRequired, onEditSuccess, user }: ArtistListItemProps) => {
+export const ArtistListItem = ({ artist, userVote, userKnowledge, votingLoading, onVote, onKnowledgeToggle, onAuthRequired, onEditSuccess, user }: ArtistListItemProps) => {
   const { toast } = useToast();
 
   const handleVote = async (voteType: number) => {
@@ -113,35 +114,39 @@ export const ArtistListItem = ({ artist, userVote, userKnowledge, onVote, onKnow
         {/* Voting Buttons */}
         <div className="flex flex-wrap gap-2">
           <Button
-            variant={userVote === 3 ? "default" : "outline"}
-            size="sm"
-            onClick={() => handleVote(3)}
-            className={`text-xs ${userVote === 3 ? "bg-orange-600 hover:bg-orange-700" : "border-orange-400 text-orange-400 hover:bg-orange-400 hover:text-white"}`}
-            title="Must go"
-          >
-            <Star className="h-3 w-3 mr-1" />
-            {getVoteCount(3)}
-          </Button>
-          <Button
             variant={userVote === 2 ? "default" : "outline"}
             size="sm"
             onClick={() => handleVote(2)}
-            className={`text-xs ${userVote === 2 ? "bg-blue-600 hover:bg-blue-700" : "border-blue-400 text-blue-400 hover:bg-blue-400 hover:text-white"}`}
-            title="Interested"
+            disabled={votingLoading}
+            className={`text-xs ${userVote === 2 ? "bg-orange-600 hover:bg-orange-700" : "border-orange-400 text-orange-400 hover:bg-orange-400 hover:text-white"}`}
+            title="Must go"
           >
-            <Heart className="h-3 w-3 mr-1" />
+            <Star className="h-3 w-3 mr-1" />
             {getVoteCount(2)}
           </Button>
           <Button
             variant={userVote === 1 ? "default" : "outline"}
             size="sm"
             onClick={() => handleVote(1)}
-            className={`text-xs ${userVote === 1 ? "bg-gray-600 hover:bg-gray-700" : "border-gray-400 text-gray-400 hover:bg-gray-400 hover:text-white"}`}
+            disabled={votingLoading}
+            className={`text-xs ${userVote === 1 ? "bg-blue-600 hover:bg-blue-700" : "border-blue-400 text-blue-400 hover:bg-blue-400 hover:text-white"}`}
+            title="Interested"
+          >
+            <Heart className="h-3 w-3 mr-1" />
+            {getVoteCount(1)}
+          </Button>
+          <Button
+            variant={userVote === -1 ? "default" : "outline"}
+            size="sm"
+            onClick={() => handleVote(-1)}
+            disabled={votingLoading}
+            className={`text-xs ${userVote === -1 ? "bg-gray-600 hover:bg-gray-700" : "border-gray-400 text-gray-400 hover:bg-gray-400 hover:text-white"}`}
             title="Won't go"
           >
             <X className="h-3 w-3 mr-1" />
-            {getVoteCount(1)}
+            {getVoteCount(-1)}
           </Button>
+          {votingLoading && <div className="h-4 w-4 animate-spin rounded-full border-2 border-purple-400 border-t-transparent" />}
         </div>
 
         {/* External Links and Details */}
@@ -246,37 +251,41 @@ export const ArtistListItem = ({ artist, userVote, userKnowledge, onVote, onKnow
         
         {/* Actions */}
         <div className="flex items-center gap-2 flex-shrink-0">
-          {/* Updated 3-Level Voting System with new labels */}
-          <Button
-            variant={userVote === 3 ? "default" : "outline"}
-            size="sm"
-            onClick={() => handleVote(3)}
-            className={userVote === 3 ? "bg-orange-600 hover:bg-orange-700" : "border-orange-400 text-orange-400 hover:bg-orange-400 hover:text-white"}
-            title="Must go"
-          >
-            <Star className="h-3 w-3 mr-1" />
-            {getVoteCount(3)}
-          </Button>
+          {/* Updated 3-Level Voting System with new vote types */}
           <Button
             variant={userVote === 2 ? "default" : "outline"}
             size="sm"
             onClick={() => handleVote(2)}
-            className={userVote === 2 ? "bg-blue-600 hover:bg-blue-700" : "border-blue-400 text-blue-400 hover:bg-blue-400 hover:text-white"}
-            title="Interested"
+            disabled={votingLoading}
+            className={userVote === 2 ? "bg-orange-600 hover:bg-orange-700" : "border-orange-400 text-orange-400 hover:bg-orange-400 hover:text-white"}
+            title="Must go"
           >
-            <Heart className="h-3 w-3 mr-1" />
+            <Star className="h-3 w-3 mr-1" />
             {getVoteCount(2)}
           </Button>
           <Button
             variant={userVote === 1 ? "default" : "outline"}
             size="sm"
             onClick={() => handleVote(1)}
-            className={userVote === 1 ? "bg-gray-600 hover:bg-gray-700" : "border-gray-400 text-gray-400 hover:bg-gray-400 hover:text-white"}
+            disabled={votingLoading}
+            className={userVote === 1 ? "bg-blue-600 hover:bg-blue-700" : "border-blue-400 text-blue-400 hover:bg-blue-400 hover:text-white"}
+            title="Interested"
+          >
+            <Heart className="h-3 w-3 mr-1" />
+            {getVoteCount(1)}
+          </Button>
+          <Button
+            variant={userVote === -1 ? "default" : "outline"}
+            size="sm"
+            onClick={() => handleVote(-1)}
+            disabled={votingLoading}
+            className={userVote === -1 ? "bg-gray-600 hover:bg-gray-700" : "border-gray-400 text-gray-400 hover:bg-gray-400 hover:text-white"}
             title="Won't go"
           >
             <X className="h-3 w-3 mr-1" />
-            {getVoteCount(1)}
+            {getVoteCount(-1)}
           </Button>
+          {votingLoading && <div className="h-4 w-4 animate-spin rounded-full border-2 border-purple-400 border-t-transparent" />}
          
          {/* External Links */}
          {artist.spotify_url && (

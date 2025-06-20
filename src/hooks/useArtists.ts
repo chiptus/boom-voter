@@ -16,6 +16,7 @@ export const useArtists = (filterSortState?: FilterSortState) => {
   const [userVotes, setUserVotes] = useState<Record<string, number>>({});
   const [userKnowledge, setUserKnowledge] = useState<Record<string, boolean>>({});
   const [loading, setLoading] = useState(true);
+  const [votingLoading, setVotingLoading] = useState<Record<string, boolean>>({});
   const { toast } = useToast();
 
   useEffect(() => {
@@ -125,38 +126,66 @@ export const useArtists = (filterSortState?: FilterSortState) => {
       return { requiresAuth: true };
     }
 
-    const existingVote = userVotes[artistId];
-    
-    if (existingVote === voteType) {
-      // Remove vote if clicking the same vote type
-      const { error } = await supabase
-        .from("votes")
-        .delete()
-        .eq("user_id", user.id)
-        .eq("artist_id", artistId);
+    if (votingLoading[artistId]) {
+      return { requiresAuth: false };
+    }
 
-      if (!error) {
-        setUserVotes(prev => {
-          const newVotes = { ...prev };
-          delete newVotes[artistId];
-          return newVotes;
-        });
-        fetchArtists();
-      }
-    } else {
-      // Add or update vote
-      const { error } = await supabase
-        .from("votes")
-        .upsert({
-          user_id: user.id,
-          artist_id: artistId,
-          vote_type: voteType,
-        });
+    setVotingLoading(prev => ({ ...prev, [artistId]: true }));
 
-      if (!error) {
-        setUserVotes(prev => ({ ...prev, [artistId]: voteType }));
-        fetchArtists();
+    try {
+      const existingVote = userVotes[artistId];
+      
+      if (existingVote === voteType) {
+        // Remove vote if clicking the same vote type
+        const { error } = await supabase
+          .from("votes")
+          .delete()
+          .eq("user_id", user.id)
+          .eq("artist_id", artistId);
+
+        if (error) {
+          toast({
+            title: "Error",
+            description: "Failed to remove vote. Please try again.",
+            variant: "destructive",
+          });
+        } else {
+          setUserVotes(prev => {
+            const newVotes = { ...prev };
+            delete newVotes[artistId];
+            return newVotes;
+          });
+          fetchArtists();
+        }
+      } else {
+        // Add or update vote
+        const { error } = await supabase
+          .from("votes")
+          .upsert({
+            user_id: user.id,
+            artist_id: artistId,
+            vote_type: voteType,
+          });
+
+        if (error) {
+          toast({
+            title: "Error",
+            description: "Failed to save vote. Please try again.",
+            variant: "destructive",
+          });
+        } else {
+          setUserVotes(prev => ({ ...prev, [artistId]: voteType }));
+          fetchArtists();
+        }
       }
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Something went wrong. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setVotingLoading(prev => ({ ...prev, [artistId]: false }));
     }
 
     return { requiresAuth: false };
@@ -212,17 +241,16 @@ export const useArtists = (filterSortState?: FilterSortState) => {
     if (artist.votes.length === 0) return 0;
     
     const totalScore = artist.votes.reduce((sum, vote) => {
-      // Map vote types to new weights: 3->2, 2->1, 1->-1
-      const weight = vote.vote_type === 3 ? 2 : vote.vote_type === 2 ? 1 : -1;
-      return sum + weight;
+      // Use the actual vote type values: 2 (Must go), 1 (Interested), -1 (Won't go)
+      return sum + vote.vote_type;
     }, 0);
     
     return totalScore / artist.votes.length;
   };
 
-  // Get positive vote count for popularity (only count vote_type >= 2)
+  // Get positive vote count for popularity (only count vote_type >= 1)
   const getPositiveVoteCount = (artist: Artist): number => {
-    return artist.votes.filter(vote => vote.vote_type >= 2).length;
+    return artist.votes.filter(vote => vote.vote_type >= 1).length;
   };
 
   // Filter and sort artists based on current state
@@ -280,6 +308,7 @@ export const useArtists = (filterSortState?: FilterSortState) => {
     userVotes,
     userKnowledge,
     loading,
+    votingLoading,
     handleVote,
     handleKnowledgeToggle,
     signOut,

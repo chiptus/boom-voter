@@ -6,7 +6,7 @@ import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { ArrowLeft, ExternalLink, Music, ThumbsUp, ThumbsDown, Play } from "lucide-react";
+import { ArrowLeft, ExternalLink, Music, Star, Heart, X, Play } from "lucide-react";
 import { ArtistImageLoader } from "@/components/ArtistImageLoader";
 import type { Database } from "@/integrations/supabase/types";
 
@@ -210,23 +210,31 @@ const ArtistDetail = () => {
                 )}
               </CardHeader>
               <CardContent>
-                {/* Voting */}
+                {/* Updated 3-Level Voting System */}
                 <div className="flex items-center gap-4 mb-6">
+                  <Button
+                    variant={userVote === 2 ? "default" : "outline"}
+                    onClick={() => handleVote(2)}
+                    className={userVote === 2 ? "bg-orange-600 hover:bg-orange-700" : "border-orange-400 text-orange-400 hover:bg-orange-400 hover:text-white"}
+                  >
+                    <Star className="h-4 w-4 mr-1" />
+                    Must go ({getVoteCount(2)})
+                  </Button>
                   <Button
                     variant={userVote === 1 ? "default" : "outline"}
                     onClick={() => handleVote(1)}
-                    className={userVote === 1 ? "bg-green-600 hover:bg-green-700" : "border-green-400 text-green-400 hover:bg-green-400 hover:text-white"}
+                    className={userVote === 1 ? "bg-blue-600 hover:bg-blue-700" : "border-blue-400 text-blue-400 hover:bg-blue-400 hover:text-white"}
                   >
-                    <ThumbsUp className="h-4 w-4 mr-1" />
-                    {getVoteCount(1)}
+                    <Heart className="h-4 w-4 mr-1" />
+                    Interested ({getVoteCount(1)})
                   </Button>
                   <Button
                     variant={userVote === -1 ? "default" : "outline"}
                     onClick={() => handleVote(-1)}
-                    className={userVote === -1 ? "bg-red-600 hover:bg-red-700" : "border-red-400 text-red-400 hover:bg-red-400 hover:text-white"}
+                    className={userVote === -1 ? "bg-gray-600 hover:bg-gray-700" : "border-gray-400 text-gray-400 hover:bg-gray-400 hover:text-white"}
                   >
-                    <ThumbsDown className="h-4 w-4 mr-1" />
-                    {getVoteCount(-1)}
+                    <X className="h-4 w-4 mr-1" />
+                    Won't go ({getVoteCount(-1)})
                   </Button>
                 </div>
 
