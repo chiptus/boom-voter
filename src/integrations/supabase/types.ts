@@ -9,7 +9,118 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      [_ in never]: never
+      artists: {
+        Row: {
+          added_by: string
+          created_at: string
+          description: string | null
+          genre_id: string
+          id: string
+          name: string
+          updated_at: string
+        }
+        Insert: {
+          added_by: string
+          created_at?: string
+          description?: string | null
+          genre_id: string
+          id?: string
+          name: string
+          updated_at?: string
+        }
+        Update: {
+          added_by?: string
+          created_at?: string
+          description?: string | null
+          genre_id?: string
+          id?: string
+          name?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "artists_genre_id_fkey"
+            columns: ["genre_id"]
+            isOneToOne: false
+            referencedRelation: "music_genres"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      music_genres: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          id: string
+          name: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          name: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          name?: string
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          created_at: string
+          id: string
+          username: string | null
+        }
+        Insert: {
+          created_at?: string
+          id: string
+          username?: string | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          username?: string | null
+        }
+        Relationships: []
+      }
+      votes: {
+        Row: {
+          artist_id: string
+          created_at: string
+          id: string
+          updated_at: string
+          user_id: string
+          vote_type: number
+        }
+        Insert: {
+          artist_id: string
+          created_at?: string
+          id?: string
+          updated_at?: string
+          user_id: string
+          vote_type: number
+        }
+        Update: {
+          artist_id?: string
+          created_at?: string
+          id?: string
+          updated_at?: string
+          user_id?: string
+          vote_type?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "votes_artist_id_fkey"
+            columns: ["artist_id"]
+            isOneToOne: false
+            referencedRelation: "artists"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
