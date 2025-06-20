@@ -2,7 +2,7 @@
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
-import { X, Filter, SortAsc } from "lucide-react";
+import { X, Filter, SortAsc, Check } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
@@ -75,22 +75,6 @@ export const FilterSortControls = ({ state, onStateChange, onClear }: FilterSort
     onStateChange({ genres: newGenres });
   };
 
-  const handleStageSelect = (value: string) => {
-    if (value === 'all') {
-      onStateChange({ stages: [] });
-    } else {
-      onStateChange({ stages: [value] });
-    }
-  };
-
-  const handleGenreSelect = (value: string) => {
-    if (value === 'all') {
-      onStateChange({ genres: [] });
-    } else {
-      onStateChange({ genres: [value] });
-    }
-  };
-
   const hasActiveFilters = state.stages.length > 0 || state.genres.length > 0 || state.minRating > 0;
 
   return (
@@ -135,43 +119,87 @@ export const FilterSortControls = ({ state, onStateChange, onClear }: FilterSort
         </Select>
       </div>
 
-      {/* Mobile filters - always visible as selects */}
+      {/* Mobile filters - multi-select dropdowns */}
       {isMobile ? (
         <div className="space-y-4">
-          {/* Stage Filter Select */}
+          {/* Stage Filter Multi-Select */}
           <div>
-            <h4 className="text-sm font-medium text-purple-200 mb-2">Stage</h4>
-            <Select value={state.stages.length === 1 ? state.stages[0] : 'all'} onValueChange={handleStageSelect}>
-              <SelectTrigger className="w-full bg-white/10 border-purple-400/30 text-purple-100">
-                <SelectValue placeholder="All Stages" />
-              </SelectTrigger>
-              <SelectContent className="bg-gray-800 border-purple-400/30">
-                <SelectItem value="all" className="text-purple-100">All Stages</SelectItem>
-                {STAGES.map(stage => (
-                  <SelectItem key={stage} value={stage} className="text-purple-100">
-                    {stage}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <h4 className="text-sm font-medium text-purple-200 mb-2">Stages</h4>
+            <div className="relative">
+              <Select>
+                <SelectTrigger className="w-full bg-white/10 border-purple-400/30 text-purple-100">
+                  <SelectValue>
+                    {state.stages.length === 0 ? (
+                      "All Stages"
+                    ) : state.stages.length === 1 ? (
+                      state.stages[0]
+                    ) : (
+                      `${state.stages.length} stages selected`
+                    )}
+                  </SelectValue>
+                </SelectTrigger>
+                <SelectContent className="bg-gray-800 border-purple-400/30">
+                  {STAGES.map(stage => (
+                    <SelectItem 
+                      key={stage} 
+                      value={stage} 
+                      className="text-purple-100 cursor-pointer"
+                      onSelect={(e) => {
+                        e.preventDefault();
+                        handleStageToggle(stage);
+                      }}
+                    >
+                      <div className="flex items-center gap-2 w-full">
+                        <div className="w-4 h-4 flex items-center justify-center">
+                          {state.stages.includes(stage) && <Check className="h-3 w-3" />}
+                        </div>
+                        <span>{stage}</span>
+                      </div>
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
           </div>
 
-          {/* Genre Filter Select */}
+          {/* Genre Filter Multi-Select */}
           <div>
-            <h4 className="text-sm font-medium text-purple-200 mb-2">Genre</h4>
-            <Select value={state.genres.length === 1 ? state.genres[0] : 'all'} onValueChange={handleGenreSelect}>
-              <SelectTrigger className="w-full bg-white/10 border-purple-400/30 text-purple-100">
-                <SelectValue placeholder="All Genres" />
-              </SelectTrigger>
-              <SelectContent className="bg-gray-800 border-purple-400/30">
-                <SelectItem value="all" className="text-purple-100">All Genres</SelectItem>
-                {genres.map(genre => (
-                  <SelectItem key={genre.id} value={genre.id} className="text-purple-100">
-                    {genre.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <h4 className="text-sm font-medium text-purple-200 mb-2">Genres</h4>
+            <div className="relative">
+              <Select>
+                <SelectTrigger className="w-full bg-white/10 border-purple-400/30 text-purple-100">
+                  <SelectValue>
+                    {state.genres.length === 0 ? (
+                      "All Genres"
+                    ) : state.genres.length === 1 ? (
+                      genres.find(g => g.id === state.genres[0])?.name || "1 genre selected"
+                    ) : (
+                      `${state.genres.length} genres selected`
+                    )}
+                  </SelectValue>
+                </SelectTrigger>
+                <SelectContent className="bg-gray-800 border-purple-400/30">
+                  {genres.map(genre => (
+                    <SelectItem 
+                      key={genre.id} 
+                      value={genre.id} 
+                      className="text-purple-100 cursor-pointer"
+                      onSelect={(e) => {
+                        e.preventDefault();
+                        handleGenreToggle(genre.id);
+                      }}
+                    >
+                      <div className="flex items-center gap-2 w-full">
+                        <div className="w-4 h-4 flex items-center justify-center">
+                          {state.genres.includes(genre.id) && <Check className="h-3 w-3" />}
+                        </div>
+                        <span>{genre.name}</span>
+                      </div>
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
           </div>
 
           {/* Rating Filter */}
