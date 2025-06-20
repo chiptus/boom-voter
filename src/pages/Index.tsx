@@ -10,6 +10,7 @@ import { AuthDialog } from "@/components/AuthDialog";
 import { AddArtistDialog } from "@/components/AddArtistDialog";
 import { AddGenreDialog } from "@/components/AddGenreDialog";
 import { ViewToggle } from "@/components/ViewToggle";
+import { Skeleton } from "@/components/ui/skeleton";
 
 const Index = () => {
   const {
@@ -25,12 +26,70 @@ const Index = () => {
   const [showAuthDialog, setShowAuthDialog] = useState(false);
   const [showAddArtist, setShowAddArtist] = useState(false);
   const [showAddGenre, setShowAddGenre] = useState(false);
-  const [view, setView] = useState<'grid' | 'list'>('grid');
+  const [view, setView] = useState<'grid' | 'list'>('list');
+
+  const LoadingSkeleton = () => (
+    <div className="space-y-4">
+      {[...Array(8)].map((_, i) => (
+        <div key={i} className="bg-white/10 backdrop-blur-md border-purple-400/30 rounded-lg p-4 flex items-center gap-4">
+          <Skeleton className="w-16 h-16 rounded-lg" />
+          <div className="flex-1 space-y-2">
+            <Skeleton className="h-5 w-48" />
+            <Skeleton className="h-4 w-24" />
+            <Skeleton className="h-3 w-64" />
+          </div>
+          <div className="flex gap-2">
+            <Skeleton className="h-8 w-16" />
+            <Skeleton className="h-8 w-16" />
+          </div>
+        </div>
+      ))}
+    </div>
+  );
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-600"></div>
+      <div className="min-h-screen bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900">
+        <div className="container mx-auto px-4 py-8">
+          <FestivalHeader artistCount={0} />
+          
+          <div className="flex flex-col sm:flex-row justify-between items-center gap-4 mb-8">
+            <AuthActionButtons
+              user={user}
+              onAddArtist={() => setShowAddArtist(true)}
+              onAddGenre={() => setShowAddGenre(true)}
+              onSignIn={() => setShowAuthDialog(true)}
+              onSignOut={signOut}
+            />
+            
+            <ViewToggle view={view} onViewChange={setView} />
+          </div>
+
+          <LoadingSkeleton />
+        </div>
+
+        <AuthDialog 
+          open={showAuthDialog} 
+          onOpenChange={setShowAuthDialog}
+          onSuccess={() => {
+            setShowAuthDialog(false);
+            fetchArtists();
+          }}
+        />
+        
+        <AddArtistDialog 
+          open={showAddArtist} 
+          onOpenChange={setShowAddArtist}
+          onSuccess={() => {
+            setShowAddArtist(false);
+            fetchArtists();
+          }}
+        />
+        
+        <AddGenreDialog 
+          open={showAddGenre} 
+          onOpenChange={setShowAddGenre}
+        />
       </div>
     );
   }
@@ -81,7 +140,7 @@ const Index = () => {
           </div>
         )}
 
-        {artists.length === 0 && <EmptyArtistsState />}
+        {artists.length === 0 && !loading && <EmptyArtistsState />}
       </div>
 
       <AuthDialog 
