@@ -36,7 +36,7 @@ export const ArtistListItem = ({ artist, userVote, onVote, onAuthRequired }: Art
   };
 
   return (
-    <div className="boom-card-gradient backdrop-blur-md border border-orange-500/30 hover:border-orange-400/50 transition-all duration-300 rounded-lg p-4 flex items-center gap-4">
+    <div className="bg-white/10 backdrop-blur-md border-purple-400/30 hover:bg-white/15 transition-all duration-300 rounded-lg p-4 flex items-center gap-4">
       {/* Artist Image */}
       <ArtistImageLoader 
         src={artist.image_url}
@@ -48,21 +48,21 @@ export const ArtistListItem = ({ artist, userVote, onVote, onAuthRequired }: Art
       <div className="flex-1 min-w-0">
         <div className="flex items-start justify-between mb-2">
           <div className="flex-1 min-w-0">
-            <h3 className="text-orange-100 text-lg font-semibold truncate">{artist.name}</h3>
+            <h3 className="text-white text-lg font-semibold truncate">{artist.name}</h3>
             <div className="flex items-center gap-2 mt-1">
               {artist.music_genres && (
-                <Badge variant="secondary" className="bg-orange-600/50 text-orange-100 text-xs">
+                <Badge variant="secondary" className="bg-purple-600/50 text-purple-100 text-xs">
                   {artist.music_genres.name}
                 </Badge>
               )}
               {artist.stage && (
-                <div className="flex items-center gap-1 text-xs text-orange-200">
+                <div className="flex items-center gap-1 text-xs text-purple-200">
                   <MapPin className="h-3 w-3" />
                   <span>{artist.stage}</span>
                 </div>
               )}
               {artist.estimated_date && (
-                <div className="flex items-center gap-1 text-xs text-orange-200">
+                <div className="flex items-center gap-1 text-xs text-purple-200">
                   <Calendar className="h-3 w-3" />
                   <span>{formatDate(artist.estimated_date)}</span>
                 </div>
@@ -79,7 +79,7 @@ export const ArtistListItem = ({ artist, userVote, onVote, onAuthRequired }: Art
         </div>
         
         {artist.description && (
-          <p className="text-orange-300 text-sm line-clamp-2 mb-2">
+          <p className="text-purple-200 text-sm line-clamp-2 mb-2">
             {artist.description}
           </p>
         )}
@@ -132,7 +132,7 @@ export const ArtistListItem = ({ artist, userVote, onVote, onAuthRequired }: Art
         )}
         
         {/* View Details Button */}
-        <Button asChild variant="outline" size="sm" className="border-orange-400 text-orange-400 hover:bg-orange-400 hover:text-black">
+        <Button asChild variant="outline" size="sm" className="border-purple-400 text-purple-400 hover:bg-purple-400 hover:text-white">
           <Link to={`/artist/${artist.id}`}>
             <ExternalLink className="h-3 w-3" />
           </Link>

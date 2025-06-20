@@ -151,12 +151,12 @@ const ArtistDetail = () => {
   }
 
   return (
-    <div className="min-h-screen boom-gradient">
+    <div className="min-h-screen bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900">
       <div className="container mx-auto px-4 py-8">
         {/* Back Button */}
         <div className="mb-6">
           <Link to="/">
-            <Button variant="outline" className="border-orange-400 text-orange-400 hover:bg-orange-400 hover:text-black">
+            <Button variant="outline" className="border-purple-400 text-purple-400 hover:bg-purple-400 hover:text-white">
               <ArrowLeft className="h-4 w-4 mr-2" />
               Back to Artists
             </Button>
@@ -167,7 +167,7 @@ const ArtistDetail = () => {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
           {/* Artist Image */}
           <div className="lg:col-span-1">
-            <Card className="boom-card-gradient backdrop-blur-md border-orange-500/30">
+            <Card className="bg-white/10 backdrop-blur-md border-purple-400/30">
               <CardContent className="p-6">
                 <ArtistImageLoader 
                   src={artist.image_url}
@@ -180,14 +180,14 @@ const ArtistDetail = () => {
 
           {/* Artist Info */}
           <div className="lg:col-span-2">
-            <Card className="boom-card-gradient backdrop-blur-md border-orange-500/30 h-full">
+            <Card className="bg-white/10 backdrop-blur-md border-purple-400/30 h-full">
               <CardHeader>
                 <div className="flex items-start justify-between">
                   <div className="flex-1">
-                    <CardTitle className="text-3xl font-bold text-orange-100 mb-2">{artist.name}</CardTitle>
+                    <CardTitle className="text-3xl font-bold text-white mb-2">{artist.name}</CardTitle>
                     <div className="flex flex-wrap gap-2 mb-4">
                       {artist.music_genres && (
-                        <Badge variant="secondary" className="bg-orange-600/50 text-orange-100">
+                        <Badge variant="secondary" className="bg-purple-600/50 text-purple-100">
                           {artist.music_genres.name}
                         </Badge>
                       )}
@@ -204,7 +204,7 @@ const ArtistDetail = () => {
                   </div>
                 </div>
                 {artist.description && (
-                  <CardDescription className="text-orange-300 text-lg leading-relaxed">
+                  <CardDescription className="text-purple-200 text-lg leading-relaxed">
                     {artist.description}
                   </CardDescription>
                 )}
