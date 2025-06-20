@@ -207,11 +207,22 @@ export const useArtists = (filterSortState?: FilterSortState) => {
     setUserKnowledge({});
   };
 
-  // Calculate rating for an artist based on votes
+  // Calculate rating for an artist based on new vote weights
   const calculateRating = (artist: Artist): number => {
     if (artist.votes.length === 0) return 0;
-    const totalScore = artist.votes.reduce((sum, vote) => sum + vote.vote_type, 0);
+    
+    const totalScore = artist.votes.reduce((sum, vote) => {
+      // Map vote types to new weights: 3->2, 2->1, 1->-1
+      const weight = vote.vote_type === 3 ? 2 : vote.vote_type === 2 ? 1 : -1;
+      return sum + weight;
+    }, 0);
+    
     return totalScore / artist.votes.length;
+  };
+
+  // Get positive vote count for popularity (only count vote_type >= 2)
+  const getPositiveVoteCount = (artist: Artist): number => {
+    return artist.votes.filter(vote => vote.vote_type >= 2).length;
   };
 
   // Filter and sort artists based on current state
@@ -248,7 +259,7 @@ export const useArtists = (filterSortState?: FilterSortState) => {
         case 'rating-desc':
           return calculateRating(b) - calculateRating(a);
         case 'popularity-desc':
-          return b.votes.length - a.votes.length;
+          return getPositiveVoteCount(b) - getPositiveVoteCount(a);
         case 'date-asc':
           if (!a.estimated_date && !b.estimated_date) return 0;
           if (!a.estimated_date) return 1;

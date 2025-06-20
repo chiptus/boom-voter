@@ -115,7 +115,7 @@ export const ArtistListItem = ({ artist, userVote, userKnowledge, onVote, onKnow
             size="sm"
             onClick={() => handleVote(3)}
             className={`text-xs ${userVote === 3 ? "bg-orange-600 hover:bg-orange-700" : "border-orange-400 text-orange-400 hover:bg-orange-400 hover:text-white"}`}
-            title="I'm going for sure"
+            title="Must go"
           >
             <Star className="h-3 w-3 mr-1" />
             {getVoteCount(3)}
@@ -125,7 +125,7 @@ export const ArtistListItem = ({ artist, userVote, userKnowledge, onVote, onKnow
             size="sm"
             onClick={() => handleVote(2)}
             className={`text-xs ${userVote === 2 ? "bg-blue-600 hover:bg-blue-700" : "border-blue-400 text-blue-400 hover:bg-blue-400 hover:text-white"}`}
-            title="Interesting"
+            title="Interested"
           >
             <Heart className="h-3 w-3 mr-1" />
             {getVoteCount(2)}
@@ -135,7 +135,7 @@ export const ArtistListItem = ({ artist, userVote, userKnowledge, onVote, onKnow
             size="sm"
             onClick={() => handleVote(1)}
             className={`text-xs ${userVote === 1 ? "bg-gray-600 hover:bg-gray-700" : "border-gray-400 text-gray-400 hover:bg-gray-400 hover:text-white"}`}
-            title="Not interesting"
+            title="Won't go"
           >
             <X className="h-3 w-3 mr-1" />
             {getVoteCount(1)}
@@ -232,13 +232,13 @@ export const ArtistListItem = ({ artist, userVote, userKnowledge, onVote, onKnow
         
         {/* Actions */}
         <div className="flex items-center gap-2 flex-shrink-0">
-          {/* New 3-Level Voting System */}
+          {/* Updated 3-Level Voting System with new labels */}
           <Button
             variant={userVote === 3 ? "default" : "outline"}
             size="sm"
             onClick={() => handleVote(3)}
             className={userVote === 3 ? "bg-orange-600 hover:bg-orange-700" : "border-orange-400 text-orange-400 hover:bg-orange-400 hover:text-white"}
-            title="I'm going for sure"
+            title="Must go"
           >
             <Star className="h-3 w-3 mr-1" />
             {getVoteCount(3)}
@@ -248,7 +248,7 @@ export const ArtistListItem = ({ artist, userVote, userKnowledge, onVote, onKnow
             size="sm"
             onClick={() => handleVote(2)}
             className={userVote === 2 ? "bg-blue-600 hover:bg-blue-700" : "border-blue-400 text-blue-400 hover:bg-blue-400 hover:text-white"}
-            title="Interesting"
+            title="Interested"
           >
             <Heart className="h-3 w-3 mr-1" />
             {getVoteCount(2)}
@@ -258,7 +258,7 @@ export const ArtistListItem = ({ artist, userVote, userKnowledge, onVote, onKnow
             size="sm"
             onClick={() => handleVote(1)}
             className={userVote === 1 ? "bg-gray-600 hover:bg-gray-700" : "border-gray-400 text-gray-400 hover:bg-gray-400 hover:text-white"}
-            title="Not interesting"
+            title="Won't go"
           >
             <X className="h-3 w-3 mr-1" />
             {getVoteCount(1)}

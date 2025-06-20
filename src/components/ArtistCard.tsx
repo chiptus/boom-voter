@@ -112,7 +112,7 @@ export const ArtistCard = ({ artist, userVote, userKnowledge, onVote, onKnowledg
        </CardHeader>
        
        <CardContent className="space-y-4">
-         {/* New 3-Level Voting System */}
+         {/* Updated 3-Level Voting System with new labels */}
          <div className="space-y-2">
            <div className="flex items-center gap-2">
              <Button
@@ -122,7 +122,7 @@ export const ArtistCard = ({ artist, userVote, userKnowledge, onVote, onKnowledg
                className={userVote === 3 ? "bg-orange-600 hover:bg-orange-700" : "border-orange-400 text-orange-400 hover:bg-orange-400 hover:text-white"}
              >
                <Star className="h-4 w-4 mr-1" />
-               I'm going for sure ({getVoteCount(3)})
+               Must go ({getVoteCount(3)})
              </Button>
            </div>
            <div className="flex items-center gap-2">
@@ -133,7 +133,7 @@ export const ArtistCard = ({ artist, userVote, userKnowledge, onVote, onKnowledg
                className={userVote === 2 ? "bg-blue-600 hover:bg-blue-700" : "border-blue-400 text-blue-400 hover:bg-blue-400 hover:text-white"}
              >
                <Heart className="h-4 w-4 mr-1" />
-               Interesting ({getVoteCount(2)})
+               Interested ({getVoteCount(2)})
              </Button>
            </div>
            <div className="flex items-center gap-2">
@@ -144,7 +144,7 @@ export const ArtistCard = ({ artist, userVote, userKnowledge, onVote, onKnowledg
                className={userVote === 1 ? "bg-gray-600 hover:bg-gray-700" : "border-gray-400 text-gray-400 hover:bg-gray-400 hover:text-white"}
              >
                <X className="h-4 w-4 mr-1" />
-               Not interesting ({getVoteCount(1)})
+               Won't go ({getVoteCount(1)})
              </Button>
            </div>
          </div>
