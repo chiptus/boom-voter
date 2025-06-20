@@ -38,8 +38,25 @@ const Index = () => {
       }
     });
 
-    return () => subscription.unsubscribe();
-  }, []);
+    // Listen for real-time updates to artists and votes
+    const artistsChannel = supabase
+      .channel('artists-changes')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'artists' }, () => {
+        fetchArtists();
+      })
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'votes' }, () => {
+        fetchArtists();
+        if (user) {
+          fetchUserVotes(user.id);
+        }
+      })
+      .subscribe();
+
+    return () => {
+      subscription.unsubscribe();
+      artistsChannel.unsubscribe();
+    };
+  }, [user]);
 
   const getUser = async () => {
     const { data: { user } } = await supabase.auth.getUser();
@@ -51,6 +68,7 @@ const Index = () => {
   };
 
   const fetchArtists = async () => {
+    console.log('Fetching artists...');
     const { data, error } = await supabase
       .from("artists")
       .select(`
@@ -61,12 +79,14 @@ const Index = () => {
       .order("created_at", { ascending: false });
 
     if (error) {
+      console.error('Error fetching artists:', error);
       toast({
         title: "Error",
         description: "Failed to fetch artists",
         variant: "destructive",
       });
     } else {
+      console.log('Fetched artists:', data?.length || 0);
       setArtists(data || []);
     }
   };
@@ -155,6 +175,9 @@ const Index = () => {
             <Heart className="h-8 w-8 text-pink-400" />
           </div>
           <p className="text-xl text-purple-200">Vote for your favorite artists!</p>
+          <p className="text-sm text-purple-300 mt-2">
+            {artists.length} artists available for voting
+          </p>
         </div>
 
         {/* Auth & Action Buttons */}
@@ -188,9 +211,11 @@ const Index = () => {
             <Card key={artist.id} className="bg-white/10 backdrop-blur-md border-purple-400/30 hover:bg-white/20 transition-all">
               <CardHeader>
                 <CardTitle className="text-white">{artist.name}</CardTitle>
-                <CardDescription className="text-purple-200">
-                  {artist.description}
-                </CardDescription>
+                {artist.description && (
+                  <CardDescription className="text-purple-200">
+                    {artist.description}
+                  </CardDescription>
+                )}
                 {artist.music_genres && (
                   <Badge variant="secondary" className="w-fit bg-purple-600/50 text-purple-100">
                     {artist.music_genres.name}
