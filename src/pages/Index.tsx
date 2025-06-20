@@ -48,11 +48,9 @@ const Index = () => {
             state={filterSortState}
             onStateChange={updateUrlState}
             onClear={() => updateUrlState({ 
-              genre: '', 
-              stage: '', 
-              knowledge: '', 
-              vote: '', 
-              search: '' 
+              stages: [], 
+              genres: [], 
+              minRating: 0 
             })}
           />
         </div>
