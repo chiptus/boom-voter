@@ -5,6 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Star, Heart, X, ExternalLink, Play, Music, MapPin, Calendar, Eye, EyeOff } from "lucide-react";
 import { ArtistImageLoader } from "./ArtistImageLoader";
+import { useToast } from "@/hooks/use-toast";
 import type { Artist } from "@/hooks/useArtists";
 
 interface ArtistListItemProps {
@@ -17,6 +18,8 @@ interface ArtistListItemProps {
 }
 
 export const ArtistListItem = ({ artist, userVote, userKnowledge, onVote, onKnowledgeToggle, onAuthRequired }: ArtistListItemProps) => {
+  const { toast } = useToast();
+
   const handleVote = async (voteType: number) => {
     const result = await onVote(artist.id, voteType);
     if (result.requiresAuth) {
@@ -28,6 +31,13 @@ export const ArtistListItem = ({ artist, userVote, userKnowledge, onVote, onKnow
     const result = await onKnowledgeToggle(artist.id);
     if (result.requiresAuth) {
       onAuthRequired();
+    } else {
+      // Show toast notification
+      const newKnowledgeState = !userKnowledge;
+      toast({
+        title: `${artist.name} is ${newKnowledgeState ? 'known' : 'unknown'}`,
+        duration: 2000,
+      });
     }
   };
 
@@ -55,7 +65,20 @@ export const ArtistListItem = ({ artist, userVote, userKnowledge, onVote, onKnow
             className="w-12 h-12 flex-shrink-0 rounded-lg overflow-hidden"
           />
           <div className="flex-1 min-w-0">
-            <h3 className="text-white text-base font-semibold truncate">{artist.name}</h3>
+            <div className="flex items-center gap-2 mb-1">
+              <h3 className="text-white text-base font-semibold truncate">{artist.name}</h3>
+              {/* Artist Knowledge Eye Icon moved next to title */}
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={handleKnowledgeToggle}
+                className={`p-1 h-6 w-6 ${userKnowledge ? 'text-purple-400 hover:text-purple-300' : 'text-purple-600 hover:text-purple-500'}`}
+                title={userKnowledge ? "I know this artist" : "Mark as known"}
+              >
+                {userKnowledge ? <Eye className="h-3 w-3" /> : <EyeOff className="h-3 w-3" />}
+              </Button>
+            </div>
+            
             <div className="flex flex-wrap items-center gap-1 mt-1">
               {artist.music_genres && (
                 <Badge variant="secondary" className="bg-purple-600/50 text-purple-100 text-xs">
@@ -84,20 +107,6 @@ export const ArtistListItem = ({ artist, userVote, userKnowledge, onVote, onKnow
             {artist.description}
           </p>
         )}
-
-        {/* Knowledge Eye Icon */}
-        <div className="flex items-center gap-2">
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={handleKnowledgeToggle}
-            className={`p-1 h-8 w-8 ${userKnowledge ? 'text-purple-400 hover:text-purple-300' : 'text-purple-600 hover:text-purple-500'}`}
-            title={userKnowledge ? "I know this artist" : "Mark as known"}
-          >
-            {userKnowledge ? <Eye className="h-4 w-4" /> : <EyeOff className="h-4 w-4" />}
-          </Button>
-          <span className="text-purple-200 text-sm">{userKnowledge ? "Known" : "Unknown"}</span>
-        </div>
 
         {/* Voting Buttons */}
         <div className="flex flex-wrap gap-2">
@@ -178,7 +187,20 @@ export const ArtistListItem = ({ artist, userVote, userKnowledge, onVote, onKnow
         <div className="flex-1 min-w-0">
           <div className="flex items-start justify-between mb-2">
             <div className="flex-1 min-w-0">
-              <h3 className="text-white text-lg font-semibold truncate">{artist.name}</h3>
+              <div className="flex items-center gap-2 mb-1">
+                <h3 className="text-white text-lg font-semibold truncate">{artist.name}</h3>
+                {/* Artist Knowledge Eye Icon moved next to title */}
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={handleKnowledgeToggle}
+                  className={`p-1 h-6 w-6 ${userKnowledge ? 'text-purple-400 hover:text-purple-300' : 'text-purple-600 hover:text-purple-500'}`}
+                  title={userKnowledge ? "I know this artist" : "Mark as known"}
+                >
+                  {userKnowledge ? <Eye className="h-3 w-3" /> : <EyeOff className="h-3 w-3" />}
+                </Button>
+              </div>
+              
               <div className="flex items-center gap-2 mt-1">
                 {artist.music_genres && (
                   <Badge variant="secondary" className="bg-purple-600/50 text-purple-100 text-xs">
@@ -199,20 +221,6 @@ export const ArtistListItem = ({ artist, userVote, userKnowledge, onVote, onKnow
                 )}
               </div>
             </div>
-          </div>
-          
-          {/* Artist Knowledge Eye Icon */}
-          <div className="flex items-center gap-2 mb-2">
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={handleKnowledgeToggle}
-              className={`p-1 h-8 w-8 ${userKnowledge ? 'text-purple-400 hover:text-purple-300' : 'text-purple-600 hover:text-purple-500'}`}
-              title={userKnowledge ? "I know this artist" : "Mark as known"}
-            >
-              {userKnowledge ? <Eye className="h-4 w-4" /> : <EyeOff className="h-4 w-4" />}
-            </Button>
-            <span className="text-purple-200 text-sm">{userKnowledge ? "Known" : "Unknown"}</span>
           </div>
           
           {artist.description && (

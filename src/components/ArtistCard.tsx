@@ -6,6 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Star, Heart, X, ExternalLink, Play, Music, MapPin, Calendar, Eye, EyeOff } from "lucide-react";
 import { ArtistImageLoader } from "./ArtistImageLoader";
+import { useToast } from "@/hooks/use-toast";
 import type { Artist } from "@/hooks/useArtists";
 
 interface ArtistCardProps {
@@ -18,6 +19,8 @@ interface ArtistCardProps {
 }
 
 export const ArtistCard = ({ artist, userVote, userKnowledge, onVote, onKnowledgeToggle, onAuthRequired }: ArtistCardProps) => {
+  const { toast } = useToast();
+
   const handleVote = async (voteType: number) => {
     const result = await onVote(artist.id, voteType);
     if (result.requiresAuth) {
@@ -29,6 +32,13 @@ export const ArtistCard = ({ artist, userVote, userKnowledge, onVote, onKnowledg
     const result = await onKnowledgeToggle(artist.id);
     if (result.requiresAuth) {
       onAuthRequired();
+    } else {
+      // Show toast notification
+      const newKnowledgeState = !userKnowledge;
+      toast({
+        title: `${artist.name} is ${newKnowledgeState ? 'known' : 'unknown'}`,
+        duration: 2000,
+      });
     }
   };
 
@@ -56,7 +66,20 @@ export const ArtistCard = ({ artist, userVote, userKnowledge, onVote, onKnowledg
         
         <div className="flex items-start justify-between">
           <div className="flex-1">
-            <CardTitle className="text-white text-xl mb-2">{artist.name}</CardTitle>
+            <div className="flex items-center gap-2 mb-2">
+              <CardTitle className="text-white text-xl">{artist.name}</CardTitle>
+              {/* Artist Knowledge Eye Icon moved next to title */}
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={handleKnowledgeToggle}
+                className={`p-1 h-6 w-6 ${userKnowledge ? 'text-purple-400 hover:text-purple-300' : 'text-purple-600 hover:text-purple-500'}`}
+                title={userKnowledge ? "I know this artist" : "Mark as known"}
+              >
+                {userKnowledge ? <Eye className="h-3 w-3" /> : <EyeOff className="h-3 w-3" />}
+              </Button>
+            </div>
+            
             {artist.music_genres && (
               <Badge variant="secondary" className="bg-purple-600/50 text-purple-100 mb-2">
                 {artist.music_genres.name}
@@ -80,20 +103,6 @@ export const ArtistCard = ({ artist, userVote, userKnowledge, onVote, onKnowledg
             </div>
            </div>
          </div>
-         
-          {/* Artist Knowledge Eye Icon */}
-          <div className="flex items-center gap-2 mb-3">
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={handleKnowledgeToggle}
-              className={`p-1 h-8 w-8 ${userKnowledge ? 'text-purple-400 hover:text-purple-300' : 'text-purple-600 hover:text-purple-500'}`}
-              title={userKnowledge ? "I know this artist" : "Mark as known"}
-            >
-              {userKnowledge ? <Eye className="h-4 w-4" /> : <EyeOff className="h-4 w-4" />}
-            </Button>
-            <span className="text-purple-200 text-sm">{userKnowledge ? "Known" : "Unknown"}</span>
-          </div>
          
          {artist.description && (
            <CardDescription className="text-purple-200 text-sm leading-relaxed">
