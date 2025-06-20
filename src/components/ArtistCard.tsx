@@ -3,20 +3,30 @@ import { Link } from "react-router-dom";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { ThumbsUp, ThumbsDown, ExternalLink, Play, Music, MapPin, Calendar } from "lucide-react";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Star, Heart, X, ExternalLink, Play, Music, MapPin, Calendar } from "lucide-react";
 import { ArtistImageLoader } from "./ArtistImageLoader";
 import type { Artist } from "@/hooks/useArtists";
 
 interface ArtistCardProps {
   artist: Artist;
   userVote?: number;
+  userKnowledge?: boolean;
   onVote: (artistId: string, voteType: number) => Promise<{ requiresAuth: boolean }>;
+  onKnowledgeToggle: (artistId: string) => Promise<{ requiresAuth: boolean }>;
   onAuthRequired: () => void;
 }
 
-export const ArtistCard = ({ artist, userVote, onVote, onAuthRequired }: ArtistCardProps) => {
+export const ArtistCard = ({ artist, userVote, userKnowledge, onVote, onKnowledgeToggle, onAuthRequired }: ArtistCardProps) => {
   const handleVote = async (voteType: number) => {
     const result = await onVote(artist.id, voteType);
+    if (result.requiresAuth) {
+      onAuthRequired();
+    }
+  };
+
+  const handleKnowledgeToggle = async () => {
+    const result = await onKnowledgeToggle(artist.id);
     if (result.requiresAuth) {
       onAuthRequired();
     }
@@ -25,8 +35,6 @@ export const ArtistCard = ({ artist, userVote, onVote, onAuthRequired }: ArtistC
   const getVoteCount = (voteType: number) => {
     return artist.votes.filter(vote => vote.vote_type === voteType).length;
   };
-
-  const netVoteScore = getVoteCount(1) - getVoteCount(-1);
 
   const formatDate = (dateString: string | null) => {
     if (!dateString) return null;
@@ -70,45 +78,63 @@ export const ArtistCard = ({ artist, userVote, onVote, onAuthRequired }: ArtistC
                 </div>
               )}
             </div>
-          </div>
-          {netVoteScore !== 0 && (
-            <div className={`text-sm font-semibold px-2 py-1 rounded ${
-              netVoteScore > 0 ? 'text-green-400' : 'text-red-400'
-            }`}>
-              {netVoteScore > 0 ? '+' : ''}{netVoteScore}
-            </div>
-          )}
-        </div>
-        
-        {artist.description && (
-          <CardDescription className="text-purple-200 text-sm leading-relaxed">
-            {artist.description}
-          </CardDescription>
-        )}
-      </CardHeader>
-      
-      <CardContent className="space-y-4">
-        {/* Voting Buttons */}
-        <div className="flex items-center gap-2">
-          <Button
-            variant={userVote === 1 ? "default" : "outline"}
-            size="sm"
-            onClick={() => handleVote(1)}
-            className={userVote === 1 ? "bg-green-600 hover:bg-green-700" : "border-green-400 text-green-400 hover:bg-green-400 hover:text-white"}
-          >
-            <ThumbsUp className="h-4 w-4 mr-1" />
-            {getVoteCount(1)}
-          </Button>
-          <Button
-            variant={userVote === -1 ? "default" : "outline"}
-            size="sm"
-            onClick={() => handleVote(-1)}
-            className={userVote === -1 ? "bg-red-600 hover:bg-red-700" : "border-red-400 text-red-400 hover:bg-red-400 hover:text-white"}
-          >
-            <ThumbsDown className="h-4 w-4 mr-1" />
-            {getVoteCount(-1)}
-          </Button>
-        </div>
+           </div>
+         </div>
+         
+         {/* Artist Knowledge Checkbox */}
+         <div className="flex items-center gap-2 mb-3">
+           <Checkbox 
+             checked={userKnowledge || false}
+             onCheckedChange={handleKnowledgeToggle}
+             className="border-purple-400 data-[state=checked]:bg-purple-600"
+           />
+           <span className="text-purple-200 text-sm">I know this artist</span>
+         </div>
+         
+         {artist.description && (
+           <CardDescription className="text-purple-200 text-sm leading-relaxed">
+             {artist.description}
+           </CardDescription>
+         )}
+       </CardHeader>
+       
+       <CardContent className="space-y-4">
+         {/* New 3-Level Voting System */}
+         <div className="space-y-2">
+           <div className="flex items-center gap-2">
+             <Button
+               variant={userVote === 3 ? "default" : "outline"}
+               size="sm"
+               onClick={() => handleVote(3)}
+               className={userVote === 3 ? "bg-orange-600 hover:bg-orange-700" : "border-orange-400 text-orange-400 hover:bg-orange-400 hover:text-white"}
+             >
+               <Star className="h-4 w-4 mr-1" />
+               I'm going for sure ({getVoteCount(3)})
+             </Button>
+           </div>
+           <div className="flex items-center gap-2">
+             <Button
+               variant={userVote === 2 ? "default" : "outline"}
+               size="sm"
+               onClick={() => handleVote(2)}
+               className={userVote === 2 ? "bg-blue-600 hover:bg-blue-700" : "border-blue-400 text-blue-400 hover:bg-blue-400 hover:text-white"}
+             >
+               <Heart className="h-4 w-4 mr-1" />
+               Interesting ({getVoteCount(2)})
+             </Button>
+           </div>
+           <div className="flex items-center gap-2">
+             <Button
+               variant={userVote === 1 ? "default" : "outline"}
+               size="sm"
+               onClick={() => handleVote(1)}
+               className={userVote === 1 ? "bg-gray-600 hover:bg-gray-700" : "border-gray-400 text-gray-400 hover:bg-gray-400 hover:text-white"}
+             >
+               <X className="h-4 w-4 mr-1" />
+               Not interesting ({getVoteCount(1)})
+             </Button>
+           </div>
+         </div>
 
         {/* External Links */}
         {(artist.spotify_url || artist.soundcloud_url) && (

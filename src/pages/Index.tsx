@@ -17,8 +17,10 @@ const Index = () => {
     user,
     artists,
     userVotes,
+    userKnowledge,
     loading,
     handleVote,
+    handleKnowledgeToggle,
     signOut,
     fetchArtists,
   } = useArtists();
@@ -121,7 +123,9 @@ const Index = () => {
                 key={artist.id}
                 artist={artist}
                 userVote={userVotes[artist.id]}
+                userKnowledge={userKnowledge[artist.id]}
                 onVote={handleVote}
+                onKnowledgeToggle={handleKnowledgeToggle}
                 onAuthRequired={() => setShowAuthDialog(true)}
               />
             ))}
@@ -133,7 +137,9 @@ const Index = () => {
                 key={artist.id}
                 artist={artist}
                 userVote={userVotes[artist.id]}
+                userKnowledge={userKnowledge[artist.id]}
                 onVote={handleVote}
+                onKnowledgeToggle={handleKnowledgeToggle}
                 onAuthRequired={() => setShowAuthDialog(true)}
               />
             ))}

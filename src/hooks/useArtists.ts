@@ -13,6 +13,7 @@ export const useArtists = () => {
   const [user, setUser] = useState<any>(null);
   const [artists, setArtists] = useState<Artist[]>([]);
   const [userVotes, setUserVotes] = useState<Record<string, number>>({});
+  const [userKnowledge, setUserKnowledge] = useState<Record<string, boolean>>({});
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
 
@@ -25,10 +26,11 @@ export const useArtists = () => {
       setUser(session?.user || null);
       if (session?.user) {
         fetchUserVotes(session.user.id);
+        fetchUserKnowledge(session.user.id);
       }
     });
 
-    // Listen for real-time updates to artists and votes
+    // Listen for real-time updates to artists, votes, and knowledge
     const artistsChannel = supabase
       .channel('artists-changes')
       .on('postgres_changes', { event: '*', schema: 'public', table: 'artists' }, () => {
@@ -38,6 +40,11 @@ export const useArtists = () => {
         fetchArtists();
         if (user) {
           fetchUserVotes(user.id);
+        }
+      })
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'artist_knowledge' }, () => {
+        if (user) {
+          fetchUserKnowledge(user.id);
         }
       })
       .subscribe();
@@ -53,6 +60,7 @@ export const useArtists = () => {
     setUser(user);
     if (user) {
       fetchUserVotes(user.id);
+      fetchUserKnowledge(user.id);
     }
     setLoading(false);
   };
@@ -93,6 +101,21 @@ export const useArtists = () => {
         return acc;
       }, {} as Record<string, number>);
       setUserVotes(votesMap);
+    }
+  };
+
+  const fetchUserKnowledge = async (userId: string) => {
+    const { data, error } = await supabase
+      .from("artist_knowledge")
+      .select("artist_id")
+      .eq("user_id", userId);
+
+    if (!error && data) {
+      const knowledgeMap = data.reduce((acc, knowledge) => {
+        acc[knowledge.artist_id] = true;
+        return acc;
+      }, {} as Record<string, boolean>);
+      setUserKnowledge(knowledgeMap);
     }
   };
 
@@ -138,17 +161,59 @@ export const useArtists = () => {
     return { requiresAuth: false };
   };
 
+  const handleKnowledgeToggle = async (artistId: string) => {
+    if (!user) {
+      return { requiresAuth: true };
+    }
+
+    const isKnown = userKnowledge[artistId];
+    
+    if (isKnown) {
+      // Remove knowledge entry
+      const { error } = await supabase
+        .from("artist_knowledge")
+        .delete()
+        .eq("user_id", user.id)
+        .eq("artist_id", artistId);
+
+      if (!error) {
+        setUserKnowledge(prev => {
+          const newKnowledge = { ...prev };
+          delete newKnowledge[artistId];
+          return newKnowledge;
+        });
+      }
+    } else {
+      // Add knowledge entry
+      const { error } = await supabase
+        .from("artist_knowledge")
+        .insert({
+          user_id: user.id,
+          artist_id: artistId,
+        });
+
+      if (!error) {
+        setUserKnowledge(prev => ({ ...prev, [artistId]: true }));
+      }
+    }
+
+    return { requiresAuth: false };
+  };
+
   const signOut = async () => {
     await supabase.auth.signOut();
     setUserVotes({});
+    setUserKnowledge({});
   };
 
   return {
     user,
     artists,
     userVotes,
+    userKnowledge,
     loading,
     handleVote,
+    handleKnowledgeToggle,
     signOut,
     fetchArtists,
   };
