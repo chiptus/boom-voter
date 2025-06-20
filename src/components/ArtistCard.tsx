@@ -3,9 +3,9 @@ import { Link } from "react-router-dom";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Checkbox } from "@/components/ui/checkbox";
 import { Star, Heart, X, ExternalLink, Play, Music, MapPin, Calendar, Eye, EyeOff } from "lucide-react";
 import { ArtistImageLoader } from "./ArtistImageLoader";
+import { EditArtistDialog } from "./EditArtistDialog";
 import { useToast } from "@/hooks/use-toast";
 import type { Artist } from "@/hooks/useArtists";
 
@@ -16,9 +16,11 @@ interface ArtistCardProps {
   onVote: (artistId: string, voteType: number) => Promise<{ requiresAuth: boolean }>;
   onKnowledgeToggle: (artistId: string) => Promise<{ requiresAuth: boolean }>;
   onAuthRequired: () => void;
+  onEditSuccess?: () => void;
+  user?: any;
 }
 
-export const ArtistCard = ({ artist, userVote, userKnowledge, onVote, onKnowledgeToggle, onAuthRequired }: ArtistCardProps) => {
+export const ArtistCard = ({ artist, userVote, userKnowledge, onVote, onKnowledgeToggle, onAuthRequired, onEditSuccess, user }: ArtistCardProps) => {
   const { toast } = useToast();
 
   const handleVote = async (voteType: number) => {
@@ -179,13 +181,29 @@ export const ArtistCard = ({ artist, userVote, userKnowledge, onVote, onKnowledg
           </div>
         )}
 
-        {/* View Details Button */}
-        <Button asChild variant="outline" className="w-full border-purple-400 text-purple-400 hover:bg-purple-400 hover:text-white">
-          <Link to={`/artist/${artist.id}`}>
-            View Details
-            <ExternalLink className="h-4 w-4 ml-2" />
-          </Link>
-        </Button>
+        {/* Action Buttons */}
+        <div className="flex gap-2">
+          {/* View Details Button */}
+          <Button asChild variant="outline" className="flex-1 border-purple-400 text-purple-400 hover:bg-purple-400 hover:text-white">
+            <Link to={`/artist/${artist.id}`}>
+              View Details
+              <ExternalLink className="h-4 w-4 ml-2" />
+            </Link>
+          </Button>
+          
+          {/* Edit Button - only show for authenticated users */}
+          {user && (
+            <EditArtistDialog
+              artist={artist}
+              onSuccess={onEditSuccess}
+              trigger={
+                <Button variant="outline" size="sm" className="border-purple-400 text-purple-400 hover:bg-purple-400 hover:text-white">
+                  <Edit className="h-4 w-4" />
+                </Button>
+              }
+            />
+          )}
+        </div>
       </CardContent>
     </Card>
   );

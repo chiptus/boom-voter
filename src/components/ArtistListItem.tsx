@@ -2,9 +2,9 @@
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Checkbox } from "@/components/ui/checkbox";
-import { Star, Heart, X, ExternalLink, Play, Music, MapPin, Calendar, Eye, EyeOff } from "lucide-react";
+import { Star, Heart, X, ExternalLink, Play, Music, MapPin, Calendar, Eye, EyeOff, Edit } from "lucide-react";
 import { ArtistImageLoader } from "./ArtistImageLoader";
+import { EditArtistDialog } from "./EditArtistDialog";
 import { useToast } from "@/hooks/use-toast";
 import type { Artist } from "@/hooks/useArtists";
 
@@ -15,9 +15,11 @@ interface ArtistListItemProps {
   onVote: (artistId: string, voteType: number) => Promise<{ requiresAuth: boolean }>;
   onKnowledgeToggle: (artistId: string) => Promise<{ requiresAuth: boolean }>;
   onAuthRequired: () => void;
+  onEditSuccess?: () => void;
+  user?: any;
 }
 
-export const ArtistListItem = ({ artist, userVote, userKnowledge, onVote, onKnowledgeToggle, onAuthRequired }: ArtistListItemProps) => {
+export const ArtistListItem = ({ artist, userVote, userKnowledge, onVote, onKnowledgeToggle, onAuthRequired, onEditSuccess, user }: ArtistListItemProps) => {
   const { toast } = useToast();
 
   const handleVote = async (voteType: number) => {
@@ -171,6 +173,18 @@ export const ArtistListItem = ({ artist, userVote, userKnowledge, onVote, onKnow
               <ExternalLink className="h-3 w-3" />
             </Link>
           </Button>
+          {/* Edit Button - only show for authenticated users */}
+          {user && (
+            <EditArtistDialog
+              artist={artist}
+              onSuccess={onEditSuccess}
+              trigger={
+                <Button variant="outline" size="sm" className="border-purple-400 text-purple-400 hover:bg-purple-400 hover:text-white text-xs px-2 py-1 h-8">
+                  <Edit className="h-3 w-3" />
+                </Button>
+              }
+            />
+          )}
         </div>
       </div>
 
@@ -294,6 +308,19 @@ export const ArtistListItem = ({ artist, userVote, userKnowledge, onVote, onKnow
              <ExternalLink className="h-3 w-3" />
            </Link>
          </Button>
+         
+         {/* Edit Button - only show for authenticated users */}
+         {user && (
+           <EditArtistDialog
+             artist={artist}
+             onSuccess={onEditSuccess}
+             trigger={
+               <Button variant="outline" size="sm" className="border-purple-400 text-purple-400 hover:bg-purple-400 hover:text-white">
+                 <Edit className="h-3 w-3" />
+               </Button>
+             }
+           />
+         )}
        </div>
      </div>
    </div>
