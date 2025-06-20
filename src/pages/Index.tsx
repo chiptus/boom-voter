@@ -1,11 +1,11 @@
-
 import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Heart, Music, Plus, ThumbsUp, ThumbsDown, LogIn, LogOut, UserPlus } from "lucide-react";
+import { Heart, Music, Plus, ThumbsUp, ThumbsDown, LogIn, LogOut, Eye } from "lucide-react";
 import { AuthDialog } from "@/components/AuthDialog";
 import { AddArtistDialog } from "@/components/AddArtistDialog";
 import { AddGenreDialog } from "@/components/AddGenreDialog";
@@ -210,12 +210,21 @@ const Index = () => {
           {artists.map((artist) => (
             <Card key={artist.id} className="bg-white/10 backdrop-blur-md border-purple-400/30 hover:bg-white/20 transition-all">
               <CardHeader>
-                <CardTitle className="text-white">{artist.name}</CardTitle>
-                {artist.description && (
-                  <CardDescription className="text-purple-200">
-                    {artist.description}
-                  </CardDescription>
-                )}
+                <div className="flex items-start justify-between">
+                  <div className="flex-1">
+                    <CardTitle className="text-white">{artist.name}</CardTitle>
+                    {artist.description && (
+                      <CardDescription className="text-purple-200">
+                        {artist.description}
+                      </CardDescription>
+                    )}
+                  </div>
+                  <Link to={`/artist/${artist.id}`}>
+                    <Button size="sm" variant="ghost" className="text-purple-300 hover:text-white hover:bg-purple-600/30">
+                      <Eye className="h-4 w-4" />
+                    </Button>
+                  </Link>
+                </div>
                 {artist.music_genres && (
                   <Badge variant="secondary" className="w-fit bg-purple-600/50 text-purple-100">
                     {artist.music_genres.name}
