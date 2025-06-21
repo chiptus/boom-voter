@@ -46,30 +46,37 @@ export const useGroups = () => {
     const currentUser = user || (await supabase.auth.getUser()).data.user;
     if (!currentUser) return;
     
+    // First fetch groups
     const { data: groupsData, error } = await supabase
       .from("groups")
-      .select(`
-        *,
-        group_members!inner(user_id)
-      `)
+      .select("*")
       .order("created_at", { ascending: false });
 
     if (error) {
       console.error('Error fetching groups:', error);
       toast({
         title: "Error",
-        description: "Failed to fetch groups",
+        description: error.message || "Failed to fetch groups",
         variant: "destructive",
       });
-    } else {
-      // Transform data to include member count and creator info
-      const transformedGroups = groupsData?.map(group => ({
-        ...group,
-        member_count: group.group_members?.length || 0,
-        is_creator: group.created_by === currentUser.id,
-      })) || [];
+    } else if (groupsData) {
+      // Then fetch member counts separately
+      const groupsWithCounts = await Promise.all(
+        groupsData.map(async (group) => {
+          const { count } = await supabase
+            .from("group_members")
+            .select("*", { count: "exact", head: true })
+            .eq("group_id", group.id);
+          
+          return {
+            ...group,
+            member_count: count || 0,
+            is_creator: group.created_by === currentUser.id,
+          };
+        })
+      );
       
-      setGroups(transformedGroups);
+      setGroups(groupsWithCounts);
     }
   };
 
