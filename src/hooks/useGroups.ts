@@ -214,12 +214,17 @@ export const useGroups = () => {
         
         if (authError || !authData) {
           toast({
-            title: "Error",
-            description: "User not found",
+            title: "User not found",
+            description: `No user found with email: ${usernameOrEmail}`,
             variant: "destructive",
           });
           return false;
         }
+        
+        toast({
+          title: "User found",
+          description: `Found user with email: ${usernameOrEmail}`,
+        });
         
         // Use the auth user ID
         const userId = authData;
@@ -273,6 +278,11 @@ export const useGroups = () => {
         return false;
       }
     }
+
+    toast({
+      title: "User found",
+      description: `Found user: ${usernameOrEmail}`,
+    });
 
     // Check if user is already in the group
     const { data: existingMember } = await supabase
