@@ -43,7 +43,8 @@ export const useGroups = () => {
   };
 
   const fetchUserGroups = async () => {
-    if (!user) return;
+    const currentUser = user || (await supabase.auth.getUser()).data.user;
+    if (!currentUser) return;
     
     const { data: groupsData, error } = await supabase
       .from("groups")
@@ -65,7 +66,7 @@ export const useGroups = () => {
       const transformedGroups = groupsData?.map(group => ({
         ...group,
         member_count: group.group_members?.length || 0,
-        is_creator: group.created_by === user.id,
+        is_creator: group.created_by === currentUser.id,
       })) || [];
       
       setGroups(transformedGroups);
@@ -82,6 +83,8 @@ export const useGroups = () => {
       return null;
     }
 
+    console.log('Creating group with user:', user.id);
+    
     const { data: group, error } = await supabase
       .from("groups")
       .insert({
@@ -93,9 +96,10 @@ export const useGroups = () => {
       .single();
 
     if (error) {
+      console.error('Error creating group:', error);
       toast({
         title: "Error",
-        description: "Failed to create group",
+        description: error.message || "Failed to create group",
         variant: "destructive",
       });
       return null;
