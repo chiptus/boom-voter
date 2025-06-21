@@ -33,7 +33,7 @@ const Index = () => {
   
   const { artists, fetchArtists } = useArtistData();
   const { userVotes, votingLoading, handleVote } = useVoting(user, fetchArtists);
-  const { userKnowledge: knowledgeData, handleKnowledgeToggle } = useKnowledge(user);
+  const { handleKnowledgeToggle } = useKnowledge(user);
   const { filteredAndSortedArtists } = useArtistFiltering(artists, urlState);
 
   // Show loading while validating invite
@@ -141,7 +141,6 @@ const Index = () => {
                     key={artist.id} 
                     artist={artist}
                     userVote={userVotes[artist.id]}
-                    userKnowledge={knowledgeData[artist.id]}
                     votingLoading={votingLoading}
                     onVote={handleVote}
                     onKnowledgeToggle={handleKnowledgeToggle}
@@ -154,7 +153,7 @@ const Index = () => {
                     key={artist.id} 
                     artist={artist}
                     userVote={userVotes[artist.id]}
-                    userKnowledge={knowledgeData[artist.id]}
+                    
                     votingLoading={votingLoading}
                     onVote={handleVote}
                     onKnowledgeToggle={handleKnowledgeToggle}
