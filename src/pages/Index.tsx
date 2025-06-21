@@ -1,5 +1,6 @@
 
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { ArtistCard } from "@/components/ArtistCard";
 import { ArtistListItem } from "@/components/ArtistListItem";
 import { AuthDialog } from "@/components/AuthDialog";
@@ -7,16 +8,18 @@ import { FestivalHeader } from "@/components/FestivalHeader";
 import { ViewToggle } from "@/components/ViewToggle";
 import { FilterSortControls } from "@/components/FilterSortControls";
 import { EmptyArtistsState } from "@/components/EmptyArtistsState";
-import { GroupSelector } from "@/components/GroupSelector";
-import { GroupManagementDialog } from "@/components/GroupManagementDialog";
 import { useArtists } from "@/hooks/useArtists";
 import { useUrlState } from "@/hooks/useUrlState";
+import { useGroups } from "@/hooks/useGroups";
+import { Button } from "@/components/ui/button";
+import { Users } from "lucide-react";
 
 const Index = () => {
+  const navigate = useNavigate();
   const [showAuthDialog, setShowAuthDialog] = useState(false);
-  const [showGroupDialog, setShowGroupDialog] = useState(false);
   const { state: filterSortState, updateUrlState } = useUrlState();
   const { user, artists, userVotes, userKnowledge, loading, votingLoading, handleVote, handleKnowledgeToggle, fetchArtists } = useArtists(filterSortState);
+  const { groups } = useGroups();
 
   const handleAuthRequired = () => {
     setShowAuthDialog(true);
@@ -46,6 +49,46 @@ const Index = () => {
       <FestivalHeader artistCount={artists.length} />
       
       <div className="container mx-auto px-4 py-8">
+        {user && groups.length > 1 && (
+          <div className="mb-6 flex justify-between items-center">
+            <div className="flex items-center gap-4">
+              <span className="text-white font-medium">Filter by group:</span>
+              <select
+                value={filterSortState.groupId || "all"}
+                onChange={(e) => updateUrlState({ groupId: e.target.value === "all" ? undefined : e.target.value })}
+                className="bg-white/10 border border-purple-400/30 text-white rounded-md px-3 py-1.5"
+              >
+                <option value="all">All votes</option>
+                {groups.map((group) => (
+                  <option key={group.id} value={group.id}>
+                    {group.name} ({group.member_count} members)
+                  </option>
+                ))}
+              </select>
+            </div>
+            <Button
+              onClick={() => navigate("/groups")}
+              variant="outline"
+              className="bg-white/10 border-purple-400/30 text-white hover:bg-white/20"
+            >
+              <Users className="h-4 w-4 mr-2" />
+              Manage Groups
+            </Button>
+          </div>
+        )}
+        
+        {user && groups.length === 0 && (
+          <div className="mb-6 flex justify-end">
+            <Button
+              onClick={() => navigate("/groups")}
+              className="bg-purple-600 hover:bg-purple-700"
+            >
+              <Users className="h-4 w-4 mr-2" />
+              Create Group
+            </Button>
+          </div>
+        )}
+        
         <div className="mb-8">
           <FilterSortControls 
             state={filterSortState}
@@ -63,13 +106,6 @@ const Index = () => {
             <h2 className="text-2xl font-bold text-white">
               Artists ({artists.length})
             </h2>
-            {user && (
-              <GroupSelector
-                selectedGroupId={filterSortState.groupId}
-                onGroupChange={(groupId) => updateUrlState({ groupId })}
-                onManageGroups={() => setShowGroupDialog(true)}
-              />
-            )}
           </div>
           <ViewToggle 
             view={filterSortState.view} 
@@ -121,13 +157,6 @@ const Index = () => {
         onOpenChange={setShowAuthDialog}
         onSuccess={handleAuthSuccess}
       />
-
-      {user && (
-        <GroupManagementDialog
-          open={showGroupDialog}
-          onOpenChange={setShowGroupDialog}
-        />
-      )}
     </div>
   );
 };
