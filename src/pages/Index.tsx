@@ -1,4 +1,5 @@
 
+// Festival Index Page
 import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
@@ -34,6 +35,7 @@ const Index = () => {
   const { artists, fetchArtists } = useArtistData();
   const { userVotes, votingLoading, handleVote } = useVoting(user, fetchArtists);
   
+  const handleKnowledgeToggle = async () => ({ requiresAuth: !user });
   const { filteredAndSortedArtists } = useArtistFiltering(artists, urlState);
 
   // Show loading while validating invite
@@ -141,8 +143,10 @@ const Index = () => {
                     key={artist.id} 
                     artist={artist}
                     userVote={userVotes[artist.id]}
+                    userKnowledge={false}
                     votingLoading={votingLoading}
                     onVote={handleVote}
+                    onKnowledgeToggle={handleKnowledgeToggle}
                     onAuthRequired={() => setShowAuthDialog(true)}
                     onEditSuccess={fetchArtists}
                     user={user}
@@ -152,9 +156,10 @@ const Index = () => {
                     key={artist.id} 
                     artist={artist}
                     userVote={userVotes[artist.id]}
-                    
+                    userKnowledge={false}
                     votingLoading={votingLoading}
                     onVote={handleVote}
+                    onKnowledgeToggle={handleKnowledgeToggle}
                     
                     onAuthRequired={() => setShowAuthDialog(true)}
                     onEditSuccess={fetchArtists}
