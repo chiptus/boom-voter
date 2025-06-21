@@ -236,6 +236,10 @@ export type Database = {
         Args: { user_email: string }
         Returns: string
       }
+      is_group_creator: {
+        Args: { group_id_param: string }
+        Returns: boolean
+      }
       is_group_member: {
         Args: { group_id_param: string }
         Returns: boolean
