@@ -141,6 +141,7 @@ const Index = () => {
                     key={artist.id} 
                     artist={artist}
                     userVote={userVotes[artist.id]}
+                    userKnowledge={knowledgeData[artist.id]}
                     votingLoading={votingLoading}
                     onVote={handleVote}
                     onKnowledgeToggle={handleKnowledgeToggle}
@@ -153,6 +154,7 @@ const Index = () => {
                     key={artist.id} 
                     artist={artist}
                     userVote={userVotes[artist.id]}
+                    userKnowledge={knowledgeData[artist.id]}
                     votingLoading={votingLoading}
                     onVote={handleVote}
                     onKnowledgeToggle={handleKnowledgeToggle}
