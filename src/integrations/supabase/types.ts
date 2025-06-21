@@ -174,16 +174,19 @@ export type Database = {
       profiles: {
         Row: {
           created_at: string
+          email: string | null
           id: string
           username: string | null
         }
         Insert: {
           created_at?: string
+          email?: string | null
           id: string
           username?: string | null
         }
         Update: {
           created_at?: string
+          email?: string | null
           id?: string
           username?: string | null
         }
@@ -229,6 +232,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      get_user_id_by_email: {
+        Args: { user_email: string }
+        Returns: string
+      }
       is_group_member: {
         Args: { group_id_param: string }
         Returns: boolean
