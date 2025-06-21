@@ -1,15 +1,13 @@
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Button } from "@/components/ui/button";
-import { Users, Plus } from "lucide-react";
+import { Users } from "lucide-react";
 import { useGroups } from "@/hooks/useGroups";
 
 interface GroupSelectorProps {
   selectedGroupId?: string;
   onGroupChange: (groupId: string | undefined) => void;
-  onManageGroups: () => void;
 }
 
-export const GroupSelector = ({ selectedGroupId, onGroupChange, onManageGroups }: GroupSelectorProps) => {
+export const GroupSelector = ({ selectedGroupId, onGroupChange }: GroupSelectorProps) => {
   const { groups, loading } = useGroups();
 
   if (loading) {
@@ -40,14 +38,6 @@ export const GroupSelector = ({ selectedGroupId, onGroupChange, onManageGroups }
           ))}
         </SelectContent>
       </Select>
-      <Button
-        variant="outline"
-        size="sm"
-        onClick={onManageGroups}
-        className="bg-white/10 border-purple-400/30 text-white hover:bg-white/20"
-      >
-        <Plus className="h-4 w-4" />
-      </Button>
     </div>
   );
 };

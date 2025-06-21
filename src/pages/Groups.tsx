@@ -5,11 +5,13 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Label } from "@/components/ui/label";
-import { ArrowLeft, Plus, Users, Trash2, UserPlus } from "lucide-react";
+import { ArrowLeft, Plus, Users, Trash2, UserPlus, Crown, Link } from "lucide-react";
 import { useGroups } from "@/hooks/useGroups";
 import { useToast } from "@/components/ui/use-toast";
 import { Badge } from "@/components/ui/badge";
+import { InviteManagement } from "@/components/InviteManagement";
 
 const Groups = () => {
   const navigate = useNavigate();
@@ -20,6 +22,9 @@ const Groups = () => {
   const [newGroupDescription, setNewGroupDescription] = useState("");
   const [inviteUsername, setInviteUsername] = useState("");
   const [invitingToGroup, setInvitingToGroup] = useState<string | null>(null);
+  const [selectedGroupForInvites, setSelectedGroupForInvites] = useState<string>("");
+  const [creating, setCreating] = useState(false);
+  const [inviting, setInviting] = useState(false);
 
   const handleCreateGroup = async () => {
     if (!newGroupName.trim()) {
@@ -31,15 +36,16 @@ const Groups = () => {
       return;
     }
 
-    const result = await createGroup(newGroupName, newGroupDescription);
+    setCreating(true);
+    const result = await createGroup(newGroupName.trim(), newGroupDescription.trim() || undefined);
     if (result) {
-      setIsCreateDialogOpen(false);
       setNewGroupName("");
       setNewGroupDescription("");
     }
+    setCreating(false);
   };
 
-  const handleInvite = async (groupId: string) => {
+  const handleInviteUser = async (groupId: string) => {
     if (!inviteUsername.trim()) {
       toast({
         title: "Error",
@@ -49,10 +55,24 @@ const Groups = () => {
       return;
     }
 
-    const success = await inviteToGroup(groupId, inviteUsername);
+    setInviting(true);
+    const success = await inviteToGroup(groupId, inviteUsername.trim());
     if (success) {
       setInviteUsername("");
       setInvitingToGroup(null);
+    }
+    setInviting(false);
+  };
+
+  const handleDeleteGroup = async (groupId: string) => {
+    if (window.confirm("Are you sure you want to delete this group? This action cannot be undone.")) {
+      await deleteGroup(groupId);
+    }
+  };
+
+  const handleLeaveGroup = async (groupId: string) => {
+    if (window.confirm("Are you sure you want to leave this group?")) {
+      await leaveGroup(groupId);
     }
   };
 
@@ -87,160 +107,205 @@ const Groups = () => {
             Back to Artists
           </Button>
           
-          <div className="flex justify-between items-center">
-            <h1 className="text-4xl font-bold text-white">My Groups</h1>
-            <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
-              <DialogTrigger asChild>
-                <Button className="bg-purple-600 hover:bg-purple-700">
-                  <Plus className="h-4 w-4 mr-2" />
-                  Create Group
-                </Button>
-              </DialogTrigger>
-              <DialogContent>
-                <DialogHeader>
-                  <DialogTitle>Create New Group</DialogTitle>
-                  <DialogDescription>
-                    Create a group to share and compare votes with friends
-                  </DialogDescription>
-                </DialogHeader>
-                <div className="space-y-4">
-                  <div>
-                    <Label htmlFor="group-name">Group Name</Label>
-                    <Input
-                      id="group-name"
-                      value={newGroupName}
-                      onChange={(e) => setNewGroupName(e.target.value)}
-                      placeholder="Enter group name"
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="group-description">Description (optional)</Label>
-                    <Textarea
-                      id="group-description"
-                      value={newGroupDescription}
-                      onChange={(e) => setNewGroupDescription(e.target.value)}
-                      placeholder="Enter group description"
-                      rows={3}
-                    />
-                  </div>
-                  <Button onClick={handleCreateGroup} className="w-full">
-                    Create Group
-                  </Button>
-                </div>
-              </DialogContent>
-            </Dialog>
-          </div>
+          <h1 className="text-4xl font-bold text-white">My Groups</h1>
         </div>
 
-        {loading ? (
-          <div className="text-center text-white">Loading groups...</div>
-        ) : groups.length === 0 ? (
-          <Card className="bg-white/10 border-purple-400/30">
-            <CardContent className="text-center py-12">
-              <Users className="h-12 w-12 mx-auto mb-4 text-purple-300" />
-              <h3 className="text-xl font-semibold text-white mb-2">No groups yet</h3>
-              <p className="text-purple-200 mb-4">Create your first group to start sharing votes with friends</p>
-              <Button
-                onClick={() => setIsCreateDialogOpen(true)}
-                className="bg-purple-600 hover:bg-purple-700"
-              >
-                <Plus className="h-4 w-4 mr-2" />
-                Create Your First Group
-              </Button>
-            </CardContent>
-          </Card>
-        ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {groups.map((group) => (
-              <Card key={group.id} className="bg-white/10 border-purple-400/30">
-                <CardHeader>
-                  <div className="flex justify-between items-start">
-                    <div>
-                      <CardTitle className="text-white">{group.name}</CardTitle>
-                      {group.description && (
-                        <CardDescription className="text-purple-200 mt-1">
-                          {group.description}
-                        </CardDescription>
-                      )}
-                    </div>
-                    {group.is_creator && (
-                      <Badge className="bg-purple-600/50 text-purple-100">Creator</Badge>
-                    )}
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  <div className="flex items-center justify-between mb-4">
-                    <div className="flex items-center text-purple-200">
-                      <Users className="h-4 w-4 mr-2" />
-                      <span>{group.member_count} members</span>
-                    </div>
-                  </div>
-                  
-                  <div className="space-y-2">
-                    {invitingToGroup === group.id ? (
-                      <div className="flex gap-2">
-                        <Input
-                          value={inviteUsername}
-                          onChange={(e) => setInviteUsername(e.target.value)}
-                          placeholder="Username or email"
-                          className="bg-white/10 border-purple-400/30 text-white"
-                        />
-                        <Button
-                          size="sm"
-                          onClick={() => handleInvite(group.id)}
-                          className="bg-purple-600 hover:bg-purple-700"
-                        >
-                          Add
-                        </Button>
-                        <Button
-                          size="sm"
-                          variant="ghost"
-                          onClick={() => {
-                            setInvitingToGroup(null);
-                            setInviteUsername("");
-                          }}
-                          className="text-purple-300 hover:text-purple-100"
-                        >
-                          Cancel
-                        </Button>
-                      </div>
-                    ) : (
-                      <div className="flex gap-2">
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          onClick={() => setInvitingToGroup(group.id)}
-                          className="flex-1 bg-white/10 border-purple-400/30 text-white hover:bg-white/20"
-                        >
-                          <UserPlus className="h-4 w-4 mr-2" />
-                          Invite Member
-                        </Button>
-                        {group.is_creator ? (
-                          <Button
-                            size="sm"
-                            variant="destructive"
-                            onClick={() => deleteGroup(group.id)}
-                          >
-                            <Trash2 className="h-4 w-4" />
-                          </Button>
-                        ) : (
-                          <Button
-                            size="sm"
-                            variant="outline"
-                            onClick={() => leaveGroup(group.id)}
-                            className="bg-white/10 border-purple-400/30 text-white hover:bg-white/20"
-                          >
-                            Leave
-                          </Button>
-                        )}
-                      </div>
-                    )}
-                  </div>
+        <Tabs defaultValue="my-groups" className="w-full">
+          <TabsList className="grid w-full grid-cols-3 bg-white/10">
+            <TabsTrigger value="my-groups" className="text-white data-[state=active]:bg-purple-600">My Groups</TabsTrigger>
+            <TabsTrigger value="create-group" className="text-white data-[state=active]:bg-purple-600">Create Group</TabsTrigger>
+            <TabsTrigger value="invite-links" className="text-white data-[state=active]:bg-purple-600">Invite Links</TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="my-groups" className="space-y-4">
+            {loading ? (
+              <div className="text-center text-white">Loading groups...</div>
+            ) : groups.length === 0 ? (
+              <Card className="bg-white/10 border-purple-400/30">
+                <CardContent className="text-center py-12">
+                  <Users className="h-12 w-12 mx-auto mb-4 text-purple-300" />
+                  <h3 className="text-xl font-semibold text-white mb-2">No groups yet</h3>
+                  <p className="text-purple-200 mb-4">Create your first group to start sharing votes with friends</p>
                 </CardContent>
               </Card>
-            ))}
-          </div>
-        )}
+            ) : (
+              <div className="space-y-4">
+                {groups.map((group) => (
+                  <Card key={group.id} className="bg-white/10 border-purple-400/30">
+                    <CardHeader className="pb-3">
+                      <div className="flex items-start justify-between">
+                        <div>
+                          <CardTitle className="flex items-center space-x-2 text-white">
+                            <span>{group.name}</span>
+                            {group.is_creator && (
+                              <Badge variant="secondary" className="text-xs bg-purple-600/50 text-purple-100">
+                                <Crown className="h-3 w-3 mr-1" />
+                                Creator
+                              </Badge>
+                            )}
+                          </CardTitle>
+                          {group.description && (
+                            <CardDescription className="mt-1 text-purple-200">
+                              {group.description}
+                            </CardDescription>
+                          )}
+                        </div>
+                        <div className="flex space-x-2">
+                          {group.is_creator ? (
+                            <>
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => setSelectedGroupForInvites(group.id)}
+                                className="bg-white/10 border-purple-400/30 text-white hover:bg-white/20"
+                              >
+                                <Link className="h-4 w-4" />
+                              </Button>
+                              <Button
+                                variant="destructive"
+                                size="sm"
+                                onClick={() => handleDeleteGroup(group.id)}
+                              >
+                                <Trash2 className="h-4 w-4" />
+                              </Button>
+                            </>
+                          ) : (
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => handleLeaveGroup(group.id)}
+                              className="bg-white/10 border-purple-400/30 text-white hover:bg-white/20"
+                            >
+                              Leave
+                            </Button>
+                          )}
+                        </div>
+                      </div>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center space-x-2 text-sm text-purple-200">
+                          <Users className="h-4 w-4" />
+                          <span>{group.member_count} members</span>
+                        </div>
+                        {group.is_creator && (
+                          <div className="flex items-center space-x-2">
+                            <Input
+                              placeholder="Username or email"
+                              value={invitingToGroup === group.id ? inviteUsername : ""}
+                              onChange={(e) => {
+                                setInvitingToGroup(group.id);
+                                setInviteUsername(e.target.value);
+                              }}
+                              className="w-40 h-8 bg-white/10 border-purple-400/30 text-white"
+                            />
+                            <Button
+                              size="sm"
+                              onClick={() => handleInviteUser(group.id)}
+                              disabled={!inviteUsername.trim() || inviting || invitingToGroup !== group.id}
+                              className="bg-purple-600 hover:bg-purple-700"
+                            >
+                              <UserPlus className="h-4 w-4" />
+                            </Button>
+                          </div>
+                        )}
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            )}
+          </TabsContent>
+
+          <TabsContent value="create-group" className="space-y-4">
+            <Card className="bg-white/10 border-purple-400/30">
+              <CardHeader>
+                <CardTitle className="text-white">Create New Group</CardTitle>
+                <CardDescription className="text-purple-200">
+                  Create a group to share and compare votes with friends
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div>
+                  <Label htmlFor="group-name" className="text-white">Group Name</Label>
+                  <Input
+                    id="group-name"
+                    placeholder="e.g., Festival Squad, Close Friends, Work Colleagues"
+                    value={newGroupName}
+                    onChange={(e) => setNewGroupName(e.target.value)}
+                    className="bg-white/10 border-purple-400/30 text-white"
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="group-description" className="text-white">Description (Optional)</Label>
+                  <Textarea
+                    id="group-description"
+                    placeholder="What's this group for?"
+                    value={newGroupDescription}
+                    onChange={(e) => setNewGroupDescription(e.target.value)}
+                    rows={3}
+                    className="bg-white/10 border-purple-400/30 text-white"
+                  />
+                </div>
+                <Button
+                  onClick={handleCreateGroup}
+                  disabled={!newGroupName.trim() || creating}
+                  className="w-full bg-purple-600 hover:bg-purple-700"
+                >
+                  {creating ? "Creating..." : "Create Group"}
+                </Button>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="invite-links" className="space-y-4">
+            {selectedGroupForInvites ? (
+              <div>
+                <Button
+                  variant="outline"
+                  className="mb-4 bg-white/10 border-purple-400/30 text-white hover:bg-white/20"
+                  onClick={() => setSelectedGroupForInvites("")}
+                >
+                  ← Back to Groups
+                </Button>
+                <InviteManagement
+                  groupId={selectedGroupForInvites}
+                  groupName={groups.find(g => g.id === selectedGroupForInvites)?.name || ""}
+                />
+              </div>
+            ) : (
+              <div>
+                <h3 className="text-lg font-semibold mb-4 text-white">Select a Group to Manage Invites</h3>
+                <div className="space-y-2">
+                  {groups.filter(g => g.is_creator).map((group) => (
+                    <Card 
+                      key={group.id} 
+                      className="cursor-pointer hover:bg-white/20 bg-white/10 border-purple-400/30" 
+                      onClick={() => setSelectedGroupForInvites(group.id)}
+                    >
+                      <CardContent className="flex items-center justify-between p-4">
+                        <div>
+                          <h4 className="font-medium text-white">{group.name}</h4>
+                          <p className="text-sm text-purple-200">{group.member_count} members</p>
+                        </div>
+                        <Link className="h-5 w-5 text-purple-300" />
+                      </CardContent>
+                    </Card>
+                  ))}
+                  {groups.filter(g => g.is_creator).length === 0 && (
+                    <Card className="bg-white/10 border-purple-400/30">
+                      <CardContent className="text-center py-8">
+                        <p className="text-purple-200">
+                          You need to be a group creator to manage invite links.
+                        </p>
+                      </CardContent>
+                    </Card>
+                  )}
+                </div>
+              </div>
+            )}
+          </TabsContent>
+        </Tabs>
       </div>
     </div>
   );

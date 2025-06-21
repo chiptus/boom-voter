@@ -5,7 +5,6 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { useInviteValidation } from "@/hooks/useInviteValidation";
 import { AuthDialog } from "@/components/AuthDialog";
-import { GroupManagementDialog } from "@/components/GroupManagementDialog";
 import { AuthActionButtons } from "@/components/AuthActionButtons";
 import { AddArtistDialog } from "@/components/AddArtistDialog";
 import { AddGenreDialog } from "@/components/AddGenreDialog";
@@ -29,13 +28,11 @@ const Index = () => {
   const [showAuthDialog, setShowAuthDialog] = useState(false);
   const [showAddArtistDialog, setShowAddArtistDialog] = useState(false);
   const [showAddGenreDialog, setShowAddGenreDialog] = useState(false);
-  const [showGroupManagement, setShowGroupManagement] = useState(false);
   const { state: urlState, updateUrlState, clearFilters } = useUrlState();
   
   const { artists, fetchArtists } = useArtistData();
   const { userVotes, votingLoading, handleVote } = useVoting(user, fetchArtists);
   
-  const handleKnowledgeToggle = async () => ({ requiresAuth: !user });
   const { filteredAndSortedArtists } = useArtistFiltering(artists, urlState);
 
   // Show loading while validating invite
@@ -112,7 +109,6 @@ const Index = () => {
               <GroupSelector
                 selectedGroupId={urlState.groupId}
                 onGroupChange={(groupId) => updateUrlState({ groupId })}
-                onManageGroups={() => setShowGroupManagement(true)}
               />
               <ViewToggle
                 view={urlState.view}
@@ -144,9 +140,9 @@ const Index = () => {
                     artist={artist}
                     userVote={userVotes[artist.id]}
                     userKnowledge={false}
-                    votingLoading={votingLoading}
+                    votingLoading={votingLoading[artist.id]}
                     onVote={handleVote}
-                    onKnowledgeToggle={handleKnowledgeToggle}
+                    onKnowledgeToggle={async (artistId: string) => ({ requiresAuth: !user })}
                     onAuthRequired={() => setShowAuthDialog(true)}
                     onEditSuccess={fetchArtists}
                     user={user}
@@ -157,10 +153,9 @@ const Index = () => {
                     artist={artist}
                     userVote={userVotes[artist.id]}
                     userKnowledge={false}
-                    votingLoading={votingLoading}
+                    votingLoading={votingLoading[artist.id]}
                     onVote={handleVote}
-                    onKnowledgeToggle={handleKnowledgeToggle}
-                    
+                    onKnowledgeToggle={async (artistId: string) => ({ requiresAuth: !user })}
                     onAuthRequired={() => setShowAuthDialog(true)}
                     onEditSuccess={fetchArtists}
                     user={user}
@@ -191,11 +186,6 @@ const Index = () => {
         <AddGenreDialog
           open={showAddGenreDialog}
           onOpenChange={setShowAddGenreDialog}
-        />
-
-        <GroupManagementDialog
-          open={showGroupManagement}
-          onOpenChange={setShowGroupManagement}
         />
       </div>
     </div>
