@@ -84,23 +84,34 @@ export const useArtistFiltering = (artists: Artist[], filterSortState?: FilterSo
 
     // Sort artists
     filtered.sort((a, b) => {
+      let primarySort = 0;
+      
       switch (filterSortState.sort) {
         case 'name-asc':
           return a.name.localeCompare(b.name);
         case 'name-desc':
           return b.name.localeCompare(a.name);
         case 'rating-desc':
-          return calculateRating(b) - calculateRating(a);
+          primarySort = calculateRating(b) - calculateRating(a);
+          break;
         case 'popularity-desc':
-          return getWeightedPopularityScore(b) - getWeightedPopularityScore(a);
+          primarySort = getWeightedPopularityScore(b) - getWeightedPopularityScore(a);
+          break;
         case 'date-asc':
-          if (!a.estimated_date && !b.estimated_date) return 0;
+          if (!a.estimated_date && !b.estimated_date) {
+            primarySort = 0;
+            break;
+          }
           if (!a.estimated_date) return 1;
           if (!b.estimated_date) return -1;
-          return new Date(a.estimated_date).getTime() - new Date(b.estimated_date).getTime();
+          primarySort = new Date(a.estimated_date).getTime() - new Date(b.estimated_date).getTime();
+          break;
         default:
-          return 0;
+          primarySort = 0;
       }
+      
+      // If primary sort values are equal, sort alphabetically
+      return primarySort !== 0 ? primarySort : a.name.localeCompare(b.name);
     });
 
     return filtered;

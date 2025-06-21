@@ -13,7 +13,7 @@ export interface FilterSortState {
 }
 
 const defaultState: FilterSortState = {
-  sort: 'name-asc',
+  sort: 'popularity-desc',
   stages: [],
   genres: [],
   minRating: 0,
