@@ -17,6 +17,9 @@ import { GroupSelector } from "@/components/GroupSelector";
 import { InviteLandingPage } from "@/components/InviteLandingPage";
 import { ViewToggle } from "@/components/ViewToggle";
 import { useArtistFiltering } from "@/hooks/useArtistFiltering";
+import { useArtistData } from "@/hooks/useArtistData";
+import { useVoting } from "@/hooks/useVoting";
+import { useKnowledge } from "@/hooks/useKnowledge";
 import { useUrlState } from "@/hooks/useUrlState";
 
 const Index = () => {
@@ -26,18 +29,12 @@ const Index = () => {
   const [showAddArtistDialog, setShowAddArtistDialog] = useState(false);
   const [showAddGenreDialog, setShowAddGenreDialog] = useState(false);
   const [showGroupManagement, setShowGroupManagement] = useState(false);
-  const { state: urlState, updateUrlState } = useUrlState();
+  const { state: urlState, updateUrlState, clearFilters } = useUrlState();
   
-  const {
-    filteredArtists,
-    loading: artistsLoading,
-  } = useArtistFiltering({
-    selectedGenres: urlState.genres,
-    selectedStages: urlState.stages,
-    minRating: urlState.minRating,
-    sortBy: urlState.sort,
-    selectedGroupId: urlState.groupId,
-  });
+  const { artists, fetchArtists } = useArtistData();
+  const { userVotes, votingLoading, handleVote } = useVoting(user, fetchArtists);
+  const { userKnowledge: knowledgeData, handleKnowledgeToggle } = useKnowledge(user);
+  const { filteredAndSortedArtists } = useArtistFiltering(artists, urlState);
 
   // Show loading while validating invite
   if (isValidating) {
@@ -86,7 +83,7 @@ const Index = () => {
     );
   }
 
-  if (loading || artistsLoading) {
+  if (loading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900 flex items-center justify-center">
         <div className="text-white text-xl">Loading...</div>
@@ -97,7 +94,7 @@ const Index = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900">
       <div className="container mx-auto px-4 py-8">
-        <FestivalHeader />
+        <FestivalHeader artistCount={filteredAndSortedArtists.length} />
         
         <AuthActionButtons
           user={user}
@@ -123,10 +120,14 @@ const Index = () => {
           </div>
         )}
 
-        <FilterSortControls />
+        <FilterSortControls 
+          state={urlState}
+          onStateChange={updateUrlState}
+          onClear={clearFilters}
+        />
 
         <div className="mt-8">
-          {filteredArtists.length === 0 ? (
+          {filteredAndSortedArtists.length === 0 ? (
             <EmptyArtistsState />
           ) : (
             <div className={
@@ -134,13 +135,33 @@ const Index = () => {
                 ? "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"
                 : "space-y-4"
             }>
-              {filteredArtists.map((artist) => (
+              {filteredAndSortedArtists.map((artist) => 
                 urlState.view === 'grid' ? (
-                  <ArtistCard key={artist.id} artist={artist} />
+                  <ArtistCard 
+                    key={artist.id} 
+                    artist={artist}
+                    userVote={userVotes[artist.id]}
+                    votingLoading={votingLoading}
+                    onVote={handleVote}
+                    onKnowledgeToggle={handleKnowledgeToggle}
+                    onAuthRequired={() => setShowAuthDialog(true)}
+                    onEditSuccess={fetchArtists}
+                    user={user}
+                  />
                 ) : (
-                  <ArtistListItem key={artist.id} artist={artist} />
+                  <ArtistListItem 
+                    key={artist.id} 
+                    artist={artist}
+                    userVote={userVotes[artist.id]}
+                    votingLoading={votingLoading}
+                    onVote={handleVote}
+                    onKnowledgeToggle={handleKnowledgeToggle}
+                    onAuthRequired={() => setShowAuthDialog(true)}
+                    onEditSuccess={fetchArtists}
+                    user={user}
+                  />
                 )
-              ))}
+              )}
             </div>
           )}
         </div>
@@ -156,6 +177,10 @@ const Index = () => {
         <AddArtistDialog
           open={showAddArtistDialog}
           onOpenChange={setShowAddArtistDialog}
+          onSuccess={() => {
+            setShowAddArtistDialog(false);
+            fetchArtists();
+          }}
         />
 
         <AddGenreDialog

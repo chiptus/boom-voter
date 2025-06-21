@@ -10,9 +10,16 @@ export const inviteService = {
     // Generate a cryptographically secure random token
     const token = crypto.randomUUID() + '-' + Date.now().toString(36);
     
+    // Get current user
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) {
+      throw new Error("Authentication required");
+    }
+    
     const inviteData = {
       group_id: groupId,
       invite_token: token,
+      created_by: user.id,
       expires_at: options?.expiresAt?.toISOString(),
       max_uses: options?.maxUses,
     };
