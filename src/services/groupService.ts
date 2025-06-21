@@ -1,3 +1,4 @@
+
 import { supabase } from "@/integrations/supabase/client";
 import type { Group, GroupMember } from "@/types/groups";
 
@@ -171,5 +172,31 @@ export const groupService = {
     }
 
     return data || [];
+  },
+
+  // New invite-related functions
+  async validateInviteToken(token: string) {
+    const { data, error } = await supabase
+      .rpc('validate_invite_token', { token });
+
+    if (error) {
+      throw new Error(error.message || "Failed to validate invite");
+    }
+
+    return data?.[0] || null;
+  },
+
+  async useInviteToken(token: string, userId: string) {
+    const { data, error } = await supabase
+      .rpc('use_invite_token', { 
+        token, 
+        user_id: userId 
+      });
+
+    if (error) {
+      throw new Error(error.message || "Failed to use invite");
+    }
+
+    return data?.[0] || null;
   },
 };

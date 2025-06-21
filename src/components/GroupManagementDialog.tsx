@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import {
   Dialog,
@@ -17,8 +18,9 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Trash2, UserPlus, Users, Crown } from "lucide-react";
+import { Trash2, UserPlus, Users, Crown, Link } from "lucide-react";
 import { useGroups } from "@/hooks/useGroups";
+import { InviteManagement } from "./InviteManagement";
 
 interface GroupManagementDialogProps {
   open: boolean;
@@ -33,12 +35,13 @@ export const GroupManagementDialog = ({ open, onOpenChange }: GroupManagementDia
   const [selectedGroupId, setSelectedGroupId] = useState<string>("");
   const [creating, setCreating] = useState(false);
   const [inviting, setInviting] = useState(false);
+  const [selectedGroupForInvites, setSelectedGroupForInvites] = useState<string>("");
 
   const handleCreateGroup = async () => {
     if (!newGroupName.trim()) return;
     
     setCreating(true);
-    const group = await createGroup(newGroupName.trim(), newGroupDescription.trim() || undefined);
+    const group = await createGroup(newGroupName.trim(),  newGroupDescription.trim() || undefined);
     if (group) {
       setNewGroupName("");
       setNewGroupDescription("");
@@ -71,7 +74,7 @@ export const GroupManagementDialog = ({ open, onOpenChange }: GroupManagementDia
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
+      <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="flex items-center space-x-2">
             <Users className="h-5 w-5" />
@@ -80,9 +83,10 @@ export const GroupManagementDialog = ({ open, onOpenChange }: GroupManagementDia
         </DialogHeader>
 
         <Tabs defaultValue="my-groups" className="w-full">
-          <TabsList className="grid w-full grid-cols-2">
+          <TabsList className="grid w-full grid-cols-3">
             <TabsTrigger value="my-groups">My Groups</TabsTrigger>
             <TabsTrigger value="create-group">Create Group</TabsTrigger>
+            <TabsTrigger value="invite-links">Invite Links</TabsTrigger>
           </TabsList>
 
           <TabsContent value="my-groups" className="space-y-4">
@@ -116,13 +120,22 @@ export const GroupManagementDialog = ({ open, onOpenChange }: GroupManagementDia
                         </div>
                         <div className="flex space-x-2">
                           {group.is_creator ? (
-                            <Button
-                              variant="destructive"
-                              size="sm"
-                              onClick={() => handleDeleteGroup(group.id)}
-                            >
-                              <Trash2 className="h-4 w-4" />
-                            </Button>
+                            <>
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => setSelectedGroupForInvites(group.id)}
+                              >
+                                <Link className="h-4 w-4" />
+                              </Button>
+                              <Button
+                                variant="destructive"
+                                size="sm"
+                                onClick={() => handleDeleteGroup(group.id)}
+                              >
+                                <Trash2 className="h-4 w-4" />
+                              </Button>
+                            </>
                           ) : (
                             <Button
                               variant="outline"
@@ -198,6 +211,46 @@ export const GroupManagementDialog = ({ open, onOpenChange }: GroupManagementDia
                 {creating ? "Creating..." : "Create Group"}
               </Button>
             </div>
+          </TabsContent>
+
+          <TabsContent value="invite-links" className="space-y-4">
+            {selectedGroupForInvites ? (
+              <div>
+                <Button
+                  variant="outline"
+                  className="mb-4"
+                  onClick={() => setSelectedGroupForInvites("")}
+                >
+                  ← Back to Groups
+                </Button>
+                <InviteManagement
+                  groupId={selectedGroupForInvites}
+                  groupName={groups.find(g => g.id === selectedGroupForInvites)?.name || ""}
+                />
+              </div>
+            ) : (
+              <div>
+                <h3 className="text-lg font-semibold mb-4">Select a Group to Manage Invites</h3>
+                <div className="space-y-2">
+                  {groups.filter(g => g.is_creator).map((group) => (
+                    <Card key={group.id} className="cursor-pointer hover:bg-muted/50" onClick={() => setSelectedGroupForInvites(group.id)}>
+                      <CardContent className="flex items-center justify-between p-4">
+                        <div>
+                          <h4 className="font-medium">{group.name}</h4>
+                          <p className="text-sm text-muted-foreground">{group.member_count} members</p>
+                        </div>
+                        <Link className="h-5 w-5" />
+                      </CardContent>
+                    </Card>
+                  ))}
+                  {groups.filter(g => g.is_creator).length === 0 && (
+                    <p className="text-center text-muted-foreground py-8">
+                      You need to be a group creator to manage invite links.
+                    </p>
+                  )}
+                </div>
+              </div>
+            )}
           </TabsContent>
         </Tabs>
       </DialogContent>

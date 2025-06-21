@@ -7,15 +7,17 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { LogIn, UserPlus } from "lucide-react";
+import { LogIn, UserPlus, Users } from "lucide-react";
 
 interface AuthDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onSuccess: () => void;
+  inviteToken?: string;
+  groupName?: string;
 }
 
-export const AuthDialog = ({ open, onOpenChange, onSuccess }: AuthDialogProps) => {
+export const AuthDialog = ({ open, onOpenChange, onSuccess, inviteToken, groupName }: AuthDialogProps) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [username, setUsername] = useState("");
@@ -32,6 +34,7 @@ export const AuthDialog = ({ open, onOpenChange, onSuccess }: AuthDialogProps) =
       options: {
         data: {
           username: username,
+          invite_token: inviteToken,
         },
       },
     });
@@ -45,7 +48,9 @@ export const AuthDialog = ({ open, onOpenChange, onSuccess }: AuthDialogProps) =
     } else {
       toast({
         title: "Success",
-        description: "Check your email to verify your account!",
+        description: inviteToken 
+          ? `Account created! Check your email to verify and join ${groupName}.`
+          : "Check your email to verify your account!",
       });
       onSuccess();
     }
@@ -81,13 +86,25 @@ export const AuthDialog = ({ open, onOpenChange, onSuccess }: AuthDialogProps) =
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle>Join the Festival!</DialogTitle>
+          <DialogTitle className="flex items-center space-x-2">
+            {inviteToken && groupName ? (
+              <>
+                <Users className="h-5 w-5" />
+                <span>Join {groupName}</span>
+              </>
+            ) : (
+              <span>Join the Festival!</span>
+            )}
+          </DialogTitle>
           <DialogDescription>
-            Sign in or create an account to vote for artists and add your favorites.
+            {inviteToken && groupName 
+              ? `Create an account or sign in to join ${groupName} and start voting!`
+              : "Sign in or create an account to vote for artists and add your favorites."
+            }
           </DialogDescription>
         </DialogHeader>
         
-        <Tabs defaultValue="signin" className="w-full">
+        <Tabs defaultValue={inviteToken ? "signup" : "signin"} className="w-full">
           <TabsList className="grid w-full grid-cols-2">
             <TabsTrigger value="signin">
               <LogIn className="h-4 w-4 mr-2" />
@@ -161,7 +178,7 @@ export const AuthDialog = ({ open, onOpenChange, onSuccess }: AuthDialogProps) =
                 />
               </div>
               <Button type="submit" className="w-full" disabled={loading}>
-                {loading ? "Creating account..." : "Sign Up"}
+                {loading ? "Creating account..." : inviteToken ? `Join ${groupName}` : "Sign Up"}
               </Button>
             </form>
           </TabsContent>

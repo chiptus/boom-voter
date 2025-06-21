@@ -10,6 +10,7 @@ export interface FilterSortState {
   minRating: number;
   view: 'grid' | 'list';
   groupId?: string;
+  invite?: string;
 }
 
 const defaultState: FilterSortState = {
@@ -19,6 +20,7 @@ const defaultState: FilterSortState = {
   minRating: 0,
   view: 'list',
   groupId: undefined,
+  invite: undefined,
 };
 
 export const useUrlState = () => {
@@ -32,6 +34,7 @@ export const useUrlState = () => {
       minRating: parseInt(searchParams.get('minRating') || '0') || defaultState.minRating,
       view: (searchParams.get('view') as 'grid' | 'list') || defaultState.view,
       groupId: searchParams.get('groupId') || defaultState.groupId,
+      invite: searchParams.get('invite') || defaultState.invite,
     };
   }, [searchParams]);
 
@@ -60,13 +63,24 @@ export const useUrlState = () => {
     if (newState.groupId) {
       newParams.set('groupId', newState.groupId);
     }
+    if (newState.invite) {
+      newParams.set('invite', newState.invite);
+    }
     
     setSearchParams(newParams, { replace: true });
   }, [getStateFromUrl, setSearchParams]);
 
   const clearFilters = useCallback(() => {
-    setSearchParams(new URLSearchParams(), { replace: true });
-  }, [setSearchParams]);
+    const currentState = getStateFromUrl();
+    const newParams = new URLSearchParams();
+    
+    // Keep invite parameter when clearing filters
+    if (currentState.invite) {
+      newParams.set('invite', currentState.invite);
+    }
+    
+    setSearchParams(newParams, { replace: true });
+  }, [getStateFromUrl, setSearchParams]);
 
   return {
     state: getStateFromUrl(),

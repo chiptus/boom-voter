@@ -91,6 +91,50 @@ export type Database = {
           },
         ]
       }
+      group_invites: {
+        Row: {
+          created_at: string
+          created_by: string
+          expires_at: string | null
+          group_id: string
+          id: string
+          invite_token: string
+          is_active: boolean
+          max_uses: number | null
+          used_count: number
+        }
+        Insert: {
+          created_at?: string
+          created_by: string
+          expires_at?: string | null
+          group_id: string
+          id?: string
+          invite_token: string
+          is_active?: boolean
+          max_uses?: number | null
+          used_count?: number
+        }
+        Update: {
+          created_at?: string
+          created_by?: string
+          expires_at?: string | null
+          group_id?: string
+          id?: string
+          invite_token?: string
+          is_active?: boolean
+          max_uses?: number | null
+          used_count?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "group_invites_group_id_fkey"
+            columns: ["group_id"]
+            isOneToOne: false
+            referencedRelation: "groups"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       group_members: {
         Row: {
           group_id: string
@@ -243,6 +287,24 @@ export type Database = {
       is_group_member: {
         Args: { group_id_param: string }
         Returns: boolean
+      }
+      use_invite_token: {
+        Args: { token: string; user_id: string }
+        Returns: {
+          success: boolean
+          message: string
+          group_id: string
+        }[]
+      }
+      validate_invite_token: {
+        Args: { token: string }
+        Returns: {
+          invite_id: string
+          group_id: string
+          group_name: string
+          is_valid: boolean
+          reason: string
+        }[]
       }
     }
     Enums: {
