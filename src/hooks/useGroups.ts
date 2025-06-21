@@ -210,7 +210,7 @@ export const useGroups = () => {
       if (emailRegex.test(usernameOrEmail)) {
         // Try to find by email in auth system
         const { data: authData, error: authError } = await supabase
-          .rpc('get_user_id_by_email', { email: usernameOrEmail });
+          .rpc('get_user_id_by_email', { user_email: usernameOrEmail });
         
         if (authError || !authData) {
           toast({
