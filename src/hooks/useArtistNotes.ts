@@ -1,9 +1,15 @@
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import type { Database } from "@/integrations/supabase/types";
 
-type ArtistNote = Database["public"]["Tables"]["artist_notes"]["Row"];
+export interface ArtistNote {
+  id: string;
+  artist_id: string;
+  user_id: string;
+  note_content: string;
+  created_at: string;
+  updated_at: string;
+}
 
 export const useArtistNotes = (artistId: string, userId: string | null) => {
   const [note, setNote] = useState<ArtistNote | null>(null);
@@ -18,8 +24,8 @@ export const useArtistNotes = (artistId: string, userId: string | null) => {
   }, [artistId, userId]);
 
   const fetchNote = async () => {
-    if (!userId) return;
-    
+    if (!artistId || !userId) return;
+
     setLoading(true);
     try {
       const { data, error } = await supabase
@@ -29,7 +35,10 @@ export const useArtistNotes = (artistId: string, userId: string | null) => {
         .eq("user_id", userId)
         .maybeSingle();
 
-      if (error) throw error;
+      if (error && error.code !== 'PGRST116') {
+        throw error;
+      }
+
       setNote(data);
     } catch (error) {
       console.error("Error fetching note:", error);
@@ -44,7 +53,7 @@ export const useArtistNotes = (artistId: string, userId: string | null) => {
   };
 
   const saveNote = async (noteContent: string) => {
-    if (!userId || !noteContent.trim()) return;
+    if (!artistId || !userId) return false;
 
     setSaving(true);
     try {
@@ -53,18 +62,19 @@ export const useArtistNotes = (artistId: string, userId: string | null) => {
         .upsert({
           artist_id: artistId,
           user_id: userId,
-          note_content: noteContent.trim(),
+          note_content: noteContent,
         })
         .select()
         .single();
 
       if (error) throw error;
-      
+
       setNote(data);
       toast({
         title: "Success",
         description: "Note saved successfully",
       });
+      return true;
     } catch (error) {
       console.error("Error saving note:", error);
       toast({
@@ -72,13 +82,14 @@ export const useArtistNotes = (artistId: string, userId: string | null) => {
         description: "Failed to save note",
         variant: "destructive",
       });
+      return false;
     } finally {
       setSaving(false);
     }
   };
 
   const deleteNote = async () => {
-    if (!userId || !note) return;
+    if (!note) return false;
 
     setSaving(true);
     try {
@@ -88,12 +99,13 @@ export const useArtistNotes = (artistId: string, userId: string | null) => {
         .eq("id", note.id);
 
       if (error) throw error;
-      
+
       setNote(null);
       toast({
         title: "Success",
         description: "Note deleted successfully",
       });
+      return true;
     } catch (error) {
       console.error("Error deleting note:", error);
       toast({
@@ -101,6 +113,7 @@ export const useArtistNotes = (artistId: string, userId: string | null) => {
         description: "Failed to delete note",
         variant: "destructive",
       });
+      return false;
     } finally {
       setSaving(false);
     }
@@ -112,5 +125,6 @@ export const useArtistNotes = (artistId: string, userId: string | null) => {
     saving,
     saveNote,
     deleteNote,
+    fetchNote,
   };
 };

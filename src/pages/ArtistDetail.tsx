@@ -35,6 +35,7 @@ const ArtistDetail = () => {
     }
   }, [id]);
 
+
   const getUser = async () => {
     const { data: { user } } = await supabase.auth.getUser();
     setUser(user);

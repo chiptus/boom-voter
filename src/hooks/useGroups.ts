@@ -234,6 +234,30 @@ export const useGroups = () => {
     return groupService.getGroupById(groupId);
   };
 
+  const canEditArtists = async (): Promise<boolean> => {
+    if (!user) return false;
+    
+    try {
+      const { data, error } = await supabase
+        .from("group_members")
+        .select(`
+          groups (
+            name
+          )
+        `)
+        .eq("user_id", user.id);
+
+      if (error) throw error;
+
+      return data?.some((membership: any) => 
+        membership.groups?.name === "Core"
+      ) || false;
+    } catch (error) {
+      console.error("Error checking Core group permission:", error);
+      return false;
+    }
+  };
+
   const checkUserPermission = async (permission: 'edit_artists') => {
     if (!user) return false;
     
