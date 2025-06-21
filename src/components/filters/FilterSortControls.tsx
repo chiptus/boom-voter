@@ -3,7 +3,10 @@ import { useState, useEffect } from "react";
 import type { SortOption, FilterSortState } from "@/hooks/useUrlState";
 import { useGenres } from "@/hooks/useGenres";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Filter } from "lucide-react";
 import { SortControls } from "./SortControls";
+import { MobileFilters } from "./MobileFilters";
 import { DesktopFilters } from "./DesktopFilters";
 
 interface FilterSortControlsProps {
@@ -32,6 +35,8 @@ export const FilterSortControls = ({ state, onStateChange, onClear }: FilterSort
     onStateChange({ sort });
   };
 
+  const hasActiveFilters = state.stages.length > 0 || state.genres.length > 0 || state.minRating > 0;
+
   return (
     <div className="bg-white/10 backdrop-blur-md border border-purple-400/30 rounded-lg p-4 space-y-4">
       <div className="flex items-center justify-between">
@@ -39,7 +44,22 @@ export const FilterSortControls = ({ state, onStateChange, onClear }: FilterSort
           sort={state.sort}
           onSortChange={handleSortChange}
         />
-        {!isMobile && (
+        {isMobile ? (
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => setIsExpanded(!isExpanded)}
+            className="text-purple-300 hover:text-purple-100 flex items-center gap-2"
+          >
+            <Filter className="h-4 w-4" />
+            Filters
+            {hasActiveFilters && (
+              <Badge variant="secondary" className="bg-purple-600/50 text-purple-100 ml-1">
+                {state.stages.length + state.genres.length + (state.minRating > 0 ? 1 : 0)}
+              </Badge>
+            )}
+          </Button>
+        ) : (
           <Button
             variant="ghost"
             size="sm"
@@ -50,6 +70,15 @@ export const FilterSortControls = ({ state, onStateChange, onClear }: FilterSort
           </Button>
         )}
       </div>
+
+      {isMobile && isExpanded && (
+        <MobileFilters 
+          state={state}
+          genres={genres}
+          onStateChange={onStateChange}
+          onClear={onClear}
+        />
+      )}
 
       {!isMobile && isExpanded && (
         <DesktopFilters 
