@@ -1,3 +1,4 @@
+
 import { useEffect, useState, useMemo } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import type { Artist } from "./useArtistData";
@@ -38,9 +39,12 @@ export const useArtistFiltering = (artists: Artist[], filterSortState?: FilterSo
     return totalScore / artist.votes.length;
   };
 
-  // Get positive vote count for popularity (only count vote_type >= 1)
-  const getPositiveVoteCount = (artist: Artist): number => {
-    return artist.votes.filter(vote => vote.vote_type >= 1).length;
+  // Get weighted popularity score: 2 * (must go votes) + interested votes
+  const getWeightedPopularityScore = (artist: Artist): number => {
+    const mustGoVotes = artist.votes.filter(vote => vote.vote_type === 2).length;
+    const interestedVotes = artist.votes.filter(vote => vote.vote_type === 1).length;
+    
+    return (2 * mustGoVotes) + interestedVotes;
   };
 
   // Filter and sort artists based on current state
@@ -88,7 +92,7 @@ export const useArtistFiltering = (artists: Artist[], filterSortState?: FilterSo
         case 'rating-desc':
           return calculateRating(b) - calculateRating(a);
         case 'popularity-desc':
-          return getPositiveVoteCount(b) - getPositiveVoteCount(a);
+          return getWeightedPopularityScore(b) - getWeightedPopularityScore(a);
         case 'date-asc':
           if (!a.estimated_date && !b.estimated_date) return 0;
           if (!a.estimated_date) return 1;

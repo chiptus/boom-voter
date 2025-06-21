@@ -58,7 +58,7 @@ export const SortControls = ({ sort, onSortChange }: SortControlsProps) => {
                   
                   <div>
                     <strong className="text-purple-300">Most Popular:</strong>
-                    <p className="text-purple-100/80">Sort by total number of positive votes (Must go + Interested votes only)</p>
+                    <p className="text-purple-100/80">Sort by weighted popularity score (Must go = 2 points, Interested = 1 point)</p>
                   </div>
                   
                   <div>
