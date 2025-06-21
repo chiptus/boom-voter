@@ -49,12 +49,16 @@ export const FilterSortControls = ({ state, onStateChange, onClear }: FilterSort
             variant="ghost"
             size="sm"
             onClick={() => setIsExpanded(!isExpanded)}
-            className="text-purple-300 hover:text-purple-100 flex items-center gap-2"
+            className={`flex items-center gap-2 ${
+              isExpanded 
+                ? 'bg-purple-600/50 text-purple-100 hover:bg-purple-600/60' 
+                : 'text-purple-300 hover:text-purple-100'
+            }`}
           >
             <Filter className="h-4 w-4" />
             Filters
             {hasActiveFilters && (
-              <Badge variant="secondary" className="bg-purple-600/50 text-purple-100 ml-1">
+              <Badge variant="secondary" className="bg-purple-800/50 text-purple-100 ml-1">
                 {state.stages.length + state.genres.length + (state.minRating > 0 ? 1 : 0)}
               </Badge>
             )}
