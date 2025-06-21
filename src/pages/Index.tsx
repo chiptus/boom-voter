@@ -19,7 +19,7 @@ import { ViewToggle } from "@/components/ViewToggle";
 import { useArtistFiltering } from "@/hooks/useArtistFiltering";
 import { useArtistData } from "@/hooks/useArtistData";
 import { useVoting } from "@/hooks/useVoting";
-import { useKnowledge } from "@/hooks/useKnowledge";
+
 import { useUrlState } from "@/hooks/useUrlState";
 
 const Index = () => {
@@ -33,7 +33,7 @@ const Index = () => {
   
   const { artists, fetchArtists } = useArtistData();
   const { userVotes, votingLoading, handleVote } = useVoting(user, fetchArtists);
-  const { handleKnowledgeToggle } = useKnowledge(user);
+  
   const { filteredAndSortedArtists } = useArtistFiltering(artists, urlState);
 
   // Show loading while validating invite
@@ -143,7 +143,6 @@ const Index = () => {
                     userVote={userVotes[artist.id]}
                     votingLoading={votingLoading}
                     onVote={handleVote}
-                    onKnowledgeToggle={handleKnowledgeToggle}
                     onAuthRequired={() => setShowAuthDialog(true)}
                     onEditSuccess={fetchArtists}
                     user={user}
@@ -156,7 +155,7 @@ const Index = () => {
                     
                     votingLoading={votingLoading}
                     onVote={handleVote}
-                    onKnowledgeToggle={handleKnowledgeToggle}
+                    
                     onAuthRequired={() => setShowAuthDialog(true)}
                     onEditSuccess={fetchArtists}
                     user={user}
