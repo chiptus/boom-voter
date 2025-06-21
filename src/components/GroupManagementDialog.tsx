@@ -144,7 +144,7 @@ export const GroupManagementDialog = ({ open, onOpenChange }: GroupManagementDia
                         {group.is_creator && (
                           <div className="flex items-center space-x-2">
                             <Input
-                              placeholder="Username to invite"
+                              placeholder="Username or email"
                               value={selectedGroupId === group.id ? inviteUsername : ""}
                               onChange={(e) => {
                                 setSelectedGroupId(group.id);

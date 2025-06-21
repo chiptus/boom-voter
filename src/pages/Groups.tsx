@@ -43,7 +43,7 @@ const Groups = () => {
     if (!inviteUsername.trim()) {
       toast({
         title: "Error",
-        description: "Username is required",
+        description: "Username or email is required",
         variant: "destructive",
       });
       return;
@@ -182,7 +182,7 @@ const Groups = () => {
                         <Input
                           value={inviteUsername}
                           onChange={(e) => setInviteUsername(e.target.value)}
-                          placeholder="Enter username"
+                          placeholder="Username or email"
                           className="bg-white/10 border-purple-400/30 text-white"
                         />
                         <Button
