@@ -38,6 +38,33 @@ export type Database = {
           },
         ]
       }
+      artist_notes: {
+        Row: {
+          artist_id: string
+          created_at: string
+          id: string
+          note_content: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          artist_id: string
+          created_at?: string
+          id?: string
+          note_content: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          artist_id?: string
+          created_at?: string
+          id?: string
+          note_content?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       artists: {
         Row: {
           added_by: string

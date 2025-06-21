@@ -6,8 +6,11 @@ import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { ArrowLeft, ExternalLink, Music, Star, Heart, X, Play } from "lucide-react";
+import { ArrowLeft, ExternalLink, Music, Star, Heart, X, Play, Edit } from "lucide-react";
 import { ArtistImageLoader } from "@/components/ArtistImageLoader";
+import { ArtistNotes } from "@/components/ArtistNotes";
+import { EditArtistDialog } from "@/components/EditArtistDialog";
+import { useGroups } from "@/hooks/useGroups";
 import type { Database } from "@/integrations/supabase/types";
 
 type Artist = Database["public"]["Tables"]["artists"]["Row"] & {
@@ -21,7 +24,9 @@ const ArtistDetail = () => {
   const [userVote, setUserVote] = useState<number | null>(null);
   const [user, setUser] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const [canEdit, setCanEdit] = useState(false);
   const { toast } = useToast();
+  const { canEditArtists } = useGroups();
 
   useEffect(() => {
     if (id) {
@@ -35,7 +40,13 @@ const ArtistDetail = () => {
     setUser(user);
     if (user && id) {
       fetchUserVote(user.id);
+      checkPermissions();
     }
+  };
+
+  const checkPermissions = async () => {
+    const editPermission = await canEditArtists();
+    setCanEdit(editPermission);
   };
 
   const fetchArtist = async () => {
@@ -200,8 +211,29 @@ const ArtistDetail = () => {
                           Score: {netVoteScore > 0 ? '+' : ''}{netVoteScore}
                         </Badge>
                       )}
+                      {canEdit && (
+                        <Badge variant="outline" className="border-purple-400 text-purple-400">
+                          Core Member
+                        </Badge>
+                      )}
                     </div>
                   </div>
+                  {canEdit && (
+                    <EditArtistDialog
+                      artist={artist as any}
+                      onSuccess={fetchArtist}
+                      trigger={
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="border-purple-400 text-purple-400 hover:bg-purple-400 hover:text-white"
+                        >
+                          <Edit className="h-4 w-4 mr-2" />
+                          Edit Artist
+                        </Button>
+                      }
+                    />
+                  )}
                 </div>
                 {artist.description && (
                   <CardDescription className="text-purple-200 text-lg leading-relaxed">
@@ -270,6 +302,11 @@ const ArtistDetail = () => {
               </CardContent>
             </Card>
           </div>
+        </div>
+
+        {/* Artist Notes Section */}
+        <div className="mb-8">
+          <ArtistNotes artistId={id!} userId={user?.id || null} />
         </div>
       </div>
     </div>

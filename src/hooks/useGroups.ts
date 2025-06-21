@@ -234,6 +234,29 @@ export const useGroups = () => {
     return groupService.getGroupById(groupId);
   };
 
+  const checkUserPermission = async (permission: 'edit_artists') => {
+    if (!user) return false;
+    
+    try {
+      // Check if user is in the Core group
+      const { data, error } = await supabase
+        .from("group_members")
+        .select("groups!inner(name)")
+        .eq("user_id", user.id)
+        .eq("groups.name", "Core")
+        .single();
+
+      return !error && !!data;
+    } catch (error) {
+      console.error('Error checking user permission:', error);
+      return false;
+    }
+  };
+
+  const canEditArtists = async () => {
+    return checkUserPermission('edit_artists');
+  };
+
   return {
     user,
     groups,
@@ -247,5 +270,7 @@ export const useGroups = () => {
     removeMemberFromGroup,
     getGroupById,
     fetchUserGroups,
+    checkUserPermission,
+    canEditArtists,
   };
 };
