@@ -323,6 +323,10 @@ export type Database = {
           group_id: string
         }[]
       }
+      users_share_group: {
+        Args: { user1_id: string; user2_id: string }
+        Returns: boolean
+      }
       validate_invite_token: {
         Args: { token: string }
         Returns: {

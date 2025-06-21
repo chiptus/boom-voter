@@ -9,42 +9,63 @@ export interface ArtistNote {
   note_content: string;
   created_at: string;
   updated_at: string;
+  author_username?: string;
+  author_email?: string;
 }
 
 export const useArtistNotes = (artistId: string, userId: string | null) => {
-  const [note, setNote] = useState<ArtistNote | null>(null);
+  const [notes, setNotes] = useState<ArtistNote[]>([]);
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
   const { toast } = useToast();
 
   useEffect(() => {
     if (artistId && userId) {
-      fetchNote();
+      fetchNotes();
     }
   }, [artistId, userId]);
 
-  const fetchNote = async () => {
+  const fetchNotes = async () => {
     if (!artistId || !userId) return;
 
     setLoading(true);
     try {
-      const { data, error } = await supabase
+      const { data: notesData, error: notesError } = await supabase
         .from("artist_notes")
         .select("*")
         .eq("artist_id", artistId)
-        .eq("user_id", userId)
-        .maybeSingle();
+        .order("created_at", { ascending: false });
 
-      if (error && error.code !== 'PGRST116') {
-        throw error;
+      if (notesError) {
+        throw notesError;
       }
 
-      setNote(data);
+      // Get author profiles for all notes
+      const userIds = notesData?.map(note => note.user_id) || [];
+      const { data: profilesData, error: profilesError } = await supabase
+        .from("profiles")
+        .select("id, username, email")
+        .in("id", userIds);
+
+      if (profilesError) {
+        console.error("Error fetching profiles:", profilesError);
+      }
+
+      const notesWithAuthor = notesData?.map(note => {
+        const profile = profilesData?.find(p => p.id === note.user_id);
+        return {
+          ...note,
+          author_username: profile?.username,
+          author_email: profile?.email,
+        };
+      }) || [];
+
+      setNotes(notesWithAuthor);
     } catch (error) {
-      console.error("Error fetching note:", error);
+      console.error("Error fetching notes:", error);
       toast({
         title: "Error",
-        description: "Failed to fetch note",
+        description: "Failed to fetch notes",
         variant: "destructive",
       });
     } finally {
@@ -69,7 +90,7 @@ export const useArtistNotes = (artistId: string, userId: string | null) => {
 
       if (error) throw error;
 
-      setNote(data);
+      fetchNotes(); // Refresh the notes list
       toast({
         title: "Success",
         description: "Note saved successfully",
@@ -88,19 +109,19 @@ export const useArtistNotes = (artistId: string, userId: string | null) => {
     }
   };
 
-  const deleteNote = async () => {
-    if (!note) return false;
+  const deleteNote = async (noteId: string) => {
+    if (!noteId) return false;
 
     setSaving(true);
     try {
       const { error } = await supabase
         .from("artist_notes")
         .delete()
-        .eq("id", note.id);
+        .eq("id", noteId);
 
       if (error) throw error;
 
-      setNote(null);
+      fetchNotes(); // Refresh the notes list
       toast({
         title: "Success",
         description: "Note deleted successfully",
@@ -120,11 +141,11 @@ export const useArtistNotes = (artistId: string, userId: string | null) => {
   };
 
   return {
-    note,
+    notes,
     loading,
     saving,
     saveNote,
     deleteNote,
-    fetchNote,
+    fetchNotes,
   };
 };
