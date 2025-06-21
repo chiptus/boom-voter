@@ -193,23 +193,85 @@ export const useGroups = () => {
     return true;
   };
 
-  const inviteToGroup = async (groupId: string, username: string) => {
+  const inviteToGroup = async (groupId: string, usernameOrEmail: string) => {
     if (!user) return false;
 
-    // First, find the user by username (assuming profiles table has usernames)
+    // First, try to find the user by username or email
     const { data: profile, error: profileError } = await supabase
       .from("profiles")
       .select("id")
-      .eq("username", username)
+      .or(`username.eq.${usernameOrEmail},email.eq.${usernameOrEmail}`)
       .single();
 
+    // If not found in profiles, check auth.users by email
     if (profileError || !profile) {
-      toast({
-        title: "Error",
-        description: "User not found",
-        variant: "destructive",
-      });
-      return false;
+      // Check if it's an email format
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (emailRegex.test(usernameOrEmail)) {
+        // Try to find by email in auth system
+        const { data: authData, error: authError } = await supabase
+          .rpc('get_user_id_by_email', { email: usernameOrEmail });
+        
+        if (authError || !authData) {
+          toast({
+            title: "Error",
+            description: "User not found",
+            variant: "destructive",
+          });
+          return false;
+        }
+        
+        // Use the auth user ID
+        const userId = authData;
+        
+        // Check if user is already in the group
+        const { data: existingMember } = await supabase
+          .from("group_members")
+          .select("id")
+          .eq("group_id", groupId)
+          .eq("user_id", userId)
+          .single();
+
+        if (existingMember) {
+          toast({
+            title: "Error",
+            description: "User is already in this group",
+            variant: "destructive",
+          });
+          return false;
+        }
+
+        // Add user to group
+        const { error } = await supabase
+          .from("group_members")
+          .insert({
+            group_id: groupId,
+            user_id: userId,
+          });
+
+        if (error) {
+          toast({
+            title: "Error",
+            description: "Failed to invite user to group",
+            variant: "destructive",
+          });
+          return false;
+        }
+
+        toast({
+          title: "Success",
+          description: `${usernameOrEmail} has been added to the group`,
+        });
+
+        return true;
+      } else {
+        toast({
+          title: "Error",
+          description: "User not found",
+          variant: "destructive",
+        });
+        return false;
+      }
     }
 
     // Check if user is already in the group
@@ -248,7 +310,7 @@ export const useGroups = () => {
 
     toast({
       title: "Success",
-      description: `${username} has been added to the group`,
+      description: `${usernameOrEmail} has been added to the group`,
     });
 
     return true;
