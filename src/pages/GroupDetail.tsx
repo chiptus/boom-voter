@@ -12,7 +12,7 @@ import type { Group, GroupMember } from "@/types/groups";
 const GroupDetail = () => {
   const { groupId } = useParams<{ groupId: string }>();
   const navigate = useNavigate();
-  const { user, getGroupById, getGroupMembers, removeMemberFromGroup } = useGroups();
+  const { user, getGroupById, getGroupMembers, removeMemberFromGroup, loading: authLoading } = useGroups();
   const { toast } = useToast();
   const [group, setGroup] = useState<Group | null>(null);
   const [members, setMembers] = useState<GroupMember[]>([]);
@@ -20,12 +20,20 @@ const GroupDetail = () => {
   const [removingMember, setRemovingMember] = useState<string | null>(null);
 
   useEffect(() => {
-    if (!groupId || !user) {
+    if (authLoading) return; // Wait for auth to load
+    
+    if (!groupId) {
       navigate("/groups");
       return;
     }
+    
+    if (!user) {
+      navigate("/"); // Redirect to home to sign in
+      return;
+    }
+    
     fetchGroupDetails();
-  }, [groupId, user]);
+  }, [groupId, user, authLoading]);
 
   const fetchGroupDetails = async () => {
     if (!groupId) return;
@@ -63,6 +71,15 @@ const GroupDetail = () => {
       setRemovingMember(null);
     }
   };
+
+  // Show loading while checking authentication
+  if (authLoading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900 flex items-center justify-center">
+        <div className="text-white text-xl">Loading...</div>
+      </div>
+    );
+  }
 
   if (!user) {
     return (
