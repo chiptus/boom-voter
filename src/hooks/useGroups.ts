@@ -210,6 +210,30 @@ export const useGroups = () => {
     return groupService.getGroupMembers(groupId);
   };
 
+  const removeMemberFromGroup = async (groupId: string, userId: string) => {
+    if (!user) return false;
+
+    try {
+      await groupService.removeMemberFromGroup(groupId, userId, user.id);
+      toast({
+        title: "Success",
+        description: "Member removed from group successfully",
+      });
+      return true;
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: error instanceof Error ? error.message : "Failed to remove member",
+        variant: "destructive",
+      });
+      return false;
+    }
+  };
+
+  const getGroupById = async (groupId: string) => {
+    return groupService.getGroupById(groupId);
+  };
+
   return {
     user,
     groups,
@@ -220,6 +244,8 @@ export const useGroups = () => {
     inviteToGroup,
     deleteGroup,
     getGroupMembers,
+    removeMemberFromGroup,
+    getGroupById,
     fetchUserGroups,
   };
 };

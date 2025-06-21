@@ -158,20 +158,85 @@ export const groupService = {
   },
 
   async getGroupMembers(groupId: string): Promise<GroupMember[]> {
-    const { data, error } = await supabase
+    // First get the group members
+    const { data: members, error } = await supabase
       .from("group_members")
-      .select(`
-        *,
-        profiles:user_id(username)
-      `)
-      .eq("group_id", groupId);
+      .select("*")
+      .eq("group_id", groupId)
+      .order("joined_at", { ascending: true });
 
     if (error) {
       console.error('Error fetching group members:', error);
       return [];
     }
 
-    return data || [];
+    if (!members || members.length === 0) {
+      return [];
+    }
+
+    // Then fetch profile information for each member
+    const membersWithProfiles = await Promise.all(
+      members.map(async (member) => {
+        const { data: profile } = await supabase
+          .from("profiles")
+          .select("username, email")
+          .eq("id", member.user_id)
+          .single();
+
+        return {
+          ...member,
+          profiles: profile || { username: null, email: null }
+        };
+      })
+    );
+
+    return membersWithProfiles;
+  },
+
+  async removeMemberFromGroup(groupId: string, userId: string, currentUserId: string): Promise<void> {
+    // First check if current user is the group creator
+    const { data: group, error: groupError } = await supabase
+      .from("groups")
+      .select("created_by")
+      .eq("id", groupId)
+      .single();
+
+    if (groupError || !group) {
+      throw new Error("Group not found");
+    }
+
+    if (group.created_by !== currentUserId) {
+      throw new Error("Only group creators can remove members");
+    }
+
+    // Prevent removing the creator
+    if (userId === currentUserId) {
+      throw new Error("You cannot remove yourself as the group creator");
+    }
+
+    const { error } = await supabase
+      .from("group_members")
+      .delete()
+      .eq("group_id", groupId)
+      .eq("user_id", userId);
+
+    if (error) {
+      throw new Error("Failed to remove member from group");
+    }
+  },
+
+  async getGroupById(groupId: string): Promise<Group | null> {
+    const { data, error } = await supabase
+      .from("groups")
+      .select("*")
+      .eq("id", groupId)
+      .single();
+
+    if (error) {
+      throw new Error("Failed to fetch group details");
+    }
+
+    return data;
   },
 
   // New invite-related functions

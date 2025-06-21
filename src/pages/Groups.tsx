@@ -151,6 +151,14 @@ const Groups = () => {
                           )}
                         </div>
                         <div className="flex space-x-2">
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => navigate(`/groups/${group.id}`)}
+                            className="bg-white/10 border-purple-400/30 text-white hover:bg-white/20"
+                          >
+                            <Users className="h-4 w-4" />
+                          </Button>
                           {group.is_creator ? (
                             <>
                               <Button

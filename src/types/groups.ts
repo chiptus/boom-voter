@@ -5,4 +5,9 @@ export type Group = Database["public"]["Tables"]["groups"]["Row"] & {
   is_creator?: boolean;
 };
 
-export type GroupMember = Database["public"]["Tables"]["group_members"]["Row"];
+export type GroupMember = Database["public"]["Tables"]["group_members"]["Row"] & {
+  profiles?: {
+    username?: string;
+    email?: string;
+  };
+};
