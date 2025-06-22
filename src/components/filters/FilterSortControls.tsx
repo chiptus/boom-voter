@@ -2,6 +2,7 @@
 import { useState, useEffect } from "react";
 import type { SortOption, FilterSortState } from "@/hooks/useUrlState";
 import { useGenres } from "@/hooks/useGenres";
+import { useGroups } from "@/hooks/useGroups";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Filter } from "lucide-react";
@@ -21,6 +22,7 @@ export const FilterSortControls = ({ state, onStateChange, onClear }: FilterSort
   const [isExpanded, setIsExpanded] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
   const { genres } = useGenres();
+  const { groups } = useGroups();
 
   useEffect(() => {
     const checkMobile = () => {
@@ -37,7 +39,7 @@ export const FilterSortControls = ({ state, onStateChange, onClear }: FilterSort
     onStateChange({ sort });
   };
 
-  const hasActiveFilters = state.stages.length > 0 || state.genres.length > 0 || state.minRating > 0;
+  const hasActiveFilters = state.stages.length > 0 || state.genres.length > 0 || state.minRating > 0 || state.groupId;
 
   return (
     <div className="bg-white/10 backdrop-blur-md border border-purple-400/30 rounded-lg p-4 space-y-4">
@@ -47,16 +49,11 @@ export const FilterSortControls = ({ state, onStateChange, onClear }: FilterSort
           onSortChange={handleSortChange}
         />
         <div className="flex items-center gap-4">
-          <GroupSelector
-            selectedGroupId={state.groupId}
-            onGroupChange={(groupId) => onStateChange({ groupId })}
-          />
           <ViewToggle
             view={state.view}
             onViewChange={(view) => onStateChange({ view })}
           />
-        </div>
-        {isMobile ? (
+          {isMobile ? (
           <Button
             variant="ghost"
             size="sm"
@@ -71,7 +68,7 @@ export const FilterSortControls = ({ state, onStateChange, onClear }: FilterSort
             Filters
             {hasActiveFilters && (
               <Badge variant="secondary" className="bg-purple-800/50 text-purple-100 ml-1">
-                {state.stages.length + state.genres.length + (state.minRating > 0 ? 1 : 0)}
+                {state.stages.length + state.genres.length + (state.minRating > 0 ? 1 : 0) + (state.groupId ? 1 : 0)}
               </Badge>
             )}
           </Button>
@@ -85,12 +82,14 @@ export const FilterSortControls = ({ state, onStateChange, onClear }: FilterSort
             {isExpanded ? 'Hide' : 'Show'} Filters
           </Button>
         )}
+        </div>
       </div>
 
       {isMobile && isExpanded && (
         <MobileFilters 
           state={state}
           genres={genres}
+          groups={groups}
           onStateChange={onStateChange}
           onClear={onClear}
         />
@@ -100,6 +99,7 @@ export const FilterSortControls = ({ state, onStateChange, onClear }: FilterSort
         <DesktopFilters 
           state={state}
           genres={genres}
+          groups={groups}
           onStateChange={onStateChange}
           onClear={onClear}
         />
