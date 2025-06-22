@@ -100,87 +100,140 @@ export const ArtistListItem = ({ artist, userVote, userKnowledge, votingLoading,
   return (
     <div className="bg-white/10 backdrop-blur-md border-purple-400/30 hover:bg-white/15 transition-all duration-300 rounded-lg p-4">
       {/* Mobile Layout (sm and below) */}
-      <div className="block md:hidden space-y-3">
-        {/* Top Row: Image + Basic Info */}
+      <div className="block md:hidden">
         <div className="flex items-start gap-3 relative">
-          <Link to={`/artist/${artist.id}`} className="flex-shrink-0">
-            <ArtistImageLoader 
-              src={artist.image_url}
-              alt={artist.name}
-              className="w-12 h-12 rounded-lg overflow-hidden hover:opacity-90 transition-opacity cursor-pointer"
-            />
-          </Link>
-          <div className="flex-1 min-w-0">
-            <div className="flex items-center gap-2 mb-1">
-              <h3 className="text-white text-base font-semibold truncate">{artist.name}</h3>
-              
-              {/* Knowledge Toggle */}
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={handleKnowledgeToggle}
-                className={`p-1 h-6 w-6 ${userKnowledge ? 'text-purple-400 hover:text-purple-300' : 'text-purple-600 hover:text-purple-500'}`}
-                title={userKnowledge ? "I know this artist" : "Mark as known"}
-              >
-                {userKnowledge ? <Eye className="h-3 w-3" /> : <EyeOff className="h-3 w-3" />}
-              </Button>
-              
-              {/* Social Links - small icons next to name */}
-              {artist.spotify_url && getSocialPlatformLogo(artist.spotify_url) && (
-                <Button 
-                  asChild 
-                  variant="secondary"
+          {/* Left side: Image + Content */}
+          <div className="flex-1 flex items-start gap-3 min-w-0">
+            <Link to={`/artist/${artist.id}`} className="flex-shrink-0">
+              <ArtistImageLoader 
+                src={artist.image_url}
+                alt={artist.name}
+                className="w-12 h-12 rounded-lg overflow-hidden hover:opacity-90 transition-opacity cursor-pointer"
+              />
+            </Link>
+            <div className="flex-1 min-w-0 space-y-2">
+              <div className="flex items-center gap-2">
+                <h3 className="text-white text-base font-semibold truncate">{artist.name}</h3>
+                
+                {/* Knowledge Toggle */}
+                <Button
+                  variant="ghost"
                   size="sm"
-                  className={`p-1 h-6 w-6 bg-white/20 hover:bg-white/30 backdrop-blur-sm border-0 ${getSocialPlatformLogo(artist.spotify_url)?.color}`}
-                  title={`Open in ${getSocialPlatformLogo(artist.spotify_url)?.platform}`}
+                  onClick={handleKnowledgeToggle}
+                  className={`p-1 h-6 w-6 ${userKnowledge ? 'text-purple-400 hover:text-purple-300' : 'text-purple-600 hover:text-purple-500'}`}
+                  title={userKnowledge ? "I know this artist" : "Mark as known"}
                 >
-                  <a href={artist.spotify_url} target="_blank" rel="noopener noreferrer">
-                    <img 
-                      src={getSocialPlatformLogo(artist.spotify_url)?.logo} 
-                      alt={`${getSocialPlatformLogo(artist.spotify_url)?.platform} logo`}
-                      className="h-3 w-3 object-contain"
-                    />
-                  </a>
+                  {userKnowledge ? <Eye className="h-3 w-3" /> : <EyeOff className="h-3 w-3" />}
                 </Button>
-              )}
-              {artist.soundcloud_url && getSocialPlatformLogo(artist.soundcloud_url) && (
-                <Button 
-                  asChild 
-                  variant="secondary"
-                  size="sm"
-                  className={`p-1 h-6 w-6 bg-white/20 hover:bg-white/30 backdrop-blur-sm border-0 ${getSocialPlatformLogo(artist.soundcloud_url)?.color}`}
-                  title={`Open in ${getSocialPlatformLogo(artist.soundcloud_url)?.platform}`}
-                >
-                  <a href={artist.soundcloud_url} target="_blank" rel="noopener noreferrer">
-                    <img 
-                      src={getSocialPlatformLogo(artist.soundcloud_url)?.logo} 
-                      alt={`${getSocialPlatformLogo(artist.soundcloud_url)?.platform} logo`}
-                      className="h-3 w-3 object-contain"
-                    />
-                  </a>
-                </Button>
+                
+                {/* Social Links - small icons next to name */}
+                {artist.spotify_url && getSocialPlatformLogo(artist.spotify_url) && (
+                  <Button 
+                    asChild 
+                    variant="secondary"
+                    size="sm"
+                    className={`p-1 h-6 w-6 bg-white/20 hover:bg-white/30 backdrop-blur-sm border-0 ${getSocialPlatformLogo(artist.spotify_url)?.color}`}
+                    title={`Open in ${getSocialPlatformLogo(artist.spotify_url)?.platform}`}
+                  >
+                    <a href={artist.spotify_url} target="_blank" rel="noopener noreferrer">
+                      <img 
+                        src={getSocialPlatformLogo(artist.spotify_url)?.logo} 
+                        alt={`${getSocialPlatformLogo(artist.spotify_url)?.platform} logo`}
+                        className="h-3 w-3 object-contain"
+                      />
+                    </a>
+                  </Button>
+                )}
+                {artist.soundcloud_url && getSocialPlatformLogo(artist.soundcloud_url) && (
+                  <Button 
+                    asChild 
+                    variant="secondary"
+                    size="sm"
+                    className={`p-1 h-6 w-6 bg-white/20 hover:bg-white/30 backdrop-blur-sm border-0 ${getSocialPlatformLogo(artist.soundcloud_url)?.color}`}
+                    title={`Open in ${getSocialPlatformLogo(artist.soundcloud_url)?.platform}`}
+                  >
+                    <a href={artist.soundcloud_url} target="_blank" rel="noopener noreferrer">
+                      <img 
+                        src={getSocialPlatformLogo(artist.soundcloud_url)?.logo} 
+                        alt={`${getSocialPlatformLogo(artist.soundcloud_url)?.platform} logo`}
+                        className="h-3 w-3 object-contain"
+                      />
+                    </a>
+                  </Button>
+                )}
+              </div>
+              
+              <div className="flex flex-wrap items-center gap-1">
+                {artist.music_genres && (
+                  <Badge variant="secondary" className="bg-purple-600/50 text-purple-100 text-xs">
+                    {artist.music_genres.name}
+                  </Badge>
+                )}
+                {artist.stage && (
+                  <div className="flex items-center gap-1 text-xs text-purple-200">
+                    <MapPin className="h-3 w-3" />
+                    <span>{artist.stage}</span>
+                  </div>
+                )}
+                {artist.estimated_date && (
+                  <div className="flex items-center gap-1 text-xs text-purple-200">
+                    <Calendar className="h-3 w-3" />
+                    <span>{formatDate(artist.estimated_date)}</span>
+                  </div>
+                )}
+              </div>
+
+              {/* Description */}
+              {artist.description && (
+                <p className="text-purple-200 text-sm line-clamp-2">
+                  {artist.description}
+                </p>
               )}
             </div>
+          </div>
+
+          {/* Right side: Voting Buttons */}
+          <div className="flex flex-col gap-1 flex-shrink-0">
+            <Button
+              variant={userVote === 2 ? "default" : "outline"}
+              size="sm"
+              onClick={() => handleVote(2)}
+              disabled={votingLoading}
+              className={`text-xs w-12 ${userVote === 2 ? "bg-orange-600 hover:bg-orange-700" : "border-orange-400 text-orange-400 hover:bg-orange-400 hover:text-white"}`}
+              title="Must go"
+            >
+              <Star className="h-3 w-3" />
+              <span className="sr-only">{getVoteCount(2)}</span>
+            </Button>
+            <span className="text-xs text-center text-orange-400">{getVoteCount(2)}</span>
             
-            <div className="flex flex-wrap items-center gap-1 mt-1">
-              {artist.music_genres && (
-                <Badge variant="secondary" className="bg-purple-600/50 text-purple-100 text-xs">
-                  {artist.music_genres.name}
-                </Badge>
-              )}
-              {artist.stage && (
-                <div className="flex items-center gap-1 text-xs text-purple-200">
-                  <MapPin className="h-3 w-3" />
-                  <span>{artist.stage}</span>
-                </div>
-              )}
-              {artist.estimated_date && (
-                <div className="flex items-center gap-1 text-xs text-purple-200">
-                  <Calendar className="h-3 w-3" />
-                  <span>{formatDate(artist.estimated_date)}</span>
-                </div>
-              )}
-            </div>
+            <Button
+              variant={userVote === 1 ? "default" : "outline"}
+              size="sm"
+              onClick={() => handleVote(1)}
+              disabled={votingLoading}
+              className={`text-xs w-12 ${userVote === 1 ? "bg-blue-600 hover:bg-blue-700" : "border-blue-400 text-blue-400 hover:bg-blue-400 hover:text-white"}`}
+              title="Interested"
+            >
+              <Heart className="h-3 w-3" />
+              <span className="sr-only">{getVoteCount(1)}</span>
+            </Button>
+            <span className="text-xs text-center text-blue-400">{getVoteCount(1)}</span>
+            
+            <Button
+              variant={userVote === -1 ? "default" : "outline"}
+              size="sm"
+              onClick={() => handleVote(-1)}
+              disabled={votingLoading}
+              className={`text-xs w-12 ${userVote === -1 ? "bg-gray-600 hover:bg-gray-700" : "border-gray-400 text-gray-400 hover:bg-gray-400 hover:text-white"}`}
+              title="Won't go"
+            >
+              <X className="h-3 w-3" />
+              <span className="sr-only">{getVoteCount(-1)}</span>
+            </Button>
+            <span className="text-xs text-center text-gray-400">{getVoteCount(-1)}</span>
+            
+            {votingLoading && <div className="h-4 w-4 animate-spin rounded-full border-2 border-purple-400 border-t-transparent mx-auto" />}
           </div>
           
           {/* Core Team Dropdown Menu */}
@@ -223,51 +276,6 @@ export const ArtistListItem = ({ artist, userVote, userKnowledge, votingLoading,
               </DropdownMenu>
             </div>
           )}
-        </div>
-
-        {/* Description */}
-        {artist.description && (
-          <p className="text-purple-200 text-sm line-clamp-2">
-            {artist.description}
-          </p>
-        )}
-
-        {/* Voting Buttons */}
-        <div className="flex flex-wrap gap-2">
-          <Button
-            variant={userVote === 2 ? "default" : "outline"}
-            size="sm"
-            onClick={() => handleVote(2)}
-            disabled={votingLoading}
-            className={`text-xs ${userVote === 2 ? "bg-orange-600 hover:bg-orange-700" : "border-orange-400 text-orange-400 hover:bg-orange-400 hover:text-white"}`}
-            title="Must go"
-          >
-            <Star className="h-3 w-3 mr-1" />
-            {getVoteCount(2)}
-          </Button>
-          <Button
-            variant={userVote === 1 ? "default" : "outline"}
-            size="sm"
-            onClick={() => handleVote(1)}
-            disabled={votingLoading}
-            className={`text-xs ${userVote === 1 ? "bg-blue-600 hover:bg-blue-700" : "border-blue-400 text-blue-400 hover:bg-blue-400 hover:text-white"}`}
-            title="Interested"
-          >
-            <Heart className="h-3 w-3 mr-1" />
-            {getVoteCount(1)}
-          </Button>
-          <Button
-            variant={userVote === -1 ? "default" : "outline"}
-            size="sm"
-            onClick={() => handleVote(-1)}
-            disabled={votingLoading}
-            className={`text-xs ${userVote === -1 ? "bg-gray-600 hover:bg-gray-700" : "border-gray-400 text-gray-400 hover:bg-gray-400 hover:text-white"}`}
-            title="Won't go"
-          >
-            <X className="h-3 w-3 mr-1" />
-            {getVoteCount(-1)}
-          </Button>
-          {votingLoading && <div className="h-4 w-4 animate-spin rounded-full border-2 border-purple-400 border-t-transparent" />}
         </div>
       </div>
 
