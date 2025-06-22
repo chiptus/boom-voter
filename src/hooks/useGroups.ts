@@ -184,6 +184,14 @@ export const useGroups = () => {
     return canEdit;
   };
 
+  const canAddArtists = async () => {
+    return canEdit;
+  };
+
+  const canAddGenres = async () => {
+    return canEdit;
+  };
+
   return {
     user,
     groups,
@@ -199,5 +207,7 @@ export const useGroups = () => {
     fetchUserGroups,
     checkUserPermission,
     canEditArtists,
+    canAddArtists,
+    canAddGenres,
   };
 };
