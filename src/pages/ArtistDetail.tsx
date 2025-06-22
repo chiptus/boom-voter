@@ -1,5 +1,5 @@
 
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { ArtistDetailHeader } from "@/components/artist-detail/ArtistDetailHeader";
 import { ArtistImageCard } from "@/components/artist-detail/ArtistImageCard";
 import { ArtistInfoCard } from "@/components/artist-detail/ArtistInfoCard";
@@ -10,6 +10,7 @@ import { useArtistDetail } from "@/hooks/useArtistDetail";
 
 const ArtistDetail = () => {
   const { id } = useParams<{ id: string }>();
+  const navigate = useNavigate();
   const {
     artist,
     user,
@@ -20,7 +21,13 @@ const ArtistDetail = () => {
     getVoteCount,
     netVoteScore,
     fetchArtist,
+    deleteArtist,
   } = useArtistDetail(id);
+
+  const handleDeleteArtist = async () => {
+    await deleteArtist();
+    navigate('/');
+  };
 
   if (loading) {
     return <ArtistLoadingState />;
@@ -50,6 +57,7 @@ const ArtistDetail = () => {
             onVote={handleVote}
             getVoteCount={getVoteCount}
             onArtistUpdate={fetchArtist}
+            onDeleteArtist={canEdit ? handleDeleteArtist : undefined}
           />
         </div>
 

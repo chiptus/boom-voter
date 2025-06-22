@@ -28,7 +28,7 @@ const Index = () => {
   const [showAddGenreDialog, setShowAddGenreDialog] = useState(false);
   const { state: urlState, updateUrlState, clearFilters } = useUrlState();
   
-  const { artists, fetchArtists } = useArtistData();
+  const { artists, fetchArtists, deleteArtist } = useArtistData();
   const { userVotes, votingLoading, handleVote } = useVoting(user, fetchArtists);
   
   const { filteredAndSortedArtists } = useArtistFiltering(artists, urlState);
@@ -128,6 +128,7 @@ const Index = () => {
                     onKnowledgeToggle={async (artistId: string) => ({ requiresAuth: !user })}
                     onAuthRequired={() => setShowAuthDialog(true)}
                     onEditSuccess={fetchArtists}
+                    onDeleteArtist={deleteArtist}
                     user={user}
                   />
                 ) : (
@@ -141,6 +142,7 @@ const Index = () => {
                     onKnowledgeToggle={async (artistId: string) => ({ requiresAuth: !user })}
                     onAuthRequired={() => setShowAuthDialog(true)}
                     onEditSuccess={fetchArtists}
+                    onDeleteArtist={deleteArtist}
                     user={user}
                   />
                 )

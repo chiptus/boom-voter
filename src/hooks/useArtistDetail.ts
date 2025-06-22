@@ -126,6 +126,30 @@ export const useArtistDetail = (id: string | undefined) => {
 
   const netVoteScore = artist ? getVoteCount(1) - getVoteCount(-1) : 0;
 
+  const deleteArtist = async () => {
+    if (!id) return;
+    
+    const { error } = await supabase
+      .from("artists")
+      .delete()
+      .eq("id", id);
+
+    if (error) {
+      console.error('Error deleting artist:', error);
+      toast({
+        title: "Error",
+        description: "Failed to delete artist",
+        variant: "destructive",
+      });
+      throw error;
+    } else {
+      toast({
+        title: "Success",
+        description: "Artist deleted successfully",
+      });
+    }
+  };
+
   return {
     artist,
     user,
@@ -136,5 +160,6 @@ export const useArtistDetail = (id: string | undefined) => {
     getVoteCount,
     netVoteScore,
     fetchArtist,
+    deleteArtist,
   };
 };

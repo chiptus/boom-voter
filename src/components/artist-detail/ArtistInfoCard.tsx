@@ -1,8 +1,9 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Edit, ExternalLink, Music, Play } from "lucide-react";
+import { Edit, ExternalLink, Music, Play, Trash } from "lucide-react";
 import { EditArtistDialog } from "@/components/EditArtistDialog";
+import { DeleteArtistDialog } from "@/components/DeleteArtistDialog";
 import { ArtistVotingButtons } from "./ArtistVotingButtons";
 import type { Database } from "@/integrations/supabase/types";
 
@@ -19,6 +20,7 @@ interface ArtistInfoCardProps {
   onVote: (voteType: number) => void;
   getVoteCount: (voteType: number) => number;
   onArtistUpdate: () => void;
+  onDeleteArtist?: () => Promise<void>;
 }
 
 export const ArtistInfoCard = ({ 
@@ -28,7 +30,8 @@ export const ArtistInfoCard = ({
   netVoteScore, 
   onVote, 
   getVoteCount, 
-  onArtistUpdate 
+  onArtistUpdate,
+  onDeleteArtist 
 }: ArtistInfoCardProps) => {
   return (
     <div className="lg:col-span-2">
@@ -60,20 +63,38 @@ export const ArtistInfoCard = ({
               </div>
             </div>
             {canEdit && (
-              <EditArtistDialog
-                artist={artist as any}
-                onSuccess={onArtistUpdate}
-                trigger={
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="border-purple-400 text-purple-400 hover:bg-purple-400 hover:text-white"
-                  >
-                    <Edit className="h-4 w-4 mr-2" />
-                    Edit Artist
-                  </Button>
-                }
-              />
+              <div className="flex gap-2">
+                <EditArtistDialog
+                  artist={artist as any}
+                  onSuccess={onArtistUpdate}
+                  trigger={
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="border-purple-400 text-purple-400 hover:bg-purple-400 hover:text-white"
+                    >
+                      <Edit className="h-4 w-4 mr-2" />
+                      Edit Artist
+                    </Button>
+                  }
+                />
+                {onDeleteArtist && (
+                  <DeleteArtistDialog
+                    artist={artist as any}
+                    onDelete={onDeleteArtist}
+                    trigger={
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="border-red-400 text-red-400 hover:bg-red-400 hover:text-white"
+                      >
+                        <Trash className="h-4 w-4 mr-2" />
+                        Delete Artist
+                      </Button>
+                    }
+                  />
+                )}
+              </div>
             )}
           </div>
           {artist.description && (

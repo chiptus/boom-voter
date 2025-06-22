@@ -2,9 +2,10 @@
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Star, Heart, X, ExternalLink, Play, Music, MapPin, Calendar, Eye, EyeOff, Edit } from "lucide-react";
+import { Star, Heart, X, ExternalLink, Play, Music, MapPin, Calendar, Eye, EyeOff, Edit, Trash } from "lucide-react";
 import { ArtistImageLoader } from "./ArtistImageLoader";
 import { EditArtistDialog } from "./EditArtistDialog";
+import { DeleteArtistDialog } from "./DeleteArtistDialog";
 import { useToast } from "@/hooks/use-toast";
 import { useGroups } from "@/hooks/useGroups";
 import { useState, useEffect } from "react";
@@ -19,10 +20,11 @@ interface ArtistListItemProps {
   onKnowledgeToggle: (artistId: string) => Promise<{ requiresAuth: boolean }>;
   onAuthRequired: () => void;
   onEditSuccess?: () => void;
+  onDeleteArtist?: (artistId: string) => Promise<void>;
   user?: any;
 }
 
-export const ArtistListItem = ({ artist, userVote, userKnowledge, votingLoading, onVote, onKnowledgeToggle, onAuthRequired, onEditSuccess, user }: ArtistListItemProps) => {
+export const ArtistListItem = ({ artist, userVote, userKnowledge, votingLoading, onVote, onKnowledgeToggle, onAuthRequired, onEditSuccess, onDeleteArtist, user }: ArtistListItemProps) => {
   const { toast } = useToast();
   const { canEditArtists } = useGroups();
   const [canEdit, setCanEdit] = useState(false);
@@ -194,17 +196,30 @@ export const ArtistListItem = ({ artist, userVote, userKnowledge, votingLoading,
               <ExternalLink className="h-3 w-3" />
             </Link>
           </Button>
-          {/* Edit Button - only show for Core team members */}
+          {/* Edit and Delete Buttons - only show for Core team members */}
           {canEdit && (
-            <EditArtistDialog
-              artist={artist}
-              onSuccess={onEditSuccess}
-              trigger={
-                <Button variant="outline" size="sm" className="border-purple-400 text-purple-400 hover:bg-purple-400 hover:text-white text-xs px-2 py-1 h-8">
-                  <Edit className="h-3 w-3" />
-                </Button>
-              }
-            />
+            <>
+              <EditArtistDialog
+                artist={artist}
+                onSuccess={onEditSuccess}
+                trigger={
+                  <Button variant="outline" size="sm" className="border-purple-400 text-purple-400 hover:bg-purple-400 hover:text-white text-xs px-2 py-1 h-8">
+                    <Edit className="h-3 w-3" />
+                  </Button>
+                }
+              />
+              {onDeleteArtist && (
+                <DeleteArtistDialog
+                  artist={artist}
+                  onDelete={onDeleteArtist}
+                  trigger={
+                    <Button variant="outline" size="sm" className="border-red-400 text-red-400 hover:bg-red-400 hover:text-white text-xs px-2 py-1 h-8">
+                      <Trash className="h-3 w-3" />
+                    </Button>
+                  }
+                />
+              )}
+            </>
           )}
         </div>
       </div>
@@ -334,18 +349,31 @@ export const ArtistListItem = ({ artist, userVote, userKnowledge, votingLoading,
            </Link>
          </Button>
          
-          {/* Edit Button - only show for Core team members */}
-          {canEdit && (
-            <EditArtistDialog
-              artist={artist}
-              onSuccess={onEditSuccess}
-              trigger={
-                <Button variant="outline" size="sm" className="border-purple-400 text-purple-400 hover:bg-purple-400 hover:text-white">
-                  <Edit className="h-3 w-3" />
-                </Button>
-              }
-            />
-          )}
+           {/* Edit and Delete Buttons - only show for Core team members */}
+           {canEdit && (
+             <>
+               <EditArtistDialog
+                 artist={artist}
+                 onSuccess={onEditSuccess}
+                 trigger={
+                   <Button variant="outline" size="sm" className="border-purple-400 text-purple-400 hover:bg-purple-400 hover:text-white">
+                     <Edit className="h-3 w-3" />
+                   </Button>
+                 }
+               />
+               {onDeleteArtist && (
+                 <DeleteArtistDialog
+                   artist={artist}
+                   onDelete={onDeleteArtist}
+                   trigger={
+                     <Button variant="outline" size="sm" className="border-red-400 text-red-400 hover:bg-red-400 hover:text-white">
+                       <Trash className="h-3 w-3" />
+                     </Button>
+                   }
+                 />
+               )}
+             </>
+           )}
        </div>
      </div>
    </div>
