@@ -2,15 +2,15 @@
 import type { FilterSortState } from "./useUrlState";
 import { useAuth } from "./useAuth";
 import { useArtistData } from "./useArtistData";
-import { useVoting } from "./useVoting";
-import { useKnowledge } from "./useKnowledge";
+import { useVoting } from "./queries/useVotingQuery";
+import { useKnowledge } from "./queries/useKnowledgeQuery";
 import { useArtistFiltering } from "./useArtistFiltering";
 
 export const useArtists = (filterSortState?: FilterSortState) => {
   const { user, loading, signOut } = useAuth();
-  const { artists, fetchArtists, archiveArtist } = useArtistData();
-  const { userVotes, votingLoading, handleVote } = useVoting(user, fetchArtists);
-  const { userKnowledge, handleKnowledgeToggle } = useKnowledge(user);
+  const { artists, fetchArtists, archiveArtist, loading: artistsLoading } = useArtistData();
+  const { userVotes, votingLoading, handleVote } = useVoting();
+  const { userKnowledge, handleKnowledgeToggle } = useKnowledge();
   const { filteredAndSortedArtists } = useArtistFiltering(artists, filterSortState);
 
   return {
@@ -19,7 +19,7 @@ export const useArtists = (filterSortState?: FilterSortState) => {
     allArtists: artists,
     userVotes,
     userKnowledge,
-    loading,
+    loading: loading || artistsLoading,
     votingLoading,
     handleVote,
     handleKnowledgeToggle,

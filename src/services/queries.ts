@@ -1,0 +1,272 @@
+import { supabase } from "@/integrations/supabase/client";
+import type { Database } from "@/integrations/supabase/types";
+
+type Artist = Database["public"]["Tables"]["artists"]["Row"] & {
+  music_genres: { name: string } | null;
+  votes: { vote_type: number; user_id: string }[];
+};
+
+type ArtistNote = {
+  id: string;
+  artist_id: string;
+  user_id: string;
+  note_content: string;
+  created_at: string;
+  updated_at: string;
+  author_username?: string;
+  author_email?: string;
+};
+
+// Artist Queries
+export const artistQueries = {
+  all: () => ['artists'] as const,
+  lists: () => [...artistQueries.all(), 'list'] as const,
+  list: (filters?: any) => [...artistQueries.lists(), filters] as const,
+  details: () => [...artistQueries.all(), 'detail'] as const,
+  detail: (id: string) => [...artistQueries.details(), id] as const,
+  notes: (artistId: string) => [...artistQueries.detail(artistId), 'notes'] as const,
+};
+
+// Voting Queries
+export const voteQueries = {
+  all: () => ['votes'] as const,
+  user: (userId: string) => [...voteQueries.all(), 'user', userId] as const,
+};
+
+// Genre Queries
+export const genreQueries = {
+  all: () => ['genres'] as const,
+};
+
+// Query Functions
+export const queryFunctions = {
+  // Artists
+  async fetchArtists(): Promise<Artist[]> {
+    console.log('Fetching artists...');
+    const { data, error } = await supabase
+      .from("artists")
+      .select(`
+        *,
+        music_genres (name),
+        votes (vote_type, user_id)
+      `)
+      .eq('archived', false)
+      .order("created_at", { ascending: false });
+
+    if (error) {
+      console.error('Error fetching artists:', error);
+      throw new Error('Failed to fetch artists');
+    }
+
+    console.log('Fetched artists:', data?.length || 0);
+    return data || [];
+  },
+
+  async fetchArtist(id: string): Promise<Artist> {
+    console.log('Fetching artist with id:', id);
+    const { data, error } = await supabase
+      .from("artists")
+      .select(`
+        *,
+        music_genres (name),
+        votes (vote_type, user_id)
+      `)
+      .eq("id", id)
+      .eq("archived", false)
+      .single();
+
+    if (error) {
+      console.error('Error fetching artist:', error);
+      throw new Error('Failed to fetch artist details');
+    }
+
+    console.log('Fetched artist:', data);
+    return data;
+  },
+
+  async fetchUserVotes(userId: string): Promise<Record<string, number>> {
+    const { data, error } = await supabase
+      .from("votes")
+      .select("artist_id, vote_type")
+      .eq("user_id", userId);
+
+    if (error) {
+      throw new Error('Failed to fetch user votes');
+    }
+
+    return (data || []).reduce((acc, vote) => {
+      acc[vote.artist_id] = vote.vote_type;
+      return acc;
+    }, {} as Record<string, number>);
+  },
+
+  async fetchUserKnowledge(userId: string): Promise<Record<string, boolean>> {
+    const { data, error } = await supabase
+      .from("artist_knowledge")
+      .select("artist_id")
+      .eq("user_id", userId);
+
+    if (error) {
+      throw new Error('Failed to fetch user knowledge');
+    }
+
+    return (data || []).reduce((acc, knowledge) => {
+      acc[knowledge.artist_id] = true;
+      return acc;
+    }, {} as Record<string, boolean>);
+  },
+
+  async fetchArtistNotes(artistId: string): Promise<ArtistNote[]> {
+    const { data: notesData, error: notesError } = await supabase
+      .from("artist_notes")
+      .select("*")
+      .eq("artist_id", artistId)
+      .order("created_at", { ascending: false });
+
+    if (notesError) {
+      throw new Error('Failed to fetch notes');
+    }
+
+    // Get author profiles for all notes
+    const userIds = notesData?.map(note => note.user_id) || [];
+    if (userIds.length === 0) return [];
+
+    const { data: profilesData, error: profilesError } = await supabase
+      .from("profiles")
+      .select("id, username, email")
+      .in("id", userIds);
+
+    if (profilesError) {
+      console.error("Error fetching profiles:", profilesError);
+    }
+
+    const notesWithAuthor = notesData?.map(note => {
+      const profile = profilesData?.find(p => p.id === note.user_id);
+      return {
+        ...note,
+        author_username: profile?.username,
+        author_email: profile?.email,
+      };
+    }) || [];
+
+    return notesWithAuthor;
+  },
+
+  async fetchGenres(): Promise<Array<{ id: string; name: string }>> {
+    const { data, error } = await supabase
+      .from('music_genres')
+      .select('id, name')
+      .order('name');
+    
+    if (error) {
+      throw new Error('Failed to load genres');
+    }
+
+    return data || [];
+  },
+};
+
+// Mutation Functions
+export const mutationFunctions = {
+  async vote(variables: { artistId: string; voteType: number; userId: string; existingVote?: number }) {
+    const { artistId, voteType, userId, existingVote } = variables;
+    
+    if (existingVote === voteType) {
+      // Remove vote if clicking the same vote type
+      const { error } = await supabase
+        .from("votes")
+        .delete()
+        .eq("user_id", userId)
+        .eq("artist_id", artistId);
+
+      if (error) throw new Error('Failed to remove vote');
+      return null;
+    } else {
+      // Add or update vote
+      const { error } = await supabase
+        .from("votes")
+        .upsert({
+          user_id: userId,
+          artist_id: artistId,
+          vote_type: voteType,
+        }, {
+          onConflict: 'user_id,artist_id'
+        });
+
+      if (error) throw new Error('Failed to save vote');
+      return voteType;
+    }
+  },
+
+  async toggleKnowledge(variables: { artistId: string; userId: string; isKnown: boolean }) {
+    const { artistId, userId, isKnown } = variables;
+    
+    if (isKnown) {
+      // Remove knowledge entry
+      const { error } = await supabase
+        .from("artist_knowledge")
+        .delete()
+        .eq("user_id", userId)
+        .eq("artist_id", artistId);
+
+      if (error) throw new Error('Failed to remove knowledge');
+      return false;
+    } else {
+      // Add knowledge entry
+      const { error } = await supabase
+        .from("artist_knowledge")
+        .insert({
+          user_id: userId,
+          artist_id: artistId,
+        });
+
+      if (error) throw new Error('Failed to add knowledge');
+      return true;
+    }
+  },
+
+  async archiveArtist(artistId: string) {
+    console.log('Archiving artist:', artistId);
+    const { error } = await supabase
+      .from("artists")
+      .update({ archived: true })
+      .eq("id", artistId);
+
+    if (error) {
+      console.error('Error archiving artist:', error);
+      throw new Error('Failed to archive artist');
+    }
+
+    console.log('Artist archived successfully');
+    return true;
+  },
+
+  async saveArtistNote(variables: { artistId: string; userId: string; noteContent: string }) {
+    const { artistId, userId, noteContent } = variables;
+    
+    const { data, error } = await supabase
+      .from("artist_notes")
+      .upsert({
+        artist_id: artistId,
+        user_id: userId,
+        note_content: noteContent,
+      })
+      .select()
+      .single();
+
+    if (error) throw new Error('Failed to save note');
+    return data;
+  },
+
+  async deleteArtistNote(noteId: string) {
+    const { error } = await supabase
+      .from("artist_notes")
+      .delete()
+      .eq("id", noteId);
+
+    if (error) throw new Error('Failed to delete note');
+    return true;
+  },
+};
+
+export type { Artist, ArtistNote };
