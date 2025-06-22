@@ -15,7 +15,7 @@ import { EmptyArtistsState } from "@/components/EmptyArtistsState";
 import { FestivalHeader } from "@/components/FestivalHeader";
 import { InviteLandingPage } from "@/components/InviteLandingPage";
 import { useArtistFiltering } from "@/hooks/useArtistFiltering";
-import { useArtistData } from "@/hooks/useArtistData";
+import { useProgressiveArtistData } from "@/hooks/useProgressiveArtistData";
 import { useVoting } from "@/hooks/queries/useVotingQuery";
 
 import { useUrlState } from "@/hooks/useUrlState";
@@ -28,7 +28,7 @@ const Index = () => {
   const [showAddGenreDialog, setShowAddGenreDialog] = useState(false);
   const { state: urlState, updateUrlState, clearFilters } = useUrlState();
   
-  const { artists, fetchArtists, archiveArtist } = useArtistData();
+  const { artists, fetchArtists, archiveArtist, votesLoading } = useProgressiveArtistData();
   const { userVotes, votingLoading, handleVote } = useVoting();
   
   const { filteredAndSortedArtists } = useArtistFiltering(artists, urlState);
@@ -123,7 +123,7 @@ const Index = () => {
                     artist={artist}
                     userVote={userVotes[artist.id]}
                     userKnowledge={false}
-                    votingLoading={votingLoading[artist.id]}
+                    votingLoading={votingLoading[artist.id] || votesLoading}
                     onVote={handleVote}
                     onKnowledgeToggle={async (artistId: string) => ({ requiresAuth: !user })}
                     onAuthRequired={() => setShowAuthDialog(true)}
@@ -137,7 +137,7 @@ const Index = () => {
                     artist={artist}
                     userVote={userVotes[artist.id]}
                     userKnowledge={false}
-                    votingLoading={votingLoading[artist.id]}
+                    votingLoading={votingLoading[artist.id] || votesLoading}
                     onVote={handleVote}
                     onKnowledgeToggle={async (artistId: string) => ({ requiresAuth: !user })}
                     onAuthRequired={() => setShowAuthDialog(true)}

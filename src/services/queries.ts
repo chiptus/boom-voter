@@ -53,6 +53,12 @@ export const authQueries = {
   user: () => ['auth', 'user'] as const,
 };
 
+// Vote summary query keys
+export const voteSummaryQueries = {
+  all: () => ['vote-summaries'] as const,
+  byArtist: () => [...voteSummaryQueries.all(), 'by-artist'] as const,
+};
+
 // Query Functions
 export const queryFunctions = {
   // Artists
@@ -75,6 +81,56 @@ export const queryFunctions = {
 
     console.log('Fetched artists:', data?.length || 0);
     return data || [];
+  },
+
+  // Basic artists without votes for fast initial load
+  async fetchArtistsBasic(): Promise<Omit<Artist, 'votes'>[]> {
+    console.log('Fetching basic artists...');
+    const { data, error } = await supabase
+      .from("artists")
+      .select(`
+        *,
+        music_genres (name)
+      `)
+      .eq('archived', false)
+      .order("created_at", { ascending: false });
+
+    if (error) {
+      console.error('Error fetching basic artists:', error);
+      throw new Error('Failed to fetch basic artists');
+    }
+
+    console.log('Fetched basic artists:', data?.length || 0);
+    return data || [];
+  },
+
+  // Vote summaries for all artists
+  async fetchVoteSummaries(): Promise<Record<string, { vote_type: number; user_id: string }[]>> {
+    console.log('Fetching vote summaries...');
+    const { data, error } = await supabase
+      .from("votes")
+      .select("artist_id, vote_type, user_id");
+
+    if (error) {
+      console.error('Error fetching vote summaries:', error);
+      throw new Error('Failed to fetch vote summaries');
+    }
+
+    console.log('Fetched vote summaries:', data?.length || 0, 'votes');
+    
+    // Group votes by artist_id
+    const votesByArtist = (data || []).reduce((acc, vote) => {
+      if (!acc[vote.artist_id]) {
+        acc[vote.artist_id] = [];
+      }
+      acc[vote.artist_id].push({
+        vote_type: vote.vote_type,
+        user_id: vote.user_id
+      });
+      return acc;
+    }, {} as Record<string, { vote_type: number; user_id: string }[]>);
+
+    return votesByArtist;
   },
 
   async fetchArtist(id: string): Promise<Artist> {
