@@ -4,28 +4,51 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Trash2, Edit3, Save, X, StickyNote } from "lucide-react";
 import { useArtistNotes } from "@/hooks/useArtistNotes";
+import { useGroupFilteredNotesQuery } from "@/hooks/queries/useGroupFilteredNotesQuery";
+import { useGroups } from "@/hooks/useGroups";
+import { GroupSelector } from "@/components/GroupSelector";
 
 interface ArtistNotesProps {
   artistId: string;
   userId: string | null;
+  selectedGroupId?: string;
+  onGroupChange: (groupId: string | undefined) => void;
 }
 
-export const ArtistNotes = ({ artistId, userId }: ArtistNotesProps) => {
-  const { notes, loading, saving, saveNote, deleteNote } = useArtistNotes(artistId, userId);
+export const ArtistNotes = ({ artistId, userId, selectedGroupId, onGroupChange }: ArtistNotesProps) => {
+  const { saving, saveNote, deleteNote } = useArtistNotes(artistId, userId);
+  const { groups } = useGroups();
   const [isEditing, setIsEditing] = useState(false);
   const [noteContent, setNoteContent] = useState("");
+  
+  // Use group-filtered notes query when group is selected
+  const { data: filteredNotes = [], isLoading: filteredLoading } = useGroupFilteredNotesQuery(selectedGroupId, artistId);
+  
+  const notes = filteredNotes;
+  const loading = filteredLoading;
+  const showGroupSelector = groups.length > 1;
 
   if (!userId) {
     return (
       <Card className="bg-white/10 backdrop-blur-md border-purple-400/30">
         <CardHeader>
-          <CardTitle className="flex items-center space-x-2 text-white">
-            <StickyNote className="h-5 w-5" />
-            <span>Group Notes</span>
-          </CardTitle>
-          <CardDescription className="text-purple-200">
-            Sign in to add notes and see notes from group members
-          </CardDescription>
+          <div className="flex items-center justify-between">
+            <div>
+              <CardTitle className="flex items-center space-x-2 text-white">
+                <StickyNote className="h-5 w-5" />
+                <span>Group Notes</span>
+              </CardTitle>
+              <CardDescription className="text-purple-200">
+                Sign in to add notes and see notes from group members
+              </CardDescription>
+            </div>
+            {showGroupSelector && (
+              <GroupSelector
+                selectedGroupId={selectedGroupId}
+                onGroupChange={onGroupChange}
+              />
+            )}
+          </div>
         </CardHeader>
       </Card>
     );
@@ -57,10 +80,18 @@ export const ArtistNotes = ({ artistId, userId }: ArtistNotesProps) => {
     return (
       <Card className="bg-white/10 backdrop-blur-md border-purple-400/30">
         <CardHeader>
-          <CardTitle className="flex items-center space-x-2 text-white">
-            <StickyNote className="h-5 w-5" />
-            <span>Group Notes</span>
-          </CardTitle>
+          <div className="flex items-center justify-between">
+            <CardTitle className="flex items-center space-x-2 text-white">
+              <StickyNote className="h-5 w-5" />
+              <span>Group Notes</span>
+            </CardTitle>
+            {showGroupSelector && (
+              <GroupSelector
+                selectedGroupId={selectedGroupId}
+                onGroupChange={onGroupChange}
+              />
+            )}
+          </div>
         </CardHeader>
         <CardContent>
           <div className="text-purple-200">Loading notes...</div>
@@ -82,6 +113,12 @@ export const ArtistNotes = ({ artistId, userId }: ArtistNotesProps) => {
               Notes from you and group members about this artist
             </CardDescription>
           </div>
+          {showGroupSelector && (
+            <GroupSelector
+              selectedGroupId={selectedGroupId}
+              onGroupChange={onGroupChange}
+            />
+          )}
         </div>
       </CardHeader>
       <CardContent>

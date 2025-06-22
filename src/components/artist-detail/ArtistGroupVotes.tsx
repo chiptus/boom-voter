@@ -4,9 +4,13 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Star, Heart, X, Users } from "lucide-react";
 import { useGroups } from "@/hooks/useGroups";
 import { useGroupMemberVotesQuery } from "@/hooks/queries/useGroupMemberVotesQuery";
+import { useAllGroupMemberVotesQuery } from "@/hooks/queries/useAllGroupMemberVotesQuery";
+import { GroupSelector } from "@/components/GroupSelector";
 
 interface ArtistGroupVotesProps {
   artistId: string;
+  selectedGroupId?: string;
+  onGroupChange: (groupId: string | undefined) => void;
 }
 
 const getVoteIcon = (voteType: number) => {
@@ -48,29 +52,49 @@ const getVoteColor = (voteType: number) => {
   }
 };
 
-export const ArtistGroupVotes = ({ artistId }: ArtistGroupVotesProps) => {
+export const ArtistGroupVotes = ({ artistId, selectedGroupId, onGroupChange }: ArtistGroupVotesProps) => {
   const { groups } = useGroups();
   
-  // For now, use the first group - later we can add group selection
-  const currentGroup = groups[0];
-  
-  const { data: memberVotes = [], isLoading } = useGroupMemberVotesQuery(
-    currentGroup?.id,
+  // Query for specific group votes
+  const { data: singleGroupVotes = [], isLoading: singleGroupLoading } = useGroupMemberVotesQuery(
+    selectedGroupId,
     artistId
   );
+  
+  // Query for all groups votes
+  const userGroupIds = groups.map(g => g.id);
+  const { data: allGroupVotes = [], isLoading: allGroupLoading } = useAllGroupMemberVotesQuery(
+    userGroupIds,
+    artistId
+  );
+  
+  // Determine which data to use
+  const memberVotes = selectedGroupId ? singleGroupVotes : allGroupVotes;
+  const isLoading = selectedGroupId ? singleGroupLoading : allGroupLoading;
 
-  if (!currentGroup || groups.length === 0) {
+  if (groups.length === 0) {
     return null;
   }
+  
+  const selectedGroup = groups.find(g => g.id === selectedGroupId);
+  const showGroupSelector = groups.length > 1;
 
   if (isLoading) {
     return (
       <Card className="bg-white/10 backdrop-blur-md border-purple-400/30">
         <CardHeader>
-          <CardTitle className="text-white flex items-center gap-2">
-            <Users className="h-5 w-5" />
-            Group Votes
-          </CardTitle>
+          <div className="flex items-center justify-between">
+            <CardTitle className="text-white flex items-center gap-2">
+              <Users className="h-5 w-5" />
+              Group Votes
+            </CardTitle>
+            {showGroupSelector && (
+              <GroupSelector
+                selectedGroupId={selectedGroupId}
+                onGroupChange={onGroupChange}
+              />
+            )}
+          </div>
         </CardHeader>
         <CardContent>
           <p className="text-purple-200">Loading group votes...</p>
@@ -83,13 +107,23 @@ export const ArtistGroupVotes = ({ artistId }: ArtistGroupVotesProps) => {
     return (
       <Card className="bg-white/10 backdrop-blur-md border-purple-400/30">
         <CardHeader>
-          <CardTitle className="text-white flex items-center gap-2">
-            <Users className="h-5 w-5" />
-            Group Votes - {currentGroup.name}
-          </CardTitle>
-          <CardDescription className="text-purple-200">
-            No votes from your group members yet
-          </CardDescription>
+          <div className="flex items-center justify-between">
+            <div>
+              <CardTitle className="text-white flex items-center gap-2">
+                <Users className="h-5 w-5" />
+                Group Votes{selectedGroup ? ` - ${selectedGroup.name}` : ' - All Groups'}
+              </CardTitle>
+              <CardDescription className="text-purple-200">
+                No votes from your group members yet
+              </CardDescription>
+            </div>
+            {showGroupSelector && (
+              <GroupSelector
+                selectedGroupId={selectedGroupId}
+                onGroupChange={onGroupChange}
+              />
+            )}
+          </div>
         </CardHeader>
       </Card>
     );
@@ -98,13 +132,23 @@ export const ArtistGroupVotes = ({ artistId }: ArtistGroupVotesProps) => {
   return (
     <Card className="bg-white/10 backdrop-blur-md border-purple-400/30">
       <CardHeader>
-        <CardTitle className="text-white flex items-center gap-2">
-          <Users className="h-5 w-5" />
-          Group Votes - {currentGroup.name}
-        </CardTitle>
-        <CardDescription className="text-purple-200">
-          How your group members voted on this artist
-        </CardDescription>
+        <div className="flex items-center justify-between">
+          <div>
+            <CardTitle className="text-white flex items-center gap-2">
+              <Users className="h-5 w-5" />
+              Group Votes{selectedGroup ? ` - ${selectedGroup.name}` : ' - All Groups'}
+            </CardTitle>
+            <CardDescription className="text-purple-200">
+              How your group members voted on this artist
+            </CardDescription>
+          </div>
+          {showGroupSelector && (
+            <GroupSelector
+              selectedGroupId={selectedGroupId}
+              onGroupChange={onGroupChange}
+            />
+          )}
+        </div>
       </CardHeader>
       <CardContent>
         <div className="space-y-3">

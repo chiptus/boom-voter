@@ -1,4 +1,5 @@
 
+import { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { ArtistDetailHeader } from "@/components/artist-detail/ArtistDetailHeader";
 import { ArtistImageCard } from "@/components/artist-detail/ArtistImageCard";
@@ -12,6 +13,9 @@ import { useArtistDetail } from "@/hooks/useArtistDetail";
 const ArtistDetail = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const [selectedNotesGroupId, setSelectedNotesGroupId] = useState<string | undefined>();
+  const [selectedVotesGroupId, setSelectedVotesGroupId] = useState<string | undefined>();
+  
   const {
     artist,
     user,
@@ -64,12 +68,21 @@ const ArtistDetail = () => {
 
         {/* Artist Notes Section */}
         <div className="mb-8">
-          <ArtistNotes artistId={id!} userId={user?.id || null} />
+          <ArtistNotes 
+            artistId={id!} 
+            userId={user?.id || null}
+            selectedGroupId={selectedNotesGroupId}
+            onGroupChange={setSelectedNotesGroupId}
+          />
         </div>
 
         {/* Group Votes Section */}
         <div className="mb-8">
-          <ArtistGroupVotes artistId={id!} />
+          <ArtistGroupVotes 
+            artistId={id!}
+            selectedGroupId={selectedVotesGroupId}
+            onGroupChange={setSelectedVotesGroupId}
+          />
         </div>
       </div>
     </div>

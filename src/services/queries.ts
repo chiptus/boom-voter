@@ -45,6 +45,7 @@ export const groupQueries = {
   detail: (groupId: string) => [...groupQueries.all(), 'detail', groupId] as const,
   members: (groupId: string) => [...groupQueries.detail(groupId), 'members'] as const,
   memberVotes: (groupId: string, artistId: string) => [...groupQueries.detail(groupId), 'votes', artistId] as const,
+  filteredNotes: (groupId: string | undefined, artistId: string) => [...groupQueries.all(), 'filtered-notes', groupId || 'all', artistId] as const,
 };
 
 // Auth Queries
@@ -294,6 +295,125 @@ export const queryFunctions = {
       .select("user_id, vote_type")
       .eq("artist_id", artistId)
       .in("user_id", memberIds);
+
+    if (votesError) {
+      throw new Error('Failed to fetch member votes');
+    }
+
+    // Get profile information for users who voted
+    const voterIds = votesData?.map(v => v.user_id) || [];
+    if (voterIds.length === 0) {
+      return [];
+    }
+
+    const { data: profilesData, error: profilesError } = await supabase
+      .from("profiles")
+      .select("id, username, email")
+      .in("id", voterIds);
+
+    if (profilesError) {
+      console.error("Error fetching profiles:", profilesError);
+    }
+
+    // Combine votes with profile information
+    const votesWithProfiles = votesData?.map(vote => {
+      const profile = profilesData?.find(p => p.id === vote.user_id);
+      return {
+        user_id: vote.user_id,
+        vote_type: vote.vote_type,
+        username: profile?.username || null,
+        email: profile?.email || null,
+      };
+    }) || [];
+
+    return votesWithProfiles;
+  },
+
+  async fetchGroupFilteredArtistNotes(groupId: string | undefined, artistId: string): Promise<ArtistNote[]> {
+    if (!groupId) {
+      // If no group selected, return all notes
+      return queryFunctions.fetchArtistNotes(artistId);
+    }
+
+    // Get group members first
+    const { data: members, error: membersError } = await supabase
+      .from("group_members")
+      .select("user_id")
+      .eq("group_id", groupId);
+
+    if (membersError) {
+      throw new Error('Failed to fetch group members');
+    }
+
+    if (!members || members.length === 0) {
+      return [];
+    }
+
+    const memberIds = members.map(m => m.user_id);
+
+    // Get notes from group members only
+    const { data: notesData, error: notesError } = await supabase
+      .from("artist_notes")
+      .select("*")
+      .eq("artist_id", artistId)
+      .in("user_id", memberIds)
+      .order("created_at", { ascending: false });
+
+    if (notesError) {
+      throw new Error('Failed to fetch notes');
+    }
+
+    // Get author profiles for all notes
+    const userIds = notesData?.map(note => note.user_id) || [];
+    if (userIds.length === 0) return [];
+
+    const { data: profilesData, error: profilesError } = await supabase
+      .from("profiles")
+      .select("id, username, email")
+      .in("id", userIds);
+
+    if (profilesError) {
+      console.error("Error fetching profiles:", profilesError);
+    }
+
+    const notesWithAuthor = notesData?.map(note => {
+      const profile = profilesData?.find(p => p.id === note.user_id);
+      return {
+        ...note,
+        author_username: profile?.username,
+        author_email: profile?.email,
+      };
+    }) || [];
+
+    return notesWithAuthor;
+  },
+
+  async fetchAllGroupMemberVotes(userGroupIds: string[], artistId: string) {
+    if (userGroupIds.length === 0) return [];
+
+    // Get all members from all user's groups
+    const { data: members, error: membersError } = await supabase
+      .from("group_members")
+      .select("user_id")
+      .in("group_id", userGroupIds);
+
+    if (membersError) {
+      throw new Error('Failed to fetch group members');
+    }
+
+    if (!members || members.length === 0) {
+      return [];
+    }
+
+    // Get unique member IDs (user might be in multiple groups)
+    const uniqueMemberIds = [...new Set(members.map(m => m.user_id))];
+
+    // Get votes from those members for this artist
+    const { data: votesData, error: votesError } = await supabase
+      .from("votes")
+      .select("user_id, vote_type")
+      .eq("artist_id", artistId)
+      .in("user_id", uniqueMemberIds);
 
     if (votesError) {
       throw new Error('Failed to fetch member votes');
