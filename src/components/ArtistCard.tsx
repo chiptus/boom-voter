@@ -3,7 +3,13 @@ import { Link } from "react-router-dom";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Star, Heart, X, ExternalLink, Play, Music, MapPin, Calendar, Eye, EyeOff, Edit, Trash } from "lucide-react";
+import { 
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Star, Heart, X, Play, Music, MapPin, Calendar, Eye, EyeOff, Edit, Trash, MoreHorizontal } from "lucide-react";
 import { ArtistImageLoader } from "./ArtistImageLoader";
 import { EditArtistDialog } from "./EditArtistDialog";
 import { ArchiveArtistDialog } from "./ArchiveArtistDialog";
@@ -78,18 +84,21 @@ export const ArtistCard = ({ artist, userVote, userKnowledge, votingLoading, onV
   return (
     <Card className="bg-white/10 backdrop-blur-md border-purple-400/30 hover:bg-white/15 transition-all duration-300 overflow-hidden">
       <CardHeader className="pb-4">
-        {/* Artist Image */}
-        <ArtistImageLoader 
-          src={artist.image_url}
-          alt={artist.name}
-          className="aspect-square w-full mb-4 overflow-hidden rounded-lg"
-        />
+        {/* Artist Image - clickable for details */}
+        <Link to={`/artist/${artist.id}`} className="block">
+          <ArtistImageLoader 
+            src={artist.image_url}
+            alt={artist.name}
+            className="aspect-square w-full mb-4 overflow-hidden rounded-lg hover:opacity-90 transition-opacity cursor-pointer"
+          />
+        </Link>
         
         <div className="flex items-start justify-between">
           <div className="flex-1">
             <div className="flex items-center gap-2 mb-2">
               <CardTitle className="text-white text-xl">{artist.name}</CardTitle>
-              {/* Artist Knowledge Eye Icon moved next to title */}
+              
+              {/* Knowledge Toggle */}
               <Button
                 variant="ghost"
                 size="sm"
@@ -99,6 +108,34 @@ export const ArtistCard = ({ artist, userVote, userKnowledge, votingLoading, onV
               >
                 {userKnowledge ? <Eye className="h-3 w-3" /> : <EyeOff className="h-3 w-3" />}
               </Button>
+              
+              {/* Social Links - small icons next to name */}
+              {artist.spotify_url && (
+                <Button 
+                  asChild 
+                  variant="ghost"
+                  size="sm"
+                  className="p-1 h-6 w-6 text-green-400 hover:text-green-300"
+                  title="Open in Spotify"
+                >
+                  <a href={artist.spotify_url} target="_blank" rel="noopener noreferrer">
+                    <Play className="h-3 w-3" />
+                  </a>
+                </Button>
+              )}
+              {artist.soundcloud_url && (
+                <Button 
+                  asChild 
+                  variant="ghost"
+                  size="sm"
+                  className="p-1 h-6 w-6 text-orange-400 hover:text-orange-300"
+                  title="Open in SoundCloud"
+                >
+                  <a href={artist.soundcloud_url} target="_blank" rel="noopener noreferrer">
+                    <Music className="h-3 w-3" />
+                  </a>
+                </Button>
+              )}
             </div>
             
             {artist.music_genres && (
@@ -122,125 +159,97 @@ export const ArtistCard = ({ artist, userVote, userKnowledge, votingLoading, onV
                 </div>
               )}
             </div>
-           </div>
-         </div>
-         
-         {artist.description && (
-           <CardDescription className="text-purple-200 text-sm leading-relaxed">
-             {artist.description}
-           </CardDescription>
-         )}
-       </CardHeader>
-       
-       <CardContent className="space-y-4">
-          {/* Updated 3-Level Voting System with new vote types */}
-          <div className="space-y-2">
-            <div className="flex items-center gap-2">
-              <Button
-                variant={userVote === 2 ? "default" : "outline"}
-                size="sm"
-                onClick={() => handleVote(2)}
-                disabled={votingLoading}
-                className={userVote === 2 ? "bg-orange-600 hover:bg-orange-700" : "border-orange-400 text-orange-400 hover:bg-orange-400 hover:text-white"}
-              >
-                <Star className="h-4 w-4 mr-1" />
-                Must go ({getVoteCount(2)})
-              </Button>
-              {votingLoading && <div className="h-4 w-4 animate-spin rounded-full border-2 border-orange-400 border-t-transparent" />}
-            </div>
-            <div className="flex items-center gap-2">
-              <Button
-                variant={userVote === 1 ? "default" : "outline"}
-                size="sm"
-                onClick={() => handleVote(1)}
-                disabled={votingLoading}
-                className={userVote === 1 ? "bg-blue-600 hover:bg-blue-700" : "border-blue-400 text-blue-400 hover:bg-blue-400 hover:text-white"}
-              >
-                <Heart className="h-4 w-4 mr-1" />
-                Interested ({getVoteCount(1)})
-              </Button>
-              {votingLoading && <div className="h-4 w-4 animate-spin rounded-full border-2 border-blue-400 border-t-transparent" />}
-            </div>
-            <div className="flex items-center gap-2">
-              <Button
-                variant={userVote === -1 ? "default" : "outline"}
-                size="sm"
-                onClick={() => handleVote(-1)}
-                disabled={votingLoading}
-                className={userVote === -1 ? "bg-gray-600 hover:bg-gray-700" : "border-gray-400 text-gray-400 hover:bg-gray-400 hover:text-white"}
-              >
-                <X className="h-4 w-4 mr-1" />
-                Won't go ({getVoteCount(-1)})
-              </Button>
-              {votingLoading && <div className="h-4 w-4 animate-spin rounded-full border-2 border-gray-400 border-t-transparent" />}
-            </div>
           </div>
-
-        {/* External Links */}
-        {(artist.spotify_url || artist.soundcloud_url) && (
-          <div className="flex flex-wrap gap-2">
-            {artist.spotify_url && (
-              <Button 
-                asChild 
-                size="sm"
-                className="bg-green-600 hover:bg-green-700 text-xs"
-              >
-                <a href={artist.spotify_url} target="_blank" rel="noopener noreferrer">
-                  <Play className="h-3 w-3 mr-1" />
-                  Spotify
-                </a>
-              </Button>
-            )}
-            {artist.soundcloud_url && (
-              <Button 
-                asChild 
-                size="sm"
-                className="bg-orange-600 hover:bg-orange-700 text-xs"
-              >
-                <a href={artist.soundcloud_url} target="_blank" rel="noopener noreferrer">
-                  <Music className="h-3 w-3 mr-1" />
-                  SoundCloud
-                </a>
-              </Button>
-            )}
-          </div>
-        )}
-
-        {/* Action Buttons */}
-        <div className="flex gap-2">
-          {/* View Details Button */}
-          <Button asChild variant="outline" className="flex-1 border-purple-400 text-purple-400 hover:bg-purple-400 hover:text-white">
-            <Link to={`/artist/${artist.id}`}>
-              View Details
-              <ExternalLink className="h-4 w-4 ml-2" />
-            </Link>
-          </Button>
           
-          {/* Edit and Delete Buttons - only show for Core team members */}
+          {/* Core Team Dropdown Menu */}
           {canEdit && (
-            <>
-              <EditArtistDialog
-                artist={artist}
-                onSuccess={onEditSuccess}
-                trigger={
-                  <Button variant="outline" size="sm" className="border-purple-400 text-purple-400 hover:bg-purple-400 hover:text-white">
-                    <Edit className="h-4 w-4" />
-                  </Button>
-                }
-              />
-              {onArchiveArtist && (
-                <ArchiveArtistDialog
-                  artist={artist}
-                  onArchive={onArchiveArtist}
-                  trigger={
-                    <Button variant="outline" size="sm" className="border-red-400 text-red-400 hover:bg-red-400 hover:text-white">
-                      <Trash className="h-4 w-4" />
-                    </Button>
-                  }
-                />
-              )}
-            </>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" size="sm" className="p-1 h-8 w-8 text-purple-400 hover:text-purple-300">
+                  <MoreHorizontal className="h-4 w-4" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="bg-black/90 border-purple-400/30">
+                <DropdownMenuItem asChild>
+                  <EditArtistDialog
+                    artist={artist}
+                    onSuccess={onEditSuccess}
+                    trigger={
+                      <div className="flex items-center gap-2 w-full cursor-pointer text-purple-400 hover:text-purple-300">
+                        <Edit className="h-4 w-4" />
+                        Edit Artist
+                      </div>
+                    }
+                  />
+                </DropdownMenuItem>
+                {onArchiveArtist && (
+                  <DropdownMenuItem asChild>
+                    <ArchiveArtistDialog
+                      artist={artist}
+                      onArchive={onArchiveArtist}
+                      trigger={
+                        <div className="flex items-center gap-2 w-full cursor-pointer text-red-400 hover:text-red-300">
+                          <Trash className="h-4 w-4" />
+                          Archive Artist
+                        </div>
+                      }
+                    />
+                  </DropdownMenuItem>
+                )}
+              </DropdownMenuContent>
+            </DropdownMenu>
           )}
+        </div>
+        
+        {artist.description && (
+          <CardDescription className="text-purple-200 text-sm leading-relaxed">
+            {artist.description}
+          </CardDescription>
+        )}
+      </CardHeader>
+       
+      <CardContent>
+        {/* Prominent Voting System */}
+        <div className="space-y-3">
+          <div className="flex items-center gap-2">
+            <Button
+              variant={userVote === 2 ? "default" : "outline"}
+              size="default"
+              onClick={() => handleVote(2)}
+              disabled={votingLoading}
+              className={`flex-1 ${userVote === 2 ? "bg-orange-600 hover:bg-orange-700" : "border-orange-400 text-orange-400 hover:bg-orange-400 hover:text-white"}`}
+            >
+              <Star className="h-4 w-4 mr-2" />
+              Must go ({getVoteCount(2)})
+            </Button>
+            {votingLoading && <div className="h-4 w-4 animate-spin rounded-full border-2 border-orange-400 border-t-transparent" />}
+          </div>
+          <div className="flex items-center gap-2">
+            <Button
+              variant={userVote === 1 ? "default" : "outline"}
+              size="default"
+              onClick={() => handleVote(1)}
+              disabled={votingLoading}
+              className={`flex-1 ${userVote === 1 ? "bg-blue-600 hover:bg-blue-700" : "border-blue-400 text-blue-400 hover:bg-blue-400 hover:text-white"}`}
+            >
+              <Heart className="h-4 w-4 mr-2" />
+              Interested ({getVoteCount(1)})
+            </Button>
+            {votingLoading && <div className="h-4 w-4 animate-spin rounded-full border-2 border-blue-400 border-t-transparent" />}
+          </div>
+          <div className="flex items-center gap-2">
+            <Button
+              variant={userVote === -1 ? "default" : "outline"}
+              size="default"
+              onClick={() => handleVote(-1)}
+              disabled={votingLoading}
+              className={`flex-1 ${userVote === -1 ? "bg-gray-600 hover:bg-gray-700" : "border-gray-400 text-gray-400 hover:bg-gray-400 hover:text-white"}`}
+            >
+              <X className="h-4 w-4 mr-2" />
+              Won't go ({getVoteCount(-1)})
+            </Button>
+            {votingLoading && <div className="h-4 w-4 animate-spin rounded-full border-2 border-gray-400 border-t-transparent" />}
+          </div>
         </div>
       </CardContent>
     </Card>

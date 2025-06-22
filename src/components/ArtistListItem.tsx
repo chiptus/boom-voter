@@ -1,8 +1,13 @@
-
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Star, Heart, X, ExternalLink, Play, Music, MapPin, Calendar, Eye, EyeOff, Edit, Trash } from "lucide-react";
+import { 
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Star, Heart, X, Play, Music, MapPin, Calendar, Eye, EyeOff, Edit, Trash, MoreHorizontal } from "lucide-react";
 import { ArtistImageLoader } from "./ArtistImageLoader";
 import { EditArtistDialog } from "./EditArtistDialog";
 import { ArchiveArtistDialog } from "./ArchiveArtistDialog";
@@ -79,16 +84,19 @@ export const ArtistListItem = ({ artist, userVote, userKnowledge, votingLoading,
       {/* Mobile Layout (sm and below) */}
       <div className="block md:hidden space-y-3">
         {/* Top Row: Image + Basic Info */}
-        <div className="flex items-start gap-3">
-          <ArtistImageLoader 
-            src={artist.image_url}
-            alt={artist.name}
-            className="w-12 h-12 flex-shrink-0 rounded-lg overflow-hidden"
-          />
+        <div className="flex items-start gap-3 relative">
+          <Link to={`/artist/${artist.id}`} className="flex-shrink-0">
+            <ArtistImageLoader 
+              src={artist.image_url}
+              alt={artist.name}
+              className="w-12 h-12 rounded-lg overflow-hidden hover:opacity-90 transition-opacity cursor-pointer"
+            />
+          </Link>
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2 mb-1">
               <h3 className="text-white text-base font-semibold truncate">{artist.name}</h3>
-              {/* Artist Knowledge Eye Icon moved next to title */}
+              
+              {/* Knowledge Toggle */}
               <Button
                 variant="ghost"
                 size="sm"
@@ -98,6 +106,34 @@ export const ArtistListItem = ({ artist, userVote, userKnowledge, votingLoading,
               >
                 {userKnowledge ? <Eye className="h-3 w-3" /> : <EyeOff className="h-3 w-3" />}
               </Button>
+              
+              {/* Social Links - small icons next to name */}
+              {artist.spotify_url && (
+                <Button 
+                  asChild 
+                  variant="ghost"
+                  size="sm"
+                  className="p-1 h-6 w-6 text-green-400 hover:text-green-300"
+                  title="Open in Spotify"
+                >
+                  <a href={artist.spotify_url} target="_blank" rel="noopener noreferrer">
+                    <Play className="h-3 w-3" />
+                  </a>
+                </Button>
+              )}
+              {artist.soundcloud_url && (
+                <Button 
+                  asChild 
+                  variant="ghost"
+                  size="sm"
+                  className="p-1 h-6 w-6 text-orange-400 hover:text-orange-300"
+                  title="Open in SoundCloud"
+                >
+                  <a href={artist.soundcloud_url} target="_blank" rel="noopener noreferrer">
+                    <Music className="h-3 w-3" />
+                  </a>
+                </Button>
+              )}
             </div>
             
             <div className="flex flex-wrap items-center gap-1 mt-1">
@@ -120,6 +156,47 @@ export const ArtistListItem = ({ artist, userVote, userKnowledge, votingLoading,
               )}
             </div>
           </div>
+          
+          {/* Core Team Dropdown Menu */}
+          {canEdit && (
+            <div className="absolute top-0 right-0">
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" size="sm" className="p-1 h-6 w-6 text-purple-400 hover:text-purple-300">
+                    <MoreHorizontal className="h-3 w-3" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="bg-black/90 border-purple-400/30">
+                  <DropdownMenuItem asChild>
+                    <EditArtistDialog
+                      artist={artist}
+                      onSuccess={onEditSuccess}
+                      trigger={
+                        <div className="flex items-center gap-2 w-full cursor-pointer text-purple-400 hover:text-purple-300">
+                          <Edit className="h-3 w-3" />
+                          Edit
+                        </div>
+                      }
+                    />
+                  </DropdownMenuItem>
+                  {onArchiveArtist && (
+                    <DropdownMenuItem asChild>
+                      <ArchiveArtistDialog
+                        artist={artist}
+                        onArchive={onArchiveArtist}
+                        trigger={
+                          <div className="flex items-center gap-2 w-full cursor-pointer text-red-400 hover:text-red-300">
+                            <Trash className="h-3 w-3" />
+                            Archive
+                          </div>
+                        }
+                      />
+                    </DropdownMenuItem>
+                  )}
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
+          )}
         </div>
 
         {/* Description */}
@@ -166,72 +243,18 @@ export const ArtistListItem = ({ artist, userVote, userKnowledge, votingLoading,
           </Button>
           {votingLoading && <div className="h-4 w-4 animate-spin rounded-full border-2 border-purple-400 border-t-transparent" />}
         </div>
-
-        {/* External Links and Details */}
-        <div className="flex flex-wrap items-center gap-2">
-          {artist.spotify_url && (
-            <Button 
-              asChild 
-              size="sm"
-              className="bg-green-600 hover:bg-green-700 text-xs px-2 py-1 h-8"
-            >
-              <a href={artist.spotify_url} target="_blank" rel="noopener noreferrer">
-                <Play className="h-3 w-3" />
-              </a>
-            </Button>
-          )}
-          {artist.soundcloud_url && (
-            <Button 
-              asChild 
-              size="sm"
-              className="bg-orange-600 hover:bg-orange-700 text-xs px-2 py-1 h-8"
-            >
-              <a href={artist.soundcloud_url} target="_blank" rel="noopener noreferrer">
-                <Music className="h-3 w-3" />
-              </a>
-            </Button>
-          )}
-          <Button asChild variant="outline" size="sm" className="border-purple-400 text-purple-400 hover:bg-purple-400 hover:text-white text-xs px-2 py-1 h-8">
-            <Link to={`/artist/${artist.id}`}>
-              <ExternalLink className="h-3 w-3" />
-            </Link>
-          </Button>
-          {/* Edit and Delete Buttons - only show for Core team members */}
-          {canEdit && (
-            <>
-              <EditArtistDialog
-                artist={artist}
-                onSuccess={onEditSuccess}
-                trigger={
-                  <Button variant="outline" size="sm" className="border-purple-400 text-purple-400 hover:bg-purple-400 hover:text-white text-xs px-2 py-1 h-8">
-                    <Edit className="h-3 w-3" />
-                  </Button>
-                }
-              />
-              {onArchiveArtist && (
-                <ArchiveArtistDialog
-                  artist={artist}
-                  onArchive={onArchiveArtist}
-                  trigger={
-                    <Button variant="outline" size="sm" className="border-red-400 text-red-400 hover:bg-red-400 hover:text-white text-xs px-2 py-1 h-8">
-                      <Trash className="h-3 w-3" />
-                    </Button>
-                  }
-                />
-              )}
-            </>
-          )}
-        </div>
       </div>
 
       {/* Desktop Layout (md and above) */}
-      <div className="hidden md:flex items-center gap-4">
-        {/* Artist Image */}
-        <ArtistImageLoader 
-          src={artist.image_url}
-          alt={artist.name}
-          className="w-16 h-16 flex-shrink-0 rounded-lg overflow-hidden"
-        />
+      <div className="hidden md:flex items-center gap-4 relative">
+        {/* Artist Image - clickable for details */}
+        <Link to={`/artist/${artist.id}`} className="flex-shrink-0">
+          <ArtistImageLoader 
+            src={artist.image_url}
+            alt={artist.name}
+            className="w-16 h-16 rounded-lg overflow-hidden hover:opacity-90 transition-opacity cursor-pointer"
+          />
+        </Link>
         
         {/* Main Content */}
         <div className="flex-1 min-w-0">
@@ -239,7 +262,8 @@ export const ArtistListItem = ({ artist, userVote, userKnowledge, votingLoading,
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-2 mb-1">
                 <h3 className="text-white text-lg font-semibold truncate">{artist.name}</h3>
-                {/* Artist Knowledge Eye Icon moved next to title */}
+                
+                {/* Knowledge Toggle */}
                 <Button
                   variant="ghost"
                   size="sm"
@@ -249,6 +273,34 @@ export const ArtistListItem = ({ artist, userVote, userKnowledge, votingLoading,
                 >
                   {userKnowledge ? <Eye className="h-3 w-3" /> : <EyeOff className="h-3 w-3" />}
                 </Button>
+                
+                {/* Social Links - small icons next to name */}
+                {artist.spotify_url && (
+                  <Button 
+                    asChild 
+                    variant="ghost"
+                    size="sm"
+                    className="p-1 h-6 w-6 text-green-400 hover:text-green-300"
+                    title="Open in Spotify"
+                  >
+                    <a href={artist.spotify_url} target="_blank" rel="noopener noreferrer">
+                      <Play className="h-3 w-3" />
+                    </a>
+                  </Button>
+                )}
+                {artist.soundcloud_url && (
+                  <Button 
+                    asChild 
+                    variant="ghost"
+                    size="sm"
+                    className="p-1 h-6 w-6 text-orange-400 hover:text-orange-300"
+                    title="Open in SoundCloud"
+                  >
+                    <a href={artist.soundcloud_url} target="_blank" rel="noopener noreferrer">
+                      <Music className="h-3 w-3" />
+                    </a>
+                  </Button>
+                )}
               </div>
               
               <div className="flex items-center gap-2 mt-1">
@@ -282,7 +334,7 @@ export const ArtistListItem = ({ artist, userVote, userKnowledge, votingLoading,
         
         {/* Actions */}
         <div className="flex items-center gap-2 flex-shrink-0">
-          {/* Updated 3-Level Voting System with new vote types */}
+          {/* Voting System */}
           <Button
             variant={userVote === 2 ? "default" : "outline"}
             size="sm"
@@ -317,65 +369,47 @@ export const ArtistListItem = ({ artist, userVote, userKnowledge, votingLoading,
             {getVoteCount(-1)}
           </Button>
           {votingLoading && <div className="h-4 w-4 animate-spin rounded-full border-2 border-purple-400 border-t-transparent" />}
-         
-         {/* External Links */}
-         {artist.spotify_url && (
-           <Button 
-             asChild 
-             size="sm"
-             className="bg-green-600 hover:bg-green-700"
-           >
-             <a href={artist.spotify_url} target="_blank" rel="noopener noreferrer">
-               <Play className="h-3 w-3" />
-             </a>
-           </Button>
-         )}
-         {artist.soundcloud_url && (
-           <Button 
-             asChild 
-             size="sm"
-             className="bg-orange-600 hover:bg-orange-700"
-           >
-             <a href={artist.soundcloud_url} target="_blank" rel="noopener noreferrer">
-               <Music className="h-3 w-3" />
-             </a>
-           </Button>
-         )}
-         
-         {/* View Details Button */}
-         <Button asChild variant="outline" size="sm" className="border-purple-400 text-purple-400 hover:bg-purple-400 hover:text-white">
-           <Link to={`/artist/${artist.id}`}>
-             <ExternalLink className="h-3 w-3" />
-           </Link>
-         </Button>
-         
-           {/* Edit and Delete Buttons - only show for Core team members */}
-           {canEdit && (
-             <>
-               <EditArtistDialog
-                 artist={artist}
-                 onSuccess={onEditSuccess}
-                 trigger={
-                   <Button variant="outline" size="sm" className="border-purple-400 text-purple-400 hover:bg-purple-400 hover:text-white">
-                     <Edit className="h-3 w-3" />
-                   </Button>
-                 }
-               />
-                {onArchiveArtist && (
+        </div>
+        
+        {/* Core Team Dropdown Menu */}
+        {canEdit && (
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" size="sm" className="p-1 h-6 w-6 text-purple-400 hover:text-purple-300">
+                <MoreHorizontal className="h-3 w-3" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="bg-black/90 border-purple-400/30">
+              <DropdownMenuItem asChild>
+                <EditArtistDialog
+                  artist={artist}
+                  onSuccess={onEditSuccess}
+                  trigger={
+                    <div className="flex items-center gap-2 w-full cursor-pointer text-purple-400 hover:text-purple-300">
+                      <Edit className="h-3 w-3" />
+                      Edit
+                    </div>
+                  }
+                />
+              </DropdownMenuItem>
+              {onArchiveArtist && (
+                <DropdownMenuItem asChild>
                   <ArchiveArtistDialog
                     artist={artist}
                     onArchive={onArchiveArtist}
                     trigger={
-                      <Button variant="outline" size="sm" className="border-red-400 text-red-400 hover:bg-red-400 hover:text-white">
+                      <div className="flex items-center gap-2 w-full cursor-pointer text-red-400 hover:text-red-300">
                         <Trash className="h-3 w-3" />
-                      </Button>
+                        Archive
+                      </div>
                     }
                   />
-                )}
-             </>
-           )}
-       </div>
-     </div>
-   </div>
- );
+                </DropdownMenuItem>
+              )}
+            </DropdownMenuContent>
+          </DropdownMenu>
+        )}
+      </div>
+    </div>
+  );
 };
