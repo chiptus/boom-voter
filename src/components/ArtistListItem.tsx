@@ -129,9 +129,9 @@ export const ArtistListItem = ({ artist, userVote, userKnowledge, votingLoading,
               {artist.spotify_url && getSocialPlatformLogo(artist.spotify_url) && (
                 <Button 
                   asChild 
-                  variant="ghost"
+                  variant="secondary"
                   size="sm"
-                  className={`p-1 h-6 w-6 ${getSocialPlatformLogo(artist.spotify_url)?.color}`}
+                  className={`p-1 h-6 w-6 bg-white/20 hover:bg-white/30 backdrop-blur-sm border-0 ${getSocialPlatformLogo(artist.spotify_url)?.color}`}
                   title={`Open in ${getSocialPlatformLogo(artist.spotify_url)?.platform}`}
                 >
                   <a href={artist.spotify_url} target="_blank" rel="noopener noreferrer">
@@ -146,9 +146,9 @@ export const ArtistListItem = ({ artist, userVote, userKnowledge, votingLoading,
               {artist.soundcloud_url && getSocialPlatformLogo(artist.soundcloud_url) && (
                 <Button 
                   asChild 
-                  variant="ghost"
+                  variant="secondary"
                   size="sm"
-                  className={`p-1 h-6 w-6 ${getSocialPlatformLogo(artist.soundcloud_url)?.color}`}
+                  className={`p-1 h-6 w-6 bg-white/20 hover:bg-white/30 backdrop-blur-sm border-0 ${getSocialPlatformLogo(artist.soundcloud_url)?.color}`}
                   title={`Open in ${getSocialPlatformLogo(artist.soundcloud_url)?.platform}`}
                 >
                   <a href={artist.soundcloud_url} target="_blank" rel="noopener noreferrer">
@@ -304,9 +304,9 @@ export const ArtistListItem = ({ artist, userVote, userKnowledge, votingLoading,
                 {artist.spotify_url && getSocialPlatformLogo(artist.spotify_url) && (
                   <Button 
                     asChild 
-                    variant="ghost"
+                    variant="secondary"
                     size="sm"
-                    className={`p-1 h-6 w-6 ${getSocialPlatformLogo(artist.spotify_url)?.color}`}
+                    className={`p-1 h-6 w-6 bg-white/20 hover:bg-white/30 backdrop-blur-sm border-0 ${getSocialPlatformLogo(artist.spotify_url)?.color}`}
                     title={`Open in ${getSocialPlatformLogo(artist.spotify_url)?.platform}`}
                   >
                     <a href={artist.spotify_url} target="_blank" rel="noopener noreferrer">
@@ -321,9 +321,9 @@ export const ArtistListItem = ({ artist, userVote, userKnowledge, votingLoading,
                 {artist.soundcloud_url && getSocialPlatformLogo(artist.soundcloud_url) && (
                   <Button 
                     asChild 
-                    variant="ghost"
+                    variant="secondary"
                     size="sm"
-                    className={`p-1 h-6 w-6 ${getSocialPlatformLogo(artist.soundcloud_url)?.color}`}
+                    className={`p-1 h-6 w-6 bg-white/20 hover:bg-white/30 backdrop-blur-sm border-0 ${getSocialPlatformLogo(artist.soundcloud_url)?.color}`}
                     title={`Open in ${getSocialPlatformLogo(artist.soundcloud_url)?.platform}`}
                   >
                     <a href={artist.soundcloud_url} target="_blank" rel="noopener noreferrer">
