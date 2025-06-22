@@ -5,17 +5,18 @@ import { useEffect } from "react";
 
 // Auth query function
 const fetchAuthUser = async () => {
-  const { data: { user }, error } = await supabase.auth.getUser();
+  const { data: { session }, error } = await supabase.auth.getSession();
   if (error) throw error;
-  return user;
+  return session?.user ?? null;
 };
 
 export const useAuthQuery = () => {
   return useQuery({
     queryKey: authQueries.user(),
     queryFn: fetchAuthUser,
-    staleTime: Infinity, // User data doesn't change often
-    gcTime: Infinity, // Keep in cache until logout
+    staleTime: 5 * 60 * 1000, // 5 minutes
+    gcTime: 10 * 60 * 1000, // 10 minutes
+    initialData: null, // Start with null user, not loading state
   });
 };
 
