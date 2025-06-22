@@ -38,6 +38,19 @@ export const genreQueries = {
   all: () => ['genres'] as const,
 };
 
+// Group Queries
+export const groupQueries = {
+  all: () => ['groups'] as const,
+  user: (userId: string) => [...groupQueries.all(), 'user', userId] as const,
+  detail: (groupId: string) => [...groupQueries.all(), 'detail', groupId] as const,
+  members: (groupId: string) => [...groupQueries.detail(groupId), 'members'] as const,
+};
+
+// Auth Queries
+export const authQueries = {
+  user: () => ['auth', 'user'] as const,
+};
+
 // Query Functions
 export const queryFunctions = {
   // Artists
@@ -164,6 +177,84 @@ export const queryFunctions = {
 
     return data || [];
   },
+
+  // Groups
+  async fetchUserGroups(userId: string) {
+    const { data: groupsData, error } = await supabase
+      .from("groups")
+      .select("*")
+      .order("created_at", { ascending: false });
+
+    if (error) {
+      throw new Error(error.message || "Failed to fetch groups");
+    }
+
+    if (!groupsData) return [];
+
+    // Then fetch member counts separately
+    const groupsWithCounts = await Promise.all(
+      groupsData.map(async (group) => {
+        const { count } = await supabase
+          .from("group_members")
+          .select("*", { count: "exact", head: true })
+          .eq("group_id", group.id);
+        
+        return {
+          ...group,
+          member_count: count || 0,
+          is_creator: group.created_by === userId,
+        };
+      })
+    );
+    
+    return groupsWithCounts;
+  },
+
+  async fetchGroupMembers(groupId: string) {
+    const { data: members, error } = await supabase
+      .from("group_members")
+      .select("*")
+      .eq("group_id", groupId)
+      .order("joined_at", { ascending: true });
+
+    if (error) {
+      throw new Error('Failed to fetch group members');
+    }
+
+    if (!members || members.length === 0) {
+      return [];
+    }
+
+    // Then fetch profile information for each member
+    const membersWithProfiles = await Promise.all(
+      members.map(async (member) => {
+        const { data: profile } = await supabase
+          .from("profiles")
+          .select("username, email")
+          .eq("id", member.user_id)
+          .single();
+
+        return {
+          ...member,
+          profiles: profile || { username: null, email: null }
+        };
+      })
+    );
+
+    return membersWithProfiles;
+  },
+
+  async checkUserPermissions(userId: string, permission: 'edit_artists') {
+    const { data, error } = await supabase
+      .from("group_members")
+      .select("groups!inner(name)")
+      .eq("user_id", userId)
+      .eq("groups.name", "Core")
+      .single();
+
+    if (error) return false;
+    return !!data;
+  },
 };
 
 // Mutation Functions
@@ -265,6 +356,89 @@ export const mutationFunctions = {
       .eq("id", noteId);
 
     if (error) throw new Error('Failed to delete note');
+    return true;
+  },
+
+  // Groups
+  async createGroup(variables: { name: string; description?: string; userId: string }) {
+    const { name, description, userId } = variables;
+    
+    const { data: group, error } = await supabase
+      .from("groups")
+      .insert({
+        name,
+        description,
+        created_by: userId,
+      })
+      .select()
+      .single();
+
+    if (error) {
+      throw new Error(error.message || "Failed to create group");
+    }
+
+    // Add creator as first member
+    const { error: memberError } = await supabase
+      .from("group_members")
+      .insert({
+        group_id: group.id,
+        user_id: userId,
+        role: "creator",
+      });
+
+    if (memberError) {
+      throw new Error("Group created but failed to add you as member");
+    }
+
+    return group;
+  },
+
+  async deleteGroup(variables: { groupId: string; userId: string }) {
+    const { groupId, userId } = variables;
+    
+    const { error } = await supabase
+      .from("groups")
+      .delete()
+      .eq("id", groupId)
+      .eq("created_by", userId);
+
+    if (error) {
+      throw new Error("Failed to delete group");
+    }
+
+    return true;
+  },
+
+  async joinGroup(variables: { groupId: string; userId: string }) {
+    const { groupId, userId } = variables;
+    
+    const { error } = await supabase
+      .from("group_members")
+      .insert({
+        group_id: groupId,
+        user_id: userId,
+      });
+
+    if (error) {
+      throw new Error("Failed to join group");
+    }
+
+    return true;
+  },
+
+  async leaveGroup(variables: { groupId: string; userId: string }) {
+    const { groupId, userId } = variables;
+    
+    const { error } = await supabase
+      .from("group_members")
+      .delete()
+      .eq("group_id", groupId)
+      .eq("user_id", userId);
+
+    if (error) {
+      throw new Error("Failed to leave group");
+    }
+
     return true;
   },
 };

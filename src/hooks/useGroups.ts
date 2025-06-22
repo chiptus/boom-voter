@@ -1,58 +1,29 @@
 
-import { useEffect, useState } from "react";
-import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "./useAuth";
+import { 
+  useUserGroupsQuery, 
+  useGroupMembersQuery, 
+  useUserPermissionsQuery,
+  useCreateGroupMutation,
+  useDeleteGroupMutation,
+  useJoinGroupMutation,
+  useLeaveGroupMutation 
+} from "./queries/useGroupsQuery";
+import { groupService } from "@/services/groupService";
 import { useToast } from "@/components/ui/use-toast";
 import type { Group, GroupMember } from "@/types/groups";
-import { groupService } from "@/services/groupService";
 
 export const useGroups = () => {
-  const [user, setUser] = useState<any>(null);
-  const [groups, setGroups] = useState<Group[]>([]);
-  const [loading, setLoading] = useState(true);
+  const { user, loading } = useAuth();
   const { toast } = useToast();
-
-  useEffect(() => {
-    getUser();
-    
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
-      setUser(session?.user || null);
-      if (session?.user) {
-        fetchUserGroups();
-      } else {
-        setGroups([]);
-      }
-    });
-
-    return () => {
-      subscription.unsubscribe();
-    };
-  }, []);
-
-  const getUser = async () => {
-    const { data: { user } } = await supabase.auth.getUser();
-    setUser(user);
-    if (user) {
-      fetchUserGroups();
-    }
-    setLoading(false);
-  };
-
-  const fetchUserGroups = async () => {
-    const currentUser = user || (await supabase.auth.getUser()).data.user;
-    if (!currentUser) return;
-    
-    try {
-      const groups = await groupService.fetchUserGroups(currentUser.id);
-      setGroups(groups);
-    } catch (error) {
-      console.error('Error fetching groups:', error);
-      toast({
-        title: "Error",
-        description: error instanceof Error ? error.message : "Failed to fetch groups",
-        variant: "destructive",
-      });
-    }
-  };
+  
+  const { data: groups = [], isLoading: groupsLoading, refetch: fetchUserGroups } = useUserGroupsQuery(user?.id);
+  const { data: canEdit = false } = useUserPermissionsQuery(user?.id, 'edit_artists');
+  
+  const createGroupMutation = useCreateGroupMutation();
+  const deleteGroupMutation = useDeleteGroupMutation();
+  const joinGroupMutation = useJoinGroupMutation();
+  const leaveGroupMutation = useLeaveGroupMutation();
 
   const createGroup = async (name: string, description?: string) => {
     if (!user) {
@@ -64,24 +35,14 @@ export const useGroups = () => {
       return null;
     }
 
-    console.log('Creating group with user:', user.id);
-    
     try {
-      const group = await groupService.createGroup(name, description, user.id);
-      toast({
-        title: "Success",
-        description: "Group created successfully",
+      const group = await createGroupMutation.mutateAsync({
+        name,
+        description,
+        userId: user.id,
       });
-      fetchUserGroups();
       return group;
     } catch (error) {
-      console.error('Error creating group:', error);
-      const message = error instanceof Error ? error.message : "Failed to create group";
-      toast({
-        title: message.includes("failed to add") ? "Warning" : "Error",
-        description: message,
-        variant: "destructive",
-      });
       return null;
     }
   };
@@ -90,19 +51,12 @@ export const useGroups = () => {
     if (!user) return false;
 
     try {
-      await groupService.joinGroup(groupId, user.id);
-      toast({
-        title: "Success",
-        description: "Joined group successfully",
+      await joinGroupMutation.mutateAsync({
+        groupId,
+        userId: user.id,
       });
-      fetchUserGroups();
       return true;
     } catch (error) {
-      toast({
-        title: "Error",
-        description: error instanceof Error ? error.message : "Failed to join group",
-        variant: "destructive",
-      });
       return false;
     }
   };
@@ -111,23 +65,31 @@ export const useGroups = () => {
     if (!user) return false;
 
     try {
-      await groupService.leaveGroup(groupId, user.id);
-      toast({
-        title: "Success",
-        description: "Left group successfully",
+      await leaveGroupMutation.mutateAsync({
+        groupId,
+        userId: user.id,
       });
-      fetchUserGroups();
       return true;
     } catch (error) {
-      toast({
-        title: "Error",
-        description: error instanceof Error ? error.message : "Failed to leave group",
-        variant: "destructive",
-      });
       return false;
     }
   };
 
+  const deleteGroup = async (groupId: string) => {
+    if (!user) return false;
+
+    try {
+      await deleteGroupMutation.mutateAsync({
+        groupId,
+        userId: user.id,
+      });
+      return true;
+    } catch (error) {
+      return false;
+    }
+  };
+
+  // Keep some legacy functions that use groupService directly
   const inviteToGroup = async (groupId: string, usernameOrEmail: string) => {
     if (!user) return false;
 
@@ -186,27 +148,6 @@ export const useGroups = () => {
     }
   };
 
-  const deleteGroup = async (groupId: string) => {
-    if (!user) return false;
-
-    try {
-      await groupService.deleteGroup(groupId, user.id);
-      toast({
-        title: "Success",
-        description: "Group deleted successfully",
-      });
-      fetchUserGroups();
-      return true;
-    } catch (error) {
-      toast({
-        title: "Error",
-        description: error instanceof Error ? error.message : "Failed to delete group",
-        variant: "destructive",
-      });
-      return false;
-    }
-  };
-
   const getGroupMembers = async (groupId: string): Promise<GroupMember[]> => {
     return groupService.getGroupMembers(groupId);
   };
@@ -236,32 +177,17 @@ export const useGroups = () => {
   };
 
   const checkUserPermission = async (permission: 'edit_artists') => {
-    if (!user) return false;
-    
-    try {
-      // Check if user is in the Core group
-      const { data, error } = await supabase
-        .from("group_members")
-        .select("groups!inner(name)")
-        .eq("user_id", user.id)
-        .eq("groups.name", "Core")
-        .single();
-
-      return !error && !!data;
-    } catch (error) {
-      console.error('Error checking user permission:', error);
-      return false;
-    }
+    return canEdit;
   };
 
   const canEditArtists = async () => {
-    return checkUserPermission('edit_artists');
+    return canEdit;
   };
 
   return {
     user,
     groups,
-    loading,
+    loading: loading || groupsLoading,
     createGroup,
     joinGroup,
     leaveGroup,
