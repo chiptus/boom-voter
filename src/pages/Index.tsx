@@ -13,9 +13,7 @@ import { ArtistCard } from "@/components/ArtistCard";
 import { ArtistListItem } from "@/components/ArtistListItem";
 import { EmptyArtistsState } from "@/components/EmptyArtistsState";
 import { FestivalHeader } from "@/components/FestivalHeader";
-import { GroupSelector } from "@/components/GroupSelector";
 import { InviteLandingPage } from "@/components/InviteLandingPage";
-import { ViewToggle } from "@/components/ViewToggle";
 import { useArtistFiltering } from "@/hooks/useArtistFiltering";
 import { useArtistData } from "@/hooks/useArtistData";
 import { useVoting } from "@/hooks/useVoting";
@@ -103,22 +101,7 @@ const Index = () => {
           onSignOut={signOut}
         />
 
-        {user && (
-          <div className="flex justify-center mb-8">
-            <div className="flex items-center space-x-4 bg-white/10 backdrop-blur-sm rounded-lg p-4">
-              <GroupSelector
-                selectedGroupId={urlState.groupId}
-                onGroupChange={(groupId) => updateUrlState({ groupId })}
-              />
-              <ViewToggle
-                view={urlState.view}
-                onViewChange={(view) => updateUrlState({ view })}
-              />
-            </div>
-          </div>
-        )}
-
-        <FilterSortControls 
+        <FilterSortControls
           state={urlState}
           onStateChange={updateUrlState}
           onClear={clearFilters}

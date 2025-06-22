@@ -8,6 +8,8 @@ import { Filter } from "lucide-react";
 import { SortControls } from "./SortControls";
 import { MobileFilters } from "./MobileFilters";
 import { DesktopFilters } from "./DesktopFilters";
+import { GroupSelector } from "../GroupSelector";
+import { ViewToggle } from "../ViewToggle";
 
 interface FilterSortControlsProps {
   state: FilterSortState;
@@ -39,11 +41,21 @@ export const FilterSortControls = ({ state, onStateChange, onClear }: FilterSort
 
   return (
     <div className="bg-white/10 backdrop-blur-md border border-purple-400/30 rounded-lg p-4 space-y-4">
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between flex-wrap gap-4">
         <SortControls 
           sort={state.sort}
           onSortChange={handleSortChange}
         />
+        <div className="flex items-center gap-4">
+          <GroupSelector
+            selectedGroupId={state.groupId}
+            onGroupChange={(groupId) => onStateChange({ groupId })}
+          />
+          <ViewToggle
+            view={state.view}
+            onViewChange={(view) => onStateChange({ view })}
+          />
+        </div>
         {isMobile ? (
           <Button
             variant="ghost"
