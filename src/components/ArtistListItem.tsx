@@ -334,6 +334,45 @@ export const ArtistListItem = ({ artist, userVote, userKnowledge, votingLoading,
         
         {/* Actions */}
         <div className="flex items-center gap-2 flex-shrink-0">
+          {/* Core Team Dropdown Menu */}
+          {canEdit && (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" size="sm" className="p-1 h-6 w-6 text-purple-400 hover:text-purple-300">
+                  <MoreHorizontal className="h-3 w-3" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="start" className="bg-black/90 border-purple-400/30">
+                <DropdownMenuItem asChild>
+                  <EditArtistDialog
+                    artist={artist}
+                    onSuccess={onEditSuccess}
+                    trigger={
+                      <div className="flex items-center gap-2 w-full cursor-pointer text-purple-400 hover:text-purple-300">
+                        <Edit className="h-3 w-3" />
+                        Edit
+                      </div>
+                    }
+                  />
+                </DropdownMenuItem>
+                {onArchiveArtist && (
+                  <DropdownMenuItem asChild>
+                    <ArchiveArtistDialog
+                      artist={artist}
+                      onArchive={onArchiveArtist}
+                      trigger={
+                        <div className="flex items-center gap-2 w-full cursor-pointer text-red-400 hover:text-red-300">
+                          <Trash className="h-3 w-3" />
+                          Archive
+                        </div>
+                      }
+                    />
+                  </DropdownMenuItem>
+                )}
+              </DropdownMenuContent>
+            </DropdownMenu>
+          )}
+          
           {/* Voting System */}
           <Button
             variant={userVote === 2 ? "default" : "outline"}
@@ -370,45 +409,6 @@ export const ArtistListItem = ({ artist, userVote, userKnowledge, votingLoading,
           </Button>
           {votingLoading && <div className="h-4 w-4 animate-spin rounded-full border-2 border-purple-400 border-t-transparent" />}
         </div>
-        
-        {/* Core Team Dropdown Menu */}
-        {canEdit && (
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="sm" className="p-1 h-6 w-6 text-purple-400 hover:text-purple-300">
-                <MoreHorizontal className="h-3 w-3" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="bg-black/90 border-purple-400/30">
-              <DropdownMenuItem asChild>
-                <EditArtistDialog
-                  artist={artist}
-                  onSuccess={onEditSuccess}
-                  trigger={
-                    <div className="flex items-center gap-2 w-full cursor-pointer text-purple-400 hover:text-purple-300">
-                      <Edit className="h-3 w-3" />
-                      Edit
-                    </div>
-                  }
-                />
-              </DropdownMenuItem>
-              {onArchiveArtist && (
-                <DropdownMenuItem asChild>
-                  <ArchiveArtistDialog
-                    artist={artist}
-                    onArchive={onArchiveArtist}
-                    trigger={
-                      <div className="flex items-center gap-2 w-full cursor-pointer text-red-400 hover:text-red-300">
-                        <Trash className="h-3 w-3" />
-                        Archive
-                      </div>
-                    }
-                  />
-                </DropdownMenuItem>
-              )}
-            </DropdownMenuContent>
-          </DropdownMenu>
-        )}
       </div>
     </div>
   );
