@@ -2,17 +2,19 @@
 import { useState } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { useArtists } from "@/hooks/useArtists";
+import { useGroupAnalytics } from "@/hooks/useGroupAnalytics";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { AuthDialog } from "@/components/AuthDialog";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from "recharts";
-import { Star, Heart, X, TrendingUp, Users, Calendar, MapPin } from "lucide-react";
+import { Star, Heart, X, TrendingUp, Users, Calendar, MapPin, UsersIcon, AlertTriangle } from "lucide-react";
 
 const Analytics = () => {
   const { user } = useAuth();
   const { allArtists, userVotes } = useArtists();
+  const { groupAnalytics, hasGroups } = useGroupAnalytics();
   const [showAuthDialog, setShowAuthDialog] = useState(false);
 
   if (!user) {
@@ -108,6 +110,11 @@ const Analytics = () => {
             <TabsTrigger value="personal" className="data-[state=active]:bg-purple-600">
               My Analytics
             </TabsTrigger>
+            {hasGroups && (
+              <TabsTrigger value="groups" className="data-[state=active]:bg-purple-600">
+                Group Analytics
+              </TabsTrigger>
+            )}
             <TabsTrigger value="festival" className="data-[state=active]:bg-purple-600">
               Festival Overview
             </TabsTrigger>
@@ -184,6 +191,213 @@ const Analytics = () => {
               </Card>
             )}
           </TabsContent>
+
+          {hasGroups && groupAnalytics && (
+            <TabsContent value="groups" className="space-y-6">
+              {/* Group Header */}
+              <Card className="bg-white/10 backdrop-blur-md border-purple-400/30">
+                <CardHeader>
+                  <CardTitle className="text-white flex items-center gap-2">
+                    <UsersIcon className="h-5 w-5" />
+                    {groupAnalytics.currentGroup.name} Analytics
+                  </CardTitle>
+                  <CardDescription className="text-purple-200">
+                    Collaborative insights for your group of {groupAnalytics.currentGroup.member_count} members
+                  </CardDescription>
+                </CardHeader>
+              </Card>
+
+              {/* Group Stats Overview */}
+              <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+                <Card className="bg-white/10 backdrop-blur-md border-purple-400/30">
+                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                    <CardTitle className="text-sm font-medium text-white">Group Consensus</CardTitle>
+                    <Users className="h-4 w-4 text-green-400" />
+                  </CardHeader>
+                  <CardContent>
+                    <div className="text-2xl font-bold text-green-400">{groupAnalytics.groupMustSeeArtists.length}</div>
+                    <p className="text-xs text-purple-200">Artists group agrees on</p>
+                  </CardContent>
+                </Card>
+                <Card className="bg-white/10 backdrop-blur-md border-purple-400/30">
+                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                    <CardTitle className="text-sm font-medium text-white">Controversial</CardTitle>
+                    <AlertTriangle className="h-4 w-4 text-orange-400" />
+                  </CardHeader>
+                  <CardContent>
+                    <div className="text-2xl font-bold text-orange-400">{groupAnalytics.controversialArtists.length}</div>
+                    <p className="text-xs text-purple-200">Artists with mixed votes</p>
+                  </CardContent>
+                </Card>
+                <Card className="bg-white/10 backdrop-blur-md border-purple-400/30">
+                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                    <CardTitle className="text-sm font-medium text-white">Group Engagement</CardTitle>
+                    <TrendingUp className="h-4 w-4 text-blue-400" />
+                  </CardHeader>
+                  <CardContent>
+                    <div className="text-2xl font-bold text-blue-400">{Math.round(groupAnalytics.groupStats.groupEngagement * 100)}%</div>
+                    <p className="text-xs text-purple-200">Artists with votes</p>
+                  </CardContent>
+                </Card>
+                <Card className="bg-white/10 backdrop-blur-md border-purple-400/30">
+                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                    <CardTitle className="text-sm font-medium text-white">Consensus Score</CardTitle>
+                    <Star className="h-4 w-4 text-purple-400" />
+                  </CardHeader>
+                  <CardContent>
+                    <div className="text-2xl font-bold text-purple-400">{Math.round(groupAnalytics.groupStats.averageConsensus * 100)}%</div>
+                    <p className="text-xs text-purple-200">Average agreement</p>
+                  </CardContent>
+                </Card>
+              </div>
+
+              {/* Group Must-See Artists */}
+              <Card className="bg-white/10 backdrop-blur-md border-purple-400/30">
+                <CardHeader>
+                  <CardTitle className="text-white flex items-center gap-2">
+                    <Star className="h-5 w-5" />
+                    Group Must-See Artists
+                  </CardTitle>
+                  <CardDescription className="text-purple-200">
+                    Artists your group has consensus on (60%+ agreement)
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  {groupAnalytics.groupMustSeeArtists.length === 0 ? (
+                    <p className="text-purple-200 text-center py-8">
+                      No group consensus yet. Keep voting to find artists your group agrees on!
+                    </p>
+                  ) : (
+                    <div className="space-y-4">
+                      {groupAnalytics.groupMustSeeArtists.slice(0, 10).map((artist, index) => (
+                        <div key={artist.id} className="flex items-center justify-between p-4 bg-white/5 rounded-lg">
+                          <div className="flex items-center gap-3">
+                            <span className="text-green-400 font-bold text-lg">#{index + 1}</span>
+                            <div>
+                              <h3 className="text-white font-semibold">{artist.name}</h3>
+                              <div className="flex items-center gap-4 text-sm text-purple-200">
+                                {artist.music_genres && (
+                                  <Badge variant="secondary" className="bg-purple-600/50 text-purple-100">
+                                    {artist.music_genres.name}
+                                  </Badge>
+                                )}
+                                {artist.stage && (
+                                  <div className="flex items-center gap-1">
+                                    <MapPin className="h-3 w-3" />
+                                    <span>{artist.stage}</span>
+                                  </div>
+                                )}
+                              </div>
+                            </div>
+                          </div>
+                          <div className="text-right">
+                            <div className="text-white font-semibold">{artist.mustGoVotes} must-go votes</div>
+                            <div className="text-xs text-purple-200">{Math.round(artist.consensusScore * 100)}% consensus</div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+
+              {/* Controversial Artists */}
+              {groupAnalytics.controversialArtists.length > 0 && (
+                <Card className="bg-white/10 backdrop-blur-md border-purple-400/30">
+                  <CardHeader>
+                    <CardTitle className="text-white flex items-center gap-2">
+                      <AlertTriangle className="h-5 w-5" />
+                      Controversial Artists
+                    </CardTitle>
+                    <CardDescription className="text-purple-200">
+                      Artists with mixed positive and negative votes in your group
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-4">
+                      {groupAnalytics.controversialArtists.slice(0, 5).map((artist, index) => (
+                        <div key={artist.id} className="flex items-center justify-between p-4 bg-white/5 rounded-lg border-l-4 border-orange-400">
+                          <div className="flex items-center gap-3">
+                            <div>
+                              <h3 className="text-white font-semibold">{artist.name}</h3>
+                              <div className="flex items-center gap-4 text-sm text-purple-200">
+                                {artist.music_genres && (
+                                  <Badge variant="secondary" className="bg-purple-600/50 text-purple-100">
+                                    {artist.music_genres.name}
+                                  </Badge>
+                                )}
+                              </div>
+                            </div>
+                          </div>
+                          <div className="text-right">
+                            <div className="text-white font-semibold">{artist.mustGoVotes + artist.interestedVotes} positive</div>
+                            <div className="text-xs text-purple-200">Group split decision</div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </CardContent>
+                </Card>
+              )}
+
+              {/* Group Genre Preferences */}
+              {groupAnalytics.topGenres.length > 0 && (
+                <Card className="bg-white/10 backdrop-blur-md border-purple-400/30">
+                  <CardHeader>
+                    <CardTitle className="text-white">Group Genre Preferences</CardTitle>
+                    <CardDescription className="text-purple-200">
+                      Combined voting patterns across your group
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <ResponsiveContainer width="100%" height={300}>
+                      <BarChart data={groupAnalytics.topGenres}>
+                        <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
+                        <XAxis 
+                          dataKey="name" 
+                          stroke="#9ca3af"
+                        />
+                        <YAxis stroke="#9ca3af" />
+                        <Tooltip 
+                          contentStyle={{ 
+                            backgroundColor: 'rgba(0,0,0,0.8)', 
+                            border: '1px solid #8b5cf6',
+                            borderRadius: '8px'
+                          }}
+                        />
+                        <Bar dataKey="votes" fill="#8b5cf6" name="Group Votes" />
+                      </BarChart>
+                    </ResponsiveContainer>
+                  </CardContent>
+                </Card>
+              )}
+
+              {/* Group Stage Distribution */}
+              {Object.keys(groupAnalytics.stageDistribution).length > 0 && (
+                <Card className="bg-white/10 backdrop-blur-md border-purple-400/30">
+                  <CardHeader>
+                    <CardTitle className="text-white flex items-center gap-2">
+                      <MapPin className="h-5 w-5" />
+                      Group Stage Coverage
+                    </CardTitle>
+                    <CardDescription className="text-purple-200">
+                      Where your group will be during the festival
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                      {Object.entries(groupAnalytics.stageDistribution).map(([stage, count]) => (
+                        <div key={stage} className="text-center p-4 bg-white/5 rounded-lg">
+                          <div className="text-2xl font-bold text-green-400">{count as number}</div>
+                          <div className="text-sm text-purple-200">{stage}</div>
+                        </div>
+                      ))}
+                    </div>
+                  </CardContent>
+                </Card>
+              )}
+            </TabsContent>
+          )}
 
           <TabsContent value="festival" className="space-y-6">
             {/* Most Popular Artists */}
