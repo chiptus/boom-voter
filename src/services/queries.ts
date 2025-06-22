@@ -244,6 +244,20 @@ export const queryFunctions = {
     return membersWithProfiles;
   },
 
+  async fetchGroupById(groupId: string) {
+    const { data, error } = await supabase
+      .from("groups")
+      .select("*")
+      .eq("id", groupId)
+      .single();
+
+    if (error) {
+      throw new Error("Failed to fetch group details");
+    }
+
+    return data;
+  },
+
   async checkUserPermissions(userId: string, permission: 'edit_artists') {
     const { data, error } = await supabase
       .from("group_members")
@@ -437,6 +451,42 @@ export const mutationFunctions = {
 
     if (error) {
       throw new Error("Failed to leave group");
+    }
+
+    return true;
+  },
+
+  async removeMemberFromGroup(variables: { groupId: string; userId: string; currentUserId: string }) {
+    const { groupId, userId, currentUserId } = variables;
+    
+    // First check if current user is the group creator
+    const { data: group, error: groupError } = await supabase
+      .from("groups")
+      .select("created_by")
+      .eq("id", groupId)
+      .single();
+
+    if (groupError || !group) {
+      throw new Error("Group not found");
+    }
+
+    if (group.created_by !== currentUserId) {
+      throw new Error("Only group creators can remove members");
+    }
+
+    // Prevent removing the creator
+    if (userId === currentUserId) {
+      throw new Error("You cannot remove yourself as the group creator");
+    }
+
+    const { error } = await supabase
+      .from("group_members")
+      .delete()
+      .eq("group_id", groupId)
+      .eq("user_id", userId);
+
+    if (error) {
+      throw new Error("Failed to remove member from group");
     }
 
     return true;
