@@ -44,6 +44,7 @@ export const groupQueries = {
   user: (userId: string) => [...groupQueries.all(), 'user', userId] as const,
   detail: (groupId: string) => [...groupQueries.all(), 'detail', groupId] as const,
   members: (groupId: string) => [...groupQueries.detail(groupId), 'members'] as const,
+  memberVotes: (groupId: string, artistId: string) => [...groupQueries.detail(groupId), 'votes', artistId] as const,
 };
 
 // Auth Queries
@@ -268,6 +269,63 @@ export const queryFunctions = {
 
     if (error) return false;
     return !!data;
+  },
+
+  async fetchGroupMemberVotes(groupId: string, artistId: string) {
+    // First get group members
+    const { data: members, error: membersError } = await supabase
+      .from("group_members")
+      .select("user_id")
+      .eq("group_id", groupId);
+
+    if (membersError) {
+      throw new Error('Failed to fetch group members');
+    }
+
+    if (!members || members.length === 0) {
+      return [];
+    }
+
+    const memberIds = members.map(m => m.user_id);
+
+    // Then get votes from those members for this artist
+    const { data: votesData, error: votesError } = await supabase
+      .from("votes")
+      .select("user_id, vote_type")
+      .eq("artist_id", artistId)
+      .in("user_id", memberIds);
+
+    if (votesError) {
+      throw new Error('Failed to fetch member votes');
+    }
+
+    // Get profile information for users who voted
+    const voterIds = votesData?.map(v => v.user_id) || [];
+    if (voterIds.length === 0) {
+      return [];
+    }
+
+    const { data: profilesData, error: profilesError } = await supabase
+      .from("profiles")
+      .select("id, username, email")
+      .in("id", voterIds);
+
+    if (profilesError) {
+      console.error("Error fetching profiles:", profilesError);
+    }
+
+    // Combine votes with profile information
+    const votesWithProfiles = votesData?.map(vote => {
+      const profile = profilesData?.find(p => p.id === vote.user_id);
+      return {
+        user_id: vote.user_id,
+        vote_type: vote.vote_type,
+        username: profile?.username || null,
+        email: profile?.email || null,
+      };
+    }) || [];
+
+    return votesWithProfiles;
   },
 };
 

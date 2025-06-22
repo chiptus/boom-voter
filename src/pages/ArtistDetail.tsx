@@ -6,6 +6,7 @@ import { ArtistInfoCard } from "@/components/artist-detail/ArtistInfoCard";
 import { ArtistNotFoundState } from "@/components/artist-detail/ArtistNotFoundState";
 import { ArtistLoadingState } from "@/components/artist-detail/ArtistLoadingState";
 import { ArtistNotes } from "@/components/ArtistNotes";
+import { ArtistGroupVotes } from "@/components/artist-detail/ArtistGroupVotes";
 import { useArtistDetail } from "@/hooks/useArtistDetail";
 
 const ArtistDetail = () => {
@@ -64,6 +65,11 @@ const ArtistDetail = () => {
         {/* Artist Notes Section */}
         <div className="mb-8">
           <ArtistNotes artistId={id!} userId={user?.id || null} />
+        </div>
+
+        {/* Group Votes Section */}
+        <div className="mb-8">
+          <ArtistGroupVotes artistId={id!} />
         </div>
       </div>
     </div>
