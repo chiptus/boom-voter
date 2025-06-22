@@ -1,4 +1,4 @@
-import { useMemo, useEffect, useRef } from "react";
+import { useMemo, useEffect, useRef, useCallback } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useArtistsBasicQuery } from "./queries/useArtistsBasicQuery";
@@ -10,8 +10,11 @@ import type { Artist } from "@/services/queries";
 export const useProgressiveArtistData = () => {
   const queryClient = useQueryClient();
   const channelRef = useRef<any>(null);
+  const artistsDebounceRef = useRef<NodeJS.Timeout | null>(null);
+  const votesDebounceRef = useRef<NodeJS.Timeout | null>(null);
+  const subscriptionDelayRef = useRef<NodeJS.Timeout | null>(null);
   
-  // Progressive queries
+  // Progressive queries with optimized caching
   const { data: basicArtists = [], isLoading: basicLoading, error: basicError, refetch: refetchBasic } = useArtistsBasicQuery();
   const { data: voteSummaries = {}, isLoading: votesLoading, error: votesError, refetch: refetchVotes } = useVoteSummariesQuery();
   const archiveArtistMutation = useArchiveArtistMutation();
@@ -24,35 +27,74 @@ export const useProgressiveArtistData = () => {
     }));
   }, [basicArtists, voteSummaries]);
 
-  // Set up real-time subscriptions
+  // Debounced query invalidation to prevent rapid successive updates
+  const debouncedInvalidateArtists = useCallback(() => {
+    if (artistsDebounceRef.current) {
+      clearTimeout(artistsDebounceRef.current);
+    }
+    artistsDebounceRef.current = setTimeout(() => {
+      console.log('Debounced: invalidating basic artists query');
+      queryClient.invalidateQueries({ queryKey: [...artistQueries.lists(), 'basic'] });
+    }, 500);
+  }, [queryClient]);
+
+  const debouncedInvalidateVotes = useCallback(() => {
+    if (votesDebounceRef.current) {
+      clearTimeout(votesDebounceRef.current);
+    }
+    votesDebounceRef.current = setTimeout(() => {
+      console.log('Debounced: invalidating vote summaries');
+      queryClient.invalidateQueries({ queryKey: voteSummaryQueries.byArtist() });
+      queryClient.invalidateQueries({ queryKey: voteQueries.all() });
+    }, 500);
+  }, [queryClient]);
+
+  // Set up real-time subscriptions with optimization
   useEffect(() => {
-    // Clean up existing channel if it exists
+    // Clean up existing subscriptions
     if (channelRef.current) {
       channelRef.current.unsubscribe();
       channelRef.current = null;
     }
+    if (subscriptionDelayRef.current) {
+      clearTimeout(subscriptionDelayRef.current);
+      subscriptionDelayRef.current = null;
+    }
+    if (artistsDebounceRef.current) {
+      clearTimeout(artistsDebounceRef.current);
+      artistsDebounceRef.current = null;
+    }
+    if (votesDebounceRef.current) {
+      clearTimeout(votesDebounceRef.current);
+      votesDebounceRef.current = null;
+    }
 
-    // Create new channel with unique name
-    const channelName = `progressive-artists-changes-${Date.now()}`;
-    const artistsChannel = supabase
-      .channel(channelName)
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'artists' }, () => {
-        console.log('Artists table changed, invalidating basic artists query');
-        queryClient.invalidateQueries({ queryKey: [...artistQueries.lists(), 'basic'] });
-      })
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'votes' }, () => {
-        console.log('Votes table changed, invalidating vote summaries and user votes');
-        queryClient.invalidateQueries({ queryKey: voteSummaryQueries.byArtist() });
-        queryClient.invalidateQueries({ queryKey: voteQueries.all() });
-      });
+    // Only set up subscriptions after initial data loads and user stays on page
+    const setupSubscriptions = () => {
+      try {
+        const channelName = `progressive-artists-changes-${Date.now()}`;
+        const artistsChannel = supabase
+          .channel(channelName)
+          .on('postgres_changes', { event: '*', schema: 'public', table: 'artists' }, debouncedInvalidateArtists)
+          .on('postgres_changes', { event: '*', schema: 'public', table: 'votes' }, debouncedInvalidateVotes);
 
-    // Subscribe to the channel
-    artistsChannel.subscribe((status) => {
-      console.log('Progressive channel subscription status:', status);
-    });
+        artistsChannel.subscribe((status) => {
+          console.log('Progressive channel subscription status:', status);
+          if (status === 'SUBSCRIBED') {
+            console.log('Real-time subscriptions active');
+          }
+        });
 
-    // Store reference for cleanup
-    channelRef.current = artistsChannel;
+        channelRef.current = artistsChannel;
+      } catch (error) {
+        console.warn('Failed to set up real-time subscriptions:', error);
+      }
+    };
+
+    // Only set up subscriptions if initial data has loaded and user stays for 2 seconds
+    if (!basicLoading && !votesLoading && basicArtists.length > 0) {
+      subscriptionDelayRef.current = setTimeout(setupSubscriptions, 2000);
+    }
 
     return () => {
       if (channelRef.current) {
@@ -60,8 +102,20 @@ export const useProgressiveArtistData = () => {
         channelRef.current.unsubscribe();
         channelRef.current = null;
       }
+      if (subscriptionDelayRef.current) {
+        clearTimeout(subscriptionDelayRef.current);
+        subscriptionDelayRef.current = null;
+      }
+      if (artistsDebounceRef.current) {
+        clearTimeout(artistsDebounceRef.current);
+        artistsDebounceRef.current = null;
+      }
+      if (votesDebounceRef.current) {
+        clearTimeout(votesDebounceRef.current);
+        votesDebounceRef.current = null;
+      }
     };
-  }, [queryClient]);
+  }, [queryClient, basicLoading, votesLoading, basicArtists.length, debouncedInvalidateArtists, debouncedInvalidateVotes]);
 
   const fetchArtists = async () => {
     await Promise.all([refetchBasic(), refetchVotes()]);
