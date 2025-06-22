@@ -75,7 +75,9 @@ export type Database = {
           genre_id: string
           id: string
           image_url: string | null
+          last_soundcloud_sync: string | null
           name: string
+          soundcloud_followers: number | null
           soundcloud_url: string | null
           spotify_url: string | null
           stage: string | null
@@ -90,7 +92,9 @@ export type Database = {
           genre_id: string
           id?: string
           image_url?: string | null
+          last_soundcloud_sync?: string | null
           name: string
+          soundcloud_followers?: number | null
           soundcloud_url?: string | null
           spotify_url?: string | null
           stage?: string | null
@@ -105,7 +109,9 @@ export type Database = {
           genre_id?: string
           id?: string
           image_url?: string | null
+          last_soundcloud_sync?: string | null
           name?: string
+          soundcloud_followers?: number | null
           soundcloud_url?: string | null
           spotify_url?: string | null
           stage?: string | null

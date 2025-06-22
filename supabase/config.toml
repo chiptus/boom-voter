@@ -1,1 +1,4 @@
 project_id = "qssmazlqrmxiudxckxvi"
+
+[functions.sync-artist-data]
+verify_jwt = false
