@@ -16,7 +16,7 @@ import { FestivalHeader } from "@/components/FestivalHeader";
 import { InviteLandingPage } from "@/components/InviteLandingPage";
 import { useArtistFiltering } from "@/hooks/useArtistFiltering";
 import { useArtistData } from "@/hooks/useArtistData";
-import { useVoting } from "@/hooks/useVoting";
+import { useVoting } from "@/hooks/queries/useVotingQuery";
 
 import { useUrlState } from "@/hooks/useUrlState";
 
@@ -29,7 +29,7 @@ const Index = () => {
   const { state: urlState, updateUrlState, clearFilters } = useUrlState();
   
   const { artists, fetchArtists, archiveArtist } = useArtistData();
-  const { userVotes, votingLoading, handleVote } = useVoting(user, fetchArtists);
+  const { userVotes, votingLoading, handleVote } = useVoting();
   
   const { filteredAndSortedArtists } = useArtistFiltering(artists, urlState);
 
