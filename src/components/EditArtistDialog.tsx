@@ -9,6 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useGenres } from "@/hooks/useGenres";
+import { useGroups } from "@/hooks/useGroups";
 import { Edit } from "lucide-react";
 import { STAGES } from "@/components/filters/constants";
 import type { Artist } from "@/hooks/useArtists";
@@ -35,10 +36,23 @@ export const EditArtistDialog = ({ artist, onSuccess, trigger }: EditArtistDialo
 
   const { genres } = useGenres();
   const { toast } = useToast();
+  const { canEditArtists } = useGroups();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
+
+    // Check Core team permissions
+    const hasPermission = await canEditArtists();
+    if (!hasPermission) {
+      toast({
+        title: "Permission Denied",
+        description: "Only Core team members can edit artists",
+        variant: "destructive",
+      });
+      setLoading(false);
+      return;
+    }
 
     try {
       const { error } = await supabase

@@ -9,6 +9,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Music } from "lucide-react";
+import { useGroups } from "@/hooks/useGroups";
 import type { Database } from "@/integrations/supabase/types";
 
 type MusicGenre = Database["public"]["Tables"]["music_genres"]["Row"];
@@ -31,6 +32,7 @@ export const AddArtistDialog = ({ open, onOpenChange, onSuccess }: AddArtistDial
   const [genres, setGenres] = useState<MusicGenre[]>([]);
   const [loading, setLoading] = useState(false);
   const { toast } = useToast();
+  const { canEditArtists } = useGroups();
 
   useEffect(() => {
     if (open) {
@@ -65,6 +67,18 @@ export const AddArtistDialog = ({ open, onOpenChange, onSuccess }: AddArtistDial
       toast({
         title: "Error",
         description: "You must be logged in to add an artist",
+        variant: "destructive",
+      });
+      setLoading(false);
+      return;
+    }
+
+    // Check Core team permissions
+    const hasPermission = await canEditArtists();
+    if (!hasPermission) {
+      toast({
+        title: "Permission Denied",
+        description: "Only Core team members can add artists",
         variant: "destructive",
       });
       setLoading(false);

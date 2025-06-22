@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Plus } from "lucide-react";
+import { useGroups } from "@/hooks/useGroups";
 
 interface AddGenreDialogProps {
   open: boolean;
@@ -17,6 +18,7 @@ export const AddGenreDialog = ({ open, onOpenChange }: AddGenreDialogProps) => {
   const [name, setName] = useState("");
   const [loading, setLoading] = useState(false);
   const { toast } = useToast();
+  const { canEditArtists } = useGroups();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -28,6 +30,18 @@ export const AddGenreDialog = ({ open, onOpenChange }: AddGenreDialogProps) => {
       toast({
         title: "Error",
         description: "You must be logged in to add a genre",
+        variant: "destructive",
+      });
+      setLoading(false);
+      return;
+    }
+
+    // Check Core team permissions
+    const hasPermission = await canEditArtists();
+    if (!hasPermission) {
+      toast({
+        title: "Permission Denied",
+        description: "Only Core team members can add genres",
         variant: "destructive",
       });
       setLoading(false);

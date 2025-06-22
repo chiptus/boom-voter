@@ -6,6 +6,8 @@ import { Star, Heart, X, ExternalLink, Play, Music, MapPin, Calendar, Eye, EyeOf
 import { ArtistImageLoader } from "./ArtistImageLoader";
 import { EditArtistDialog } from "./EditArtistDialog";
 import { useToast } from "@/hooks/use-toast";
+import { useGroups } from "@/hooks/useGroups";
+import { useState, useEffect } from "react";
 import type { Artist } from "@/hooks/useArtists";
 
 interface ArtistListItemProps {
@@ -22,6 +24,20 @@ interface ArtistListItemProps {
 
 export const ArtistListItem = ({ artist, userVote, userKnowledge, votingLoading, onVote, onKnowledgeToggle, onAuthRequired, onEditSuccess, user }: ArtistListItemProps) => {
   const { toast } = useToast();
+  const { canEditArtists } = useGroups();
+  const [canEdit, setCanEdit] = useState(false);
+
+  useEffect(() => {
+    const checkPermissions = async () => {
+      if (user) {
+        const hasPermission = await canEditArtists();
+        setCanEdit(hasPermission);
+      } else {
+        setCanEdit(false);
+      }
+    };
+    checkPermissions();
+  }, [user, canEditArtists]);
 
   const handleVote = async (voteType: number) => {
     const result = await onVote(artist.id, voteType);
@@ -178,8 +194,8 @@ export const ArtistListItem = ({ artist, userVote, userKnowledge, votingLoading,
               <ExternalLink className="h-3 w-3" />
             </Link>
           </Button>
-          {/* Edit Button - only show for authenticated users */}
-          {user && (
+          {/* Edit Button - only show for Core team members */}
+          {canEdit && (
             <EditArtistDialog
               artist={artist}
               onSuccess={onEditSuccess}
@@ -318,18 +334,18 @@ export const ArtistListItem = ({ artist, userVote, userKnowledge, votingLoading,
            </Link>
          </Button>
          
-         {/* Edit Button - only show for authenticated users */}
-         {user && (
-           <EditArtistDialog
-             artist={artist}
-             onSuccess={onEditSuccess}
-             trigger={
-               <Button variant="outline" size="sm" className="border-purple-400 text-purple-400 hover:bg-purple-400 hover:text-white">
-                 <Edit className="h-3 w-3" />
-               </Button>
-             }
-           />
-         )}
+          {/* Edit Button - only show for Core team members */}
+          {canEdit && (
+            <EditArtistDialog
+              artist={artist}
+              onSuccess={onEditSuccess}
+              trigger={
+                <Button variant="outline" size="sm" className="border-purple-400 text-purple-400 hover:bg-purple-400 hover:text-white">
+                  <Edit className="h-3 w-3" />
+                </Button>
+              }
+            />
+          )}
        </div>
      </div>
    </div>

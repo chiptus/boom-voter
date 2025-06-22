@@ -7,6 +7,8 @@ import { Star, Heart, X, ExternalLink, Play, Music, MapPin, Calendar, Eye, EyeOf
 import { ArtistImageLoader } from "./ArtistImageLoader";
 import { EditArtistDialog } from "./EditArtistDialog";
 import { useToast } from "@/hooks/use-toast";
+import { useGroups } from "@/hooks/useGroups";
+import { useState, useEffect } from "react";
 import type { Artist } from "@/hooks/useArtists";
 
 interface ArtistCardProps {
@@ -23,6 +25,20 @@ interface ArtistCardProps {
 
 export const ArtistCard = ({ artist, userVote, userKnowledge, votingLoading, onVote, onKnowledgeToggle, onAuthRequired, onEditSuccess, user }: ArtistCardProps) => {
   const { toast } = useToast();
+  const { canEditArtists } = useGroups();
+  const [canEdit, setCanEdit] = useState(false);
+
+  useEffect(() => {
+    const checkPermissions = async () => {
+      if (user) {
+        const hasPermission = await canEditArtists();
+        setCanEdit(hasPermission);
+      } else {
+        setCanEdit(false);
+      }
+    };
+    checkPermissions();
+  }, [user, canEditArtists]);
 
   const handleVote = async (voteType: number) => {
     const result = await onVote(artist.id, voteType);
@@ -198,8 +214,8 @@ export const ArtistCard = ({ artist, userVote, userKnowledge, votingLoading, onV
             </Link>
           </Button>
           
-          {/* Edit Button - only show for authenticated users */}
-          {user && (
+          {/* Edit Button - only show for Core team members */}
+          {canEdit && (
             <EditArtistDialog
               artist={artist}
               onSuccess={onEditSuccess}
