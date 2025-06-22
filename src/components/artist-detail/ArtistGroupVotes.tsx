@@ -154,21 +154,18 @@ export const ArtistGroupVotes = ({ artistId, selectedGroupId, onGroupChange }: A
         <div className="space-y-3">
           {memberVotes.map((vote) => (
             <div key={vote.user_id} className="flex items-center justify-between p-3 bg-white/5 rounded-lg">
-              <div className="flex items-center gap-3">
-                <Avatar className="h-8 w-8">
-                  <AvatarFallback className="bg-purple-600 text-white text-sm">
-                    {(vote.username || vote.email || 'U').charAt(0).toUpperCase()}
-                  </AvatarFallback>
-                </Avatar>
-                <div>
-                  <p className="text-white font-medium">
-                    {vote.username || vote.email || 'Anonymous User'}
-                  </p>
-                  {vote.username && vote.email && (
-                    <p className="text-xs text-purple-300">{vote.email}</p>
-                  )}
-                </div>
-              </div>
+               <div className="flex items-center gap-3">
+                 <Avatar className="h-8 w-8">
+                   <AvatarFallback className="bg-purple-600 text-white text-sm">
+                     {(vote.username || 'U').charAt(0).toUpperCase()}
+                   </AvatarFallback>
+                 </Avatar>
+                 <div>
+                   <p className="text-white font-medium">
+                     {vote.username || 'Anonymous User'}
+                   </p>
+                 </div>
+               </div>
               <Badge 
                 variant="outline" 
                 className={`flex items-center gap-1 ${getVoteColor(vote.vote_type)}`}
