@@ -8,7 +8,7 @@ import { useArtistFiltering } from "./useArtistFiltering";
 
 export const useArtists = (filterSortState?: FilterSortState) => {
   const { user, loading, signOut } = useAuth();
-  const { artists, fetchArtists, deleteArtist } = useArtistData();
+  const { artists, fetchArtists, archiveArtist } = useArtistData();
   const { userVotes, votingLoading, handleVote } = useVoting(user, fetchArtists);
   const { userKnowledge, handleKnowledgeToggle } = useKnowledge(user);
   const { filteredAndSortedArtists } = useArtistFiltering(artists, filterSortState);
@@ -25,7 +25,7 @@ export const useArtists = (filterSortState?: FilterSortState) => {
     handleKnowledgeToggle,
     signOut,
     fetchArtists,
-    deleteArtist,
+    archiveArtist,
   };
 };
 

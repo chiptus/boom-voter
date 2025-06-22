@@ -49,6 +49,7 @@ export const useArtistDetail = (id: string | undefined) => {
         votes (vote_type)
       `)
       .eq("id", id)
+      .eq("archived", false)
       .single();
 
     if (error) {
@@ -126,26 +127,26 @@ export const useArtistDetail = (id: string | undefined) => {
 
   const netVoteScore = artist ? getVoteCount(1) - getVoteCount(-1) : 0;
 
-  const deleteArtist = async () => {
+  const archiveArtist = async () => {
     if (!id) return;
     
     const { error } = await supabase
       .from("artists")
-      .delete()
+      .update({ archived: true })
       .eq("id", id);
 
     if (error) {
-      console.error('Error deleting artist:', error);
+      console.error('Error archiving artist:', error);
       toast({
         title: "Error",
-        description: "Failed to delete artist",
+        description: "Failed to archive artist",
         variant: "destructive",
       });
       throw error;
     } else {
       toast({
         title: "Success",
-        description: "Artist deleted successfully",
+        description: "Artist archived successfully",
       });
     }
   };
@@ -160,6 +161,6 @@ export const useArtistDetail = (id: string | undefined) => {
     getVoteCount,
     netVoteScore,
     fetchArtist,
-    deleteArtist,
+    archiveArtist,
   };
 };

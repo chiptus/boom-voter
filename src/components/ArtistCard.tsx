@@ -6,7 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Star, Heart, X, ExternalLink, Play, Music, MapPin, Calendar, Eye, EyeOff, Edit, Trash } from "lucide-react";
 import { ArtistImageLoader } from "./ArtistImageLoader";
 import { EditArtistDialog } from "./EditArtistDialog";
-import { DeleteArtistDialog } from "./DeleteArtistDialog";
+import { ArchiveArtistDialog } from "./ArchiveArtistDialog";
 import { useToast } from "@/hooks/use-toast";
 import { useGroups } from "@/hooks/useGroups";
 import { useState, useEffect } from "react";
@@ -21,11 +21,11 @@ interface ArtistCardProps {
   onKnowledgeToggle: (artistId: string) => Promise<{ requiresAuth: boolean }>;
   onAuthRequired: () => void;
   onEditSuccess?: () => void;
-  onDeleteArtist?: (artistId: string) => Promise<void>;
+  onArchiveArtist?: (artistId: string) => Promise<void>;
   user?: any;
 }
 
-export const ArtistCard = ({ artist, userVote, userKnowledge, votingLoading, onVote, onKnowledgeToggle, onAuthRequired, onEditSuccess, onDeleteArtist, user }: ArtistCardProps) => {
+export const ArtistCard = ({ artist, userVote, userKnowledge, votingLoading, onVote, onKnowledgeToggle, onAuthRequired, onEditSuccess, onArchiveArtist, user }: ArtistCardProps) => {
   const { toast } = useToast();
   const { canEditArtists } = useGroups();
   const [canEdit, setCanEdit] = useState(false);
@@ -228,10 +228,10 @@ export const ArtistCard = ({ artist, userVote, userKnowledge, votingLoading, onV
                   </Button>
                 }
               />
-              {onDeleteArtist && (
-                <DeleteArtistDialog
+              {onArchiveArtist && (
+                <ArchiveArtistDialog
                   artist={artist}
-                  onDelete={onDeleteArtist}
+                  onArchive={onArchiveArtist}
                   trigger={
                     <Button variant="outline" size="sm" className="border-red-400 text-red-400 hover:bg-red-400 hover:text-white">
                       <Trash className="h-4 w-4" />

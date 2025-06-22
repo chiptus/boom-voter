@@ -68,6 +68,7 @@ export type Database = {
       artists: {
         Row: {
           added_by: string
+          archived: boolean
           created_at: string
           description: string | null
           estimated_date: string | null
@@ -82,6 +83,7 @@ export type Database = {
         }
         Insert: {
           added_by: string
+          archived?: boolean
           created_at?: string
           description?: string | null
           estimated_date?: string | null
@@ -96,6 +98,7 @@ export type Database = {
         }
         Update: {
           added_by?: string
+          archived?: boolean
           created_at?: string
           description?: string | null
           estimated_date?: string | null

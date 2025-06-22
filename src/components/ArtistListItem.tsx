@@ -5,7 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { Star, Heart, X, ExternalLink, Play, Music, MapPin, Calendar, Eye, EyeOff, Edit, Trash } from "lucide-react";
 import { ArtistImageLoader } from "./ArtistImageLoader";
 import { EditArtistDialog } from "./EditArtistDialog";
-import { DeleteArtistDialog } from "./DeleteArtistDialog";
+import { ArchiveArtistDialog } from "./ArchiveArtistDialog";
 import { useToast } from "@/hooks/use-toast";
 import { useGroups } from "@/hooks/useGroups";
 import { useState, useEffect } from "react";
@@ -20,11 +20,11 @@ interface ArtistListItemProps {
   onKnowledgeToggle: (artistId: string) => Promise<{ requiresAuth: boolean }>;
   onAuthRequired: () => void;
   onEditSuccess?: () => void;
-  onDeleteArtist?: (artistId: string) => Promise<void>;
+  onArchiveArtist?: (artistId: string) => Promise<void>;
   user?: any;
 }
 
-export const ArtistListItem = ({ artist, userVote, userKnowledge, votingLoading, onVote, onKnowledgeToggle, onAuthRequired, onEditSuccess, onDeleteArtist, user }: ArtistListItemProps) => {
+export const ArtistListItem = ({ artist, userVote, userKnowledge, votingLoading, onVote, onKnowledgeToggle, onAuthRequired, onEditSuccess, onArchiveArtist, user }: ArtistListItemProps) => {
   const { toast } = useToast();
   const { canEditArtists } = useGroups();
   const [canEdit, setCanEdit] = useState(false);
@@ -208,10 +208,10 @@ export const ArtistListItem = ({ artist, userVote, userKnowledge, votingLoading,
                   </Button>
                 }
               />
-              {onDeleteArtist && (
-                <DeleteArtistDialog
+              {onArchiveArtist && (
+                <ArchiveArtistDialog
                   artist={artist}
-                  onDelete={onDeleteArtist}
+                  onArchive={onArchiveArtist}
                   trigger={
                     <Button variant="outline" size="sm" className="border-red-400 text-red-400 hover:bg-red-400 hover:text-white text-xs px-2 py-1 h-8">
                       <Trash className="h-3 w-3" />
@@ -361,17 +361,17 @@ export const ArtistListItem = ({ artist, userVote, userKnowledge, votingLoading,
                    </Button>
                  }
                />
-               {onDeleteArtist && (
-                 <DeleteArtistDialog
-                   artist={artist}
-                   onDelete={onDeleteArtist}
-                   trigger={
-                     <Button variant="outline" size="sm" className="border-red-400 text-red-400 hover:bg-red-400 hover:text-white">
-                       <Trash className="h-3 w-3" />
-                     </Button>
-                   }
-                 />
-               )}
+                {onArchiveArtist && (
+                  <ArchiveArtistDialog
+                    artist={artist}
+                    onArchive={onArchiveArtist}
+                    trigger={
+                      <Button variant="outline" size="sm" className="border-red-400 text-red-400 hover:bg-red-400 hover:text-white">
+                        <Trash className="h-3 w-3" />
+                      </Button>
+                    }
+                  />
+                )}
              </>
            )}
        </div>

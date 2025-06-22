@@ -21,6 +21,7 @@ export const useArtistData = () => {
         music_genres (name),
         votes (vote_type, user_id)
       `)
+      .eq('archived', false)
       .order("created_at", { ascending: false });
 
     const { data, error } = await query;
@@ -57,26 +58,26 @@ export const useArtistData = () => {
     };
   }, []);
 
-  const deleteArtist = async (artistId: string) => {
-    console.log('Deleting artist:', artistId);
+  const archiveArtist = async (artistId: string) => {
+    console.log('Archiving artist:', artistId);
     const { error } = await supabase
       .from("artists")
-      .delete()
+      .update({ archived: true })
       .eq("id", artistId);
 
     if (error) {
-      console.error('Error deleting artist:', error);
+      console.error('Error archiving artist:', error);
       toast({
         title: "Error",
-        description: "Failed to delete artist",
+        description: "Failed to archive artist",
         variant: "destructive",
       });
       throw error;
     } else {
-      console.log('Artist deleted successfully');
+      console.log('Artist archived successfully');
       toast({
         title: "Success",
-        description: "Artist deleted successfully",
+        description: "Artist archived successfully",
       });
       // Refresh the artists list
       fetchArtists();
@@ -86,7 +87,7 @@ export const useArtistData = () => {
   return {
     artists,
     fetchArtists,
-    deleteArtist,
+    archiveArtist,
   };
 };
 

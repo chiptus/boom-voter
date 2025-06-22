@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Edit, ExternalLink, Music, Play, Trash } from "lucide-react";
 import { EditArtistDialog } from "@/components/EditArtistDialog";
-import { DeleteArtistDialog } from "@/components/DeleteArtistDialog";
+import { ArchiveArtistDialog } from "@/components/ArchiveArtistDialog";
 import { ArtistVotingButtons } from "./ArtistVotingButtons";
 import type { Database } from "@/integrations/supabase/types";
 
@@ -20,7 +20,7 @@ interface ArtistInfoCardProps {
   onVote: (voteType: number) => void;
   getVoteCount: (voteType: number) => number;
   onArtistUpdate: () => void;
-  onDeleteArtist?: () => Promise<void>;
+  onArchiveArtist?: () => Promise<void>;
 }
 
 export const ArtistInfoCard = ({ 
@@ -31,7 +31,7 @@ export const ArtistInfoCard = ({
   onVote, 
   getVoteCount, 
   onArtistUpdate,
-  onDeleteArtist 
+  onArchiveArtist 
 }: ArtistInfoCardProps) => {
   return (
     <div className="lg:col-span-2">
@@ -78,10 +78,10 @@ export const ArtistInfoCard = ({
                     </Button>
                   }
                 />
-                {onDeleteArtist && (
-                  <DeleteArtistDialog
+                {onArchiveArtist && (
+                  <ArchiveArtistDialog
                     artist={artist as any}
-                    onDelete={onDeleteArtist}
+                    onArchive={onArchiveArtist}
                     trigger={
                       <Button
                         variant="outline"
@@ -89,7 +89,7 @@ export const ArtistInfoCard = ({
                         className="border-red-400 text-red-400 hover:bg-red-400 hover:text-white"
                       >
                         <Trash className="h-4 w-4 mr-2" />
-                        Delete Artist
+                        Archive Artist
                       </Button>
                     }
                   />

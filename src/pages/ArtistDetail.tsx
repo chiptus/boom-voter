@@ -21,11 +21,11 @@ const ArtistDetail = () => {
     getVoteCount,
     netVoteScore,
     fetchArtist,
-    deleteArtist,
+    archiveArtist,
   } = useArtistDetail(id);
 
-  const handleDeleteArtist = async () => {
-    await deleteArtist();
+  const handleArchiveArtist = async () => {
+    await archiveArtist();
     navigate('/');
   };
 
@@ -57,7 +57,7 @@ const ArtistDetail = () => {
             onVote={handleVote}
             getVoteCount={getVoteCount}
             onArtistUpdate={fetchArtist}
-            onDeleteArtist={canEdit ? handleDeleteArtist : undefined}
+            onArchiveArtist={canEdit ? handleArchiveArtist : undefined}
           />
         </div>
 

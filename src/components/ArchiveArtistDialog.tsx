@@ -14,18 +14,23 @@ import { Button } from "@/components/ui/button";
 import { Trash } from "lucide-react";
 import type { Artist } from "@/hooks/useArtists";
 
-interface DeleteArtistDialogProps {
+interface ArchiveArtistDialogProps {
   artist: Artist;
-  onDelete: (artistId: string) => Promise<void>;
+  onArchive: ((artistId: string) => Promise<void>) | (() => Promise<void>);
   trigger?: React.ReactNode;
   loading?: boolean;
 }
 
-export const DeleteArtistDialog = ({ artist, onDelete, trigger, loading = false }: DeleteArtistDialogProps) => {
+export const ArchiveArtistDialog = ({ artist, onArchive, trigger, loading = false }: ArchiveArtistDialogProps) => {
   const [open, setOpen] = useState(false);
 
-  const handleDelete = async () => {
-    await onDelete(artist.id);
+  const handleArchive = async () => {
+    // Handle both function signatures
+    if (onArchive.length > 0) {
+      await (onArchive as (artistId: string) => Promise<void>)(artist.id);
+    } else {
+      await (onArchive as () => Promise<void>)();
+    }
     setOpen(false);
   };
 
@@ -42,20 +47,21 @@ export const DeleteArtistDialog = ({ artist, onDelete, trigger, loading = false 
       </AlertDialogTrigger>
       <AlertDialogContent>
         <AlertDialogHeader>
-          <AlertDialogTitle>Delete Artist</AlertDialogTitle>
+          <AlertDialogTitle>Archive Artist</AlertDialogTitle>
           <AlertDialogDescription>
-            Are you sure you want to delete <strong>{artist.name}</strong>? 
-            This action cannot be undone and will permanently remove the artist and all associated votes.
+            Are you sure you want to archive <strong>{artist.name}</strong>? 
+            This will hide the artist from the main list but preserve all data and votes. 
+            The artist can be restored later by Core team members.
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel>Cancel</AlertDialogCancel>
           <AlertDialogAction
-            onClick={handleDelete}
+            onClick={handleArchive}
             disabled={loading}
             className="bg-red-600 hover:bg-red-700"
           >
-            {loading ? "Deleting..." : "Delete Artist"}
+            {loading ? "Archiving..." : "Archive Artist"}
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>
