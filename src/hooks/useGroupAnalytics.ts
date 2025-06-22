@@ -2,16 +2,17 @@ import { useMemo } from 'react';
 import { useGroups } from './useGroups';
 import { useArtists } from './useArtists';
 
-export const useGroupAnalytics = () => {
+export const useGroupAnalytics = (selectedGroupId?: string) => {
   const { groups, user } = useGroups();
   const { allArtists, userVotes } = useArtists();
 
   const groupAnalytics = useMemo(() => {
     if (!user || groups.length === 0) return null;
 
-    // For now, analyze the first group the user is in
-    // TODO: Allow user to select which group to analyze
-    const currentGroup = groups[0];
+    // Use selected group or default to first group
+    const currentGroup = selectedGroupId 
+      ? groups.find(g => g.id === selectedGroupId) || groups[0]
+      : groups[0];
     
     // Calculate group consensus for each artist
     const artistAnalysis = allArtists.map(artist => {
@@ -88,7 +89,7 @@ export const useGroupAnalytics = () => {
       groupStats,
       artistAnalysis
     };
-  }, [groups, allArtists, user]);
+  }, [groups, allArtists, user, selectedGroupId]);
 
   return {
     groupAnalytics,

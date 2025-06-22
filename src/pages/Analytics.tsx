@@ -3,6 +3,8 @@ import { useState } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { useArtists } from "@/hooks/useArtists";
 import { useGroupAnalytics } from "@/hooks/useGroupAnalytics";
+import { useGroups } from "@/hooks/useGroups";
+import { GroupSelector } from "@/components/GroupSelector";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -14,7 +16,9 @@ import { Star, Heart, X, TrendingUp, Users, Calendar, MapPin, UsersIcon, AlertTr
 const Analytics = () => {
   const { user } = useAuth();
   const { allArtists, userVotes } = useArtists();
-  const { groupAnalytics, hasGroups } = useGroupAnalytics();
+  const { groups } = useGroups();
+  const [selectedGroupId, setSelectedGroupId] = useState<string | undefined>();
+  const { groupAnalytics, hasGroups } = useGroupAnalytics(selectedGroupId);
   const [showAuthDialog, setShowAuthDialog] = useState(false);
 
   if (!user) {
@@ -192,18 +196,28 @@ const Analytics = () => {
             )}
           </TabsContent>
 
-          {hasGroups && groupAnalytics && (
+            {hasGroups && groupAnalytics && (
             <TabsContent value="groups" className="space-y-6">
-              {/* Group Header */}
+              {/* Group Header with Selector */}
               <Card className="bg-white/10 backdrop-blur-md border-purple-400/30">
                 <CardHeader>
-                  <CardTitle className="text-white flex items-center gap-2">
-                    <UsersIcon className="h-5 w-5" />
-                    {groupAnalytics.currentGroup.name} Analytics
-                  </CardTitle>
-                  <CardDescription className="text-purple-200">
-                    Collaborative insights for your group of {groupAnalytics.currentGroup.member_count} members
-                  </CardDescription>
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <CardTitle className="text-white flex items-center gap-2">
+                        <UsersIcon className="h-5 w-5" />
+                        {groupAnalytics.currentGroup.name} Analytics
+                      </CardTitle>
+                      <CardDescription className="text-purple-200">
+                        Collaborative insights for your group of {groupAnalytics.currentGroup.member_count} members
+                      </CardDescription>
+                    </div>
+                    {groups.length > 1 && (
+                      <GroupSelector
+                        selectedGroupId={selectedGroupId}
+                        onGroupChange={setSelectedGroupId}
+                      />
+                    )}
+                  </div>
                 </CardHeader>
               </Card>
 
