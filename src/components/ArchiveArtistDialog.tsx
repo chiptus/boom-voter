@@ -18,20 +18,27 @@ interface ArchiveArtistDialogProps {
   artist: Artist;
   onArchive: ((artistId: string) => Promise<void>) | (() => Promise<void>);
   trigger?: React.ReactNode;
-  loading?: boolean;
 }
 
-export const ArchiveArtistDialog = ({ artist, onArchive, trigger, loading = false }: ArchiveArtistDialogProps) => {
+export const ArchiveArtistDialog = ({ artist, onArchive, trigger }: ArchiveArtistDialogProps) => {
   const [open, setOpen] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const handleArchive = async () => {
-    // Handle both function signatures
-    if (onArchive.length > 0) {
-      await (onArchive as (artistId: string) => Promise<void>)(artist.id);
-    } else {
-      await (onArchive as () => Promise<void>)();
+    try {
+      setLoading(true);
+      // Handle both function signatures
+      if (onArchive.length > 0) {
+        await (onArchive as (artistId: string) => Promise<void>)(artist.id);
+      } else {
+        await (onArchive as () => Promise<void>)();
+      }
+      setOpen(false);
+    } catch (error) {
+      console.error('Failed to archive artist:', error);
+    } finally {
+      setLoading(false);
     }
-    setOpen(false);
   };
 
   const defaultTrigger = (
