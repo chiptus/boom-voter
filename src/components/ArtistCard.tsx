@@ -161,6 +161,18 @@ export const ArtistCard = ({ artist, userVote, userKnowledge, votingLoading, onV
             </div>
           </div>
           
+        </div>
+        
+        {artist.description && (
+          <CardDescription className="text-purple-200 text-sm leading-relaxed">
+            {artist.description}
+          </CardDescription>
+        )}
+      </CardHeader>
+       
+      <CardContent>
+        {/* Admin Controls + Voting System */}
+        <div className="flex items-start gap-3">
           {/* Core Team Dropdown Menu */}
           {canEdit && (
             <DropdownMenu>
@@ -169,7 +181,7 @@ export const ArtistCard = ({ artist, userVote, userKnowledge, votingLoading, onV
                   <MoreHorizontal className="h-4 w-4" />
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="bg-black/90 border-purple-400/30">
+              <DropdownMenuContent align="start" className="bg-black/90 border-purple-400/30">
                 <DropdownMenuItem asChild>
                   <EditArtistDialog
                     artist={artist}
@@ -199,18 +211,9 @@ export const ArtistCard = ({ artist, userVote, userKnowledge, votingLoading, onV
               </DropdownMenuContent>
             </DropdownMenu>
           )}
-        </div>
-        
-        {artist.description && (
-          <CardDescription className="text-purple-200 text-sm leading-relaxed">
-            {artist.description}
-          </CardDescription>
-        )}
-      </CardHeader>
-       
-      <CardContent>
-        {/* Prominent Voting System */}
-        <div className="space-y-3">
+          
+          {/* Prominent Voting System */}
+          <div className="flex-1 space-y-3">
           <div className="flex items-center gap-2">
             <Button
               variant={userVote === 2 ? "default" : "outline"}
@@ -249,6 +252,7 @@ export const ArtistCard = ({ artist, userVote, userKnowledge, votingLoading, onV
               Won't go ({getVoteCount(-1)})
             </Button>
             {votingLoading && <div className="h-4 w-4 animate-spin rounded-full border-2 border-gray-400 border-t-transparent" />}
+          </div>
           </div>
         </div>
       </CardContent>
