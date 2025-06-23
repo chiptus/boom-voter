@@ -5,6 +5,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { useInviteValidation } from "@/hooks/useInviteValidation";
 import { AuthDialog } from "@/components/AuthDialog";
+import { UsernameSetupDialog } from "@/components/UsernameSetupDialog";
 import { AuthActionButtons } from "@/components/AuthActionButtons";
 import { AddArtistDialog } from "@/components/AddArtistDialog";
 import { AddGenreDialog } from "@/components/AddGenreDialog";
@@ -17,13 +18,14 @@ import { InviteLandingPage } from "@/components/InviteLandingPage";
 import { useArtistFiltering } from "@/hooks/useArtistFiltering";
 import { useArtistData } from "@/hooks/useArtistData";
 import { useVoting } from "@/hooks/useVoting";
-
+import { useEffect } from "react";
 import { useUrlState } from "@/hooks/useUrlState";
 
 const Index = () => {
-  const { user, loading, signOut } = useAuth();
+  const { user, loading, signOut, hasUsername, refreshProfile } = useAuth();
   const { inviteValidation, isValidating, hasValidInvite, useInvite, clearInvite } = useInviteValidation();
   const [showAuthDialog, setShowAuthDialog] = useState(false);
+  const [showUsernameSetup, setShowUsernameSetup] = useState(false);
   const [showAddArtistDialog, setShowAddArtistDialog] = useState(false);
   const [showAddGenreDialog, setShowAddGenreDialog] = useState(false);
   const { state: urlState, updateUrlState, clearFilters } = useUrlState();
@@ -32,6 +34,15 @@ const Index = () => {
   const { userVotes, votingLoading, handleVote } = useVoting(user, fetchArtists);
   
   const { filteredAndSortedArtists } = useArtistFiltering(artists, urlState);
+
+  // Check if username setup is needed after authentication
+  useEffect(() => {
+    if (user && !loading && !hasUsername()) {
+      setShowUsernameSetup(true);
+    } else {
+      setShowUsernameSetup(false);
+    }
+  }, [user, loading, hasUsername]);
 
   // Show loading while validating invite
   if (isValidating) {
@@ -171,6 +182,15 @@ const Index = () => {
         <AddGenreDialog
           open={showAddGenreDialog}
           onOpenChange={setShowAddGenreDialog}
+        />
+
+        <UsernameSetupDialog
+          open={showUsernameSetup}
+          user={user}
+          onSuccess={async () => {
+            await refreshProfile();
+            setShowUsernameSetup(false);
+          }}
         />
       </div>
     </div>

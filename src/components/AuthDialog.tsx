@@ -19,7 +19,6 @@ interface AuthDialogProps {
 
 export const AuthDialog = ({ open, onOpenChange, onSuccess, inviteToken, groupName }: AuthDialogProps) => {
   const [email, setEmail] = useState("");
-  const [username, setUsername] = useState("");
   const [otp, setOtp] = useState("");
   const [loading, setLoading] = useState(false);
   const [step, setStep] = useState<"email" | "otp">("email");
@@ -35,7 +34,6 @@ export const AuthDialog = ({ open, onOpenChange, onSuccess, inviteToken, groupNa
         emailRedirectTo: `${window.location.origin}/`,
         shouldCreateUser: true,
         data: {
-          username: username,
           invite_token: inviteToken,
         },
       },
@@ -134,16 +132,6 @@ export const AuthDialog = ({ open, onOpenChange, onSuccess, inviteToken, groupNa
         
         {step === "email" ? (
           <form onSubmit={handleSendMagicLink} className="space-y-4">
-            <div>
-              <Label htmlFor="username">Username (optional for new users)</Label>
-              <Input
-                id="username"
-                type="text"
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
-                placeholder="Your display name"
-              />
-            </div>
             <div>
               <Label htmlFor="email">Email</Label>
               <Input
