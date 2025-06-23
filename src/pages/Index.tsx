@@ -37,9 +37,12 @@ const Index = () => {
 
   // Check if username setup is needed after authentication
   useEffect(() => {
+    // Only show dialog when we're certain user needs username setup
     if (user && !loading && !hasUsername()) {
       setShowUsernameSetup(true);
-    } else {
+    }
+    // Hide dialog when user gets a username or logs out
+    if (!user || (user && !loading && hasUsername())) {
       setShowUsernameSetup(false);
     }
   }, [user, loading, hasUsername]);
