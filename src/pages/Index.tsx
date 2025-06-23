@@ -14,7 +14,7 @@ import { ArtistListItem } from "@/components/ArtistListItem";
 import { EmptyArtistsState } from "@/components/EmptyArtistsState";
 import { FestivalHeader } from "@/components/FestivalHeader";
 import { InviteLandingPage } from "@/components/InviteLandingPage";
-import { useArtistFiltering } from "@/hooks/useArtistFiltering";
+import { useOptimizedArtistFiltering } from "@/hooks/useOptimizedArtistFiltering";
 import { useProgressiveArtistData } from "@/hooks/useProgressiveArtistData";
 import { useVoting } from "@/hooks/queries/useVotingQuery";
 
@@ -31,7 +31,7 @@ const Index = () => {
   const { artists, fetchArtists, archiveArtist, votesLoading } = useProgressiveArtistData();
   const { userVotes, votingLoading, handleVote } = useVoting();
   
-  const { filteredAndSortedArtists } = useArtistFiltering(artists, urlState);
+  const { filteredAndSortedArtists, isFiltering } = useOptimizedArtistFiltering(artists, urlState);
 
   // Show loading while validating invite
   if (isValidating) {
@@ -108,9 +108,14 @@ const Index = () => {
         />
 
         <div className="mt-8">
-          {filteredAndSortedArtists.length === 0 ? (
+          {isFiltering && (
+            <div className="flex items-center justify-center py-8">
+              <div className="text-purple-200 text-lg">Filtering artists...</div>
+            </div>
+          )}
+          {!isFiltering && filteredAndSortedArtists.length === 0 ? (
             <EmptyArtistsState />
-          ) : (
+          ) : !isFiltering ? (
             <div className={
               urlState.view === 'grid' 
                 ? "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"
@@ -148,7 +153,7 @@ const Index = () => {
                 )
               )}
             </div>
-          )}
+          ) : null}
         </div>
 
         <AuthDialog
