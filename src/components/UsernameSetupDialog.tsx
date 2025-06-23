@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { supabase } from "@/integrations/supabase/client";
+import { useUpdateProfileMutation } from "@/hooks/queries/useProfileQuery";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -15,34 +15,35 @@ interface UsernameSetupDialogProps {
 
 export const UsernameSetupDialog = ({ open, user, onSuccess }: UsernameSetupDialogProps) => {
   const [username, setUsername] = useState("");
-  const [loading, setLoading] = useState(false);
   const { toast } = useToast();
+  const updateProfileMutation = useUpdateProfileMutation();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!username.trim()) return;
     
-    setLoading(true);
-
-    const { error } = await supabase
-      .from('profiles')
-      .update({ username: username.trim() })
-      .eq('id', user.id);
-
-    if (error) {
-      toast({
-        title: "Error",
-        description: error.message,
-        variant: "destructive",
-      });
-    } else {
-      toast({
-        title: "Welcome!",
-        description: "Your username has been set successfully.",
-      });
-      onSuccess();
-    }
-    setLoading(false);
+    updateProfileMutation.mutate(
+      { 
+        userId: user.id, 
+        updates: { username: username.trim() } 
+      },
+      {
+        onSuccess: () => {
+          toast({
+            title: "Welcome!",
+            description: "Your username has been set successfully.",
+          });
+          onSuccess();
+        },
+        onError: (error: any) => {
+          toast({
+            title: "Error",
+            description: error.message,
+            variant: "destructive",
+          });
+        }
+      }
+    );
   };
 
   return (
@@ -71,8 +72,8 @@ export const UsernameSetupDialog = ({ open, user, onSuccess }: UsernameSetupDial
               autoFocus
             />
           </div>
-          <Button type="submit" className="w-full" disabled={loading || !username.trim()}>
-            {loading ? "Setting up..." : "Continue to Festival"}
+          <Button type="submit" className="w-full" disabled={updateProfileMutation.isPending || !username.trim()}>
+            {updateProfileMutation.isPending ? "Setting up..." : "Continue to Festival"}
           </Button>
         </form>
       </DialogContent>

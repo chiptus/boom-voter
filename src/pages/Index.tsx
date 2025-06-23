@@ -22,7 +22,7 @@ import { useEffect } from "react";
 import { useUrlState } from "@/hooks/useUrlState";
 
 const Index = () => {
-  const { user, loading, signOut, hasUsername, refreshProfile } = useAuth();
+  const { user, loading, signOut, hasUsername } = useAuth();
   const { inviteValidation, isValidating, hasValidInvite, useInvite, clearInvite } = useInviteValidation();
   const [showAuthDialog, setShowAuthDialog] = useState(false);
   const [showUsernameSetup, setShowUsernameSetup] = useState(false);
@@ -187,8 +187,7 @@ const Index = () => {
         <UsernameSetupDialog
           open={showUsernameSetup}
           user={user}
-          onSuccess={async () => {
-            await refreshProfile();
+          onSuccess={() => {
             setShowUsernameSetup(false);
           }}
         />

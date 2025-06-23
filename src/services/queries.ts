@@ -49,6 +49,7 @@ export const groupQueries = {
 // Auth Queries
 export const authQueries = {
   user: () => ['auth', 'user'] as const,
+  profile: (userId?: string) => ['auth', 'profile', userId] as const,
 };
 
 // Query Functions
@@ -255,6 +256,20 @@ export const queryFunctions = {
     if (error) return false;
     return !!data;
   },
+
+  async fetchProfile(userId: string) {
+    const { data, error } = await supabase
+      .from('profiles')
+      .select('*')
+      .eq('id', userId)
+      .single();
+
+    if (error) {
+      throw new Error('Failed to fetch profile');
+    }
+
+    return data;
+  },
 };
 
 // Mutation Functions
@@ -440,6 +455,23 @@ export const mutationFunctions = {
     }
 
     return true;
+  },
+
+  async updateProfile(variables: { userId: string; updates: any }) {
+    const { userId, updates } = variables;
+    
+    const { data, error } = await supabase
+      .from('profiles')
+      .update(updates)
+      .eq('id', userId)
+      .select()
+      .single();
+
+    if (error) {
+      throw new Error('Failed to update profile');
+    }
+
+    return data;
   },
 };
 

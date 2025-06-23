@@ -1,21 +1,19 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { useProfileQuery } from "@/hooks/queries/useProfileQuery";
 
 export const useAuth = () => {
   const [user, setUser] = useState<any>(null);
-  const [profile, setProfile] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  
+  // Use TanStack Query for profile data
+  const { data: profile } = useProfileQuery(user?.id);
 
   useEffect(() => {
     getUser();
     
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
       setUser(session?.user || null);
-      if (session?.user) {
-        await fetchProfile(session.user.id);
-      } else {
-        setProfile(null);
-      }
     });
 
     return () => {
@@ -26,19 +24,7 @@ export const useAuth = () => {
   const getUser = async () => {
     const { data: { user } } = await supabase.auth.getUser();
     setUser(user);
-    if (user) {
-      await fetchProfile(user.id);
-    }
     setLoading(false);
-  };
-
-  const fetchProfile = async (userId: string) => {
-    const { data: profile } = await supabase
-      .from('profiles')
-      .select('*')
-      .eq('id', userId)
-      .single();
-    setProfile(profile);
   };
 
   const signOut = async () => {
@@ -49,18 +35,11 @@ export const useAuth = () => {
     return profile?.username && profile.username.trim() !== '';
   };
 
-  const refreshProfile = async () => {
-    if (user) {
-      await fetchProfile(user.id);
-    }
-  };
-
   return {
     user,
     profile,
     loading,
     hasUsername,
     signOut,
-    refreshProfile,
   };
 };
