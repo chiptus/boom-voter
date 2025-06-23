@@ -32,6 +32,7 @@ export const AuthDialog = ({ open, onOpenChange, onSuccess, inviteToken, groupNa
       email,
       password,
       options: {
+        emailRedirectTo: `${window.location.origin}/`,
         data: {
           username: username,
           invite_token: inviteToken,
@@ -174,7 +175,7 @@ export const AuthDialog = ({ open, onOpenChange, onSuccess, inviteToken, groupNa
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
-                  minLength={6}
+                  minLength={8}
                 />
               </div>
               <Button type="submit" className="w-full" disabled={loading}>
