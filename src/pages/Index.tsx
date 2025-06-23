@@ -14,9 +14,9 @@ import { ArtistListItem } from "@/components/ArtistListItem";
 import { EmptyArtistsState } from "@/components/EmptyArtistsState";
 import { FestivalHeader } from "@/components/FestivalHeader";
 import { InviteLandingPage } from "@/components/InviteLandingPage";
-import { useOptimizedArtistFiltering } from "@/hooks/useOptimizedArtistFiltering";
-import { useProgressiveArtistData } from "@/hooks/useProgressiveArtistData";
-import { useVoting } from "@/hooks/queries/useVotingQuery";
+import { useArtistFiltering } from "@/hooks/useArtistFiltering";
+import { useArtistData } from "@/hooks/useArtistData";
+import { useVoting } from "@/hooks/useVoting";
 
 import { useUrlState } from "@/hooks/useUrlState";
 
@@ -28,10 +28,10 @@ const Index = () => {
   const [showAddGenreDialog, setShowAddGenreDialog] = useState(false);
   const { state: urlState, updateUrlState, clearFilters } = useUrlState();
   
-  const { artists, fetchArtists, archiveArtist, votesLoading } = useProgressiveArtistData();
-  const { userVotes, votingLoading, handleVote } = useVoting();
+  const { artists, fetchArtists, archiveArtist } = useArtistData();
+  const { userVotes, votingLoading, handleVote } = useVoting(user, fetchArtists);
   
-  const { filteredAndSortedArtists, isFiltering } = useOptimizedArtistFiltering(artists, urlState);
+  const { filteredAndSortedArtists } = useArtistFiltering(artists, urlState);
 
   // Show loading while validating invite
   if (isValidating) {
@@ -108,14 +108,9 @@ const Index = () => {
         />
 
         <div className="mt-8">
-          {isFiltering && (
-            <div className="flex items-center justify-center py-8">
-              <div className="text-purple-200 text-lg">Filtering artists...</div>
-            </div>
-          )}
-          {!isFiltering && filteredAndSortedArtists.length === 0 ? (
+          {filteredAndSortedArtists.length === 0 ? (
             <EmptyArtistsState />
-          ) : !isFiltering ? (
+          ) : (
             <div className={
               urlState.view === 'grid' 
                 ? "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"
@@ -128,7 +123,7 @@ const Index = () => {
                     artist={artist}
                     userVote={userVotes[artist.id]}
                     userKnowledge={false}
-                    votingLoading={votingLoading[artist.id] || votesLoading}
+                    votingLoading={votingLoading[artist.id]}
                     onVote={handleVote}
                     onKnowledgeToggle={async (artistId: string) => ({ requiresAuth: !user })}
                     onAuthRequired={() => setShowAuthDialog(true)}
@@ -142,7 +137,7 @@ const Index = () => {
                     artist={artist}
                     userVote={userVotes[artist.id]}
                     userKnowledge={false}
-                    votingLoading={votingLoading[artist.id] || votesLoading}
+                    votingLoading={votingLoading[artist.id]}
                     onVote={handleVote}
                     onKnowledgeToggle={async (artistId: string) => ({ requiresAuth: !user })}
                     onAuthRequired={() => setShowAuthDialog(true)}
@@ -153,7 +148,7 @@ const Index = () => {
                 )
               )}
             </div>
-          ) : null}
+          )}
         </div>
 
         <AuthDialog

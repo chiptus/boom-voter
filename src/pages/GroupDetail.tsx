@@ -1,64 +1,74 @@
-import { useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { useParams, useNavigate, Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ArrowLeft, Users, UserMinus, Crown } from "lucide-react";
-import { useAuth } from "@/hooks/useAuth";
-import { useGroupDetailQuery, useGroupMembersQuery, useRemoveMemberMutation } from "@/hooks/queries/useGroupsQuery";
+import { ArrowLeft, Users, Link as LinkIcon, UserMinus, Crown } from "lucide-react";
+import { useGroups } from "@/hooks/useGroups";
 import { useToast } from "@/components/ui/use-toast";
 import { InviteManagement } from "@/components/InviteManagement";
+import type { Group, GroupMember } from "@/types/groups";
 
 const GroupDetail = () => {
   const { groupId } = useParams<{ groupId: string }>();
   const navigate = useNavigate();
-  const { user, loading: authLoading } = useAuth();
+  const { user, getGroupById, getGroupMembers, removeMemberFromGroup, loading: authLoading } = useGroups();
   const { toast } = useToast();
+  const [group, setGroup] = useState<Group | null>(null);
+  const [members, setMembers] = useState<GroupMember[]>([]);
+  const [loading, setLoading] = useState(true);
   const [removingMember, setRemovingMember] = useState<string | null>(null);
 
-  // Redirect if no groupId
-  if (!groupId) {
-    navigate("/groups");
-    return null;
-  }
+  useEffect(() => {
+    if (authLoading) return; // Wait for auth to load
+    
+    if (!groupId) {
+      navigate("/groups");
+      return;
+    }
+    
+    if (!user) {
+      navigate("/"); // Redirect to home to sign in
+      return;
+    }
+    
+    fetchGroupDetails();
+  }, [groupId, user, authLoading]);
 
-  // Redirect if not authenticated  
-  if (!authLoading && !user) {
-    navigate("/");
-    return null;
-  }
-
-  const { data: group, isLoading: groupLoading, error: groupError } = useGroupDetailQuery(groupId);
-  const { data: members = [], isLoading: membersLoading } = useGroupMembersQuery(groupId);
-  const removeMemberMutation = useRemoveMemberMutation();
-
-  // Handle group fetch error
-  if (groupError) {
-    toast({
-      title: "Error",
-      description: "Failed to fetch group details",
-      variant: "destructive",
-    });
-    navigate("/groups");
-    return null;
-  }
+  const fetchGroupDetails = async () => {
+    if (!groupId) return;
+    
+    try {
+      setLoading(true);
+      const [groupData, membersData] = await Promise.all([
+        getGroupById(groupId),
+        getGroupMembers(groupId)
+      ]);
+      
+      setGroup(groupData);
+      setMembers(membersData);
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to fetch group details",
+        variant: "destructive",
+      });
+      navigate("/groups");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleRemoveMember = async (memberId: string, memberUserId: string) => {
     if (!groupId || !user) return;
 
     if (window.confirm("Are you sure you want to remove this member from the group?")) {
       setRemovingMember(memberId);
-      try {
-        await removeMemberMutation.mutateAsync({
-          groupId,
-          userId: memberUserId,
-          currentUserId: user.id,
-        });
-      } catch (error) {
-        // Error handling is done in the mutation
-      } finally {
-        setRemovingMember(null);
+      const success = await removeMemberFromGroup(groupId, memberUserId);
+      if (success) {
+        await fetchGroupDetails(); // Refresh the member list
       }
+      setRemovingMember(null);
     }
   };
 
@@ -89,7 +99,7 @@ const GroupDetail = () => {
     );
   }
 
-  if (groupLoading || membersLoading) {
+  if (loading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900 flex items-center justify-center">
         <div className="text-white text-xl">Loading group details...</div>

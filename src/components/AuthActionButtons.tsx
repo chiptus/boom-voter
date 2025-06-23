@@ -1,7 +1,6 @@
 
 import { Button } from "@/components/ui/button";
-import { Plus, LogIn, LogOut, BarChart3 } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Plus, LogIn, LogOut } from "lucide-react";
 import { useGroups } from "@/hooks/useGroups";
 import { useState, useEffect } from "react";
 
@@ -13,78 +12,55 @@ interface AuthActionButtonsProps {
   onSignOut: () => void;
 }
 
-export const AuthActionButtons = ({ user, onAddArtist, onAddGenre, onSignIn, onSignOut }: AuthActionButtonsProps) => {
-  const { canAddArtists, canAddGenres } = useGroups();
-  const [canAdd, setCanAdd] = useState({ artists: false, genres: false });
+export const AuthActionButtons = ({
+  user,
+  onAddArtist,
+  onAddGenre,
+  onSignIn,
+  onSignOut,
+}: AuthActionButtonsProps) => {
+  const { canEditArtists } = useGroups();
+  const [canEdit, setCanEdit] = useState(false);
 
   useEffect(() => {
     const checkPermissions = async () => {
       if (user) {
-        const [artistsPermission, genresPermission] = await Promise.all([
-          canAddArtists(),
-          canAddGenres()
-        ]);
-        setCanAdd({ artists: artistsPermission, genres: genresPermission });
+        const hasPermission = await canEditArtists();
+        setCanEdit(hasPermission);
       } else {
-        setCanAdd({ artists: false, genres: false });
+        setCanEdit(false);
       }
     };
     checkPermissions();
-  }, [user, canAddArtists, canAddGenres]);
-
-  if (!user) {
-    return (
-      <div className="flex flex-col sm:flex-row items-center gap-4 mb-8">
-        <Button
-          onClick={onSignIn}
-          className="bg-white/20 hover:bg-white/30 backdrop-blur-sm text-white border-0"
-        >
-          <LogIn className="h-4 w-4 mr-2" />
-          Sign In
-        </Button>
-      </div>
-    );
-  }
+  }, [user, canEditArtists]);
 
   return (
-    <div className="flex flex-col sm:flex-row items-center gap-4 mb-8">
-      <div className="flex items-center gap-2">
-        <Button asChild className="bg-purple-600 hover:bg-purple-700">
-          <Link to="/analytics">
-            <BarChart3 className="h-4 w-4 mr-2" />
-            Analytics
-          </Link>
+    <div className="flex justify-center gap-4 mb-8 flex-wrap">
+      {user ? (
+        <>
+          {canEdit && (
+            <>
+              <Button onClick={onAddArtist} className="bg-purple-600 hover:bg-purple-700">
+                <Plus className="h-4 w-4 mr-2" />
+                Add Artist
+              </Button>
+              <Button onClick={onAddGenre} variant="outline" className="border-purple-400 text-purple-400 hover:bg-purple-400 hover:text-white">
+                <Plus className="h-4 w-4 mr-2" />
+                Add Genre
+              </Button>
+            </>
+          )}
+          <Button onClick={onSignOut} variant="outline" className="border-red-400 text-red-400 hover:bg-red-400 hover:text-white">
+            <LogOut className="h-4 w-4 mr-2" />
+            Sign Out
+          </Button>
+        </>
+      ) : (
+        <Button onClick={onSignIn} className="bg-purple-600 hover:bg-purple-700">
+          <LogIn className="h-4 w-4 mr-2" />
+          Sign In / Sign Up
         </Button>
-        
-        {canAdd.artists && (
-          <Button
-            onClick={onAddArtist}
-            className="bg-white/20 hover:bg-white/30 backdrop-blur-sm text-white border-0"
-          >
-            <Plus className="h-4 w-4 mr-2" />
-            Add Artist
-          </Button>
-        )}
-        
-        {canAdd.genres && (
-          <Button
-            onClick={onAddGenre}
-            className="bg-white/20 hover:bg-white/30 backdrop-blur-sm text-white border-0"
-          >
-            <Plus className="h-4 w-4 mr-2" />
-            Add Genre
-          </Button>
-        )}
-      </div>
-      
-      <Button
-        onClick={onSignOut}
-        variant="outline"
-        className="bg-white/10 hover:bg-white/20 backdrop-blur-sm text-white border-white/20"
-      >
-        <LogOut className="h-4 w-4 mr-2" />
-        Sign Out
-      </Button>
+      )}
     </div>
   );
 };

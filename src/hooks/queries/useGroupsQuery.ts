@@ -11,14 +11,6 @@ export const useUserGroupsQuery = (userId: string | undefined) => {
   });
 };
 
-export const useGroupDetailQuery = (groupId: string) => {
-  return useQuery({
-    queryKey: groupQueries.detail(groupId),
-    queryFn: () => queryFunctions.fetchGroupById(groupId),
-    enabled: !!groupId,
-  });
-};
-
 export const useGroupMembersQuery = (groupId: string) => {
   return useQuery({
     queryKey: groupQueries.members(groupId),
@@ -123,29 +115,6 @@ export const useLeaveGroupMutation = () => {
       toast({
         title: "Error",
         description: error?.message || "Failed to leave group",
-        variant: "destructive",
-      });
-    },
-  });
-};
-
-export const useRemoveMemberMutation = () => {
-  const queryClient = useQueryClient();
-  const { toast } = useToast();
-
-  return useMutation({
-    mutationFn: mutationFunctions.removeMemberFromGroup,
-    onSuccess: (data, variables) => {
-      queryClient.invalidateQueries({ queryKey: groupQueries.members(variables.groupId) });
-      toast({
-        title: "Success",
-        description: "Member removed from group successfully",
-      });
-    },
-    onError: (error: any) => {
-      toast({
-        title: "Error",
-        description: error?.message || "Failed to remove member",
         variant: "destructive",
       });
     },
