@@ -58,16 +58,9 @@ const Index = () => {
     return (
       <InviteLandingPage
         inviteValidation={inviteValidation}
-        onSignupSuccess={async () => {
+        onSignupSuccess={() => {
           setShowAuthDialog(false);
-          // Wait a moment for auth state to update, then try to use invite
-          setTimeout(async () => {
-            const { data: { user: newUser } } = await supabase.auth.getUser();
-            if (newUser && inviteValidation) {
-              await useInvite(newUser.id);
-              clearInvite();
-            }
-          }, 1000);
+          // Invite processing is now handled in useAuth hook
         }}
       />
     );
