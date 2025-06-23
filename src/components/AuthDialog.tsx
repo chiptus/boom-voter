@@ -31,7 +31,9 @@ export const AuthDialog = ({ open, onOpenChange, onSuccess, inviteToken, groupNa
     const { error } = await supabase.auth.signInWithOtp({
       email,
       options: {
-        emailRedirectTo: `${window.location.origin}/`,
+        emailRedirectTo: inviteToken 
+          ? `${window.location.origin}/?invite=${inviteToken}`
+          : `${window.location.origin}/`,
         shouldCreateUser: true,
         data: {
           invite_token: inviteToken,
