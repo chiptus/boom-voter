@@ -5,6 +5,7 @@ import { ArtistImageCard } from "@/components/artist-detail/ArtistImageCard";
 import { ArtistInfoCard } from "@/components/artist-detail/ArtistInfoCard";
 import { ArtistNotFoundState } from "@/components/artist-detail/ArtistNotFoundState";
 import { ArtistLoadingState } from "@/components/artist-detail/ArtistLoadingState";
+import { ArtistGroupVoting } from "@/components/artist-detail/ArtistGroupVoting";
 import { ArtistNotes } from "@/components/ArtistNotes";
 import { useArtistDetail } from "@/hooks/useArtistDetail";
 
@@ -59,6 +60,11 @@ const ArtistDetail = () => {
             onArtistUpdate={fetchArtist}
             onArchiveArtist={canEdit ? handleArchiveArtist : undefined}
           />
+        </div>
+
+        {/* Artist Group Voting Section */}
+        <div className="mb-8">
+          <ArtistGroupVoting artistId={id!} />
         </div>
 
         {/* Artist Notes Section */}

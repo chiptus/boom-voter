@@ -166,6 +166,62 @@ export const queryFunctions = {
     return notesWithAuthor;
   },
 
+  async fetchArtistGroupVotes(artistId: string, groupId: string): Promise<Array<{
+    vote_type: number;
+    user_id: string;
+    username: string | null;
+  }>> {
+    // First get group member user IDs
+    const { data: groupMembers, error: membersError } = await supabase
+      .from("group_members")
+      .select("user_id")
+      .eq("group_id", groupId);
+
+    if (membersError) {
+      throw new Error('Failed to fetch group members');
+    }
+
+    if (!groupMembers || groupMembers.length === 0) {
+      return [];
+    }
+
+    const memberIds = groupMembers.map(member => member.user_id);
+
+    // Then get votes from those users for this artist
+    const { data: votes, error: votesError } = await supabase
+      .from("votes")
+      .select("vote_type, user_id")
+      .eq("artist_id", artistId)
+      .in("user_id", memberIds);
+
+    if (votesError) {
+      throw new Error('Failed to fetch group votes');
+    }
+
+    if (!votes || votes.length === 0) {
+      return [];
+    }
+
+    // Finally get usernames for the voters
+    const { data: profiles, error: profilesError } = await supabase
+      .from("profiles")
+      .select("id, username")
+      .in("id", votes.map(vote => vote.user_id));
+
+    if (profilesError) {
+      console.error("Error fetching profiles:", profilesError);
+    }
+
+    return votes.map(vote => {
+      const profile = profiles?.find(p => p.id === vote.user_id);
+      return {
+        vote_type: vote.vote_type,
+        user_id: vote.user_id,
+        username: profile?.username || null,
+      };
+    });
+  },
+
   async fetchGenres(): Promise<Array<{ id: string; name: string }>> {
     const { data, error } = await supabase
       .from('music_genres')
