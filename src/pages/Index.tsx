@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
+import { useProfileQuery } from "@/hooks/queries/useProfileQuery";
 import { useInviteValidation } from "@/hooks/useInviteValidation";
 import { AuthDialog } from "@/components/AuthDialog";
 import { UsernameSetupDialog } from "@/components/UsernameSetupDialog";
@@ -34,18 +35,21 @@ const Index = () => {
   const { userVotes, votingLoading, handleVote } = useVoting(user, fetchArtists);
   
   const { filteredAndSortedArtists } = useArtistFiltering(artists, urlState);
+  
+  // Get profile loading state to prevent dialog flashing
+  const { data: profile, isLoading: profileLoading } = useProfileQuery(user?.id);
 
   // Check if username setup is needed after authentication
   useEffect(() => {
-    // Only show dialog when we're certain user needs username setup
-    if (user && !loading && !hasUsername()) {
+    // Only show dialog when all data is loaded and user definitely needs username setup
+    if (user && !loading && !profileLoading && !hasUsername()) {
       setShowUsernameSetup(true);
     }
-    // Hide dialog when user gets a username or logs out
-    if (!user || (user && !loading && hasUsername())) {
+    // Hide dialog when user gets a username or logs out or data is still loading
+    if (!user || (user && !loading && !profileLoading && hasUsername())) {
       setShowUsernameSetup(false);
     }
-  }, [user, loading, hasUsername]);
+  }, [user, loading, profileLoading, hasUsername]);
 
   // Show loading while validating invite
   if (isValidating) {
