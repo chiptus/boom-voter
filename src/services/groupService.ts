@@ -4,10 +4,11 @@ import type { Group, GroupMember } from "@/types/groups";
 
 export const groupService = {
   async fetchUserGroups(currentUserId: string): Promise<Group[]> {
-    // First fetch groups
+    // First fetch groups, filtering out archived ones
     const { data: groupsData, error } = await supabase
       .from("groups")
       .select("*")
+      .eq("archived", false)
       .order("created_at", { ascending: false });
 
     if (error) {
@@ -94,7 +95,7 @@ export const groupService = {
   async deleteGroup(groupId: string, userId: string): Promise<void> {
     const { error } = await supabase
       .from("groups")
-      .delete()
+      .update({ archived: true })
       .eq("id", groupId)
       .eq("created_by", userId);
 

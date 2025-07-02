@@ -12,6 +12,7 @@ import { useGroups } from "@/hooks/useGroups";
 import { useToast } from "@/components/ui/use-toast";
 import { Badge } from "@/components/ui/badge";
 import { InviteManagement } from "@/components/InviteManagement";
+import { DeleteGroupDialog } from "@/components/DeleteGroupDialog";
 
 const Groups = () => {
   const navigate = useNavigate();
@@ -25,6 +26,9 @@ const Groups = () => {
   const [selectedGroupForInvites, setSelectedGroupForInvites] = useState<string>("");
   const [creating, setCreating] = useState(false);
   const [inviting, setInviting] = useState(false);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [groupToDelete, setGroupToDelete] = useState<{ id: string; name: string } | null>(null);
+  const [deleting, setDeleting] = useState(false);
 
   const handleCreateGroup = async () => {
     if (!newGroupName.trim()) {
@@ -64,10 +68,19 @@ const Groups = () => {
     setInviting(false);
   };
 
-  const handleDeleteGroup = async (groupId: string) => {
-    if (window.confirm("Are you sure you want to delete this group? This action cannot be undone.")) {
-      await deleteGroup(groupId);
-    }
+  const handleDeleteGroup = (groupId: string, groupName: string) => {
+    setGroupToDelete({ id: groupId, name: groupName });
+    setDeleteDialogOpen(true);
+  };
+
+  const confirmDeleteGroup = async () => {
+    if (!groupToDelete) return;
+    
+    setDeleting(true);
+    await deleteGroup(groupToDelete.id);
+    setDeleting(false);
+    setDeleteDialogOpen(false);
+    setGroupToDelete(null);
   };
 
   const handleLeaveGroup = async (groupId: string) => {
@@ -172,7 +185,7 @@ const Groups = () => {
                               <Button
                                 variant="destructive"
                                 size="sm"
-                                onClick={() => handleDeleteGroup(group.id)}
+                                onClick={() => handleDeleteGroup(group.id, group.name)}
                               >
                                 <Trash2 className="h-4 w-4" />
                               </Button>
@@ -314,6 +327,17 @@ const Groups = () => {
             )}
           </TabsContent>
         </Tabs>
+
+        <DeleteGroupDialog
+          isOpen={deleteDialogOpen}
+          onClose={() => {
+            setDeleteDialogOpen(false);
+            setGroupToDelete(null);
+          }}
+          onConfirm={confirmDeleteGroup}
+          groupName={groupToDelete?.name || ""}
+          isDeleting={deleting}
+        />
       </div>
     </div>
   );

@@ -205,6 +205,7 @@ export type Database = {
       }
       groups: {
         Row: {
+          archived: boolean
           created_at: string
           created_by: string
           description: string | null
@@ -213,6 +214,7 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          archived?: boolean
           created_at?: string
           created_by: string
           description?: string | null
@@ -221,6 +223,7 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          archived?: boolean
           created_at?: string
           created_by?: string
           description?: string | null
