@@ -2,36 +2,38 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useProfileQuery } from "@/hooks/queries/useProfileQuery";
 import { useToast } from "@/hooks/use-toast";
+import { User } from "@supabase/supabase-js";
 
 export const useAuth = () => {
-  const [user, setUser] = useState<any>(null);
+  const [user, setUser] = useState<User>(null);
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
-  
-  // Use TanStack Query for profile data
-  const { data: profile } = useProfileQuery(user?.id);
+  const profileQuery = useProfileQuery(user?.id);
+
+  const profile = profileQuery.data;
 
   useEffect(() => {
     // Set up auth state listener first
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange(async (event, session) => {
       setUser(session?.user || null);
       setLoading(false);
-      
+
       // Handle invite processing when user signs in
-      if (event === 'SIGNED_IN' && session?.user) {
+      if (event === "SIGNED_IN" && session?.user) {
         const urlParams = new URLSearchParams(window.location.search);
-        const inviteToken = urlParams.get('invite');
-        
+        const inviteToken = urlParams.get("invite");
+
         if (inviteToken) {
           try {
-            const { data, error } = await supabase
-              .rpc('use_invite_token', { 
-                token: inviteToken, 
-                user_id: session.user.id 
-              });
+            const { data, error } = await supabase.rpc("use_invite_token", {
+              token: inviteToken,
+              user_id: session.user.id,
+            });
 
             if (error) {
-              console.error('Error using invite:', error);
+              console.error("Error using invite:", error);
               toast({
                 title: "Error",
                 description: "Failed to join group",
@@ -46,8 +48,8 @@ export const useAuth = () => {
                 });
                 // Clear invite from URL
                 const newUrl = new URL(window.location.href);
-                newUrl.searchParams.delete('invite');
-                window.history.replaceState({}, '', newUrl.toString());
+                newUrl.searchParams.delete("invite");
+                window.history.replaceState({}, "", newUrl.toString());
               } else {
                 toast({
                   title: "Error",
@@ -57,7 +59,7 @@ export const useAuth = () => {
               }
             }
           } catch (error) {
-            console.error('Error processing invite:', error);
+            console.error("Error processing invite:", error);
           }
         }
       }
@@ -78,9 +80,13 @@ export const useAuth = () => {
     await supabase.auth.signOut();
   };
 
-  const hasUsername = () => {
-    return profile?.username && profile.username.trim() !== '';
-  };
+  function hasUsername() {
+    return (
+      // loading ||
+      // profileQuery.isLoading ||
+      (profile?.username && profile?.username.trim() !== "")
+    );
+  }
 
   return {
     user,

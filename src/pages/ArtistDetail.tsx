@@ -25,10 +25,7 @@ const ArtistDetail = () => {
     archiveArtist,
   } = useArtistDetail(id);
 
-  const handleArchiveArtist = async () => {
-    await archiveArtist();
-    navigate('/');
-  };
+
 
   if (loading) {
     return <ArtistLoadingState />;
@@ -78,6 +75,11 @@ const ArtistDetail = () => {
       </div>
     </div>
   );
+
+  async function handleArchiveArtist() {
+    await archiveArtist();
+    navigate('/');
+  }
 };
 
 export default ArtistDetail;

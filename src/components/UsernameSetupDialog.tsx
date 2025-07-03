@@ -5,11 +5,12 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { User } from "lucide-react";
+import { User as UserIcon } from "lucide-react";
+import { User } from "@supabase/supabase-js";
 
 interface UsernameSetupDialogProps {
   open: boolean;
-  user: any;
+  user: User;
   onSuccess: () => void;
 }
 
@@ -35,7 +36,7 @@ export const UsernameSetupDialog = ({ open, user, onSuccess }: UsernameSetupDial
           });
           onSuccess();
         },
-        onError: (error: any) => {
+        onError: (error) => {
           toast({
             title: "Error",
             description: error.message,
@@ -51,7 +52,7 @@ export const UsernameSetupDialog = ({ open, user, onSuccess }: UsernameSetupDial
       <DialogContent className="sm:max-w-md" onInteractOutside={(e) => e.preventDefault()}>
         <DialogHeader>
           <DialogTitle className="flex items-center space-x-2">
-            <User className="h-5 w-5" />
+            <UserIcon className="h-5 w-5" />
             <span>Choose Your Username</span>
           </DialogTitle>
           <DialogDescription>

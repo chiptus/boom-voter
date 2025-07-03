@@ -9,7 +9,6 @@ import { Filter } from "lucide-react";
 import { SortControls } from "./SortControls";
 import { MobileFilters } from "./MobileFilters";
 import { DesktopFilters } from "./DesktopFilters";
-import { GroupSelector } from "../GroupSelector";
 import { ViewToggle } from "../ViewToggle";
 
 interface FilterSortControlsProps {

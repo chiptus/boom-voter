@@ -1,11 +1,10 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
 import { groupQueries, queryFunctions, mutationFunctions, authQueries } from "@/services/queries";
-import { useAuth } from "@/hooks/useAuth";
 
 export const useUserGroupsQuery = (userId: string | undefined) => {
   return useQuery({
-    queryKey: groupQueries.user(userId || ''),
+    queryKey: groupQueries.user(userId!),
     queryFn: () => queryFunctions.fetchUserGroups(userId!),
     enabled: !!userId,
   });
@@ -21,7 +20,7 @@ export const useGroupMembersQuery = (groupId: string) => {
 
 export const useUserPermissionsQuery = (userId: string | undefined, permission: 'edit_artists') => {
   return useQuery({
-    queryKey: ['permissions', userId, permission],
+    queryKey: ['permissions', {userId, permission}],
     queryFn: () => queryFunctions.checkUserPermissions(userId!, permission),
     enabled: !!userId,
     staleTime: 5 * 60 * 1000, // 5 minutes - permissions don't change often
@@ -41,7 +40,7 @@ export const useCreateGroupMutation = () => {
         description: "Group created successfully",
       });
     },
-    onError: (error: any) => {
+    onError: (error) => {
       const message = error?.message || "Failed to create group";
       toast({
         title: message.includes("failed to add") ? "Warning" : "Error",
@@ -65,7 +64,7 @@ export const useDeleteGroupMutation = () => {
         description: "Group deleted successfully",
       });
     },
-    onError: (error: any) => {
+    onError: (error) => {
       toast({
         title: "Error",
         description: error?.message || "Failed to delete group",
@@ -88,7 +87,7 @@ export const useJoinGroupMutation = () => {
         description: "Joined group successfully",
       });
     },
-    onError: (error: any) => {
+    onError: (error) => {
       toast({
         title: "Error",
         description: error?.message || "Failed to join group",
@@ -111,7 +110,7 @@ export const useLeaveGroupMutation = () => {
         description: "Left group successfully",
       });
     },
-    onError: (error: any) => {
+    onError: (error) => {
       toast({
         title: "Error",
         description: error?.message || "Failed to leave group",

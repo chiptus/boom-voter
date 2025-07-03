@@ -18,6 +18,7 @@ import { useGroups } from "@/hooks/useGroups";
 import { useState, useEffect } from "react";
 import { formatTimeRange } from "@/lib/timeUtils";
 import type { Artist } from "@/hooks/useArtists";
+import { User } from "@supabase/supabase-js";
 
 interface ArtistCardProps {
   artist: Artist;
@@ -29,7 +30,7 @@ interface ArtistCardProps {
   onAuthRequired: () => void;
   onEditSuccess?: () => void;
   onArchiveArtist?: (artistId: string) => Promise<void>;
-  user?: any;
+  user?: User;
 }
 
 export const ArtistCard = ({ artist, userVote, userKnowledge, votingLoading, onVote, onKnowledgeToggle, onAuthRequired, onEditSuccess, onArchiveArtist, user }: ArtistCardProps) => {

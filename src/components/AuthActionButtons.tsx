@@ -3,9 +3,10 @@ import { Button } from "@/components/ui/button";
 import { Plus, LogIn, LogOut } from "lucide-react";
 import { useGroups } from "@/hooks/useGroups";
 import { useState, useEffect } from "react";
+import { User } from "@supabase/supabase-js";
 
 interface AuthActionButtonsProps {
-  user: any;
+  user: User;
   onAddArtist: () => void;
   onAddGenre: () => void;
   onSignIn: () => void;

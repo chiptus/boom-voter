@@ -180,7 +180,7 @@ const GroupDetail = () => {
                   {members.map((member) => {
                     const isCurrentUser = member.user_id === user.id;
                     const isMemberCreator = member.role === "creator";
-                    const profile = member.profiles as any;
+                    const profile = member.profiles
                     
                     return (
                       <div key={member.id} className="flex items-center justify-between p-3 bg-white/5 rounded-lg">

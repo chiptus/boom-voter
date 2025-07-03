@@ -1,17 +1,18 @@
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Edit, ExternalLink, Music, Play, Trash, Clock, MapPin } from "lucide-react";
 import { EditArtistDialog } from "@/components/EditArtistDialog";
 import { ArchiveArtistDialog } from "@/components/ArchiveArtistDialog";
 import { ArtistVotingButtons } from "./ArtistVotingButtons";
+import { Artist } from "@/services/queries";
 import { formatTimeRange } from "@/lib/timeUtils";
-import type { Database } from "@/integrations/supabase/types";
-
-type Artist = Database["public"]["Tables"]["artists"]["Row"] & {
-  music_genres: { name: string } | null;
-  votes: { vote_type: number }[];
-};
 
 interface ArtistInfoCardProps {
   artist: Artist;
@@ -24,15 +25,15 @@ interface ArtistInfoCardProps {
   onArchiveArtist?: () => Promise<void>;
 }
 
-export const ArtistInfoCard = ({ 
-  artist, 
-  canEdit, 
-  userVote, 
-  netVoteScore, 
-  onVote, 
-  getVoteCount, 
+export const ArtistInfoCard = ({
+  artist,
+  canEdit,
+  userVote,
+  netVoteScore,
+  onVote,
+  getVoteCount,
   onArtistUpdate,
-  onArchiveArtist 
+  onArchiveArtist,
 }: ArtistInfoCardProps) => {
   return (
     <div className="lg:col-span-2">
@@ -40,24 +41,36 @@ export const ArtistInfoCard = ({
         <CardHeader>
           <div className="flex items-start justify-between">
             <div className="flex-1">
-              <CardTitle className="text-3xl font-bold text-white mb-2">{artist.name}</CardTitle>
+              <CardTitle className="text-3xl font-bold text-white mb-2">
+                {artist.name}
+              </CardTitle>
               <div className="flex flex-wrap gap-2 mb-4">
                 {artist.music_genres && (
-                  <Badge variant="secondary" className="bg-purple-600/50 text-purple-100">
+                  <Badge
+                    variant="secondary"
+                    className="bg-purple-600/50 text-purple-100"
+                  >
                     {artist.music_genres.name}
                   </Badge>
                 )}
                 {netVoteScore !== 0 && (
-                  <Badge variant="outline" className={`${
-                    netVoteScore > 0 
-                      ? 'border-green-400 text-green-400' 
-                      : 'border-red-400 text-red-400'
-                  }`}>
-                    Score: {netVoteScore > 0 ? '+' : ''}{netVoteScore}
+                  <Badge
+                    variant="outline"
+                    className={`${
+                      netVoteScore > 0
+                        ? "border-green-400 text-green-400"
+                        : "border-red-400 text-red-400"
+                    }`}
+                  >
+                    Score: {netVoteScore > 0 ? "+" : ""}
+                    {netVoteScore}
                   </Badge>
                 )}
                 {canEdit && (
-                  <Badge variant="outline" className="border-purple-400 text-purple-400">
+                  <Badge
+                    variant="outline"
+                    className="border-purple-400 text-purple-400"
+                  >
                     Core Member
                   </Badge>
                 )}
@@ -82,7 +95,7 @@ export const ArtistInfoCard = ({
             {canEdit && (
               <div className="flex gap-2">
                 <EditArtistDialog
-                  artist={artist as any}
+                  artist={artist}
                   onSuccess={onArtistUpdate}
                   trigger={
                     <Button
@@ -97,7 +110,7 @@ export const ArtistInfoCard = ({
                 />
                 {onArchiveArtist && (
                   <ArchiveArtistDialog
-                    artist={artist as any}
+                    artist={artist}
                     onArchive={onArchiveArtist}
                     trigger={
                       <Button
@@ -122,7 +135,7 @@ export const ArtistInfoCard = ({
         </CardHeader>
         <CardContent>
           {/* Voting System */}
-          <ArtistVotingButtons 
+          <ArtistVotingButtons
             userVote={userVote}
             onVote={onVote}
             getVoteCount={getVoteCount}
@@ -132,11 +145,12 @@ export const ArtistInfoCard = ({
           {(artist.spotify_url || artist.soundcloud_url) && (
             <div className="flex flex-wrap gap-4">
               {artist.spotify_url && (
-                <Button 
-                  asChild 
-                  className="bg-green-600 hover:bg-green-700"
-                >
-                  <a href={artist.spotify_url} target="_blank" rel="noopener noreferrer">
+                <Button asChild className="bg-green-600 hover:bg-green-700">
+                  <a
+                    href={artist.spotify_url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
                     <Play className="h-4 w-4 mr-2" />
                     Open in Spotify
                     <ExternalLink className="h-4 w-4 ml-2" />
@@ -144,11 +158,12 @@ export const ArtistInfoCard = ({
                 </Button>
               )}
               {artist.soundcloud_url && (
-                <Button 
-                  asChild 
-                  className="bg-orange-600 hover:bg-orange-700"
-                >
-                  <a href={artist.soundcloud_url} target="_blank" rel="noopener noreferrer">
+                <Button asChild className="bg-orange-600 hover:bg-orange-700">
+                  <a
+                    href={artist.soundcloud_url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
                     <Music className="h-4 w-4 mr-2" />
                     Open in SoundCloud
                     <ExternalLink className="h-4 w-4 ml-2" />
