@@ -1,10 +1,5 @@
+import { useState, useEffect } from "react";
 
-// Festival Index Page
-import { useState } from "react";
-import { Link } from "react-router-dom";
-import { Calendar } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { useProfileQuery } from "@/hooks/queries/useProfileQuery";
 import { useInviteValidation } from "@/hooks/useInviteValidation";
@@ -14,33 +9,29 @@ import { UsernameSetupDialog } from "@/components/UsernameSetupDialog";
 import { AddArtistDialog } from "@/components/AddArtistDialog";
 import { AddGenreDialog } from "@/components/AddGenreDialog";
 import { FilterSortControls } from "@/components/filters/FilterSortControls";
-import { ArtistCard } from "@/components/ArtistCard";
-import { ArtistListItem } from "@/components/ArtistListItem";
-import { EmptyArtistsState } from "@/components/EmptyArtistsState";
 import { AppHeader } from "@/components/AppHeader";
 import { InviteLandingPage } from "@/components/InviteLandingPage";
 import { useArtistFiltering } from "@/hooks/useArtistFiltering";
 import { useOfflineArtistData } from "@/hooks/useOfflineArtistData";
-import { useOfflineVoting } from "@/hooks/useOfflineVoting";
-import { useEffect } from "react";
 import { useUrlState } from "@/hooks/useUrlState";
+import { ArtistsPanel } from "@/components/ArtistsPanel";
 
-const Index = () => {
+export default function Index() {
   const { user, loading, signOut, hasUsername } = useAuth();
-  const { inviteValidation, isValidating, hasValidInvite, useInvite, clearInvite } = useInviteValidation();
+  const { inviteValidation, isValidating, hasValidInvite } =
+    useInviteValidation();
   const [showAuthDialog, setShowAuthDialog] = useState(false);
   const [showUsernameSetup, setShowUsernameSetup] = useState(false);
   const [showAddArtistDialog, setShowAddArtistDialog] = useState(false);
   const [showAddGenreDialog, setShowAddGenreDialog] = useState(false);
   const { state: urlState, updateUrlState, clearFilters } = useUrlState();
   
-  const { artists, fetchArtists, archiveArtist } = useOfflineArtistData();
-  const { userVotes, votingLoading, handleVote } = useOfflineVoting(user);
+  const { artists, fetchArtists } = useOfflineArtistData();
   
   const { filteredAndSortedArtists } = useArtistFiltering(artists, urlState);
-  
+
   // Get profile loading state to prevent dialog flashing
-  const { data: profile, isLoading: profileLoading } = useProfileQuery(user?.id);
+  const { isLoading: profileLoading } = useProfileQuery(user?.id);
 
   // Check if username setup is needed after authentication
   useEffect(() => {
@@ -83,8 +74,8 @@ const Index = () => {
         <div className="text-center text-white">
           <h1 className="text-2xl font-bold mb-4">Invalid Invite</h1>
           <p className="mb-4">This invite link is no longer valid.</p>
-          <button 
-            onClick={() => window.location.href = "/"}
+          <button
+            onClick={() => (window.location.href = "/")}
             className="bg-purple-600 hover:bg-purple-700 px-4 py-2 rounded"
           >
             Go to Festival
@@ -124,47 +115,12 @@ const Index = () => {
         />
 
         <div className="mt-8">
-          {filteredAndSortedArtists.length === 0 ? (
-            <EmptyArtistsState />
-          ) : (
-            <div className={
-              urlState.view === 'grid' 
-                ? "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"
-                : "space-y-4"
-            }>
-              {filteredAndSortedArtists.map((artist) => 
-                urlState.view === 'grid' ? (
-                  <ArtistCard 
-                    key={artist.id} 
-                    artist={artist}
-                    userVote={userVotes[artist.id]}
-                    userKnowledge={false}
-                    votingLoading={votingLoading[artist.id]}
-                    onVote={handleVote}
-                    onKnowledgeToggle={async (artistId: string) => ({ requiresAuth: !user })}
-                    onAuthRequired={() => setShowAuthDialog(true)}
-                    onEditSuccess={fetchArtists}
-                    onArchiveArtist={archiveArtist}
-                    user={user}
-                  />
-                ) : (
-                  <ArtistListItem 
-                    key={artist.id} 
-                    artist={artist}
-                    userVote={userVotes[artist.id]}
-                    userKnowledge={false}
-                    votingLoading={votingLoading[artist.id]}
-                    onVote={handleVote}
-                    onKnowledgeToggle={async (artistId: string) => ({ requiresAuth: !user })}
-                    onAuthRequired={() => setShowAuthDialog(true)}
-                    onEditSuccess={fetchArtists}
-                    onArchiveArtist={archiveArtist}
-                    user={user}
-                  />
-                )
-              )}
-            </div>
-          )}
+          <ArtistsPanel
+            items={filteredAndSortedArtists}
+            isGrid={urlState.view === "grid"}
+            user={user}
+            openAuthDialog={() => setShowAuthDialog(true)}
+          />
         </div>
 
         <AuthDialog
@@ -199,6 +155,4 @@ const Index = () => {
       </div>
     </div>
   );
-};
-
-export default Index;
+}
