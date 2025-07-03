@@ -9,7 +9,7 @@ import { Filter } from "lucide-react";
 import { SortControls } from "./SortControls";
 import { MobileFilters } from "./MobileFilters";
 import { DesktopFilters } from "./DesktopFilters";
-import { ViewToggle } from "../ViewToggle";
+import { ViewToggle } from "./ViewToggle";
 
 interface FilterSortControlsProps {
   state: FilterSortState;
