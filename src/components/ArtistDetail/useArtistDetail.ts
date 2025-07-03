@@ -2,8 +2,8 @@ import { useState, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { useGroups } from "@/hooks/useGroups";
 import { useAuth } from "@/hooks/useAuth";
-import { Artist, useOfflineArtistData } from "./useOfflineArtistData";
-import { useOfflineVoting } from "./useOfflineVoting";
+import { Artist, useOfflineArtistData } from "@/hooks/useOfflineArtistData";
+import { useOfflineVoting } from "@/hooks/useOfflineVoting";
 import { offlineStorage } from "@/lib/offlineStorage";
 
 export const useArtistDetail = (id: string | undefined) => {

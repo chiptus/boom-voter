@@ -11,7 +11,7 @@ import { Users, Trash2, UserPlus, Crown, Link } from "lucide-react";
 import { useGroups } from "@/hooks/useGroups";
 import { useToast } from "@/components/ui/use-toast";
 import { Badge } from "@/components/ui/badge";
-import { InviteManagement } from "@/components/InviteManagement";
+import { InviteManagement } from "@/components/Groups/InviteManagement";
 import { DeleteGroupDialog } from "@/components/DeleteGroupDialog";
 
 const Groups = () => {

@@ -2,7 +2,6 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { authQueries, queryFunctions, mutationFunctions } from "@/services/queries";
 import type { Database } from "@/integrations/supabase/types";
 
-type Profile = Database["public"]["Tables"]["profiles"]["Row"];
 
 export const useProfileQuery = (userId?: string) => {
   return useQuery({

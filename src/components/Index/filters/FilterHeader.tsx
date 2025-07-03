@@ -2,7 +2,7 @@
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Filter } from "lucide-react";
-import type { FilterSortState } from "@/hooks/useUrlState";
+import type { FilterSortState } from "@/components/Index/useUrlState";
 
 interface FilterHeaderProps {
   state: FilterSortState;

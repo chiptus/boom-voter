@@ -2,19 +2,19 @@ import { useState, useEffect } from "react";
 
 import { useAuth } from "@/hooks/useAuth";
 import { useProfileQuery } from "@/hooks/queries/useProfileQuery";
-import { useInviteValidation } from "@/hooks/useInviteValidation";
-import { AuthDialog } from "@/components/AuthDialog";
-import { UsernameSetupDialog } from "@/components/UsernameSetupDialog";
+import { useInviteValidation } from "@/components/Index/useInviteValidation";
+import { AuthDialog } from "@/components/Index/AuthDialog";
+import { UsernameSetupDialog } from "@/components/Index/UsernameSetupDialog";
 
-import { AddArtistDialog } from "@/components/AddArtistDialog";
-import { AddGenreDialog } from "@/components/AddGenreDialog";
-import { FilterSortControls } from "@/components/filters/FilterSortControls";
+import { AddArtistDialog } from "@/components/Index/AddArtistDialog";
+import { AddGenreDialog } from "@/components/Index/AddGenreDialog";
+import { FilterSortControls } from "@/components/Index/filters/FilterSortControls";
 import { AppHeader } from "@/components/AppHeader";
-import { InviteLandingPage } from "@/components/InviteLandingPage";
-import { useArtistFiltering } from "@/hooks/useArtistFiltering";
+import { InviteLandingPage } from "@/components/Index/InviteLandingPage";
+import { useArtistFiltering } from "@/components/Index/useArtistFiltering";
 import { useOfflineArtistData } from "@/hooks/useOfflineArtistData";
-import { useUrlState } from "@/hooks/useUrlState";
-import { ArtistsPanel } from "@/components/ArtistsPanel";
+import { useUrlState } from "@/components/Index/useUrlState";
+import { ArtistsPanel } from "@/components/Index/ArtistsPanel";
 
 export default function Index() {
   const { user, loading, signOut, hasUsername } = useAuth();

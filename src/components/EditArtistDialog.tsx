@@ -8,11 +8,11 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
-import { useGenres } from "@/hooks/useGenres";
 import { useGroups } from "@/hooks/useGroups";
 import { Edit } from "lucide-react";
-import { STAGES } from "@/components/filters/constants";
-import type { Artist } from "@/hooks/useArtists";
+import { STAGES } from "@/components/Index/filters/constants";
+import { Artist } from "@/services/queries";
+import { useGenres } from "@/hooks/queries/useGenresQuery";
 
 interface EditArtistDialogProps {
   artist: Artist;
