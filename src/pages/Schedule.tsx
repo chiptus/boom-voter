@@ -98,39 +98,26 @@ const Schedule = () => {
           totalPerformances={totalPerformances}
         />
 
-        {urlState.scheduleView !== 'timeline' && (
-          <DaySelector
-            days={scheduleDays}
-            selectedDay={selectedDay}
-            onDayChange={setSelectedDay}
-          />
-        )}
-
-        {currentDay && (
-          <div className="mt-8">
-            {urlState.scheduleView === 'grid' && (
-              <ScheduleGridView
-                day={currentDay}
-                userVotes={userVotes}
-                onVote={handleVoteAction}
-              />
-            )}
-            {urlState.scheduleView === 'timeline' && (
-              <ScheduleTimelineView
-                day={currentDay}
-                userVotes={userVotes}
-                onVote={handleVoteAction}
-              />
-            )}
-            {urlState.scheduleView === 'list' && (
-              <ScheduleListView
-                day={currentDay}
-                userVotes={userVotes}
-                onVote={handleVoteAction}
-              />
-            )}
-          </div>
-        )}
+        <div className="mt-8">
+          {urlState.scheduleView === 'grid' && (
+            <ScheduleGridView
+              userVotes={userVotes}
+              onVote={handleVoteAction}
+            />
+          )}
+          {urlState.scheduleView === 'timeline' && (
+            <ScheduleTimelineView
+              userVotes={userVotes}
+              onVote={handleVoteAction}
+            />
+          )}
+          {urlState.scheduleView === 'list' && (
+            <ScheduleListView
+              userVotes={userVotes}
+              onVote={handleVoteAction}
+            />
+          )}
+        </div>
 
         <AuthDialog
           open={showAuthDialog}

@@ -1,41 +1,54 @@
-import { ScrollArea } from "@/components/ui/scroll-area";
 import { ArtistScheduleBlock } from "./ArtistScheduleBlock";
-import type { ScheduleDay } from "@/hooks/useScheduleData";
+import { DayDivider } from "./DayDivider";
+import { useStreamingTimeline } from "@/hooks/useStreamingTimeline";
 
 interface ScheduleListViewProps {
-  day: ScheduleDay;
   userVotes: Record<string, number>;
   onVote: (artistId: string, voteType: number) => void;
 }
 
-export const ScheduleListView = ({ day, userVotes, onVote }: ScheduleListViewProps) => {
-  if (!day || day.stages.length === 0) {
+export const ScheduleListView = ({ userVotes, onVote }: ScheduleListViewProps) => {
+  const { streamingItems, loading, error } = useStreamingTimeline();
+
+  if (loading) {
     return (
       <div className="text-center text-purple-300 py-12">
-        <p>No performances scheduled for this day.</p>
+        <p>Loading schedule...</p>
       </div>
     );
   }
 
-  // Flatten all artists from all stages and sort by time
-  const allArtists = day.stages
-    .flatMap(stage => stage.artists)
-    .sort((a, b) => {
-      if (!a.startTime || !b.startTime) return 0;
-      return a.startTime.getTime() - b.startTime.getTime();
-    });
+  if (error || streamingItems.length === 0) {
+    return (
+      <div className="text-center text-purple-300 py-12">
+        <p>No performances scheduled.</p>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-4">
-      {allArtists.map((artist) => (
-        <ArtistScheduleBlock
-          key={artist.id}
-          artist={artist}
-          userVote={userVotes[artist.id]}
-          onVote={onVote}
-          compact={true}
-        />
-      ))}
+      {streamingItems.map((item, index) => {
+        if (item.type === 'day-divider') {
+          return (
+            <DayDivider
+              key={item.id}
+              displayDate={item.displayDate!}
+              isFirst={index === 0}
+            />
+          );
+        }
+
+        return (
+          <ArtistScheduleBlock
+            key={item.id}
+            artist={item.artist!}
+            userVote={userVotes[item.artist!.id]}
+            onVote={onVote}
+            compact={true}
+          />
+        );
+      })}
     </div>
   );
 };

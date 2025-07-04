@@ -9,12 +9,11 @@ import { format } from "date-fns";
 import type { ScheduleDay } from "@/hooks/useScheduleData";
 
 interface ScheduleTimelineViewProps {
-  day: ScheduleDay;
   userVotes: Record<string, number>;
   onVote: (artistId: string, voteType: number) => void;
 }
 
-export const ScheduleTimelineView = ({ day, userVotes, onVote }: ScheduleTimelineViewProps) => {
+export const ScheduleTimelineView = ({ userVotes, onVote }: ScheduleTimelineViewProps) => {
   const { streamingItems, totalArtists, loading, error } = useStreamingTimeline();
   const containerRef = useRef<HTMLDivElement>(null);
   const [currentDateIndex, setCurrentDateIndex] = useState(0);
