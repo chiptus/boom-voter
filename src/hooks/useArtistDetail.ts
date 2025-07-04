@@ -2,22 +2,19 @@ import { useState, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { useGroups } from "@/hooks/useGroups";
 import { useAuth } from "@/hooks/useAuth";
-import { useArtistQuery } from "./queries/useArtistsQuery";
-import { useUserVotesQuery, useVoteMutation } from "./queries/useVotingQuery";
-import { useArchiveArtistMutation } from "./queries/useArtistsQuery";
+import { useOfflineArtistData } from "./useOfflineArtistData";
+import { useOfflineVoting } from "./useOfflineVoting";
+import { offlineStorage } from "@/lib/offlineStorage";
 
 export const useArtistDetail = (id: string | undefined) => {
   const [canEdit, setCanEdit] = useState(false);
+  const [artist, setArtist] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
   const { toast } = useToast();
   const { canEditArtists } = useGroups();
   const { user } = useAuth();
-  
-  const { data: artist, isLoading: loading, refetch: fetchArtist } = useArtistQuery(id);
-  const { data: userVotes = {} } = useUserVotesQuery(user?.id);
-  const voteMutation = useVoteMutation();
-  const archiveArtistMutation = useArchiveArtistMutation();
-
-  const userVote = userVotes[id || ''] || null;
+  const { archiveArtist: archiveArtistOffline } = useOfflineArtistData();
+  const { userVotes, handleVote } = useOfflineVoting(user);
 
   useEffect(() => {
     if (user) {
@@ -25,31 +22,39 @@ export const useArtistDetail = (id: string | undefined) => {
     }
   }, [user]);
 
+  useEffect(() => {
+    if (id) {
+      loadArtist();
+    }
+  }, [id]);
+
+  const loadArtist = async () => {
+    if (!id) return;
+    
+    setLoading(true);
+    try {
+      const artistData = await offlineStorage.getArtist(id);
+      setArtist(artistData);
+    } catch (error) {
+      console.error('Error loading artist:', error);
+      toast({
+        title: "Error",
+        description: "Failed to load artist data",
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const checkPermissions = async () => {
     const editPermission = await canEditArtists();
     setCanEdit(editPermission);
   };
 
-  const handleVote = async (voteType: number) => {
-    if (!user || !id) {
-      toast({
-        title: "Authentication required",
-        description: "Please sign in to vote",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    try {
-      await voteMutation.mutateAsync({
-        artistId: id,
-        voteType,
-        userId: user.id,
-        existingVote: userVote,
-      });
-    } catch (error) {
-      // Error handling is done in the mutation
-    }
+  const handleVoteAction = async (voteType: number) => {
+    if (!id) return;
+    await handleVote(id, voteType);
   };
 
   const getVoteCount = (voteType: number) => {
@@ -61,14 +66,10 @@ export const useArtistDetail = (id: string | undefined) => {
 
   const archiveArtist = async () => {
     if (!id) return;
-    
-    try {
-      await archiveArtistMutation.mutateAsync(id);
-    } catch (error) {
-      // Error handling is done in the mutation
-      throw error;
-    }
+    await archiveArtistOffline(id);
   };
+
+  const userVote = userVotes[id || ''] || null;
 
   return {
     artist,
@@ -76,10 +77,10 @@ export const useArtistDetail = (id: string | undefined) => {
     userVote,
     loading,
     canEdit,
-    handleVote,
+    handleVote: handleVoteAction,
     getVoteCount,
     netVoteScore,
-    fetchArtist,
+    fetchArtist: loadArtist,
     archiveArtist,
   };
 };
