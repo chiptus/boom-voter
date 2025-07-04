@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import { ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
-import { useVoting } from "@/hooks/queries/useVotingQuery";
+import { useOfflineVoting } from "@/hooks/useOfflineVoting";
 import { useUrlState } from "@/hooks/useUrlState";
 import { useScheduleData } from "@/hooks/useScheduleData";
 import { ScheduleHeader } from "@/components/schedule/ScheduleHeader";
@@ -16,7 +16,7 @@ import ErrorBoundary from "@/components/ErrorBoundary";
 
 const Schedule = () => {
   const { user } = useAuth();
-  const { userVotes, handleVote } = useVoting();
+  const { userVotes, handleVote } = useOfflineVoting(user);
   const { state: urlState, updateUrlState } = useUrlState();
   const { scheduleDays, loading, error } = useScheduleData();
   const [showAuthDialog, setShowAuthDialog] = useState(false);

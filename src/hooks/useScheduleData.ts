@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import { useArtistData, type Artist } from './useArtistData';
+import { useOfflineArtistData, type Artist } from './useOfflineArtistData';
 import { formatDateTime } from '@/lib/timeUtils';
 import { parse, isValid, format, startOfDay, isSameDay } from 'date-fns';
 
@@ -26,7 +26,7 @@ export interface ScheduleArtist extends Artist {
 }
 
 export const useScheduleData = () => {
-  const { artists, loading, error } = useArtistData();
+  const { artists, loading, error } = useOfflineArtistData();
 
   const scheduleDays = useMemo(() => {
     console.log('useScheduleData - Processing artists:', artists?.length || 0);
