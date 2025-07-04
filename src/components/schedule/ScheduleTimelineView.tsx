@@ -3,10 +3,10 @@ import { ArtistScheduleBlock } from "./ArtistScheduleBlock";
 import { DayDivider } from "./DayDivider";
 import { FloatingDateIndicator } from "./FloatingDateIndicator";
 import { TimelineProgress } from "./TimelineProgress";
-import { ScrollToNow } from "./ScrollToNow";
+import { DateNavigation } from "./DateNavigation";
 import { useStreamingTimeline } from "@/hooks/useStreamingTimeline";
+import { useScheduleData } from "@/hooks/useScheduleData";
 import { format } from "date-fns";
-import type { ScheduleDay } from "@/hooks/useScheduleData";
 
 interface ScheduleTimelineViewProps {
   userVotes: Record<string, number>;
@@ -15,6 +15,7 @@ interface ScheduleTimelineViewProps {
 
 export const ScheduleTimelineView = ({ userVotes, onVote }: ScheduleTimelineViewProps) => {
   const { streamingItems, totalArtists, loading, error } = useStreamingTimeline();
+  const { scheduleDays } = useScheduleData();
   const containerRef = useRef<HTMLDivElement>(null);
   const [currentDateIndex, setCurrentDateIndex] = useState(0);
   const [showFloatingDate, setShowFloatingDate] = useState(false);
@@ -67,6 +68,18 @@ export const ScheduleTimelineView = ({ userVotes, onVote }: ScheduleTimelineView
       element?.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
   }, [streamingItems]);
+
+  const scrollToDate = useCallback((dateIndex: number) => {
+    const dayDividerItem = streamingItems.find(item => 
+      item.type === 'day-divider' && 
+      item.date === scheduleDays[dateIndex]?.date
+    );
+    
+    if (dayDividerItem) {
+      const element = containerRef.current?.querySelector(`[data-index="${dayDividerItem.position}"]`);
+      element?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  }, [streamingItems, scheduleDays]);
 
   if (loading) {
     return (
@@ -143,9 +156,10 @@ export const ScheduleTimelineView = ({ userVotes, onVote }: ScheduleTimelineView
         visible={streamingItems.length > 10}
       />
       
-      <ScrollToNow
-        onClick={scrollToNow}
-        visible={totalArtists > 0}
+      <DateNavigation
+        onScrollToDate={scrollToDate}
+        onScrollToNow={scrollToNow}
+        containerRef={containerRef}
       />
     </div>
   );

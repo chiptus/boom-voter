@@ -21,7 +21,7 @@ const defaultState: FilterSortState = {
   genres: [],
   minRating: 0,
   view: 'list',
-  scheduleView: 'list',
+  scheduleView: 'timeline',
   groupId: undefined,
   invite: undefined,
 };
