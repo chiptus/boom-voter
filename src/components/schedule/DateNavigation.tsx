@@ -19,16 +19,16 @@ export const DateNavigation = ({ onScrollToDate, onScrollToNow, containerRef }: 
   if (scheduleDays.length === 0) return null;
 
   return (
-    <div className="fixed bottom-4 right-4 z-50 flex flex-col gap-2">
+    <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
       {/* Date selection buttons */}
-      <div className="flex flex-col gap-1 bg-purple-900/90 backdrop-blur-md rounded-lg p-2 border border-purple-400/30">
+      <div className="flex flex-wrap gap-2">
         {scheduleDays.map((day, index) => (
           <Button
             key={day.date}
             onClick={() => onScrollToDate(index)}
-            variant="ghost"
+            variant="outline"
             size="sm"
-            className="text-xs text-purple-200 hover:text-white hover:bg-purple-600/50 justify-start w-24"
+            className="border-purple-400/50 text-purple-300 hover:bg-purple-600/50 hover:text-white"
           >
             <Calendar className="h-3 w-3 mr-1" />
             {day.displayDate.split(',')[1]?.trim() || day.displayDate}
@@ -37,22 +37,24 @@ export const DateNavigation = ({ onScrollToDate, onScrollToNow, containerRef }: 
       </div>
 
       {/* Control buttons */}
-      <div className="flex flex-col gap-2">
+      <div className="flex gap-2">
         <Button
           onClick={onScrollToNow}
-          className="rounded-full h-12 w-12 p-0 bg-purple-600 hover:bg-purple-700 shadow-lg border border-purple-400/50"
+          className="bg-purple-600 hover:bg-purple-700 shadow-lg border border-purple-400/50"
           aria-label="Scroll to current time"
         >
-          <Clock className="h-5 w-5" />
+          <Clock className="h-4 w-4 mr-2" />
+          Now
         </Button>
         
         <Button
           onClick={scrollToTop}
           variant="outline"
-          className="rounded-full h-10 w-10 p-0 border-purple-400/50 text-purple-300 hover:bg-purple-600/50 hover:text-white"
+          className="border-purple-400/50 text-purple-300 hover:bg-purple-600/50 hover:text-white"
           aria-label="Scroll to top"
         >
-          <ChevronUp className="h-4 w-4" />
+          <ChevronUp className="h-4 w-4 mr-2" />
+          Top
         </Button>
       </div>
     </div>

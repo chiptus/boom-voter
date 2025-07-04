@@ -156,6 +156,12 @@ export const ScheduleTimelineView = ({ userVotes, onVote }: ScheduleTimelineView
           visible={showFloatingDate && streamingItems.length > 0}
         />
         
+        <DateNavigation
+          onScrollToDate={scrollToDate}
+          onScrollToNow={scrollToNow}
+          containerRef={containerRef}
+        />
+        
         <div 
           ref={containerRef}
           className="max-h-[80vh] overflow-y-auto scroll-smooth"
@@ -211,12 +217,6 @@ export const ScheduleTimelineView = ({ userVotes, onVote }: ScheduleTimelineView
           currentPosition={visibleItemIndex}
           totalItems={streamingItems.length}
           visible={streamingItems.length > 10}
-        />
-        
-        <DateNavigation
-          onScrollToDate={scrollToDate}
-          onScrollToNow={scrollToNow}
-          containerRef={containerRef}
         />
       </div>
     </ErrorBoundary>
