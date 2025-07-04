@@ -98,11 +98,13 @@ const Schedule = () => {
           totalPerformances={totalPerformances}
         />
 
-        <DaySelector
-          days={scheduleDays}
-          selectedDay={selectedDay}
-          onDayChange={setSelectedDay}
-        />
+        {urlState.scheduleView !== 'timeline' && (
+          <DaySelector
+            days={scheduleDays}
+            selectedDay={selectedDay}
+            onDayChange={setSelectedDay}
+          />
+        )}
 
         {currentDay && (
           <div className="mt-8">
