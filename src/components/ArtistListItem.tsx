@@ -7,13 +7,14 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Star, Heart, X, Play, Music, MapPin, Calendar, Eye, EyeOff, Edit, Trash, MoreHorizontal } from "lucide-react";
+import { Star, Heart, X, Play, Music, MapPin, Clock, Eye, EyeOff, Edit, Trash, MoreHorizontal } from "lucide-react";
 import { ArtistImageLoader } from "./ArtistImageLoader";
 import { EditArtistDialog } from "./EditArtistDialog";
 import { ArchiveArtistDialog } from "./ArchiveArtistDialog";
 import { useToast } from "@/hooks/use-toast";
 import { useGroups } from "@/hooks/useGroups";
 import { useState, useEffect } from "react";
+import { formatTimeRange } from "@/lib/timeUtils";
 import type { Artist } from "@/hooks/useArtists";
 
 interface ArtistListItemProps {
@@ -69,14 +70,6 @@ export const ArtistListItem = ({ artist, userVote, userKnowledge, votingLoading,
 
   const getVoteCount = (voteType: number) => {
     return artist.votes.filter(vote => vote.vote_type === voteType).length;
-  };
-
-  const formatDate = (dateString: string | null) => {
-    if (!dateString) return null;
-    return new Date(dateString).toLocaleDateString('en-US', {
-      month: 'short',
-      day: 'numeric'
-    });
   };
 
   const getSocialPlatformLogo = (url: string) => {
@@ -174,10 +167,10 @@ export const ArtistListItem = ({ artist, userVote, userKnowledge, votingLoading,
                   <span>{artist.stage}</span>
                 </div>
               )}
-              {artist.estimated_date && (
+              {formatTimeRange(artist.time_start, artist.time_end) && (
                 <div className="flex items-center gap-1 text-xs text-purple-200">
-                  <Calendar className="h-3 w-3" />
-                  <span>{formatDate(artist.estimated_date)}</span>
+                  <Clock className="h-3 w-3" />
+                  <span>{formatTimeRange(artist.time_start, artist.time_end)}</span>
                 </div>
               )}
             </div>
@@ -349,10 +342,10 @@ export const ArtistListItem = ({ artist, userVote, userKnowledge, votingLoading,
                     <span>{artist.stage}</span>
                   </div>
                 )}
-                {artist.estimated_date && (
+                {formatTimeRange(artist.time_start, artist.time_end) && (
                   <div className="flex items-center gap-1 text-xs text-purple-200">
-                    <Calendar className="h-3 w-3" />
-                    <span>{formatDate(artist.estimated_date)}</span>
+                    <Clock className="h-3 w-3" />
+                    <span>{formatTimeRange(artist.time_start, artist.time_end)}</span>
                   </div>
                 )}
               </div>

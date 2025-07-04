@@ -28,7 +28,8 @@ export const AddArtistDialog = ({ open, onOpenChange, onSuccess }: AddArtistDial
   const [soundcloudUrl, setSoundcloudUrl] = useState("");
   const [imageUrl, setImageUrl] = useState("");
   const [stage, setStage] = useState("");
-  const [estimatedDate, setEstimatedDate] = useState("");
+  const [timeStart, setTimeStart] = useState("");
+  const [timeEnd, setTimeEnd] = useState("");
   const [genres, setGenres] = useState<MusicGenre[]>([]);
   const [loading, setLoading] = useState(false);
   const { toast } = useToast();
@@ -96,7 +97,8 @@ export const AddArtistDialog = ({ open, onOpenChange, onSuccess }: AddArtistDial
         soundcloud_url: soundcloudUrl || null,
         image_url: imageUrl || null,
         stage: stage || null,
-        estimated_date: estimatedDate || null,
+        time_start: timeStart || null,
+        time_end: timeEnd || null,
       });
 
     if (error) {
@@ -117,7 +119,8 @@ export const AddArtistDialog = ({ open, onOpenChange, onSuccess }: AddArtistDial
       setSoundcloudUrl("");
       setImageUrl("");
       setStage("");
-      setEstimatedDate("");
+      setTimeStart("");
+      setTimeEnd("");
       onSuccess();
     }
     setLoading(false);
@@ -188,12 +191,22 @@ export const AddArtistDialog = ({ open, onOpenChange, onSuccess }: AddArtistDial
           </div>
 
           <div>
-            <Label htmlFor="estimated-date">Estimated Performance Date (Optional)</Label>
+            <Label htmlFor="time-start">Performance Start Time (Optional)</Label>
             <Input
-              id="estimated-date"
-              type="date"
-              value={estimatedDate}
-              onChange={(e) => setEstimatedDate(e.target.value)}
+              id="time-start"
+              type="datetime-local"
+              value={timeStart}
+              onChange={(e) => setTimeStart(e.target.value)}
+            />
+          </div>
+
+          <div>
+            <Label htmlFor="time-end">Performance End Time (Optional)</Label>
+            <Input
+              id="time-end"
+              type="datetime-local"
+              value={timeEnd}
+              onChange={(e) => setTimeEnd(e.target.value)}
             />
           </div>
 

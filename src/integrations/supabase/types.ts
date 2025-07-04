@@ -81,6 +81,8 @@ export type Database = {
           soundcloud_url: string | null
           spotify_url: string | null
           stage: string | null
+          time_end: string | null
+          time_start: string | null
           updated_at: string
         }
         Insert: {
@@ -98,6 +100,8 @@ export type Database = {
           soundcloud_url?: string | null
           spotify_url?: string | null
           stage?: string | null
+          time_end?: string | null
+          time_start?: string | null
           updated_at?: string
         }
         Update: {
@@ -115,6 +119,8 @@ export type Database = {
           soundcloud_url?: string | null
           spotify_url?: string | null
           stage?: string | null
+          time_end?: string | null
+          time_start?: string | null
           updated_at?: string
         }
         Relationships: [

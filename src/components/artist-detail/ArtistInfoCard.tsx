@@ -1,10 +1,11 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Edit, ExternalLink, Music, Play, Trash } from "lucide-react";
+import { Edit, ExternalLink, Music, Play, Trash, Clock, MapPin } from "lucide-react";
 import { EditArtistDialog } from "@/components/EditArtistDialog";
 import { ArchiveArtistDialog } from "@/components/ArchiveArtistDialog";
 import { ArtistVotingButtons } from "./ArtistVotingButtons";
+import { formatTimeRange } from "@/lib/timeUtils";
 import type { Database } from "@/integrations/supabase/types";
 
 type Artist = Database["public"]["Tables"]["artists"]["Row"] & {
@@ -59,6 +60,22 @@ export const ArtistInfoCard = ({
                   <Badge variant="outline" className="border-purple-400 text-purple-400">
                     Core Member
                   </Badge>
+                )}
+              </div>
+              
+              {/* Performance Information */}
+              <div className="flex flex-wrap gap-4 mb-4 text-purple-200">
+                {artist.stage && (
+                  <div className="flex items-center gap-2">
+                    <MapPin className="h-4 w-4" />
+                    <span className="text-sm">{artist.stage}</span>
+                  </div>
+                )}
+                {formatTimeRange(artist.time_start, artist.time_end) && (
+                  <div className="flex items-center gap-2">
+                    <Clock className="h-4 w-4" />
+                    <span className="text-sm">{formatTimeRange(artist.time_start, artist.time_end)}</span>
+                  </div>
                 )}
               </div>
             </div>

@@ -98,13 +98,13 @@ export const useArtistFiltering = (artists: Artist[], filterSortState?: FilterSo
           primarySort = getWeightedPopularityScore(b) - getWeightedPopularityScore(a);
           break;
         case 'date-asc':
-          if (!a.estimated_date && !b.estimated_date) {
+          if (!a.time_start && !b.time_start) {
             primarySort = 0;
             break;
           }
-          if (!a.estimated_date) return 1;
-          if (!b.estimated_date) return -1;
-          primarySort = new Date(a.estimated_date).getTime() - new Date(b.estimated_date).getTime();
+          if (!a.time_start) return 1;
+          if (!b.time_start) return -1;
+          primarySort = new Date(a.time_start).getTime() - new Date(b.time_start).getTime();
           break;
         default:
           primarySort = 0;

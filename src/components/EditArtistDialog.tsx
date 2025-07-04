@@ -28,7 +28,8 @@ export const EditArtistDialog = ({ artist, onSuccess, trigger }: EditArtistDialo
     description: artist.description || "",
     genre_id: artist.genre_id,
     stage: artist.stage || "",
-    estimated_date: artist.estimated_date || "",
+    time_start: artist.time_start || "",
+    time_end: artist.time_end || "",
     spotify_url: artist.spotify_url || "",
     soundcloud_url: artist.soundcloud_url || "",
     image_url: artist.image_url || "",
@@ -62,7 +63,8 @@ export const EditArtistDialog = ({ artist, onSuccess, trigger }: EditArtistDialo
           description: formData.description || null,
           genre_id: formData.genre_id,
           stage: formData.stage || null,
-          estimated_date: formData.estimated_date || null,
+          time_start: formData.time_start || null,
+          time_end: formData.time_end || null,
           spotify_url: formData.spotify_url || null,
           soundcloud_url: formData.soundcloud_url || null,
           image_url: formData.image_url || null,
@@ -151,12 +153,22 @@ export const EditArtistDialog = ({ artist, onSuccess, trigger }: EditArtistDialo
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="estimated_date">Performance Date</Label>
+            <Label htmlFor="time_start">Performance Start Time</Label>
             <Input
-              id="estimated_date"
-              type="date"
-              value={formData.estimated_date}
-              onChange={(e) => setFormData({ ...formData, estimated_date: e.target.value })}
+              id="time_start"
+              type="datetime-local"
+              value={formData.time_start}
+              onChange={(e) => setFormData({ ...formData, time_start: e.target.value })}
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="time_end">Performance End Time</Label>
+            <Input
+              id="time_end"
+              type="datetime-local"
+              value={formData.time_end}
+              onChange={(e) => setFormData({ ...formData, time_end: e.target.value })}
             />
           </div>
 
