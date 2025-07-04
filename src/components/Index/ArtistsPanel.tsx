@@ -13,17 +13,20 @@ export function ArtistsPanel({
   isGrid,
   user,
   openAuthDialog,
+  fetchArtists,
+  archiveArtist,
 }: {
   items: Array<Artist>;
   isGrid: boolean;
   user: User;
   openAuthDialog(): void;
+  fetchArtists(): void;
+  archiveArtist(artistId: string): Promise<void>;
 }) {
   const { userVotes, votingLoading, handleVote } = useOfflineVoting(
     user,
     () => {} //TODO? should we refretch on vote?
   );
-  const { fetchArtists, archiveArtist } = useOfflineArtistData();
 
   if (items.length === 0) {
     return <EmptyArtistsState />;
@@ -54,9 +57,9 @@ export function ArtistsPanel({
   }
 
   return (
-    <div className={"space-y-4"}>
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
       {items.map((artist) => (
-        <ArtistListItem
+        <ArtistCard
           key={artist.id}
           artist={artist}
           userVote={userVotes[artist.id]}

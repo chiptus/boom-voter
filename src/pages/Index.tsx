@@ -26,7 +26,7 @@ export default function Index() {
   const [showAddGenreDialog, setShowAddGenreDialog] = useState(false);
   const { state: urlState, updateUrlState, clearFilters } = useUrlState();
   
-  const { artists, fetchArtists } = useOfflineArtistData();
+  const { artists, fetchArtists, archiveArtist } = useOfflineArtistData();
   
   const { filteredAndSortedArtists } = useArtistFiltering(artists, urlState);
 
@@ -120,6 +120,8 @@ export default function Index() {
             isGrid={urlState.view === "grid"}
             user={user}
             openAuthDialog={() => setShowAuthDialog(true)}
+            fetchArtists={fetchArtists}
+            archiveArtist={archiveArtist}
           />
         </div>
 
