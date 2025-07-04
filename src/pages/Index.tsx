@@ -17,8 +17,8 @@ import { EmptyArtistsState } from "@/components/EmptyArtistsState";
 import { FestivalHeader } from "@/components/FestivalHeader";
 import { InviteLandingPage } from "@/components/InviteLandingPage";
 import { useArtistFiltering } from "@/hooks/useArtistFiltering";
-import { useArtistData } from "@/hooks/useArtistData";
-import { useVoting } from "@/hooks/useVoting";
+import { useOfflineArtistData } from "@/hooks/useOfflineArtistData";
+import { useOfflineVoting } from "@/hooks/useOfflineVoting";
 import { useEffect } from "react";
 import { useUrlState } from "@/hooks/useUrlState";
 
@@ -31,8 +31,8 @@ const Index = () => {
   const [showAddGenreDialog, setShowAddGenreDialog] = useState(false);
   const { state: urlState, updateUrlState, clearFilters } = useUrlState();
   
-  const { artists, fetchArtists, archiveArtist } = useArtistData();
-  const { userVotes, votingLoading, handleVote } = useVoting(user, fetchArtists);
+  const { artists, fetchArtists, archiveArtist } = useOfflineArtistData();
+  const { userVotes, votingLoading, handleVote } = useOfflineVoting(user);
   
   const { filteredAndSortedArtists } = useArtistFiltering(artists, urlState);
   

@@ -3,7 +3,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Trash2, Edit3, Save, X, StickyNote } from "lucide-react";
-import { useArtistNotes } from "@/hooks/useArtistNotes";
+import { useOfflineNotes } from "@/hooks/useOfflineNotes";
 
 interface ArtistNotesProps {
   artistId: string;
@@ -11,7 +11,7 @@ interface ArtistNotesProps {
 }
 
 export const ArtistNotes = ({ artistId, userId }: ArtistNotesProps) => {
-  const { notes, loading, saving, saveNote, deleteNote } = useArtistNotes(artistId, userId);
+  const { notes, loading, saving, saveNote, deleteNote } = useOfflineNotes(artistId, userId);
   const [isEditing, setIsEditing] = useState(false);
   const [noteContent, setNoteContent] = useState("");
 
