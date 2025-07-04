@@ -12,6 +12,7 @@ import { ScheduleGridView } from "@/components/schedule/ScheduleGridView";
 import { ScheduleTimelineView } from "@/components/schedule/ScheduleTimelineView";
 import { ScheduleListView } from "@/components/schedule/ScheduleListView";
 import { AuthDialog } from "@/components/AuthDialog";
+import ErrorBoundary from "@/components/ErrorBoundary";
 
 const Schedule = () => {
   const { user } = useAuth();
@@ -99,24 +100,26 @@ const Schedule = () => {
         />
 
         <div className="mt-8">
-          {urlState.scheduleView === 'grid' && (
-            <ScheduleGridView
-              userVotes={userVotes}
-              onVote={handleVoteAction}
-            />
-          )}
-          {urlState.scheduleView === 'timeline' && (
-            <ScheduleTimelineView
-              userVotes={userVotes}
-              onVote={handleVoteAction}
-            />
-          )}
-          {urlState.scheduleView === 'list' && (
-            <ScheduleListView
-              userVotes={userVotes}
-              onVote={handleVoteAction}
-            />
-          )}
+          <ErrorBoundary>
+            {urlState.scheduleView === 'grid' && (
+              <ScheduleGridView
+                userVotes={userVotes}
+                onVote={handleVoteAction}
+              />
+            )}
+            {urlState.scheduleView === 'timeline' && (
+              <ScheduleTimelineView
+                userVotes={userVotes}
+                onVote={handleVoteAction}
+              />
+            )}
+            {urlState.scheduleView === 'list' && (
+              <ScheduleListView
+                userVotes={userVotes}
+                onVote={handleVoteAction}
+              />
+            )}
+          </ErrorBoundary>
         </div>
 
         <AuthDialog
