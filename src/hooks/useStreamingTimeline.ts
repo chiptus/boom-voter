@@ -14,7 +14,11 @@ export const useStreamingTimeline = () => {
   const { scheduleDays, loading, error } = useScheduleData();
 
   const streamingItems = useMemo(() => {
-    if (!scheduleDays || scheduleDays.length === 0) return [];
+    console.log('useStreamingTimeline - Processing schedule days:', scheduleDays?.length || 0);
+    if (!scheduleDays || scheduleDays.length === 0) {
+      console.log('useStreamingTimeline - No schedule days available');
+      return [];
+    }
 
     const items: StreamingTimelineItem[] = [];
     let position = 0;

@@ -29,10 +29,15 @@ export const useScheduleData = () => {
   const { artists, loading, error } = useArtistData();
 
   const scheduleDays = useMemo(() => {
-    if (!artists || artists.length === 0) return [];
+    console.log('useScheduleData - Processing artists:', artists?.length || 0);
+    if (!artists || artists.length === 0) {
+      console.log('useScheduleData - No artists available');
+      return [];
+    }
 
     // Filter artists with performance times
     const performingArtists = artists.filter(artist => artist.time_start);
+    console.log('useScheduleData - Performing artists:', performingArtists.length);
 
     // Parse and enhance artist data
     const enhancedArtists: ScheduleArtist[] = performingArtists.map(artist => {

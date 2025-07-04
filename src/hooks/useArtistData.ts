@@ -12,20 +12,32 @@ export const useArtistData = () => {
 
   // Set up real-time subscriptions
   useEffect(() => {
-    // Listen for real-time updates to artists
+    // Create unique channel name to prevent conflicts
+    const channelName = `artists-changes-${Date.now()}`;
+    console.log('Setting up artist data subscriptions:', channelName);
+    
     const artistsChannel = supabase
-      .channel('artists-changes')
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'artists' }, () => {
+      .channel(channelName)
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'artists' }, (payload) => {
+        console.log('Artists table changed:', payload);
         queryClient.invalidateQueries({ queryKey: artistQueries.lists() });
       })
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'votes' }, () => {
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'votes' }, (payload) => {
+        console.log('Votes table changed:', payload);
         queryClient.invalidateQueries({ queryKey: artistQueries.lists() });
         queryClient.invalidateQueries({ queryKey: voteQueries.all() });
       })
-      .subscribe();
+      .subscribe((status, err) => {
+        if (err) {
+          console.error('Subscription error:', err);
+        } else {
+          console.log('Subscription status:', status);
+        }
+      });
 
     return () => {
-      artistsChannel.unsubscribe();
+      console.log('Cleaning up artist data subscriptions:', channelName);
+      supabase.removeChannel(artistsChannel);
     };
   }, [queryClient]);
 
