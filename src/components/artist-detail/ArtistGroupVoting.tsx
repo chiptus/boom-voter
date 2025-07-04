@@ -4,6 +4,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Badge } from "@/components/ui/badge";
 import { useGroups } from "@/hooks/useGroups";
 import { queryFunctions } from "@/services/queries";
+import { offlineStorage } from "@/lib/offlineStorage";
+import { useOnlineStatus } from "@/hooks/useOffline";
 import { Users, ThumbsUp, Heart, ThumbsDown } from "lucide-react";
 
 interface ArtistGroupVotingProps {
@@ -48,6 +50,7 @@ export const ArtistGroupVoting = ({ artistId }: ArtistGroupVotingProps) => {
   const [selectedGroupId, setSelectedGroupId] = useState<string>("");
   const [groupVotes, setGroupVotes] = useState<GroupVote[]>([]);
   const [loading, setLoading] = useState(false);
+  const isOnline = useOnlineStatus();
 
   // Set default group when groups load
   useEffect(() => {
@@ -68,7 +71,12 @@ export const ArtistGroupVoting = ({ artistId }: ArtistGroupVotingProps) => {
     
     setLoading(true);
     try {
-      const votes = await queryFunctions.fetchArtistGroupVotes(artistId, selectedGroupId);
+      let votes;
+      if (isOnline) {
+        votes = await queryFunctions.fetchArtistGroupVotes(artistId, selectedGroupId);
+      } else {
+        votes = await offlineStorage.getArtistGroupVotes(artistId, selectedGroupId);
+      }
       setGroupVotes(votes);
     } catch (error) {
       console.error("Error fetching group votes:", error);

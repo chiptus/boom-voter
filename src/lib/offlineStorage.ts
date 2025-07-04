@@ -81,7 +81,25 @@ class OfflineStorageManager {
 
   async getArtist(id: string): Promise<any> {
     const db = await this.ensureDB();
-    return db.get('artists', id);
+    const artist = await db.get('artists', id);
+    
+    if (!artist) {
+      return null;
+    }
+
+    // Get all votes for this artist from offline storage
+    const votes = await this.getVotes(id);
+    
+    // Transform offline votes to match server format
+    const transformedVotes = votes.map(vote => ({
+      vote_type: vote.voteType,
+      user_id: vote.userId,
+    }));
+
+    return {
+      ...artist,
+      votes: transformedVotes,
+    };
   }
 
   // Votes methods
@@ -182,6 +200,29 @@ class OfflineStorageManager {
     const db = await this.ensureDB();
     const result = await db.get('settings', key);
     return result?.value;
+  }
+
+  // Group voting methods
+  async getArtistGroupVotes(artistId: string, groupId: string): Promise<Array<{
+    vote_type: number;
+    user_id: string;
+    username: string | null;
+  }>> {
+    try {
+      // Get all votes for this artist
+      const artistVotes = await this.getVotes(artistId);
+      
+      // For now, return all votes since we don't have group member filtering offline
+      // In a real implementation, you'd also cache group member data
+      return artistVotes.map(vote => ({
+        vote_type: vote.voteType,
+        user_id: vote.userId,
+        username: null, // We don't store usernames in offline votes currently
+      }));
+    } catch (error) {
+      console.error('Error fetching offline group votes:', error);
+      return [];
+    }
   }
 
   // Utility methods
