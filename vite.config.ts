@@ -45,9 +45,9 @@ export default defineConfig(({ mode }) => ({
       },
       includeAssets: ['favicon.svg', 'icon-512.png', 'robots.txt'],
       manifest: {
-        name: 'Festival App',
-        short_name: 'Festival',
-        description: 'Your offline-first festival companion',
+        name: 'UpLine',
+        short_name: 'UpLine',
+        description: 'UpLine - Your offline-first Boom Festival companion',
         theme_color: '#7c3aed',
         background_color: '#1e1b4b',
         display: 'standalone',
