@@ -1,12 +1,13 @@
 import { useState, useEffect } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
-import { Button } from "@/components/ui/button";
+import { AppHeader } from "@/components/AppHeader";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ArrowLeft, Users, Link as LinkIcon, UserMinus, Crown } from "lucide-react";
+import { Users, Link as LinkIcon, UserMinus, Crown } from "lucide-react";
 import { useGroups } from "@/hooks/useGroups";
 import { useToast } from "@/components/ui/use-toast";
 import { InviteManagement } from "@/components/InviteManagement";
+import { Button } from "@/components/ui/button";
 import type { Group, GroupMember } from "@/types/groups";
 
 const GroupDetail = () => {
@@ -130,18 +131,15 @@ const GroupDetail = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900">
       <div className="container mx-auto px-4 py-8">
+        <AppHeader 
+          showBackButton
+          backTo="/groups"
+          backLabel="Back to Groups"
+        />
+        
         <div className="mb-8">
-          <Button
-            variant="ghost"
-            onClick={() => navigate("/groups")}
-            className="text-white hover:text-purple-200 mb-4"
-          >
-            <ArrowLeft className="h-4 w-4 mr-2" />
-            Back to Groups
-          </Button>
-          
           <div className="flex items-center space-x-4 mb-2">
-            <h1 className="text-4xl font-bold text-white">{group.name}</h1>
+            <h2 className="text-4xl font-bold text-white">{group.name}</h2>
             {isCreator && (
               <div className="flex items-center space-x-1 bg-purple-600/50 text-purple-100 px-2 py-1 rounded text-sm">
                 <Crown className="h-3 w-3" />

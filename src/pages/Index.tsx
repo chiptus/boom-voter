@@ -1,6 +1,9 @@
 
 // Festival Index Page
 import { useState } from "react";
+import { Link } from "react-router-dom";
+import { Calendar } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { useProfileQuery } from "@/hooks/queries/useProfileQuery";
@@ -14,7 +17,7 @@ import { FilterSortControls } from "@/components/filters/FilterSortControls";
 import { ArtistCard } from "@/components/ArtistCard";
 import { ArtistListItem } from "@/components/ArtistListItem";
 import { EmptyArtistsState } from "@/components/EmptyArtistsState";
-import { FestivalHeader } from "@/components/FestivalHeader";
+import { AppHeader } from "@/components/AppHeader";
 import { InviteLandingPage } from "@/components/InviteLandingPage";
 import { useArtistFiltering } from "@/hooks/useArtistFiltering";
 import { useOfflineArtistData } from "@/hooks/useOfflineArtistData";
@@ -102,7 +105,22 @@ const Index = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900">
       <div className="container mx-auto px-4 py-8">
-        <FestivalHeader artistCount={filteredAndSortedArtists.length} />
+        <AppHeader 
+          title="Boom Festival"
+          subtitle="Vote for your favorite artists!"
+          description={`${filteredAndSortedArtists.length} artists available for voting`}
+          actions={
+            <Link to="/schedule">
+              <Button 
+                variant="outline" 
+                className="border-purple-400 text-purple-400 hover:bg-purple-400 hover:text-white"
+              >
+                <Calendar className="h-4 w-4 mr-2" />
+                View Schedule
+              </Button>
+            </Link>
+          }
+        />
         
         <AuthActionButtons
           user={user}

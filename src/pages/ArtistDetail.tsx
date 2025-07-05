@@ -1,6 +1,6 @@
 
 import { useParams, useNavigate } from "react-router-dom";
-import { ArtistDetailHeader } from "@/components/artist-detail/ArtistDetailHeader";
+import { AppHeader } from "@/components/AppHeader";
 import { ArtistImageCard } from "@/components/artist-detail/ArtistImageCard";
 import { ArtistInfoCard } from "@/components/artist-detail/ArtistInfoCard";
 import { ArtistNotFoundState } from "@/components/artist-detail/ArtistNotFoundState";
@@ -41,7 +41,11 @@ const ArtistDetail = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900">
       <div className="container mx-auto px-4 py-8">
-        <ArtistDetailHeader />
+        <AppHeader 
+          showBackButton
+          backTo="/"
+          backLabel="Back to Artists"
+        />
 
         {/* Artist Header */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">

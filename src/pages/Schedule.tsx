@@ -6,7 +6,8 @@ import { useAuth } from "@/hooks/useAuth";
 import { useOfflineVoting } from "@/hooks/useOfflineVoting";
 import { useUrlState } from "@/hooks/useUrlState";
 import { useScheduleData } from "@/hooks/useScheduleData";
-import { ScheduleHeader } from "@/components/schedule/ScheduleHeader";
+import { AppHeader } from "@/components/AppHeader";
+import { ScheduleViewToggle } from "@/components/schedule/ScheduleViewToggle";
 import { DaySelector } from "@/components/schedule/DaySelector";
 import { ScheduleGridView } from "@/components/schedule/ScheduleGridView";
 import { ScheduleTimelineView } from "@/components/schedule/ScheduleTimelineView";
@@ -62,14 +63,11 @@ const Schedule = () => {
     return (
       <div className="min-h-screen bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900">
         <div className="container mx-auto px-4 py-8">
-          <div className="mb-6">
-            <Link to="/">
-              <Button variant="outline" className="border-purple-400 text-purple-400 hover:bg-purple-400 hover:text-white">
-                <ArrowLeft className="h-4 w-4 mr-2" />
-                Back to Artists
-              </Button>
-            </Link>
-          </div>
+          <AppHeader 
+            showBackButton
+            backTo="/"
+            backLabel="Back to Artists"
+          />
           
           <div className="text-center text-white py-12">
             <h1 className="text-4xl font-bold mb-4">Festival Schedule</h1>
@@ -84,19 +82,19 @@ const Schedule = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900">
       <div className="container mx-auto px-4 py-8">
-        <div className="mb-6">
-          <Link to="/">
-            <Button variant="outline" className="border-purple-400 text-purple-400 hover:bg-purple-400 hover:text-white">
-              <ArrowLeft className="h-4 w-4 mr-2" />
-              Back to Artists
-            </Button>
-          </Link>
-        </div>
-
-        <ScheduleHeader
-          view={urlState.scheduleView}
-          onViewChange={(view) => updateUrlState({ scheduleView: view })}
-          totalPerformances={totalPerformances}
+        <AppHeader 
+          showBackButton
+          backTo="/"
+          backLabel="Back to Artists"
+          title="Festival Schedule"
+          subtitle="Plan your festival experience"
+          description={`${totalPerformances} performances scheduled`}
+          actions={
+            <ScheduleViewToggle 
+              view={urlState.scheduleView} 
+              onViewChange={(view) => updateUrlState({ scheduleView: view })} 
+            />
+          }
         />
 
         <div className="mt-8">

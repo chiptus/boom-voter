@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { AppHeader } from "@/components/AppHeader";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -7,7 +8,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Label } from "@/components/ui/label";
-import { ArrowLeft, Plus, Users, Trash2, UserPlus, Crown, Link } from "lucide-react";
+import { Plus, Users, Trash2, UserPlus, Crown, Link } from "lucide-react";
 import { useGroups } from "@/hooks/useGroups";
 import { useToast } from "@/components/ui/use-toast";
 import { Badge } from "@/components/ui/badge";
@@ -110,18 +111,13 @@ const Groups = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900">
       <div className="container mx-auto px-4 py-8">
-        <div className="mb-8">
-          <Button
-            variant="ghost"
-            onClick={() => navigate("/")}
-            className="text-white hover:text-purple-200 mb-4"
-          >
-            <ArrowLeft className="h-4 w-4 mr-2" />
-            Back to Artists
-          </Button>
-          
-          <h1 className="text-4xl font-bold text-white">My Groups</h1>
-        </div>
+        <AppHeader 
+          showBackButton
+          backTo="/"
+          backLabel="Back to Artists"
+          title="My Groups"
+          subtitle="Create and manage your festival groups"
+        />
 
         <Tabs defaultValue="my-groups" className="w-full">
           <TabsList className="grid w-full grid-cols-3 bg-white/10">
