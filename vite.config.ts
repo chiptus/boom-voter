@@ -43,7 +43,7 @@ export default defineConfig(({ mode }) => ({
           },
         ],
       },
-      includeAssets: ['favicon.svg', 'robots.txt'],
+      includeAssets: ['favicon.svg', 'icon-512.png', 'robots.txt'],
       manifest: {
         name: 'Festival App',
         short_name: 'Festival',
@@ -54,11 +54,19 @@ export default defineConfig(({ mode }) => ({
         orientation: 'portrait',
         scope: '/',
         start_url: '/',
+        categories: ['entertainment', 'music'],
         icons: [
           {
             src: 'favicon.svg',
             sizes: 'any',
-            type: 'image/svg+xml'
+            type: 'image/svg+xml',
+            purpose: 'any'
+          },
+          {
+            src: 'icon-512.png',
+            sizes: '512x512',
+            type: 'image/png',
+            purpose: 'any maskable'
           }
         ]
       }
