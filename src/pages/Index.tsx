@@ -10,7 +10,7 @@ import { useProfileQuery } from "@/hooks/queries/useProfileQuery";
 import { useInviteValidation } from "@/hooks/useInviteValidation";
 import { AuthDialog } from "@/components/AuthDialog";
 import { UsernameSetupDialog } from "@/components/UsernameSetupDialog";
-import { AuthActionButtons } from "@/components/AuthActionButtons";
+
 import { AddArtistDialog } from "@/components/AddArtistDialog";
 import { AddGenreDialog } from "@/components/AddGenreDialog";
 import { FilterSortControls } from "@/components/filters/FilterSortControls";
@@ -109,25 +109,12 @@ const Index = () => {
           title="Boom Festival"
           subtitle="Vote for your favorite artists!"
           description={`${filteredAndSortedArtists.length} artists available for voting`}
-          actions={
-            <Link to="/schedule">
-              <Button 
-                variant="outline" 
-                className="border-purple-400 text-purple-400 hover:bg-purple-400 hover:text-white"
-              >
-                <Calendar className="h-4 w-4 mr-2" />
-                View Schedule
-              </Button>
-            </Link>
-          }
-        />
-        
-        <AuthActionButtons
           user={user}
-          onAddArtist={() => setShowAddArtistDialog(true)}
-          onAddGenre={() => setShowAddGenreDialog(true)}
           onSignIn={() => setShowAuthDialog(true)}
           onSignOut={signOut}
+          onAddArtist={() => setShowAddArtistDialog(true)}
+          onAddGenre={() => setShowAddGenreDialog(true)}
+          showScheduleButton={true}
         />
 
         <FilterSortControls
