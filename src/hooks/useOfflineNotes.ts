@@ -3,7 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
 import { offlineStorage } from '@/lib/offlineStorage';
 import { useOnlineStatus, useOfflineQueue } from './useOffline';
-import type { ArtistNote } from './useArtistNotes';
+import type { ArtistNote } from '@/services/queries';
 
 export const useOfflineNotes = (artistId: string, userId: string | null) => {
   const [notes, setNotes] = useState<ArtistNote[]>([]);

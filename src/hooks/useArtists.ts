@@ -29,4 +29,4 @@ export const useArtists = (filterSortState?: FilterSortState) => {
   };
 };
 
-export type { Artist } from "./useArtistData";
+export type { Artist } from "./useOfflineArtistData";
