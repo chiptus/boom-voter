@@ -250,6 +250,7 @@ serve(async (req) => {
 
     console.log('Starting SoundCloud artist data sync...')
 
+    // Get count of artists that need syncing
     const { data: artists, error: fetchError } = await supabase
       .from('artists')
       .select('id, name, soundcloud_url, image_url, last_soundcloud_sync')
@@ -261,110 +262,24 @@ serve(async (req) => {
       throw new Error('Failed to fetch artists')
     }
 
-    console.log(`Found ${artists?.length || 0} artists to sync`)
+    const artistCount = artists?.length || 0
+    console.log(`Found ${artistCount} artists to sync`)
 
-    const results = {
-      processed: 0,
-      updated: 0,
-      failed: 0,
-      errors: [] as string[]
-    }
+    // Use EdgeRuntime.waitUntil to ensure background job completes
+    EdgeRuntime.waitUntil(
+      processSoundCloudArtists(supabase, artists || [])
+    )
 
-    if (!artists || artists.length === 0) {
-      return new Response(
-        JSON.stringify({ message: 'No artists to sync', results }),
-        { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      )
-    }
-
-    // Process each artist
-    for (const artist of artists) {
-      try {
-        results.processed++
-        console.log(`Processing artist: ${artist.name}`)
-
-        const soundcloudUrl = artist.soundcloud_url
-        
-        if (!soundcloudUrl.includes('soundcloud.com/')) {
-          console.warn(`Invalid SoundCloud URL for ${artist.name}: ${soundcloudUrl}`)
-          results.failed++
-          results.errors.push(`Invalid URL format for ${artist.name}`)
-          continue
-        }
-
-        console.log(`Scraping data for ${artist.name} from SoundCloud...`)
-        
-        const scrapedData = await scrapeSoundCloudWithBrowserless(soundcloudUrl)
-        
-        console.log(`Found data for ${artist.name}:`, scrapedData)
-
-        const updateData: any = {
-          last_soundcloud_sync: new Date().toISOString()
-        }
-
-        if (scrapedData.followersCount !== null && scrapedData.followersCount > 0) {
-          updateData.soundcloud_followers = scrapedData.followersCount
-        }
-
-        if (scrapedData.avatarUrl && (!artist.image_url || scrapedData.avatarUrl.includes('t500x500'))) {
-          // Try to get higher resolution image
-          let highResUrl = scrapedData.avatarUrl
-          if (highResUrl.includes('large.jpg')) {
-            highResUrl = highResUrl.replace('large.jpg', 't500x500.jpg')
-          } else if (highResUrl.includes('crop')) {
-            // SoundCloud sometimes uses crop parameter, try to get original
-            highResUrl = highResUrl.replace(/crop.*?\.jpg/, 't500x500.jpg')
-          }
-          updateData.image_url = highResUrl
-          console.log(`Updating image for ${artist.name}`)
-        }
-
-        const { error: updateError } = await supabase
-          .from('artists')
-          .update(updateData)
-          .eq('id', artist.id)
-
-        if (updateError) {
-          console.error(`Error updating ${artist.name}:`, updateError)
-          results.failed++
-          results.errors.push(`Update error for ${artist.name}: ${updateError.message}`)
-        } else {
-          results.updated++
-          console.log(`Successfully updated ${artist.name}`)
-        }
-
-        // Rate limiting - Browserless has generous limits but still be respectful
-        await new Promise(resolve => setTimeout(resolve, 2000))
-
-      } catch (error) {
-        console.error(`Error processing ${artist.name}:`, error)
-        results.failed++
-        results.errors.push(`Processing error for ${artist.name}: ${error.message}`)
-        
-        // Only update sync timestamp on certain types of errors (not scraping failures)
-        if (error.message.includes('Invalid URL format') || error.message.includes('rate limit')) {
-          try {
-            await supabase
-              .from('artists')
-              .update({ last_soundcloud_sync: new Date().toISOString() })
-              .eq('id', artist.id)
-          } catch (syncError) {
-            console.error(`Failed to update sync timestamp for ${artist.name}:`, syncError)
-          }
-        }
-      }
-    }
-
-    console.log('Sync completed:', results)
-
+    // Return immediately with job started confirmation
     return new Response(
       JSON.stringify({ 
-        message: 'SoundCloud sync completed', 
-        results 
+        message: 'SoundCloud sync job started in background',
+        artistsToProcess: artistCount,
+        startedAt: new Date().toISOString()
       }),
       { 
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        status: 200
+        status: 202 // Accepted - processing in background
       }
     )
 
@@ -373,7 +288,7 @@ serve(async (req) => {
     return new Response(
       JSON.stringify({ 
         error: error.message,
-        message: 'SoundCloud sync failed'
+        message: 'Failed to start SoundCloud sync job'
       }),
       { 
         status: 500, 
@@ -382,3 +297,116 @@ serve(async (req) => {
     )
   }
 })
+
+// Background processing function
+async function processSoundCloudArtists(supabase: any, artists: any[]) {
+  const results = {
+    processed: 0,
+    updated: 0,
+    failed: 0,
+    errors: [] as string[],
+    startedAt: new Date().toISOString(),
+    completedAt: null as string | null
+  }
+
+  console.log(`Background job processing ${artists.length} artists...`)
+
+  if (artists.length === 0) {
+    console.log('No artists to process')
+    return
+  }
+
+  // Process each artist
+  for (const artist of artists) {
+    try {
+      results.processed++
+      console.log(`Processing artist ${results.processed}/${artists.length}: ${artist.name}`)
+
+      const soundcloudUrl = artist.soundcloud_url
+      
+      if (!soundcloudUrl.includes('soundcloud.com/')) {
+        console.warn(`Invalid SoundCloud URL for ${artist.name}: ${soundcloudUrl}`)
+        results.failed++
+        results.errors.push(`Invalid URL format for ${artist.name}`)
+        continue
+      }
+
+      console.log(`Scraping data for ${artist.name} from SoundCloud...`)
+      
+      const scrapedData = await scrapeSoundCloudWithBrowserless(soundcloudUrl)
+      
+      console.log(`Found data for ${artist.name}:`, scrapedData)
+
+      const updateData: any = {
+        last_soundcloud_sync: new Date().toISOString()
+      }
+
+      if (scrapedData.followersCount !== null && scrapedData.followersCount > 0) {
+        updateData.soundcloud_followers = scrapedData.followersCount
+      }
+
+      if (scrapedData.avatarUrl && (!artist.image_url || scrapedData.avatarUrl.includes('t500x500'))) {
+        // Try to get higher resolution image
+        let highResUrl = scrapedData.avatarUrl
+        if (highResUrl.includes('large.jpg')) {
+          highResUrl = highResUrl.replace('large.jpg', 't500x500.jpg')
+        } else if (highResUrl.includes('crop')) {
+          // SoundCloud sometimes uses crop parameter, try to get original
+          highResUrl = highResUrl.replace(/crop.*?\.jpg/, 't500x500.jpg')
+        }
+        updateData.image_url = highResUrl
+        console.log(`Updating image for ${artist.name}`)
+      }
+
+      const { error: updateError } = await supabase
+        .from('artists')
+        .update(updateData)
+        .eq('id', artist.id)
+
+      if (updateError) {
+        console.error(`Error updating ${artist.name}:`, updateError)
+        results.failed++
+        results.errors.push(`Update error for ${artist.name}: ${updateError.message}`)
+      } else {
+        results.updated++
+        console.log(`Successfully updated ${artist.name}`)
+      }
+
+      // Rate limiting - Browserless has generous limits but still be respectful
+      await new Promise(resolve => setTimeout(resolve, 2000))
+
+    } catch (error) {
+      console.error(`Error processing ${artist.name}:`, error)
+      results.failed++
+      results.errors.push(`Processing error for ${artist.name}: ${error.message}`)
+      
+      // Only update sync timestamp on certain types of errors (not scraping failures)
+      if (error.message.includes('Invalid URL format') || error.message.includes('rate limit')) {
+        try {
+          await supabase
+            .from('artists')
+            .update({ last_soundcloud_sync: new Date().toISOString() })
+            .eq('id', artist.id)
+        } catch (syncError) {
+          console.error(`Failed to update sync timestamp for ${artist.name}:`, syncError)
+        }
+      }
+    }
+  }
+
+  results.completedAt = new Date().toISOString()
+  console.log('Background job completed:', results)
+
+  // Optionally store results in a database table for tracking
+  // try {
+  //   await supabase
+  //     .from('sync_jobs')
+  //     .insert({
+  //       job_type: 'soundcloud_sync',
+  //       results: results,
+  //       created_at: new Date().toISOString()
+  //     })
+  // } catch (error) {
+  //   console.error('Failed to store job results:', error)
+  // }
+}
