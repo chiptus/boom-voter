@@ -93,7 +93,7 @@ export const AppHeader = ({
 
   return (
     <TooltipProvider>
-      <div className="mb-8">
+      <div className="sticky top-0 z-50 bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900 mb-8">
         {/* Top Bar - App Branding & Navigation */}
         <div className="flex items-center justify-between mb-6 pb-4 border-b border-purple-400/20">
           <div className="flex items-center gap-3">
