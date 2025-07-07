@@ -12,6 +12,7 @@ import { DaySelector } from "@/components/schedule/DaySelector";
 import { ScheduleGridView } from "@/components/schedule/ScheduleGridView";
 import { ScheduleTimelineView } from "@/components/schedule/ScheduleTimelineView";
 import { ScheduleListView } from "@/components/schedule/ScheduleListView";
+import { ScheduleHorizontalTimelineView } from "@/components/schedule/ScheduleHorizontalTimelineView";
 import { AuthDialog } from "@/components/AuthDialog";
 import ErrorBoundary from "@/components/ErrorBoundary";
 
@@ -113,6 +114,12 @@ const Schedule = () => {
             )}
             {urlState.scheduleView === 'list' && (
               <ScheduleListView
+                userVotes={userVotes}
+                onVote={handleVoteAction}
+              />
+            )}
+            {urlState.scheduleView === 'horizontal' && (
+              <ScheduleHorizontalTimelineView
                 userVotes={userVotes}
                 onVote={handleVoteAction}
               />

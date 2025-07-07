@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { Calendar, Clock, List } from "lucide-react";
+import { Calendar, Clock, List, BarChart3 } from "lucide-react";
 import type { ScheduleViewOption } from "@/hooks/useUrlState";
 
 interface ScheduleViewToggleProps {
@@ -36,6 +36,15 @@ export const ScheduleViewToggle = ({ view, onViewChange }: ScheduleViewTogglePro
       >
         <List className="h-4 w-4" />
         <span className="hidden sm:inline ml-2">List</span>
+      </Button>
+      <Button
+        variant={view === 'horizontal' ? 'default' : 'ghost'}
+        size="sm"
+        onClick={() => onViewChange('horizontal')}
+        className={view === 'horizontal' ? 'bg-purple-600 hover:bg-purple-700 text-white' : 'text-purple-200 hover:text-white hover:bg-white/10'}
+      >
+        <BarChart3 className="h-4 w-4" />
+        <span className="hidden sm:inline ml-2">Timeline</span>
       </Button>
     </div>
   );
