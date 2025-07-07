@@ -53,7 +53,7 @@ export const ArtistScheduleBlock = ({
             </div>
           )}
           
-          {artist.stage && (
+          {!compact && artist.stage && (
             <div className="flex items-center gap-2">
               <MapPin className="h-4 w-4" />
               <span>{artist.stage}</span>
@@ -61,7 +61,7 @@ export const ArtistScheduleBlock = ({
           )}
         </div>
 
-        {onVote && !compact && (
+        {onVote && (
           <div className="flex gap-2 mt-3">
             <Button
               variant="outline"
