@@ -1,11 +1,12 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { authQueries, queryFunctions, mutationFunctions } from "@/services/queries";
-import { useOfflineProfile } from "@/hooks/useOfflineProfile";
+import { profileOfflineService } from "@/services/profileOfflineService";
+import { useOfflineProfileToast } from "@/hooks/useOfflineProfileToast";
 import type { Database } from "@/integrations/supabase/types";
 
 
 export const useProfileQuery = (userId?: string) => {
-  const { cacheProfile, getCachedProfile, showOfflineProfileToast, isOnline } = useOfflineProfile();
+  const { showOfflineProfileToast, isOnline } = useOfflineProfileToast();
 
   return useQuery({
     queryKey: authQueries.profile(userId),
@@ -17,11 +18,11 @@ export const useProfileQuery = (userId?: string) => {
         if (isOnline) {
           const profile = await queryFunctions.fetchProfile(userId);
           // Cache successful fetch
-          await cacheProfile(userId, profile);
+          await profileOfflineService.cacheProfile(userId, profile);
           return profile;
         } else {
           // Use cached data when offline
-          const cachedProfile = await getCachedProfile(userId);
+          const cachedProfile = await profileOfflineService.getCachedProfile(userId);
           if (cachedProfile) {
             showOfflineProfileToast();
             return cachedProfile;
@@ -32,7 +33,7 @@ export const useProfileQuery = (userId?: string) => {
         // Fallback to cache on error
         if (isOnline) {
           console.error('Online profile fetch failed, using cache:', error);
-          const cachedProfile = await getCachedProfile(userId);
+          const cachedProfile = await profileOfflineService.getCachedProfile(userId);
           if (cachedProfile) {
             showOfflineProfileToast();
             return cachedProfile;
@@ -54,7 +55,6 @@ export const useProfileQuery = (userId?: string) => {
 
 export const useUpdateProfileMutation = () => {
   const queryClient = useQueryClient();
-  const { cacheProfile } = useOfflineProfile();
   
   return useMutation({
     mutationFn: mutationFunctions.updateProfile,
@@ -63,7 +63,7 @@ export const useUpdateProfileMutation = () => {
       queryClient.setQueryData(authQueries.profile(variables.userId), data);
       
       // Update offline cache
-      await cacheProfile(variables.userId, data);
+      await profileOfflineService.cacheProfile(variables.userId, data);
       
       // Invalidate to ensure consistency
       queryClient.invalidateQueries({

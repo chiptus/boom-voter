@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useProfileQuery } from "@/hooks/queries/useProfileQuery";
-import { useOfflineProfile } from "@/hooks/useOfflineProfile";
+import { profileOfflineService } from "@/services/profileOfflineService";
 import { useToast } from "@/hooks/use-toast";
 import { User, Session } from "@supabase/supabase-js";
 
@@ -10,7 +10,6 @@ export const useAuth = () => {
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
-  const { clearCachedProfile } = useOfflineProfile();
   const profileQuery = useProfileQuery(user?.id);
 
   const profile = profileQuery.data;
@@ -27,7 +26,7 @@ export const useAuth = () => {
       // Clear cached profile on sign out for security
       if (event === "SIGNED_OUT") {
         if (user?.id) {
-          await clearCachedProfile(user.id);
+          await profileOfflineService.clearCachedProfile(user.id);
         }
       }
 
@@ -91,7 +90,7 @@ export const useAuth = () => {
   const signOut = async () => {
     // Clear cached profile before signing out
     if (user?.id) {
-      await clearCachedProfile(user.id);
+      await profileOfflineService.clearCachedProfile(user.id);
     }
     await supabase.auth.signOut();
   };
