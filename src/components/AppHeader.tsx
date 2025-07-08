@@ -1,20 +1,16 @@
 import { ReactNode, useState, useEffect } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { 
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { 
-  Tooltip,
-  TooltipContent,
   TooltipProvider,
-  TooltipTrigger 
 } from "@/components/ui/tooltip";
-import { ArrowLeft, Music, Heart, Calendar, Plus, LogIn, LogOut, Menu, Users } from "lucide-react";
+import { Music, Heart, LogIn } from "lucide-react";
 import { useGroups } from "@/hooks/useGroups";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { useProfileQuery } from "@/hooks/queries/useProfileQuery";
+import { Navigation } from "./AppHeader/Navigation";
+import { UserMenu } from "./AppHeader/UserMenu";
+import { AdminActions } from "./AppHeader/AdminActions";
 
 interface AppHeaderProps {
   // Navigation
@@ -64,6 +60,7 @@ export const AppHeader = ({
   const { canEditArtists } = useGroups();
   const [canEdit, setCanEdit] = useState(false);
   const isMobile = useIsMobile();
+  const { data: profile } = useProfileQuery(user?.id);
 
   useEffect(() => {
     const checkPermissions = async () => {
@@ -77,164 +74,89 @@ export const AppHeader = ({
     checkPermissions();
   }, [user, canEditArtists]);
 
-  // Helper function to create tooltipped buttons for mobile
-  const TooltipButton = ({ children, tooltip, ...props }: { children: React.ReactNode; tooltip: string; [key: string]: any }) => {
-    if (!isMobile) return <Button {...props}>{children}</Button>;
-    
-    return (
-      <Tooltip>
-        <TooltipTrigger asChild>
-          <Button {...props}>{children}</Button>
-        </TooltipTrigger>
-        <TooltipContent>
-          <p>{tooltip}</p>
-        </TooltipContent>
-      </Tooltip>
-    );
+  const handleBackClick = () => {
+    navigate(backTo);
   };
+
+  const getGreeting = () => {
+    const hour = new Date().getHours();
+    if (hour < 12) return "Good morning";
+    if (hour < 18) return "Good afternoon";
+    return "Good evening";
+  };
+
+  const displayName = profile?.username || user?.email?.split('@')[0] || 'there';
 
   return (
     <TooltipProvider>
       <div className="mb-8">
-        {/* Top Bar - App Branding & Navigation */}
-        <div className="flex items-center justify-between mb-6 pb-4 border-b border-purple-400/20">
-          <div className="flex items-center gap-3">
-            <Music className="h-6 w-6 text-purple-400" />
-            <h1 className="text-2xl font-bold text-white">UpLine</h1>
+        {/* Top Bar - App Branding, User Identity & Navigation */}
+        <div className="flex items-center justify-between mb-6 pb-6 border-b border-purple-400/20">
+          {/* Left Side - Branding */}
+          <div className="flex items-center gap-4">
+            <div className="flex items-center gap-3">
+              <Music className="h-6 w-6 text-purple-400" />
+              <h1 className="text-2xl font-bold text-white">UpLine</h1>
+            </div>
+            
+            {/* User Greeting - Desktop Only */}
+            {user && !isMobile && (
+              <div className="flex items-center gap-3 pl-4 border-l border-purple-400/20">
+                <span className="text-purple-200 text-sm">
+                  {getGreeting()}, {displayName}! 🎶
+                </span>
+              </div>
+            )}
           </div>
           
-          {/* Navigation & Actions */}
-          <div className="flex items-center gap-2">
-            {/* Navigation Back Button */}
-            {showBackButton && (
-              <TooltipButton
-                variant="outline" 
-                size={isMobile ? "sm" : "default"}
-                onClick={() => navigate(backTo)}
-                className="border-purple-400 text-purple-400 hover:bg-purple-400 hover:text-white"
-                tooltip={backLabel}
-              >
-                <ArrowLeft className="h-4 w-4" />
-                {!isMobile && <span className="ml-2">{backLabel}</span>}
-              </TooltipButton>
-            )}
+          {/* Right Side - Navigation & User Actions */}
+          <div className="flex items-center gap-4">
+            {/* Navigation Buttons */}
+            <Navigation
+              showBackButton={showBackButton}
+              backTo={backTo}
+              backLabel={backLabel}
+              showScheduleButton={showScheduleButton}
+              showGroupsButton={showGroupsButton}
+              user={user}
+              isMobile={isMobile}
+              onBackClick={handleBackClick}
+            />
             
-            {/* Schedule Button */}
-            {showScheduleButton && (
-              <Link to="/schedule">
-                <TooltipButton
-                  variant="outline" 
-                  size={isMobile ? "sm" : "default"}
-                  className="border-purple-400 text-purple-400 hover:bg-purple-400 hover:text-white"
-                  tooltip="View Schedule"
-                >
-                  <Calendar className="h-4 w-4" />
-                  {!isMobile && <span className="ml-2">View Schedule</span>}
-                </TooltipButton>
-              </Link>
-            )}
-            
-            {/* Groups Button */}
-            {showGroupsButton && user && (
-              <Link to="/groups">
-                <TooltipButton
-                  variant="outline" 
-                  size={isMobile ? "sm" : "default"}
-                  className="border-purple-400 text-purple-400 hover:bg-purple-400 hover:text-white"
-                  tooltip="View Groups"
-                >
-                  <Users className="h-4 w-4" />
-                  {!isMobile && <span className="ml-2">Groups</span>}
-                </TooltipButton>
-              </Link>
-            )}
-            
-            {/* Admin Actions - Mobile Dropdown or Desktop Buttons */}
-            {user && canEdit && (onAddArtist || onAddGenre) && (
-              <>
-                {isMobile ? (
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button 
-                        variant="outline" 
-                        size="sm"
-                        className="border-purple-400 text-purple-400 hover:bg-purple-400 hover:text-white"
-                      >
-                        <Menu className="h-4 w-4" />
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end" className="bg-gray-800 border-purple-400/20">
-                      {onAddArtist && (
-                        <Button 
-                          onClick={onAddArtist} 
-                          variant="ghost" 
-                          className="w-full justify-start text-white hover:bg-purple-600"
-                        >
-                          <Plus className="h-4 w-4 mr-2" />
-                          Add Artist
-                        </Button>
-                      )}
-                      {onAddGenre && (
-                        <Button 
-                          onClick={onAddGenre} 
-                          variant="ghost" 
-                          className="w-full justify-start text-white hover:bg-purple-600"
-                        >
-                          <Plus className="h-4 w-4 mr-2" />
-                          Add Genre
-                        </Button>
-                      )}
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                ) : (
-                  <div className="flex items-center gap-2 border-l border-purple-400/20 pl-2 ml-2">
-                    {onAddArtist && (
-                      <Button 
-                        onClick={onAddArtist} 
-                        size="sm"
-                        className="bg-purple-600 hover:bg-purple-700"
-                      >
-                        <Plus className="h-4 w-4 mr-2" />
-                        Add Artist
-                      </Button>
-                    )}
-                    {onAddGenre && (
-                      <Button 
-                        onClick={onAddGenre} 
-                        variant="outline" 
-                        size="sm"
-                        className="border-purple-400 text-purple-400 hover:bg-purple-400 hover:text-white"
-                      >
-                        <Plus className="h-4 w-4 mr-2" />
-                        Add Genre
-                      </Button>
-                    )}
-                  </div>
+            {/* Admin Actions */}
+            {user && (
+              <div className="flex items-center gap-3">
+                <AdminActions
+                  canEdit={canEdit}
+                  onAddArtist={onAddArtist}
+                  onAddGenre={onAddGenre}
+                  isMobile={isMobile}
+                />
+                
+                {/* Divider before user menu */}
+                {canEdit && (onAddArtist || onAddGenre) && (
+                  <div className="h-4 w-px bg-purple-400/20" />
                 )}
-              </>
+              </div>
             )}
             
-            {/* Authentication Actions */}
-            <div className="flex items-center gap-2 border-l border-purple-400/20 pl-2 ml-2">
+            {/* Authentication - User Menu or Sign In */}
+            <div className="flex items-center">
               {user ? (
                 onSignOut && (
-                  <TooltipButton
-                    onClick={onSignOut} 
-                    variant="outline" 
-                    size={isMobile ? "sm" : "default"}
-                    className="border-red-400 text-red-400 hover:bg-red-400 hover:text-white"
-                    tooltip="Sign Out"
-                  >
-                    <LogOut className="h-4 w-4" />
-                    {!isMobile && <span className="ml-2">Sign Out</span>}
-                  </TooltipButton>
+                  <UserMenu
+                    user={user}
+                    profile={profile}
+                    onSignOut={onSignOut}
+                    isMobile={isMobile}
+                  />
                 )
               ) : (
                 onSignIn && (
                   <Button 
                     onClick={onSignIn} 
                     size={isMobile ? "sm" : "default"}
-                    className="bg-purple-600 hover:bg-purple-700"
+                    className="bg-purple-600 hover:bg-purple-700 text-white font-medium rounded-full px-6"
                   >
                     <LogIn className="h-4 w-4" />
                     <span className={isMobile ? "ml-1" : "ml-2"}>
@@ -249,25 +171,25 @@ export const AppHeader = ({
 
         {/* Page Content Section */}
         {(title || subtitle || description || children) && (
-          <div className="text-center">
+          <div className="text-center space-y-4">
             {title && (
-              <div className="flex items-center justify-center gap-2 mb-4">
-                <Music className="h-8 w-8 text-purple-400" />
-                <h2 className="text-4xl font-bold text-white">{title}</h2>
-                <Heart className="h-8 w-8 text-pink-400" />
+              <div className="flex items-center justify-center gap-3 mb-6">
+                <Music className="h-8 w-8 text-purple-400 animate-pulse" />
+                <h2 className="text-4xl font-bold text-white tracking-tight">{title}</h2>
+                <Heart className="h-8 w-8 text-pink-400 animate-pulse" />
               </div>
             )}
             
             {subtitle && (
-              <p className="text-xl text-purple-200 mb-4">{subtitle}</p>
+              <p className="text-xl text-purple-200 font-medium mb-4">{subtitle}</p>
             )}
             
             {description && (
-              <p className="text-sm text-purple-300 mb-6">{description}</p>
+              <p className="text-purple-300 mb-6 max-w-2xl mx-auto leading-relaxed">{description}</p>
             )}
             
             {actions && (
-              <div className="flex justify-center mb-6">
+              <div className="flex justify-center mb-8">
                 {actions}
               </div>
             )}
