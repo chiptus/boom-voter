@@ -25,6 +25,7 @@ import { Artist } from "@/services/queries";
 import { useGenres } from "@/hooks/queries/useGenresQuery";
 import { toZonedTime, fromZonedTime } from "date-fns-tz";
 import { StageSelector } from "./StageSelector";
+import { formatISO } from "date-fns";
 
 // Get user's timezone
 const getUserTimeZone = () => Intl.DateTimeFormat().resolvedOptions().timeZone;
@@ -35,7 +36,15 @@ const toDatetimeLocal = (isoString: string | null): string => {
   const utcDate = new Date(isoString);
   const userTimeZone = getUserTimeZone();
   const localDate = toZonedTime(utcDate, userTimeZone);
-  return localDate.toISOString().slice(0, 16); // YYYY-MM-DDTHH:mm
+
+  // Format the date in local timezone for datetime-local input
+  const year = localDate.getFullYear();
+  const month = String(localDate.getMonth() + 1).padStart(2, "0");
+  const day = String(localDate.getDate()).padStart(2, "0");
+  const hours = String(localDate.getHours()).padStart(2, "0");
+  const minutes = String(localDate.getMinutes()).padStart(2, "0");
+
+  return `${year}-${month}-${day}T${hours}:${minutes}`;
 };
 
 // Helper function to convert local datetime-local to UTC ISO string
