@@ -11,6 +11,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } f
 import { Music } from "lucide-react";
 import { useGroups } from "@/hooks/useGroups";
 import type { Database } from "@/integrations/supabase/types";
+import { StageSelector } from "../StageSelector";
 
 type MusicGenre = Database["public"]["Tables"]["music_genres"]["Row"];
 
@@ -178,6 +179,8 @@ export const AddArtistDialog = ({ open, onOpenChange, onSuccess }: AddArtistDial
               rows={3}
             />
           </div>
+
+          <StageSelector value={stage} onValueChange={setStage} />
 
           <div>
             <Label htmlFor="artist-stage">Stage (Optional)</Label>

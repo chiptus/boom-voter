@@ -7,4 +7,4 @@ export const SORT_OPTIONS = [
   { value: 'date-asc', label: 'By Date' },
 ] as const;
 
-export const STAGES = ['Alchemy Circle', 'Dance Temple', 'Sacred Fire', 'TBD', 'The Gardens'];
+export const STAGES = ['Alchemy Circle', 'Dance Temple', 'Sacred Fire', 'The Gardens'];
