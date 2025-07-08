@@ -1,13 +1,16 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useProfileQuery } from "@/hooks/queries/useProfileQuery";
+import { useOfflineProfile } from "@/hooks/useOfflineProfile";
 import { useToast } from "@/hooks/use-toast";
-import { User } from "@supabase/supabase-js";
+import { User, Session } from "@supabase/supabase-js";
 
 export const useAuth = () => {
-  const [user, setUser] = useState<User>(null);
+  const [user, setUser] = useState<User | null>(null);
+  const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
+  const { clearCachedProfile } = useOfflineProfile();
   const profileQuery = useProfileQuery(user?.id);
 
   const profile = profileQuery.data;
@@ -17,8 +20,16 @@ export const useAuth = () => {
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange(async (event, session) => {
+      setSession(session);
       setUser(session?.user || null);
       setLoading(false);
+
+      // Clear cached profile on sign out for security
+      if (event === "SIGNED_OUT") {
+        if (user?.id) {
+          await clearCachedProfile(user.id);
+        }
+      }
 
       // Handle invite processing when user signs in
       if (event === "SIGNED_IN" && session?.user) {
@@ -67,6 +78,7 @@ export const useAuth = () => {
 
     // Then check for existing session
     supabase.auth.getSession().then(({ data: { session } }) => {
+      setSession(session);
       setUser(session?.user || null);
       setLoading(false);
     });
@@ -77,6 +89,10 @@ export const useAuth = () => {
   }, [toast]);
 
   const signOut = async () => {
+    // Clear cached profile before signing out
+    if (user?.id) {
+      await clearCachedProfile(user.id);
+    }
     await supabase.auth.signOut();
   };
 
@@ -90,6 +106,7 @@ export const useAuth = () => {
 
   return {
     user,
+    session,
     profile,
     loading,
     hasUsername,

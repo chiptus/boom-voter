@@ -190,6 +190,31 @@ class OfflineStorageManager {
     return result?.data;
   }
 
+  // Profile methods (secure offline caching)
+  async saveProfile(userId: string, profile: any): Promise<void> {
+    const db = await this.ensureDB();
+    // Only cache non-sensitive profile data
+    const safeProfile = {
+      id: profile.id,
+      username: profile.username,
+      email: profile.email, // Email is generally safe to cache
+      created_at: profile.created_at,
+      timestamp: Date.now(),
+    };
+    await db.put('settings', { key: `profile_${userId}`, value: safeProfile });
+  }
+
+  async getProfile(userId: string): Promise<any> {
+    const db = await this.ensureDB();
+    const result = await db.get('settings', `profile_${userId}`);
+    return result?.value;
+  }
+
+  async clearProfile(userId: string): Promise<void> {
+    const db = await this.ensureDB();
+    await db.delete('settings', `profile_${userId}`);
+  }
+
   // Settings methods
   async saveSetting(key: string, value: any): Promise<void> {
     const db = await this.ensureDB();
