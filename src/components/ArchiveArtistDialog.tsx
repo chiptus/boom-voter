@@ -12,7 +12,8 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import { Trash } from "lucide-react";
-import type { Artist } from "@/hooks/useArtists";
+import { Artist } from "@/services/queries";
+
 
 interface ArchiveArtistDialogProps {
   artist: Artist;

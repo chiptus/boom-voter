@@ -2,7 +2,7 @@
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { X } from "lucide-react";
-import type { FilterSortState } from "@/components/Index/useUrlState";
+import type { FilterSortState } from "@/hooks/useUrlState";
 import { STAGES } from "./constants";
 
 interface MobileFiltersProps {

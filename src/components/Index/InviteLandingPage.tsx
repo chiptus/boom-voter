@@ -2,7 +2,7 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Users, UserPlus, AlertCircle } from "lucide-react";
-import { AuthDialog } from "./AuthDialog";
+import { AuthDialog } from "../AuthDialog";
 import { useState } from "react";
 import type { InviteValidation } from "@/types/invites";
 

@@ -1,8 +1,8 @@
 
 import { useEffect, useState, useMemo } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import type { Artist } from "./useOfflineArtistData";
-import type { FilterSortState } from "./useUrlState";
+import { Artist } from "@/services/queries";
+import type { FilterSortState } from "../../hooks/useUrlState";
 
 export const useArtistFiltering = (artists: Artist[], filterSortState?: FilterSortState) => {
   const [groupMemberIds, setGroupMemberIds] = useState<string[]>([]);

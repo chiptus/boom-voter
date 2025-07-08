@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { useProfileQuery } from "@/hooks/queries/useProfileQuery";
 import { useInviteValidation } from "@/components/Index/useInviteValidation";
-import { AuthDialog } from "@/components/Index/AuthDialog";
+import { AuthDialog } from "@/components/AuthDialog";
 import { UsernameSetupDialog } from "@/components/Index/UsernameSetupDialog";
 
 import { AddArtistDialog } from "@/components/Index/AddArtistDialog";
@@ -13,7 +13,7 @@ import { AppHeader } from "@/components/AppHeader";
 import { InviteLandingPage } from "@/components/Index/InviteLandingPage";
 import { useArtistFiltering } from "@/components/Index/useArtistFiltering";
 import { useOfflineArtistData } from "@/hooks/useOfflineArtistData";
-import { useUrlState } from "@/components/Index/useUrlState";
+import { useUrlState } from "@/hooks/useUrlState";
 import { ArtistsPanel } from "@/components/Index/ArtistsPanel";
 
 export default function Index() {

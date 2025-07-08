@@ -1,7 +1,7 @@
 
 import { Button } from "@/components/ui/button";
 import { X } from "lucide-react";
-import type { FilterSortState } from "@/components/Index/useUrlState";
+import type { FilterSortState } from "@/hooks/useUrlState";
 import { STAGES } from "./constants";
 
 interface DesktopFiltersProps {

@@ -1,6 +1,6 @@
 
 import { useState, useEffect } from "react";
-import type { SortOption, FilterSortState } from "@/components/Index/useUrlState";
+import type { SortOption, FilterSortState } from "@/hooks/useUrlState";
 import { useGenres } from "@/hooks/queries/useGenresQuery";
 import { useGroups } from "@/hooks/useGroups";
 import { Button } from "@/components/ui/button";

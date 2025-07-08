@@ -3,7 +3,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { SortAsc, HelpCircle } from "lucide-react";
-import type { SortOption } from "@/components/Index/useUrlState";
+import type { SortOption } from "@/hooks/useUrlState";
 import { SORT_OPTIONS } from "./constants";
 
 interface SortControlsProps {

@@ -1,14 +1,10 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
-import { ArrowLeft } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
 import { useOfflineVoting } from "@/hooks/useOfflineVoting";
 import { useUrlState } from "@/hooks/useUrlState";
 import { useScheduleData } from "@/hooks/useScheduleData";
 import { AppHeader } from "@/components/AppHeader";
 import { ScheduleViewToggle } from "@/components/schedule/ScheduleViewToggle";
-import { DaySelector } from "@/components/schedule/DaySelector";
 import { ScheduleGridView } from "@/components/schedule/ScheduleGridView";
 import { ScheduleTimelineView } from "@/components/schedule/ScheduleTimelineView";
 import { ScheduleListView } from "@/components/schedule/ScheduleListView";
