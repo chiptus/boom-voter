@@ -1,7 +1,7 @@
 
 import { useState, useEffect } from "react";
-import type { SortOption, FilterSortState } from "@/hooks/useUrlState";
-import { useGenres } from "@/hooks/useGenres";
+import type { SortOption, FilterSortState } from "@/components/Index/useUrlState";
+import { useGenres } from "@/hooks/queries/useGenresQuery";
 import { useGroups } from "@/hooks/useGroups";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -9,8 +9,7 @@ import { Filter } from "lucide-react";
 import { SortControls } from "./SortControls";
 import { MobileFilters } from "./MobileFilters";
 import { DesktopFilters } from "./DesktopFilters";
-import { GroupSelector } from "../GroupSelector";
-import { ViewToggle } from "../ViewToggle";
+import { ViewToggle } from "./ViewToggle";
 
 interface FilterSortControlsProps {
   state: FilterSortState;

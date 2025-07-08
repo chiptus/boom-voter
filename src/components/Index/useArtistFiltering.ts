@@ -51,7 +51,7 @@ export const useArtistFiltering = (artists: Artist[], filterSortState?: FilterSo
   const filteredAndSortedArtists = useMemo(() => {
     if (!filterSortState) return artists;
 
-    let filtered = artists.map(artist => {
+    const filtered = artists.map(artist => {
       // Filter votes by group if groupId is selected
       let filteredVotes = artist.votes;
       if (filterSortState.groupId && groupMemberIds.length > 0) {

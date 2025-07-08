@@ -1,12 +1,12 @@
 import { useState, useEffect } from "react";
-import { useParams, useNavigate, Link } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { AppHeader } from "@/components/AppHeader";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Users, Link as LinkIcon, UserMinus, Crown } from "lucide-react";
+import { Users, UserMinus, Crown } from "lucide-react";
 import { useGroups } from "@/hooks/useGroups";
 import { useToast } from "@/components/ui/use-toast";
-import { InviteManagement } from "@/components/InviteManagement";
+import { InviteManagement } from "@/components/Groups/InviteManagement";
 import { Button } from "@/components/ui/button";
 import type { Group, GroupMember } from "@/types/groups";
 
@@ -180,7 +180,7 @@ const GroupDetail = () => {
                   {members.map((member) => {
                     const isCurrentUser = member.user_id === user.id;
                     const isMemberCreator = member.role === "creator";
-                    const profile = member.profiles as any;
+                    const profile = member.profiles
                     
                     return (
                       <div key={member.id} className="flex items-center justify-between p-3 bg-white/5 rounded-lg">

@@ -17,7 +17,7 @@ interface InviteManagementProps {
 
 export const InviteManagement = ({ groupId, groupName }: InviteManagementProps) => {
   const [invites, setInvites] = useState<GroupInvite[]>([]);
-  const [loading, setLoading] = useState(false);
+ 
   const [generating, setGenerating] = useState(false);
   const [expirationDays, setExpirationDays] = useState<string>("");
   const [maxUses, setMaxUses] = useState<string>("");
@@ -44,7 +44,10 @@ export const InviteManagement = ({ groupId, groupName }: InviteManagementProps) 
   const generateInvite = async () => {
     setGenerating(true);
     try {
-      const options: any = {};
+      const options: {
+        expiresAt?: Date;
+        maxUses?: number;
+    } = {};
       
       if (expirationDays) {
         const expireDate = new Date();

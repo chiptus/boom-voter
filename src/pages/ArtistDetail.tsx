@@ -1,13 +1,13 @@
 
 import { useParams, useNavigate } from "react-router-dom";
 import { AppHeader } from "@/components/AppHeader";
-import { ArtistImageCard } from "@/components/artist-detail/ArtistImageCard";
-import { ArtistInfoCard } from "@/components/artist-detail/ArtistInfoCard";
-import { ArtistNotFoundState } from "@/components/artist-detail/ArtistNotFoundState";
-import { ArtistLoadingState } from "@/components/artist-detail/ArtistLoadingState";
-import { ArtistGroupVoting } from "@/components/artist-detail/ArtistGroupVoting";
-import { ArtistNotes } from "@/components/ArtistNotes";
-import { useArtistDetail } from "@/hooks/useArtistDetail";
+import { ArtistImageCard } from "@/components/ArtistDetail/ArtistImageCard";
+import { ArtistInfoCard } from "@/components/ArtistDetail/ArtistInfoCard";
+import { ArtistNotFoundState } from "@/components/ArtistDetail/ArtistNotFoundState";
+import { ArtistLoadingState } from "@/components/ArtistDetail/ArtistLoadingState";
+import { ArtistGroupVoting } from "@/components/ArtistDetail/ArtistGroupVoting";
+import { ArtistNotes } from "@/components/ArtistDetail/ArtistNotes";
+import { useArtistDetail } from "@/components/ArtistDetail/useArtistDetail";
 
 const ArtistDetail = () => {
   const { id } = useParams<{ id: string }>();
@@ -25,10 +25,7 @@ const ArtistDetail = () => {
     archiveArtist,
   } = useArtistDetail(id);
 
-  const handleArchiveArtist = async () => {
-    await archiveArtist();
-    navigate('/');
-  };
+
 
   if (loading) {
     return <ArtistLoadingState />;
@@ -78,6 +75,11 @@ const ArtistDetail = () => {
       </div>
     </div>
   );
+
+  async function handleArchiveArtist() {
+    await archiveArtist();
+    navigate('/');
+  }
 };
 
 export default ArtistDetail;

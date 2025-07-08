@@ -5,21 +5,19 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Label } from "@/components/ui/label";
-import { Plus, Users, Trash2, UserPlus, Crown, Link } from "lucide-react";
+import { Users, Trash2, UserPlus, Crown, Link } from "lucide-react";
 import { useGroups } from "@/hooks/useGroups";
 import { useToast } from "@/components/ui/use-toast";
 import { Badge } from "@/components/ui/badge";
-import { InviteManagement } from "@/components/InviteManagement";
+import { InviteManagement } from "@/components/Groups/InviteManagement";
 import { DeleteGroupDialog } from "@/components/DeleteGroupDialog";
 
 const Groups = () => {
   const navigate = useNavigate();
   const { user, groups, loading, createGroup, leaveGroup, deleteGroup, inviteToGroup } = useGroups();
   const { toast } = useToast();
-  const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const [newGroupName, setNewGroupName] = useState("");
   const [newGroupDescription, setNewGroupDescription] = useState("");
   const [inviteUsername, setInviteUsername] = useState("");

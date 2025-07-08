@@ -1,25 +1,31 @@
-
 import { useAuth } from "./useAuth";
-import { 
-  useUserGroupsQuery, 
-  useGroupMembersQuery, 
+import {
+  useUserGroupsQuery,
   useUserPermissionsQuery,
   useCreateGroupMutation,
   useDeleteGroupMutation,
   useJoinGroupMutation,
-  useLeaveGroupMutation 
+  useLeaveGroupMutation,
 } from "./queries/useGroupsQuery";
 import { groupService } from "@/services/groupService";
 import { useToast } from "@/components/ui/use-toast";
-import type { Group, GroupMember } from "@/types/groups";
+import type { GroupMember } from "@/types/groups";
+import { useCallback } from "react";
 
 export const useGroups = () => {
   const { user, loading } = useAuth();
   const { toast } = useToast();
-  
-  const { data: groups = [], isLoading: groupsLoading, refetch: fetchUserGroups } = useUserGroupsQuery(user?.id);
-  const { data: canEdit = false } = useUserPermissionsQuery(user?.id, 'edit_artists');
-  
+
+  const {
+    data: groups = [],
+    isLoading: groupsLoading,
+    refetch: fetchUserGroups,
+  } = useUserGroupsQuery(user?.id);
+  const { data: canEdit = false } = useUserPermissionsQuery(
+    user?.id,
+    "edit_artists"
+  );
+
   const createGroupMutation = useCreateGroupMutation();
   const deleteGroupMutation = useDeleteGroupMutation();
   const joinGroupMutation = useJoinGroupMutation();
@@ -95,12 +101,15 @@ export const useGroups = () => {
 
     try {
       // Find user by username or email
-      const userResult = await groupService.findUserByUsernameOrEmail(usernameOrEmail);
-      
+      const userResult = await groupService.findUserByUsernameOrEmail(
+        usernameOrEmail
+      );
+
       if (!userResult.found) {
-        const errorMessage = userResult.foundBy === 'email' 
-          ? `No user found with email: ${usernameOrEmail}`
-          : "User not found";
+        const errorMessage =
+          userResult.foundBy === "email"
+            ? `No user found with email: ${usernameOrEmail}`
+            : "User not found";
         toast({
           title: "User not found",
           description: errorMessage,
@@ -110,16 +119,20 @@ export const useGroups = () => {
       }
 
       // Show success toast for finding user
-      const foundMessage = userResult.foundBy === 'email' 
-        ? `Found user with email: ${usernameOrEmail}`
-        : `Found user: ${usernameOrEmail}`;
+      const foundMessage =
+        userResult.foundBy === "email"
+          ? `Found user with email: ${usernameOrEmail}`
+          : `Found user: ${usernameOrEmail}`;
       toast({
         title: "User found",
         description: foundMessage,
       });
 
       // Check if user is already in the group
-      const isAlreadyMember = await groupService.checkIfUserInGroup(groupId, userResult.userId!);
+      const isAlreadyMember = await groupService.checkIfUserInGroup(
+        groupId,
+        userResult.userId!
+      );
       if (isAlreadyMember) {
         toast({
           title: "Error",
@@ -131,7 +144,7 @@ export const useGroups = () => {
 
       // Add user to group
       await groupService.addUserToGroup(groupId, userResult.userId!);
-      
+
       toast({
         title: "Success",
         description: `${usernameOrEmail} has been added to the group`,
@@ -141,7 +154,10 @@ export const useGroups = () => {
     } catch (error) {
       toast({
         title: "Error",
-        description: error instanceof Error ? error.message : "Failed to invite user to group",
+        description:
+          error instanceof Error
+            ? error.message
+            : "Failed to invite user to group",
         variant: "destructive",
       });
       return false;
@@ -165,7 +181,8 @@ export const useGroups = () => {
     } catch (error) {
       toast({
         title: "Error",
-        description: error instanceof Error ? error.message : "Failed to remove member",
+        description:
+          error instanceof Error ? error.message : "Failed to remove member",
         variant: "destructive",
       });
       return false;
@@ -176,13 +193,13 @@ export const useGroups = () => {
     return groupService.getGroupById(groupId);
   };
 
-  const checkUserPermission = async (permission: 'edit_artists') => {
+  const checkUserPermission = async (permission: "edit_artists") => {
     return canEdit;
   };
 
-  const canEditArtists = async () => {
+  const canEditArtists = useCallback(async () => {
     return canEdit;
-  };
+  }, [canEdit]);
 
   return {
     user,

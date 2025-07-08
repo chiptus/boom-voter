@@ -2,13 +2,13 @@ import { useState, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { useGroups } from "@/hooks/useGroups";
 import { useAuth } from "@/hooks/useAuth";
-import { useOfflineArtistData } from "./useOfflineArtistData";
-import { useOfflineVoting } from "./useOfflineVoting";
+import { Artist, useOfflineArtistData } from "@/hooks/useOfflineArtistData";
+import { useOfflineVoting } from "@/hooks/useOfflineVoting";
 import { offlineStorage } from "@/lib/offlineStorage";
 
 export const useArtistDetail = (id: string | undefined) => {
   const [canEdit, setCanEdit] = useState(false);
-  const [artist, setArtist] = useState<any>(null);
+  const [artist, setArtist] = useState<Artist | null>(null);
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
   const { canEditArtists } = useGroups();
@@ -59,7 +59,7 @@ export const useArtistDetail = (id: string | undefined) => {
 
   const getVoteCount = (voteType: number) => {
     if (!artist) return 0;
-    return artist.votes.filter(vote => vote.vote_type === voteType).length;
+    return artist.votes.filter((vote) => vote.vote_type === voteType).length;
   };
 
   const netVoteScore = artist ? getVoteCount(1) - getVoteCount(-1) : 0;

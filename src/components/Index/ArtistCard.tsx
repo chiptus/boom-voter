@@ -9,15 +9,16 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Star, Heart, X, Play, Music, MapPin, Clock, Eye, EyeOff, Edit, Trash, MoreHorizontal } from "lucide-react";
-import { ArtistImageLoader } from "./ArtistImageLoader";
-import { EditArtistDialog } from "./EditArtistDialog";
-import { ArchiveArtistDialog } from "./ArchiveArtistDialog";
+import { Star, Heart, X, MapPin, Clock, Eye, EyeOff, Edit, Trash, MoreHorizontal } from "lucide-react";
+import { ArtistImageLoader } from "@/components/ArtistImageLoader";
+import { EditArtistDialog } from "@/components/EditArtistDialog";
+import { ArchiveArtistDialog } from "@/components/ArchiveArtistDialog";
 import { useToast } from "@/hooks/use-toast";
 import { useGroups } from "@/hooks/useGroups";
 import { useState, useEffect } from "react";
 import { formatTimeRange } from "@/lib/timeUtils";
-import type { Artist } from "@/hooks/useArtists";
+import { User } from "@supabase/supabase-js";
+import { Artist } from "@/services/queries";
 
 interface ArtistCardProps {
   artist: Artist;
@@ -29,7 +30,7 @@ interface ArtistCardProps {
   onAuthRequired: () => void;
   onEditSuccess?: () => void;
   onArchiveArtist?: (artistId: string) => Promise<void>;
-  user?: any;
+  user?: User;
 }
 
 export const ArtistCard = ({ artist, userVote, userKnowledge, votingLoading, onVote, onKnowledgeToggle, onAuthRequired, onEditSuccess, onArchiveArtist, user }: ArtistCardProps) => {

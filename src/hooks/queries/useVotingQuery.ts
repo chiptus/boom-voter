@@ -64,35 +64,3 @@ export const useVoteMutation = () => {
     },
   });
 };
-
-export const useVoting = () => {
-  const { user } = useAuth();
-  const { data: userVotes = {}, isLoading: votingLoading } = useUserVotesQuery(user?.id);
-  const voteMutation = useVoteMutation();
-
-  const handleVote = async (artistId: string, voteType: number) => {
-    if (!user) {
-      return { requiresAuth: true };
-    }
-
-    const existingVote = userVotes[artistId];
-    
-    try {
-      await voteMutation.mutateAsync({
-        artistId,
-        voteType,
-        userId: user.id,
-        existingVote,
-      });
-      return { requiresAuth: false };
-    } catch (error) {
-      return { requiresAuth: false };
-    }
-  };
-
-  return {
-    userVotes,
-    votingLoading: votingLoading || voteMutation.isPending,
-    handleVote,
-  };
-};
