@@ -106,6 +106,7 @@ export default function Index() {
           onAddArtist={() => setShowAddArtistDialog(true)}
           onAddGenre={() => setShowAddGenreDialog(true)}
           showScheduleButton={true}
+          showGroupsButton={true}
         />
 
         <FilterSortControls

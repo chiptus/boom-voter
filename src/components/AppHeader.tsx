@@ -12,7 +12,7 @@ import {
   TooltipProvider,
   TooltipTrigger 
 } from "@/components/ui/tooltip";
-import { ArrowLeft, Music, Heart, Calendar, Plus, LogIn, LogOut, Menu } from "lucide-react";
+import { ArrowLeft, Music, Heart, Calendar, Plus, LogIn, LogOut, Menu, Users } from "lucide-react";
 import { useGroups } from "@/hooks/useGroups";
 import { useIsMobile } from "@/hooks/use-mobile";
 
@@ -37,6 +37,7 @@ interface AppHeaderProps {
   onAddArtist?: () => void;
   onAddGenre?: () => void;
   showScheduleButton?: boolean;
+  showGroupsButton?: boolean;
   
   // Custom content section
   children?: ReactNode;
@@ -56,6 +57,7 @@ export const AppHeader = ({
   onAddArtist,
   onAddGenre,
   showScheduleButton = false,
+  showGroupsButton = false,
   children
 }: AppHeaderProps) => {
   const navigate = useNavigate();
@@ -128,6 +130,21 @@ export const AppHeader = ({
                 >
                   <Calendar className="h-4 w-4" />
                   {!isMobile && <span className="ml-2">View Schedule</span>}
+                </TooltipButton>
+              </Link>
+            )}
+            
+            {/* Groups Button */}
+            {showGroupsButton && user && (
+              <Link to="/groups">
+                <TooltipButton
+                  variant="outline" 
+                  size={isMobile ? "sm" : "default"}
+                  className="border-purple-400 text-purple-400 hover:bg-purple-400 hover:text-white"
+                  tooltip="View Groups"
+                >
+                  <Users className="h-4 w-4" />
+                  {!isMobile && <span className="ml-2">Groups</span>}
                 </TooltipButton>
               </Link>
             )}
