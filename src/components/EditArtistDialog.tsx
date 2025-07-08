@@ -14,6 +14,19 @@ import { Edit } from "lucide-react";
 import { STAGES } from "@/components/filters/constants";
 import type { Artist } from "@/hooks/useArtists";
 
+// Helper function to convert ISO string to local datetime-local format
+const toDatetimeLocal = (isoString: string | null): string => {
+  if (!isoString) return "";
+  const date = new Date(isoString);
+  return date.toISOString().slice(0, 16); // YYYY-MM-DDTHH:mm
+};
+
+// Helper function to convert datetime-local to ISO string
+const toISOString = (datetimeLocal: string): string => {
+  if (!datetimeLocal) return "";
+  return new Date(datetimeLocal).toISOString();
+};
+
 interface EditArtistDialogProps {
   artist: Artist;
   onSuccess?: () => void;
@@ -28,8 +41,8 @@ export const EditArtistDialog = ({ artist, onSuccess, trigger }: EditArtistDialo
     description: artist.description || "",
     genre_id: artist.genre_id,
     stage: artist.stage || "",
-    time_start: artist.time_start || "",
-    time_end: artist.time_end || "",
+    time_start: toDatetimeLocal(artist.time_start),
+    time_end: toDatetimeLocal(artist.time_end),
     spotify_url: artist.spotify_url || "",
     soundcloud_url: artist.soundcloud_url || "",
     image_url: artist.image_url || "",
@@ -63,8 +76,8 @@ export const EditArtistDialog = ({ artist, onSuccess, trigger }: EditArtistDialo
           description: formData.description || null,
           genre_id: formData.genre_id,
           stage: formData.stage || null,
-          time_start: formData.time_start || null,
-          time_end: formData.time_end || null,
+          time_start: formData.time_start ? toISOString(formData.time_start) : null,
+          time_end: formData.time_end ? toISOString(formData.time_end) : null,
           spotify_url: formData.spotify_url || null,
           soundcloud_url: formData.soundcloud_url || null,
           image_url: formData.image_url || null,
