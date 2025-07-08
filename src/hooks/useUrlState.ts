@@ -11,6 +11,7 @@ export interface FilterSortState {
   minRating: number;
   view: 'grid' | 'list';
   scheduleView: ScheduleViewOption;
+  use24Hour: boolean;
   groupId?: string;
   invite?: string;
 }
@@ -22,6 +23,7 @@ const defaultState: FilterSortState = {
   minRating: 0,
   view: 'list',
   scheduleView: 'timeline',
+  use24Hour: false,
   groupId: undefined,
   invite: undefined,
 };
@@ -37,6 +39,7 @@ export const useUrlState = () => {
       minRating: parseInt(searchParams.get('minRating') || '0') || defaultState.minRating,
       view: (searchParams.get('view') as 'grid' | 'list') || defaultState.view,
       scheduleView: (searchParams.get('scheduleView') as ScheduleViewOption) || defaultState.scheduleView,
+      use24Hour: searchParams.get('use24Hour') === 'true' || defaultState.use24Hour,
       groupId: searchParams.get('groupId') || defaultState.groupId,
       invite: searchParams.get('invite') || defaultState.invite,
     };
@@ -66,6 +69,9 @@ export const useUrlState = () => {
     }
     if (newState.scheduleView !== defaultState.scheduleView) {
       newParams.set('scheduleView', newState.scheduleView);
+    }
+    if (newState.use24Hour !== defaultState.use24Hour) {
+      newParams.set('use24Hour', newState.use24Hour.toString());
     }
     if (newState.groupId) {
       newParams.set('groupId', newState.groupId);

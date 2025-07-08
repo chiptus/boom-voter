@@ -116,14 +116,15 @@ export default function Index() {
         />
 
         <div className="mt-8">
-          <ArtistsPanel
-            items={filteredAndSortedArtists}
-            isGrid={urlState.view === "grid"}
-            user={user}
-            openAuthDialog={() => setShowAuthDialog(true)}
-            fetchArtists={fetchArtists}
-            archiveArtist={archiveArtist}
-          />
+            <ArtistsPanel
+              items={filteredAndSortedArtists}
+              isGrid={urlState.view === "grid"}
+              user={user}
+              use24Hour={urlState.use24Hour}
+              openAuthDialog={() => setShowAuthDialog(true)}
+              fetchArtists={fetchArtists}
+              archiveArtist={archiveArtist}
+            />
         </div>
 
         <AuthDialog

@@ -23,6 +23,7 @@ interface ArtistInfoCardProps {
   getVoteCount: (voteType: number) => number;
   onArtistUpdate: () => void;
   onArchiveArtist?: () => Promise<void>;
+  use24Hour?: boolean;
 }
 
 export const ArtistInfoCard = ({
@@ -34,6 +35,7 @@ export const ArtistInfoCard = ({
   getVoteCount,
   onArtistUpdate,
   onArchiveArtist,
+  use24Hour = false,
 }: ArtistInfoCardProps) => {
   return (
     <div className="lg:col-span-2">
@@ -84,10 +86,10 @@ export const ArtistInfoCard = ({
                     <span className="text-sm">{artist.stage}</span>
                   </div>
                 )}
-                {formatTimeRange(artist.time_start, artist.time_end) && (
+                {formatTimeRange(artist.time_start, artist.time_end, use24Hour) && (
                   <div className="flex items-center gap-2">
                     <Clock className="h-4 w-4" />
-                    <span className="text-sm">{formatTimeRange(artist.time_start, artist.time_end)}</span>
+                    <span className="text-sm">{formatTimeRange(artist.time_start, artist.time_end, use24Hour)}</span>
                   </div>
                 )}
               </div>

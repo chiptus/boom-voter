@@ -16,7 +16,7 @@ const Schedule = () => {
   const { user } = useAuth();
   const { userVotes, handleVote } = useOfflineVoting(user);
   const { state: urlState, updateUrlState } = useUrlState();
-  const { scheduleDays, loading, error } = useScheduleData();
+  const { scheduleDays, loading, error } = useScheduleData(urlState.use24Hour);
   const [showAuthDialog, setShowAuthDialog] = useState(false);
   const [selectedDay, setSelectedDay] = useState<string>(
     scheduleDays.length > 0 ? scheduleDays[0].date : ''

@@ -12,6 +12,7 @@ export function ArtistsPanel({
   items,
   isGrid,
   user,
+  use24Hour,
   openAuthDialog,
   fetchArtists,
   archiveArtist,
@@ -19,6 +20,7 @@ export function ArtistsPanel({
   items: Array<Artist>;
   isGrid: boolean;
   user: User;
+  use24Hour: boolean;
   openAuthDialog(): void;
   fetchArtists(): void;
   archiveArtist(artistId: string): Promise<void>;
@@ -36,7 +38,7 @@ export function ArtistsPanel({
     return (
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
         {items.map((artist) => (
-          <ArtistCard
+            <ArtistCard
             key={artist.id}
             artist={artist}
             userVote={userVotes[artist.id]}
@@ -50,6 +52,7 @@ export function ArtistsPanel({
             onEditSuccess={fetchArtists}
             onArchiveArtist={archiveArtist}
             user={user}
+            use24Hour={use24Hour}
           />
         ))}
       </div>
@@ -73,6 +76,7 @@ export function ArtistsPanel({
           onEditSuccess={fetchArtists}
           onArchiveArtist={archiveArtist}
           user={user}
+          use24Hour={use24Hour}
         />
       ))}
     </div>

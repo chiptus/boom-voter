@@ -8,10 +8,12 @@ import { ArtistLoadingState } from "@/components/ArtistDetail/ArtistLoadingState
 import { ArtistGroupVoting } from "@/components/ArtistDetail/ArtistGroupVoting";
 import { ArtistNotes } from "@/components/ArtistDetail/ArtistNotes";
 import { useArtistDetail } from "@/components/ArtistDetail/useArtistDetail";
+import { useUrlState } from "@/hooks/useUrlState";
 
 const ArtistDetail = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const { state: urlState } = useUrlState();
   const {
     artist,
     user,
@@ -60,6 +62,7 @@ const ArtistDetail = () => {
             getVoteCount={getVoteCount}
             onArtistUpdate={fetchArtist}
             onArchiveArtist={canEdit ? handleArchiveArtist : undefined}
+            use24Hour={urlState.use24Hour}
           />
         </div>
 

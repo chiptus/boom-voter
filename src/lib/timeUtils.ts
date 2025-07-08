@@ -1,7 +1,7 @@
 import { format, isValid, parseISO, isSameDay } from "date-fns";
 
 export function formatTimeRange(startTime: string | null,
-  endTime: string | null): string | null {
+  endTime: string | null, use24Hour: boolean = false): string | null {
   if (!startTime && !endTime) return null;
 
   const start = startTime ? parseISO(startTime) : null;
@@ -13,29 +13,32 @@ export function formatTimeRange(startTime: string | null,
 
   if (!validStart && !validEnd) return null;
 
+  const timeFormat = use24Hour ? "HH:mm" : "h:mm a";
+  const dateTimeFormat = use24Hour ? "MMM d, HH:mm" : "MMM d, h:mm a";
+
   // Only start time
   if (validStart && !validEnd) {
-    return `Starts: ${format(validStart, "MMM d, h:mm a")}`;
+    return `Starts: ${format(validStart, dateTimeFormat)}`;
   }
 
   // Only end time
   if (!validStart && validEnd) {
-    return `Ends: ${format(validEnd, "MMM d, h:mm a")}`;
+    return `Ends: ${format(validEnd, dateTimeFormat)}`;
   }
 
   // Both times
   if (validStart && validEnd) {
     if (isSameDay(validStart, validEnd)) {
-      // Same day: "Dec 15, 2:00 PM - 4:00 PM"
-      return `${format(validStart, "MMM d, h:mm a")} - ${format(
+      // Same day: "Dec 15, 2:00 PM - 4:00 PM" or "Dec 15, 14:00 - 16:00"
+      return `${format(validStart, dateTimeFormat)} - ${format(
         validEnd,
-        "h:mm a"
+        timeFormat
       )}`;
     } else {
-      // Different days: "Dec 15, 2:00 PM - Dec 16, 1:00 AM"
-      return `${format(validStart, "MMM d, h:mm a")} - ${format(
+      // Different days: "Dec 15, 2:00 PM - Dec 16, 1:00 AM" or "Dec 15, 14:00 - Dec 16, 01:00"
+      return `${format(validStart, dateTimeFormat)} - ${format(
         validEnd,
-        "MMM d, h:mm a"
+        dateTimeFormat
       )}`;
     }
   }
@@ -43,11 +46,12 @@ export function formatTimeRange(startTime: string | null,
   return null;
 }
 
-export const formatDateTime = (dateTime: string | null): string | null => {
+export const formatDateTime = (dateTime: string | null, use24Hour: boolean = false): string | null => {
   if (!dateTime) return null;
 
   const date = parseISO(dateTime);
   if (!isValid(date)) return null;
 
-  return format(date, "MMM d, h:mm a");
+  const dateTimeFormat = use24Hour ? "MMM d, HH:mm" : "MMM d, h:mm a";
+  return format(date, dateTimeFormat);
 };

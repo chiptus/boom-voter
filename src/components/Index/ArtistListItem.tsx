@@ -30,9 +30,10 @@ interface ArtistListItemProps {
   onEditSuccess?: () => void;
   onArchiveArtist?: (artistId: string) => Promise<void>;
   user?: User;
+  use24Hour?: boolean;
 }
 
-export const ArtistListItem = ({ artist, userVote, userKnowledge, votingLoading, onVote, onKnowledgeToggle, onAuthRequired, onEditSuccess, onArchiveArtist, user }: ArtistListItemProps) => {
+export const ArtistListItem = ({ artist, userVote, userKnowledge, votingLoading, onVote, onKnowledgeToggle, onAuthRequired, onEditSuccess, onArchiveArtist, user, use24Hour = false }: ArtistListItemProps) => {
   const { toast } = useToast();
   const { canEditArtists } = useGroups();
   const [canEdit, setCanEdit] = useState(false);
@@ -169,10 +170,10 @@ export const ArtistListItem = ({ artist, userVote, userKnowledge, votingLoading,
                   <span>{artist.stage}</span>
                 </div>
               )}
-              {formatTimeRange(artist.time_start, artist.time_end) && (
+              {formatTimeRange(artist.time_start, artist.time_end, use24Hour) && (
                 <div className="flex items-center gap-1 text-xs text-purple-200">
                   <Clock className="h-3 w-3" />
-                  <span>{formatTimeRange(artist.time_start, artist.time_end)}</span>
+                  <span>{formatTimeRange(artist.time_start, artist.time_end, use24Hour)}</span>
                 </div>
               )}
             </div>
@@ -344,10 +345,10 @@ export const ArtistListItem = ({ artist, userVote, userKnowledge, votingLoading,
                     <span>{artist.stage}</span>
                   </div>
                 )}
-                {formatTimeRange(artist.time_start, artist.time_end) && (
+                {formatTimeRange(artist.time_start, artist.time_end, use24Hour) && (
                   <div className="flex items-center gap-1 text-xs text-purple-200">
                     <Clock className="h-3 w-3" />
-                    <span>{formatTimeRange(artist.time_start, artist.time_end)}</span>
+                    <span>{formatTimeRange(artist.time_start, artist.time_end, use24Hour)}</span>
                   </div>
                 )}
               </div>

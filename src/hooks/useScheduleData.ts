@@ -25,7 +25,7 @@ export interface ScheduleArtist extends Artist {
   };
 }
 
-export const useScheduleData = () => {
+export const useScheduleData = (use24Hour: boolean = false) => {
   const { artists, loading, error } = useOfflineArtistData();
 
   const scheduleDays = useMemo(() => {
@@ -53,7 +53,7 @@ export const useScheduleData = () => {
         ...artist,
         startTime,
         endTime,
-        formattedTimeRange: formatDateTime(artist.time_start),
+        formattedTimeRange: formatDateTime(artist.time_start, use24Hour),
       };
     });
 
@@ -102,7 +102,7 @@ export const useScheduleData = () => {
       });
 
     return scheduleDays;
-  }, [artists]);
+  }, [artists, use24Hour]);
 
   const allStages = useMemo(() => {
     const stageSet = new Set<string>();

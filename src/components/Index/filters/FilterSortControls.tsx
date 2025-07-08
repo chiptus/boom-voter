@@ -10,6 +10,7 @@ import { SortControls } from "./SortControls";
 import { MobileFilters } from "./MobileFilters";
 import { DesktopFilters } from "./DesktopFilters";
 import { ViewToggle } from "./ViewToggle";
+import { TimeFormatToggle } from "./TimeFormatToggle";
 
 interface FilterSortControlsProps {
   state: FilterSortState;
@@ -48,6 +49,10 @@ export const FilterSortControls = ({ state, onStateChange, onClear }: FilterSort
           onSortChange={handleSortChange}
         />
         <div className="flex items-center gap-4">
+          <TimeFormatToggle
+            use24Hour={state.use24Hour}
+            onChange={(use24Hour) => onStateChange({ use24Hour })}
+          />
           <ViewToggle
             view={state.view}
             onViewChange={(view) => onStateChange({ view })}
