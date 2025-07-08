@@ -26,7 +26,7 @@ export const AppFooter = () => {
                 Collaborate with your group to discover and vote on the best festival artists.
               </p>
               <p className="text-xs text-muted-foreground">
-                GDPR Compliant • Privacy First • No Tracking
+                GDPR Compliant
               </p>
             </div>
 
@@ -87,10 +87,10 @@ export const AppFooter = () => {
             <p className="mt-2 sm:mt-0">
               Questions? Contact us at{" "}
               <a 
-                href="mailto:contact@yourapp.com" 
+                href="mailto:chiptus@pm.me" 
                 className="hover:text-primary transition-colors"
               >
-                contact@yourapp.com
+                chiptus@pm.me
               </a>
             </p>
           </div>

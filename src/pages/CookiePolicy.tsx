@@ -168,8 +168,7 @@ const CookiePolicy = () => {
               <h2 className="text-2xl font-semibold">9. Contact Us</h2>
               <p className="text-muted-foreground">
                 If you have any questions about our use of cookies or this Cookie Policy, please contact us at:
-                <br />Email: [contact@yourapp.com]
-                <br />Address: [Your Organization Address]
+                <br />Email: chiptus@pm.me
               </p>
             </section>
           </div>

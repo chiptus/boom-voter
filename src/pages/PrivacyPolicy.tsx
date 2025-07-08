@@ -27,8 +27,8 @@ const PrivacyPolicy = () => {
             <section className="space-y-4">
               <h2 className="text-2xl font-semibold">1. Data Controller</h2>
               <p className="text-muted-foreground">
-                This festival voting application is operated by [Your Organization Name]. 
-                For any data protection inquiries, please contact us at [contact@yourapp.com].
+                This festival voting application is operated by Chaim Lev-Ari. 
+                For any data protection inquiries, please contact us at chiptus@pm.me.
               </p>
             </section>
 
@@ -143,8 +143,7 @@ const PrivacyPolicy = () => {
               <h2 className="text-2xl font-semibold">11. Contact Information</h2>
               <p className="text-muted-foreground">
                 For any questions about this privacy policy or to exercise your rights, please contact us at:
-                <br />Email: [contact@yourapp.com]
-                <br />Address: [Your Organization Address]
+                <br />Email: chiptus@pm.me
               </p>
             </section>
 

@@ -83,7 +83,7 @@ const TermsOfService = () => {
               <h2 className="text-2xl font-semibold">7. Intellectual Property Rights</h2>
               <p className="text-muted-foreground">
                 The service and its original content, features, and functionality are and will remain the exclusive property of 
-                [Your Organization Name] and its licensors. The service is protected by copyright, trademark, and other laws.
+                Chaim Lev-Ari and its licensors. The service is protected by copyright, trademark, and other laws.
               </p>
             </section>
 
@@ -106,7 +106,7 @@ const TermsOfService = () => {
             <section className="space-y-4">
               <h2 className="text-2xl font-semibold">10. Limitation of Liability</h2>
               <p className="text-muted-foreground">
-                In no event shall [Your Organization Name], nor its directors, employees, partners, agents, suppliers, or affiliates, 
+                In no event shall Chaim Lev-Ari, nor its directors, employees, partners, agents, suppliers, or affiliates, 
                 be liable for any indirect, incidental, special, consequential, or punitive damages arising out of your use of the service.
               </p>
             </section>
@@ -114,7 +114,7 @@ const TermsOfService = () => {
             <section className="space-y-4">
               <h2 className="text-2xl font-semibold">11. Governing Law</h2>
               <p className="text-muted-foreground">
-                These Terms shall be interpreted and governed by the laws of [Your Jurisdiction], without regard to its conflict of law provisions.
+                These Terms shall be interpreted and governed by the laws of the applicable jurisdiction, without regard to its conflict of law provisions.
               </p>
             </section>
 
@@ -130,8 +130,7 @@ const TermsOfService = () => {
               <h2 className="text-2xl font-semibold">13. Contact Information</h2>
               <p className="text-muted-foreground">
                 If you have any questions about these Terms of Service, please contact us at:
-                <br />Email: [contact@yourapp.com]
-                <br />Address: [Your Organization Address]
+                <br />Email: chiptus@pm.me
               </p>
             </section>
           </div>
