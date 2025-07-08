@@ -183,17 +183,6 @@ export const AddArtistDialog = ({ open, onOpenChange, onSuccess }: AddArtistDial
           <StageSelector value={stage} onValueChange={setStage} />
 
           <div>
-            <Label htmlFor="artist-stage">Stage (Optional)</Label>
-            <Input
-              id="artist-stage"
-              type="text"
-              value={stage}
-              onChange={(e) => setStage(e.target.value)}
-              placeholder="e.g., Main Stage, Dance Temple, Chill Out Gardens"
-            />
-          </div>
-
-          <div>
             <Label htmlFor="time-start">Performance Start Time (Optional)</Label>
             <Input
               id="time-start"

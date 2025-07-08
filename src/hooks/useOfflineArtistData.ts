@@ -37,32 +37,30 @@ export const useOfflineArtistData = () => {
 
     // Clean up any existing channel first
     if (channelRef.current) {
-      console.log('Cleaning up existing channel before creating new one');
+      
       supabase.removeChannel(channelRef.current);
       channelRef.current = null;
     }
 
     // Create unique channel name to prevent conflicts
     const channelName = `artists-changes-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
-    console.log('Setting up artist data subscriptions:', channelName);
+    
     
     try {
       const artistsChannel = supabase
         .channel(channelName)
         .on('postgres_changes', { event: '*', schema: 'public', table: 'artists' }, (payload) => {
-          console.log('Artists table changed:', payload);
+          
           queryClient.invalidateQueries({ queryKey: artistQueries.lists() });
         })
         .on('postgres_changes', { event: '*', schema: 'public', table: 'votes' }, (payload) => {
-          console.log('Votes table changed:', payload);
+          
           queryClient.invalidateQueries({ queryKey: artistQueries.lists() });
           queryClient.invalidateQueries({ queryKey: voteQueries.all() });
         })
         .subscribe((status, err) => {
           if (err) {
             console.error('Subscription error:', err);
-          } else {
-            console.log('Subscription status:', status);
           }
         });
 
@@ -73,7 +71,7 @@ export const useOfflineArtistData = () => {
 
     return () => {
       if (channelRef.current) {
-        console.log('Cleaning up artist data subscriptions:', channelName);
+        
         try {
           supabase.removeChannel(channelRef.current);
         } catch (err) {
@@ -90,7 +88,7 @@ export const useOfflineArtistData = () => {
       if (cachedArtists.length > 0) {
         setOfflineArtists(cachedArtists);
         setDataSource('offline');
-        console.log('Loaded', cachedArtists.length, 'artists from offline storage');
+        
       }
     } catch (error) {
       console.error('Error loading offline artists:', error);

@@ -56,7 +56,7 @@ export const authQueries = {
 export const queryFunctions = {
   // Artists
   async fetchArtists(): Promise<Artist[]> {
-    console.log('Fetching artists...');
+    
     const { data, error } = await supabase
       .from("artists")
       .select(`
@@ -72,12 +72,12 @@ export const queryFunctions = {
       throw new Error('Failed to fetch artists');
     }
 
-    console.log('Fetched artists:', data?.length || 0);
+    
     return data || [];
   },
 
   async fetchArtist(id: string): Promise<Artist> {
-    console.log('Fetching artist with id:', id);
+    
     const { data, error } = await supabase
       .from("artists")
       .select(`
@@ -94,7 +94,7 @@ export const queryFunctions = {
       throw new Error('Failed to fetch artist details');
     }
 
-    console.log('Fetched artist:', data);
+    
     return data;
   },
 
@@ -388,7 +388,7 @@ export const mutationFunctions = {
   },
 
   async archiveArtist(artistId: string) {
-    console.log('Archiving artist:', artistId);
+    
     const { error } = await supabase
       .from("artists")
       .update({ archived: true })
@@ -399,7 +399,7 @@ export const mutationFunctions = {
       throw new Error('Failed to archive artist');
     }
 
-    console.log('Artist archived successfully');
+    
     return true;
   },
 

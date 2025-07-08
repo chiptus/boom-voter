@@ -29,27 +29,20 @@ export const useScheduleData = () => {
   const { artists, loading, error } = useOfflineArtistData();
 
   const scheduleDays = useMemo(() => {
-    console.log('useScheduleData - Processing artists:', artists?.length || 0);
+    
     
     // Enhanced defensive checks
     if (!artists) {
-      console.log('useScheduleData - Artists is null/undefined');
+      
       return [];
     }
     
-    if (!Array.isArray(artists)) {
-      console.log('useScheduleData - Artists is not an array:', typeof artists);
-      return [];
-    }
-    
-    if (artists.length === 0) {
-      console.log('useScheduleData - No artists available');
+    if (!Array.isArray(artists) || artists.length === 0) {
       return [];
     }
 
     // Filter artists with performance times
     const performingArtists = artists.filter(artist => artist.time_start);
-    console.log('useScheduleData - Performing artists:', performingArtists.length);
 
     // Parse and enhance artist data
     const enhancedArtists: ScheduleArtist[] = performingArtists.map(artist => {

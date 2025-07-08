@@ -27,7 +27,7 @@ export const ScheduleTimelineView = ({ userVotes, onVote }: ScheduleTimelineView
   useEffect(() => {
     const container = containerRef.current;
     if (!container || !streamingItems || streamingItems.length === 0) {
-      console.log('ScheduleTimelineView - Container or streamingItems not ready');
+      
       return;
     }
 
@@ -71,7 +71,7 @@ export const ScheduleTimelineView = ({ userVotes, onVote }: ScheduleTimelineView
       const items = container.querySelectorAll('[data-index]');
       if (items.length > 0) {
         items.forEach((item) => observer.observe(item));
-        console.log('ScheduleTimelineView - Observing', items.length, 'items');
+        
       }
     } catch (err) {
       console.error('ScheduleTimelineView - Error setting up intersection observer:', err);
@@ -138,7 +138,7 @@ export const ScheduleTimelineView = ({ userVotes, onVote }: ScheduleTimelineView
   }
 
   if (!streamingItems || streamingItems.length === 0) {
-    console.log('ScheduleTimelineView - No streaming items available');
+    
     return (
       <div className="text-center text-purple-300 py-12">
         <p>No performances scheduled.</p>
@@ -170,7 +170,7 @@ export const ScheduleTimelineView = ({ userVotes, onVote }: ScheduleTimelineView
           <div className="space-y-4 pr-4 pb-20">
             {streamingItems.map((item, index) => {
               if (!item) {
-                console.warn('ScheduleTimelineView - Invalid item at index:', index);
+                
                 return null;
               }
               

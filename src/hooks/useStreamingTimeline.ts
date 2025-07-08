@@ -14,21 +14,10 @@ export const useStreamingTimeline = () => {
   const { scheduleDays, loading, error } = useScheduleData();
 
   const streamingItems = useMemo(() => {
-    console.log('useStreamingTimeline - Processing schedule days:', scheduleDays?.length || 0);
+    
     
     // Enhanced defensive checks
-    if (!scheduleDays) {
-      console.log('useStreamingTimeline - Schedule days is null/undefined');
-      return [];
-    }
-    
-    if (!Array.isArray(scheduleDays)) {
-      console.log('useStreamingTimeline - Schedule days is not an array:', typeof scheduleDays);
-      return [];
-    }
-    
-    if (scheduleDays.length === 0) {
-      console.log('useStreamingTimeline - No schedule days available');
+    if (!scheduleDays || !Array.isArray(scheduleDays) || scheduleDays.length === 0) {
       return [];
     }
 
