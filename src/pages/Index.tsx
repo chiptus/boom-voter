@@ -17,7 +17,7 @@ import { useUrlState } from "@/hooks/useUrlState";
 import { ArtistsPanel } from "@/components/Index/ArtistsPanel";
 
 export default function Index() {
-  const { user, loading, signOut, hasUsername } = useAuth();
+  const { user, loading: authLoading, signOut, hasUsername } = useAuth();
   const { inviteValidation, isValidating, hasValidInvite } =
     useInviteValidation();
   const [showAuthDialog, setShowAuthDialog] = useState(false);
@@ -36,14 +36,14 @@ export default function Index() {
   // Check if username setup is needed after authentication
   useEffect(() => {
     // Only show dialog when all data is loaded and user definitely needs username setup
-    if (user && !loading && !profileLoading && !hasUsername()) {
+    if (user && !authLoading && !profileLoading && !hasUsername()) {
       setShowUsernameSetup(true);
     }
     // Hide dialog when user gets a username or logs out or data is still loading
-    if (!user || (user && !loading && !profileLoading && hasUsername())) {
+    if (!user || (user && !authLoading && !profileLoading && hasUsername())) {
       setShowUsernameSetup(false);
     }
-  }, [user, loading, profileLoading, hasUsername]);
+  }, [user, authLoading, profileLoading, hasUsername]);
 
   // Show loading while validating invite
   if (isValidating) {
@@ -85,7 +85,7 @@ export default function Index() {
     );
   }
 
-  if (loading) {
+  if (authLoading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900 flex items-center justify-center">
         <div className="text-white text-xl">Loading...</div>

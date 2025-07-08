@@ -23,7 +23,7 @@ const defaultState: FilterSortState = {
   minRating: 0,
   view: 'list',
   scheduleView: 'timeline',
-  use24Hour: false,
+  use24Hour: true,
   groupId: undefined,
   invite: undefined,
 };
