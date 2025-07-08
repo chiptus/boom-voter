@@ -2,39 +2,48 @@
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { OfflineIndicator } from "@/components/OfflineIndicator";
+import { CookieConsentBanner } from "@/components/legal/CookieConsentBanner";
+import { AppFooter } from "@/components/legal/AppFooter";
 import Index from "./pages/Index";
 import ArtistDetail from "./pages/ArtistDetail";
 import Groups from "./pages/Groups";
 import GroupDetail from "./pages/GroupDetail";
 import Schedule from "./pages/Schedule";
+import PrivacyPolicy from "./pages/PrivacyPolicy";
+import TermsOfService from "./pages/TermsOfService";
+import CookiePolicy from "./pages/CookiePolicy";
 import NotFound from "./pages/NotFound";
 
-const queryClient = new QueryClient();
-
 const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <div className="fixed top-4 right-4 z-50">
-        <OfflineIndicator />
+  <TooltipProvider>
+    <div className="fixed top-4 right-4 z-50">
+      <OfflineIndicator />
+    </div>
+    <Toaster />
+    <Sonner />
+    <CookieConsentBanner />
+    <BrowserRouter>
+      <div className="min-h-screen flex flex-col">
+        <div className="flex-1">
+          <Routes>
+            <Route path="/" element={<Index />} />
+            <Route path="/artist/:id" element={<ArtistDetail />} />
+            <Route path="/groups" element={<Groups />} />
+            <Route path="/groups/:groupId" element={<GroupDetail />} />
+            <Route path="/schedule" element={<Schedule />} />
+            <Route path="/privacy" element={<PrivacyPolicy />} />
+            <Route path="/terms" element={<TermsOfService />} />
+            <Route path="/cookies" element={<CookiePolicy />} />
+            {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </div>
+        <AppFooter />
       </div>
-      <Toaster />
-      <Sonner />
-      <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<Index />} />
-          <Route path="/artist/:id" element={<ArtistDetail />} />
-          <Route path="/groups" element={<Groups />} />
-          <Route path="/groups/:groupId" element={<GroupDetail />} />
-          <Route path="/schedule" element={<Schedule />} />
-          {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-      </BrowserRouter>
-    </TooltipProvider>
-  </QueryClientProvider>
+    </BrowserRouter>
+  </TooltipProvider>
 );
 
 export default App;
