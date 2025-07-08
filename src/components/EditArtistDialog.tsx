@@ -13,18 +13,27 @@ import { Edit } from "lucide-react";
 import { STAGES } from "@/components/Index/filters/constants";
 import { Artist } from "@/services/queries";
 import { useGenres } from "@/hooks/queries/useGenresQuery";
+import { toZonedTime, fromZonedTime } from "date-fns-tz";
 
-// Helper function to convert ISO string to local datetime-local format
+// Get user's timezone
+const getUserTimeZone = () => Intl.DateTimeFormat().resolvedOptions().timeZone;
+
+// Helper function to convert UTC ISO string to local datetime-local format
 const toDatetimeLocal = (isoString: string | null): string => {
   if (!isoString) return "";
-  const date = new Date(isoString);
-  return date.toISOString().slice(0, 16); // YYYY-MM-DDTHH:mm
+  const utcDate = new Date(isoString);
+  const userTimeZone = getUserTimeZone();
+  const localDate = toZonedTime(utcDate, userTimeZone);
+  return localDate.toISOString().slice(0, 16); // YYYY-MM-DDTHH:mm
 };
 
-// Helper function to convert datetime-local to ISO string
+// Helper function to convert local datetime-local to UTC ISO string
 const toISOString = (datetimeLocal: string): string => {
   if (!datetimeLocal) return "";
-  return new Date(datetimeLocal).toISOString();
+  const localDate = new Date(datetimeLocal);
+  const userTimeZone = getUserTimeZone();
+  const utcDate = fromZonedTime(localDate, userTimeZone);
+  return utcDate.toISOString();
 };
 
 interface EditArtistDialogProps {
