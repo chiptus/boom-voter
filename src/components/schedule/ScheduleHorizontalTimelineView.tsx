@@ -124,7 +124,15 @@ export const ScheduleHorizontalTimelineView = ({ userVotes, onVote }: ScheduleHo
     );
   }
 
-  if (error || !timelineData) {
+  if (error){
+    return (
+      <div className="text-center text-purple-300 py-12">
+        <p>Error loading schedule.</p>
+      </div>
+    );
+  }
+
+  if (!timelineData) {
     return (
       <div className="text-center text-purple-300 py-12">
         <p>No performances scheduled.</p>
@@ -134,18 +142,18 @@ export const ScheduleHorizontalTimelineView = ({ userVotes, onVote }: ScheduleHo
 
   return (
     <div className="space-y-8">
-      {/* Festival Timeline Header */}
+      {/* Festival Timeline Header
       <div className="flex items-center gap-4 border-b border-purple-400/30 pb-4">
         <h2 className="text-2xl font-bold text-white">Festival Timeline</h2>
         <div className="text-purple-300">
           {format(timelineData.festivalStart, 'MMM d')} - {format(timelineData.festivalEnd, 'MMM d')}
         </div>
-      </div>
+      </div> */}
 
       {/* Unified Timeline Container */}
       <div className="relative bg-white/5 rounded-lg p-4 overflow-x-auto">
         {/* Time Scale */}
-        <div className="flex items-center mb-6 relative" style={{ minWidth: timelineData.totalWidth }}>
+        <div className="flex items-center mb-[72px] relative" style={{ minWidth: timelineData.totalWidth }}>
           <div className="w-32 flex-shrink-0"></div> {/* Space for stage labels */}
           <div className="flex-1 relative">
             {timelineData.timeSlots.map((timeSlot, index) => (
@@ -169,7 +177,7 @@ export const ScheduleHorizontalTimelineView = ({ userVotes, onVote }: ScheduleHo
         </div>
 
         {/* Stage Rows */}
-        <div className="space-y-6">
+        <div className="space-y-8">
           {timelineData.stages.map((stage) => (
             <div key={stage.name} className="flex items-start gap-4">
               {/* Stage Label */}
