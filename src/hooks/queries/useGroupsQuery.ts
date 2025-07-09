@@ -18,7 +18,7 @@ export const useGroupMembersQuery = (groupId: string) => {
   });
 };
 
-export const useUserPermissionsQuery = (userId: string | undefined, permission: 'edit_artists') => {
+export const useUserPermissionsQuery = (userId: string | undefined, permission: 'edit_artists' | 'is_admin') => {
   return useQuery({
     queryKey: ['permissions', {userId, permission}],
     queryFn: () => queryFunctions.checkUserPermissions(userId!, permission),

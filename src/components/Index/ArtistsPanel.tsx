@@ -49,8 +49,6 @@ export function ArtistsPanel({
               requiresAuth: !user,
             })}
             onAuthRequired={openAuthDialog}
-            onEditSuccess={fetchArtists}
-            onArchiveArtist={archiveArtist}
             user={user}
             use24Hour={use24Hour}
           />
@@ -73,8 +71,6 @@ export function ArtistsPanel({
             requiresAuth: !user,
           })}
           onAuthRequired={openAuthDialog}
-          onEditSuccess={fetchArtists}
-          onArchiveArtist={archiveArtist}
           user={user}
           use24Hour={use24Hour}
         />

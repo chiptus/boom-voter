@@ -6,8 +6,6 @@ import { useInviteValidation } from "@/components/Index/useInviteValidation";
 import { AuthDialog } from "@/components/AuthDialog";
 import { UsernameSetupDialog } from "@/components/Index/UsernameSetupDialog";
 
-import { AddArtistDialog } from "@/components/Index/AddArtistDialog";
-import { AddGenreDialog } from "@/components/Index/AddGenreDialog";
 import { FilterSortControls } from "@/components/Index/filters/FilterSortControls";
 import { AppHeader } from "@/components/AppHeader";
 import { InviteLandingPage } from "@/components/Index/InviteLandingPage";
@@ -22,8 +20,6 @@ export default function Index() {
     useInviteValidation();
   const [showAuthDialog, setShowAuthDialog] = useState(false);
   const [showUsernameSetup, setShowUsernameSetup] = useState(false);
-  const [showAddArtistDialog, setShowAddArtistDialog] = useState(false);
-  const [showAddGenreDialog, setShowAddGenreDialog] = useState(false);
   const { state: urlState, updateUrlState, clearFilters } = useUrlState();
   
   const { artists, fetchArtists, archiveArtist } = useOfflineArtistData();
@@ -103,8 +99,6 @@ export default function Index() {
           user={user}
           onSignIn={() => setShowAuthDialog(true)}
           onSignOut={signOut}
-          onAddArtist={() => setShowAddArtistDialog(true)}
-          onAddGenre={() => setShowAddGenreDialog(true)}
           showScheduleButton={true}
           showGroupsButton={true}
         />
@@ -135,19 +129,6 @@ export default function Index() {
           groupName={hasValidInvite ? inviteValidation?.group_name : undefined}
         />
 
-        <AddArtistDialog
-          open={showAddArtistDialog}
-          onOpenChange={setShowAddArtistDialog}
-          onSuccess={() => {
-            setShowAddArtistDialog(false);
-            fetchArtists();
-          }}
-        />
-
-        <AddGenreDialog
-          open={showAddGenreDialog}
-          onOpenChange={setShowAddGenreDialog}
-        />
 
         <UsernameSetupDialog
           open={showUsernameSetup}

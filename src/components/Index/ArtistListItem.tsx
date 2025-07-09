@@ -1,17 +1,8 @@
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { 
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { Star, Heart, X,  MapPin, Clock, Eye, EyeOff, Edit, Trash, MoreHorizontal } from "lucide-react";
-import { EditArtistDialog } from "@/components/EditArtistDialog";
-import { ArchiveArtistDialog } from "@/components/ArchiveArtistDialog";
+import { Star, Heart, X,  MapPin, Clock, Eye, EyeOff } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import { useGroups } from "@/hooks/useGroups";
 import { useState, useEffect } from "react";
 import { formatTimeRange } from "@/lib/timeUtils";
 import { User } from "@supabase/supabase-js";
@@ -27,28 +18,12 @@ interface ArtistListItemProps {
   onVote: (artistId: string, voteType: number) => Promise<{ requiresAuth: boolean }>;
   onKnowledgeToggle: (artistId: string) => Promise<{ requiresAuth: boolean }>;
   onAuthRequired: () => void;
-  onEditSuccess?: () => void;
-  onArchiveArtist?: (artistId: string) => Promise<void>;
   user?: User;
   use24Hour?: boolean;
 }
 
-export const ArtistListItem = ({ artist, userVote, userKnowledge, votingLoading, onVote, onKnowledgeToggle, onAuthRequired, onEditSuccess, onArchiveArtist, user, use24Hour = false }: ArtistListItemProps) => {
+export const ArtistListItem = ({ artist, userVote, userKnowledge, votingLoading, onVote, onKnowledgeToggle, onAuthRequired, user, use24Hour = false }: ArtistListItemProps) => {
   const { toast } = useToast();
-  const { canEditArtists } = useGroups();
-  const [canEdit, setCanEdit] = useState(false);
-
-  useEffect(() => {
-    const checkPermissions = async () => {
-      if (user) {
-        const hasPermission = await canEditArtists();
-        setCanEdit(hasPermission);
-      } else {
-        setCanEdit(false);
-      }
-    };
-    checkPermissions();
-  }, [user, canEditArtists]);
 
   const handleVote = async (voteType: number) => {
     const result = await onVote(artist.id, voteType);
@@ -179,46 +154,6 @@ export const ArtistListItem = ({ artist, userVote, userKnowledge, votingLoading,
             </div>
           </div>
           
-          {/* Core Team Dropdown Menu */}
-          {canEdit && (
-            <div className="absolute top-0 right-0">
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" size="sm" className="p-1 h-6 w-6 text-purple-400 hover:text-purple-300">
-                    <MoreHorizontal className="h-3 w-3" />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="bg-black/90 border-purple-400/30">
-                  <DropdownMenuItem asChild>
-                    <EditArtistDialog
-                      artist={artist}
-                      onSuccess={onEditSuccess}
-                      trigger={
-                        <div className="flex items-center gap-2 w-full cursor-pointer text-purple-400 hover:text-purple-300">
-                          <Edit className="h-3 w-3" />
-                          Edit
-                        </div>
-                      }
-                    />
-                  </DropdownMenuItem>
-                  {onArchiveArtist && (
-                    <DropdownMenuItem asChild>
-                      <ArchiveArtistDialog
-                        artist={artist}
-                        onArchive={onArchiveArtist}
-                        trigger={
-                          <div className="flex items-center gap-2 w-full cursor-pointer text-red-400 hover:text-red-300">
-                            <Trash className="h-3 w-3" />
-                            Archive
-                          </div>
-                        }
-                      />
-                    </DropdownMenuItem>
-                  )}
-                </DropdownMenuContent>
-              </DropdownMenu>
-            </div>
-          )}
         </div>
 
         {/* Description */}
@@ -364,44 +299,6 @@ export const ArtistListItem = ({ artist, userVote, userKnowledge, votingLoading,
         
         {/* Actions */}
         <div className="flex items-center gap-2 flex-shrink-0">
-          {/* Core Team Dropdown Menu */}
-          {canEdit && (
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="sm" className="p-1 h-6 w-6 text-purple-400 hover:text-purple-300">
-                  <MoreHorizontal className="h-3 w-3" />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="start" className="bg-black/90 border-purple-400/30">
-                <DropdownMenuItem asChild>
-                  <EditArtistDialog
-                    artist={artist}
-                    onSuccess={onEditSuccess}
-                    trigger={
-                      <div className="flex items-center gap-2 w-full cursor-pointer text-purple-400 hover:text-purple-300">
-                        <Edit className="h-3 w-3" />
-                        Edit
-                      </div>
-                    }
-                  />
-                </DropdownMenuItem>
-                {onArchiveArtist && (
-                  <DropdownMenuItem asChild>
-                    <ArchiveArtistDialog
-                      artist={artist}
-                      onArchive={onArchiveArtist}
-                      trigger={
-                        <div className="flex items-center gap-2 w-full cursor-pointer text-red-400 hover:text-red-300">
-                          <Trash className="h-3 w-3" />
-                          Archive
-                        </div>
-                      }
-                    />
-                  </DropdownMenuItem>
-                )}
-              </DropdownMenuContent>
-            </DropdownMenu>
-          )}
           
           {/* Voting System */}
           <Button

@@ -301,7 +301,9 @@ export const queryFunctions = {
     return membersWithProfiles;
   },
 
-  async checkUserPermissions(userId: string, permission: 'edit_artists') {
+  async checkUserPermissions(userId: string, permission: 'edit_artists' | 'is_admin') {
+    // For now, use the existing Core group logic until migration is applied
+    // TODO: Replace with admin_roles table after migration
     const { data, error } = await supabase
       .from("group_members")
       .select("groups!inner(name)")
