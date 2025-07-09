@@ -2,14 +2,27 @@ import { useAuth } from "@/hooks/useAuth";
 import { useGroups } from "@/hooks/useGroups";
 import { AppHeader } from "@/components/AppHeader";
 import { ArtistsTable } from "@/components/Admin/ArtistsTable";
+import { AdminRolesTable } from "@/components/Admin/AdminRolesTable";
+import { AddArtistDialog } from "@/components/Index/AddArtistDialog";
+import { AddGenreDialog } from "@/components/Index/AddGenreDialog";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { Music, Tag, UserPlus, Plus } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
+import { queryFunctions } from "@/services/queries";
 
 export default function Admin() {
   const { user, loading } = useAuth();
   const { canEditArtists } = useGroups();
   const [hasPermission, setHasPermission] = useState<boolean | null>(null);
+  const [isSuperAdmin, setIsSuperAdmin] = useState(false);
+  const [addArtistOpen, setAddArtistOpen] = useState(false);
+  const [addGenreOpen, setAddGenreOpen] = useState(false);
   const navigate = useNavigate();
+  const { toast } = useToast();
 
   useEffect(() => {
     const checkPermissions = async () => {
@@ -28,7 +41,12 @@ export default function Admin() {
       
       if (!permission) {
         navigate("/");
+        return;
       }
+
+      // Check if user is super admin
+      const superAdminCheck = await queryFunctions.checkUserPermissions(user.id, 'is_admin');
+      setIsSuperAdmin(superAdminCheck);
     };
     
     checkPermissions();
@@ -46,6 +64,14 @@ export default function Admin() {
     return null; // Will redirect
   }
 
+  const handleArtistAdded = () => {
+    setAddArtistOpen(false);
+    toast({
+      title: "Success",
+      description: "Artist added successfully!",
+    });
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900">
       <div className="container mx-auto px-4 py-8">
@@ -54,14 +80,98 @@ export default function Admin() {
           backTo="/"
           backLabel="Back to Artists"
           title="Admin Dashboard"
-          subtitle="Manage Artists"
-          description="Edit artist information, schedules, and details"
+          subtitle="Platform Management"
+          description="Manage artists, genres, and admin permissions"
         />
         
         <div className="mt-8">
-          <ArtistsTable />
+          <Tabs defaultValue="artists" className="w-full">
+            <TabsList className="grid w-full grid-cols-3 bg-white/10 backdrop-blur-md">
+              <TabsTrigger value="artists" className="data-[state=active]:bg-purple-600 data-[state=active]:text-white">
+                <Music className="h-4 w-4 mr-2" />
+                Artists
+              </TabsTrigger>
+              <TabsTrigger value="content" className="data-[state=active]:bg-purple-600 data-[state=active]:text-white">
+                <Plus className="h-4 w-4 mr-2" />
+                Add Content
+              </TabsTrigger>
+              {isSuperAdmin && (
+                <TabsTrigger value="admins" className="data-[state=active]:bg-purple-600 data-[state=active]:text-white">
+                  <UserPlus className="h-4 w-4 mr-2" />
+                  Admin Roles
+                </TabsTrigger>
+              )}
+            </TabsList>
+            
+            <TabsContent value="artists" className="mt-6">
+              <ArtistsTable />
+            </TabsContent>
+            
+            <TabsContent value="content" className="mt-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <Card className="bg-white/10 backdrop-blur-md border-white/20">
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2 text-white">
+                      <Music className="h-5 w-5" />
+                      Add Artist
+                    </CardTitle>
+                    <CardDescription className="text-white/70">
+                      Add a new artist to the festival lineup
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <Button 
+                      onClick={() => setAddArtistOpen(true)}
+                      className="w-full bg-purple-600 hover:bg-purple-700 text-white"
+                    >
+                      <Music className="h-4 w-4 mr-2" />
+                      Add New Artist
+                    </Button>
+                  </CardContent>
+                </Card>
+
+                <Card className="bg-white/10 backdrop-blur-md border-white/20">
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2 text-white">
+                      <Tag className="h-5 w-5" />
+                      Add Genre
+                    </CardTitle>
+                    <CardDescription className="text-white/70">
+                      Add a new music genre for categorization
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <Button 
+                      onClick={() => setAddGenreOpen(true)}
+                      className="w-full bg-purple-600 hover:bg-purple-700 text-white"
+                    >
+                      <Tag className="h-4 w-4 mr-2" />
+                      Add New Genre
+                    </Button>
+                  </CardContent>
+                </Card>
+              </div>
+            </TabsContent>
+            
+            {isSuperAdmin && (
+              <TabsContent value="admins" className="mt-6">
+                <AdminRolesTable />
+              </TabsContent>
+            )}
+          </Tabs>
         </div>
       </div>
+
+      <AddArtistDialog 
+        open={addArtistOpen}
+        onOpenChange={setAddArtistOpen}
+        onSuccess={handleArtistAdded}
+      />
+
+      <AddGenreDialog 
+        open={addGenreOpen}
+        onOpenChange={setAddGenreOpen}
+      />
     </div>
   );
 }
