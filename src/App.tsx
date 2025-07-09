@@ -10,6 +10,7 @@ import ArtistDetail from "./pages/ArtistDetail";
 import Groups from "./pages/Groups";
 import GroupDetail from "./pages/GroupDetail";
 import Schedule from "./pages/Schedule";
+import Admin from "./pages/Admin";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
 import TermsOfService from "./pages/TermsOfService";
 import CookiePolicy from "./pages/CookiePolicy";
@@ -29,6 +30,7 @@ const App = () => (
             <Route path="/groups" element={<Groups />} />
             <Route path="/groups/:groupId" element={<GroupDetail />} />
             <Route path="/schedule" element={<Schedule />} />
+            <Route path="/admin" element={<Admin />} />
             <Route path="/privacy" element={<PrivacyPolicy />} />
             <Route path="/terms" element={<TermsOfService />} />
             <Route path="/cookies" element={<CookiePolicy />} />
