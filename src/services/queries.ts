@@ -302,17 +302,29 @@ export const queryFunctions = {
   },
 
   async checkUserPermissions(userId: string, permission: 'edit_artists' | 'is_admin') {
-    // For now, use the existing Core group logic until migration is applied
-    // TODO: Replace with admin_roles table after migration
-    const { data, error } = await supabase
-      .from("group_members")
-      .select("groups!inner(name)")
-      .eq("user_id", userId)
-      .eq("groups.name", "Core")
-      .single();
-
-    if (error) return false;
-    return !!data;
+    try {
+      // Use new admin roles system
+      if (permission === 'edit_artists') {
+        const { data, error } = await supabase.rpc('can_edit_artists', { check_user_id: userId });
+        if (error) {
+          console.error('Error checking edit_artists permission:', error);
+          return false;
+        }
+        return data || false;
+      } else if (permission === 'is_admin') {
+        const { data, error } = await supabase.rpc('is_admin', { check_user_id: userId });
+        if (error) {
+          console.error('Error checking is_admin permission:', error);
+          return false;
+        }
+        return data || false;
+      }
+      
+      return false;
+    } catch (error) {
+      console.error('Error in checkUserPermissions:', error);
+      return false;
+    }
   },
 
   async fetchProfile(userId: string) {

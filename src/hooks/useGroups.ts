@@ -23,7 +23,7 @@ export const useGroups = () => {
   } = useUserGroupsQuery(user?.id);
   const { data: canEdit = false } = useUserPermissionsQuery(
     user?.id,
-    "is_admin"
+    "edit_artists"
   );
 
   const createGroupMutation = useCreateGroupMutation();

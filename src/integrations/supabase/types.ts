@@ -14,6 +14,30 @@ export type Database = {
   }
   public: {
     Tables: {
+      admin_roles: {
+        Row: {
+          created_at: string
+          created_by: string
+          id: string
+          role: Database["public"]["Enums"]["admin_role"]
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          created_by: string
+          id?: string
+          role: Database["public"]["Enums"]["admin_role"]
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string
+          id?: string
+          role?: Database["public"]["Enums"]["admin_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
       artist_knowledge: {
         Row: {
           artist_id: string
@@ -326,9 +350,24 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      can_edit_artists: {
+        Args: { check_user_id: string }
+        Returns: boolean
+      }
       get_user_id_by_email: {
         Args: { user_email: string }
         Returns: string
+      }
+      has_admin_role: {
+        Args: {
+          check_user_id: string
+          check_role: Database["public"]["Enums"]["admin_role"]
+        }
+        Returns: boolean
+      }
+      is_admin: {
+        Args: { check_user_id: string }
+        Returns: boolean
       }
       is_group_creator: {
         Args: { group_id_param: string }
@@ -362,7 +401,7 @@ export type Database = {
       }
     }
     Enums: {
-      [_ in never]: never
+      admin_role: "super_admin" | "admin" | "moderator"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -489,6 +528,8 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      admin_role: ["super_admin", "admin", "moderator"],
+    },
   },
 } as const
