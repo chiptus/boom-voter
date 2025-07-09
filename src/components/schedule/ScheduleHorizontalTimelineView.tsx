@@ -84,18 +84,32 @@ export const ScheduleHorizontalTimelineView = ({ userVotes, onVote }: ScheduleHo
       });
     });
 
-    // Create unified stages array
+    // Create unified stages array with custom ordering
+    const stageOrder = ["Dance Temple", "Alchemy Circle", "The Gardens"];
     const unifiedStages = Object.entries(allStageGroups).map(([stageName, artists]) => ({
       name: stageName,
       artists: artists.sort((a, b) => {
         if (!a.startTime || !b.startTime) return 0;
         return a.startTime.getTime() - b.startTime.getTime();
       })
-    }));
+    })).sort((a, b) => {
+      const aIndex = stageOrder.indexOf(a.name);
+      const bIndex = stageOrder.indexOf(b.name);
+      
+      if (aIndex !== -1 && bIndex !== -1) {
+        return aIndex - bIndex;
+      } else if (aIndex !== -1) {
+        return -1;
+      } else if (bIndex !== -1) {
+        return 1;
+      } else {
+        return a.name.localeCompare(b.name);
+      }
+    });
 
     return {
       timeSlots,
-      stages: unifiedStages.sort((a, b) => a.name.localeCompare(b.name)),
+      stages: unifiedStages,
       totalWidth: totalHours * 120, // 120px per hour
       festivalStart: earliestTime,
       festivalEnd: latestTime
@@ -159,8 +173,8 @@ export const ScheduleHorizontalTimelineView = ({ userVotes, onVote }: ScheduleHo
           {timelineData.stages.map((stage) => (
             <div key={stage.name} className="flex items-start gap-4">
               {/* Stage Label */}
-              <div className="w-28 flex-shrink-0 text-right">
-                <div className="text-lg font-semibold text-white sticky left-0 bg-gradient-to-r from-purple-600 to-blue-600 px-3 py-2 rounded-lg">
+              <div className="w-32 flex-shrink-0 text-right sticky left-0 z-10">
+                <div className="text-sm font-medium text-white bg-gradient-to-r from-purple-600 to-blue-600 px-2 py-1 rounded">
                   {stage.name}
                 </div>
               </div>

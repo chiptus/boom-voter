@@ -55,3 +55,20 @@ export const formatDateTime = (dateTime: string | null, use24Hour: boolean = fal
   const dateTimeFormat = use24Hour ? "MMM d, HH:mm" : "MMM d, h:mm a";
   return format(date, dateTimeFormat);
 };
+
+export const formatTimeOnly = (startTime: string | null, endTime: string | null, use24Hour: boolean = false): string | null => {
+  if (!startTime) return null;
+
+  const start = parseISO(startTime);
+  const end = endTime ? parseISO(endTime) : null;
+
+  if (!isValid(start)) return null;
+
+  const timeFormat = use24Hour ? "HH:mm" : "h:mm a";
+
+  if (end && isValid(end)) {
+    return `${format(start, timeFormat)} - ${format(end, timeFormat)}`;
+  }
+
+  return format(start, timeFormat);
+};

@@ -41,8 +41,8 @@ export const useScheduleData = (use24Hour: boolean = false) => {
       return [];
     }
 
-    // Filter artists with performance times
-    const performingArtists = artists.filter(artist => artist.time_start);
+    // Filter artists with performance times and stages
+    const performingArtists = artists.filter(artist => artist.time_start && artist.stage);
 
     // Parse and enhance artist data
     const enhancedArtists: ScheduleArtist[] = performingArtists.map(artist => {

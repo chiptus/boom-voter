@@ -102,12 +102,6 @@ const Schedule = () => {
                 onVote={handleVoteAction}
               />
             )}
-            {urlState.scheduleView === 'timeline' && (
-              <ScheduleTimelineView
-                userVotes={userVotes}
-                onVote={handleVoteAction}
-              />
-            )}
             {urlState.scheduleView === 'list' && (
               <ScheduleListView
                 userVotes={userVotes}

@@ -2,7 +2,7 @@ import { useCallback } from 'react';
 import { useSearchParams } from 'react-router-dom';
 
 export type SortOption = 'name-asc' | 'name-desc' | 'rating-desc' | 'popularity-desc' | 'date-asc';
-export type ScheduleViewOption = 'grid' | 'timeline' | 'list' | 'horizontal';
+export type ScheduleViewOption = 'grid' | 'list' | 'horizontal';
 
 export interface FilterSortState {
   sort: SortOption;
@@ -22,7 +22,7 @@ const defaultState: FilterSortState = {
   genres: [],
   minRating: 0,
   view: 'list',
-  scheduleView: 'timeline',
+  scheduleView: 'horizontal',
   use24Hour: true,
   groupId: undefined,
   invite: undefined,
