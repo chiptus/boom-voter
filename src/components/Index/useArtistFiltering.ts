@@ -1,8 +1,9 @@
 
 import { useEffect, useState, useMemo } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { Artist } from "@/services/queries";
+import type { Artist } from "./useOfflineArtistData";
 import type { FilterSortState } from "../../hooks/useUrlState";
+import { STAGES } from "./filters/constants";
 
 export const useArtistFiltering = (artists: Artist[], filterSortState?: FilterSortState) => {
   const [groupMemberIds, setGroupMemberIds] = useState<string[]>([]);
@@ -63,11 +64,15 @@ export const useArtistFiltering = (artists: Artist[], filterSortState?: FilterSo
         votes: filteredVotes,
       };
     }).filter(artist => {
+      // if (!artist.stage || !STAGES.includes(artist.stage)){ return true;}
+      // return false;
+
       // Stage filter
       if (filterSortState.stages.length > 0 && artist.stage) {
         if (!filterSortState.stages.includes(artist.stage)) return false;
       }
 
+      
       // Genre filter
       if (filterSortState.genres.length > 0 && artist.music_genres) {
         if (!filterSortState.genres.includes(artist.genre_id)) return false;

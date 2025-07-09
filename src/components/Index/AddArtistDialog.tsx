@@ -9,9 +9,10 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Music } from "lucide-react";
-import { useGroups } from "@/hooks/useGroups";
 import type { Database } from "@/integrations/supabase/types";
 import { StageSelector } from "../StageSelector";
+import { useAuth } from "@/hooks/useAuth";
+import { useUserPermissionsQuery } from "@/hooks/queries/useGroupsQuery";
 
 type MusicGenre = Database["public"]["Tables"]["music_genres"]["Row"];
 
@@ -22,6 +23,10 @@ interface AddArtistDialogProps {
 }
 
 export const AddArtistDialog = ({ open, onOpenChange, onSuccess }: AddArtistDialogProps) => {
+  const { user, loading: authLoading } = useAuth();
+  const { data: canEdit = false, isLoading: isLoadingPermissions } =
+    useUserPermissionsQuery(user?.id, "edit_artists");
+
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [genreId, setGenreId] = useState("");
@@ -34,13 +39,18 @@ export const AddArtistDialog = ({ open, onOpenChange, onSuccess }: AddArtistDial
   const [genres, setGenres] = useState<MusicGenre[]>([]);
   const [loading, setLoading] = useState(false);
   const { toast } = useToast();
-  const { canEditArtists } = useGroups();
 
   useEffect(() => {
     if (open) {
       fetchGenres();
     }
   }, [open]);
+
+  if (authLoading || isLoadingPermissions) {
+    return null;
+  }
+
+ 
 
   const fetchGenres = async () => {
     const { data, error } = await supabase
@@ -76,8 +86,7 @@ export const AddArtistDialog = ({ open, onOpenChange, onSuccess }: AddArtistDial
     }
 
     // Check Core team permissions
-    const hasPermission = await canEditArtists();
-    if (!hasPermission) {
+    if (!canEdit) {
       toast({
         title: "Permission Denied",
         description: "Only Core team members can add artists",

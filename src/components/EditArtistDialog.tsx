@@ -26,35 +26,10 @@ import { useGenres } from "@/hooks/queries/useGenresQuery";
 import { toZonedTime, fromZonedTime } from "date-fns-tz";
 import { StageSelector } from "./StageSelector";
 import { formatISO } from "date-fns";
+import { useUserPermissionsQuery } from "@/hooks/queries/useGroupsQuery";
+import { useAuth } from "@/hooks/useAuth";
+import { toDatetimeLocal, toISOString } from "@/lib/timeUtils";
 
-// Get user's timezone
-const getUserTimeZone = () => Intl.DateTimeFormat().resolvedOptions().timeZone;
-
-// Helper function to convert UTC ISO string to local datetime-local format
-const toDatetimeLocal = (isoString: string | null): string => {
-  if (!isoString) return "";
-  const utcDate = new Date(isoString);
-  const userTimeZone = getUserTimeZone();
-  const localDate = toZonedTime(utcDate, userTimeZone);
-
-  // Format the date in local timezone for datetime-local input
-  const year = localDate.getFullYear();
-  const month = String(localDate.getMonth() + 1).padStart(2, "0");
-  const day = String(localDate.getDate()).padStart(2, "0");
-  const hours = String(localDate.getHours()).padStart(2, "0");
-  const minutes = String(localDate.getMinutes()).padStart(2, "0");
-
-  return `${year}-${month}-${day}T${hours}:${minutes}`;
-};
-
-// Helper function to convert local datetime-local to UTC ISO string
-const toISOString = (datetimeLocal: string): string => {
-  if (!datetimeLocal) return "";
-  const localDate = new Date(datetimeLocal);
-  const userTimeZone = getUserTimeZone();
-  const utcDate = fromZonedTime(localDate, userTimeZone);
-  return utcDate.toISOString();
-};
 
 // Helper function to subtract one hour from datetime-local string
 const subtractOneHour = (datetimeLocal: string): string => {
@@ -82,6 +57,14 @@ export const EditArtistDialog = ({
   onSuccess,
   trigger,
 }: EditArtistDialogProps) => {
+  const { user, loading: authLoading } = useAuth();
+  const { data: canEdit = false, isLoading: isLoadingPermissions } = useUserPermissionsQuery(
+    user?.id,
+    "edit_artists"
+  );
+
+  
+  
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
@@ -98,15 +81,16 @@ export const EditArtistDialog = ({
 
   const { genres } = useGenres();
   const { toast } = useToast();
-  const { canEditArtists } = useGroups();
+  if (authLoading || isLoadingPermissions) {
+    return null;
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
 
     // Check Core team permissions
-    const hasPermission = await canEditArtists();
-    if (!hasPermission) {
+    if (!canEdit) {
       toast({
         title: "Permission Denied",
         description: "Only Core team members can edit artists",

@@ -1,5 +1,4 @@
 import { useAuth } from "@/hooks/useAuth";
-import { useGroups } from "@/hooks/useGroups";
 import { AppHeader } from "@/components/AppHeader";
 import { ArtistsTable } from "@/components/Admin/ArtistsTable";
 import { AdminRolesTable } from "@/components/Admin/AdminRolesTable";
@@ -7,52 +6,55 @@ import { AddArtistDialog } from "@/components/Index/AddArtistDialog";
 import { AddGenreDialog } from "@/components/Index/AddGenreDialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Music, Tag, UserPlus, Plus } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import { queryFunctions } from "@/services/queries";
+import { useUserPermissionsQuery } from "@/hooks/queries/useGroupsQuery";
 
 export default function Admin() {
-  const { user, loading } = useAuth();
-  const { canEditArtists } = useGroups();
-  const [hasPermission, setHasPermission] = useState<boolean | null>(null);
-  const [isSuperAdmin, setIsSuperAdmin] = useState(false);
+  const { user, loading: authLoading } = useAuth();
   const [addArtistOpen, setAddArtistOpen] = useState(false);
   const [addGenreOpen, setAddGenreOpen] = useState(false);
+
   const navigate = useNavigate();
   const { toast } = useToast();
 
+  const { data: canEdit = false, isLoading: isLoadingPermissions } =
+    useUserPermissionsQuery(user?.id, "edit_artists");
+
+  const { data: isSuperAdmin = false, isLoading: isLoadingSuperAdmin } =
+    useUserPermissionsQuery(user?.id, "is_admin");
+
+ 
+
   useEffect(() => {
-    const checkPermissions = async () => {
-      // Wait for auth loading to complete
-      if (loading) return;
-      
-      // If not authenticated, redirect
-      if (!user) {
-        navigate("/");
-        return;
-      }
-      
-      // Check permissions
-      const permission = await canEditArtists();
-      setHasPermission(permission);
-      
-      if (!permission) {
-        navigate("/");
-        return;
-      }
+    // Wait for auth loading to complete
+    if (authLoading || isLoadingPermissions) {
+      return;
+    }
 
-      // Check if user is super admin
-      const superAdminCheck = await queryFunctions.checkUserPermissions(user.id, 'is_admin');
-      setIsSuperAdmin(superAdminCheck);
-    };
-    
-    checkPermissions();
-  }, [user, loading, canEditArtists, navigate]);
+    // If not authenticated, redirect
+    if (!user) {
+      console.log("redirecting to /, no user");
+      navigate("/");
+      return;
+    }
 
-  if (hasPermission === null) {
+    if (!canEdit) {
+      console.log("redirecting to /, no permission");
+      navigate("/");
+    }
+  }, [user, authLoading, navigate, isLoadingPermissions, canEdit]);
+
+  if (isLoadingPermissions || authLoading || isLoadingSuperAdmin) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900 flex items-center justify-center">
         <div className="text-white text-xl">Loading...</div>
@@ -60,7 +62,7 @@ export default function Admin() {
     );
   }
 
-  if (!hasPermission) {
+  if (!canEdit) {
     return null; // Will redirect
   }
 
@@ -75,7 +77,7 @@ export default function Admin() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900">
       <div className="container mx-auto px-4 py-8">
-        <AppHeader 
+        <AppHeader
           showBackButton={true}
           backTo="/"
           backLabel="Back to Artists"
@@ -83,30 +85,39 @@ export default function Admin() {
           subtitle="Platform Management"
           description="Manage artists, genres, and admin permissions"
         />
-        
+
         <div className="mt-8">
           <Tabs defaultValue="artists" className="w-full">
             <TabsList className="grid w-full grid-cols-3 bg-white/10 backdrop-blur-md">
-              <TabsTrigger value="artists" className="data-[state=active]:bg-purple-600 data-[state=active]:text-white">
+              <TabsTrigger
+                value="artists"
+                className="data-[state=active]:bg-purple-600 data-[state=active]:text-white"
+              >
                 <Music className="h-4 w-4 mr-2" />
                 Artists
               </TabsTrigger>
-              <TabsTrigger value="content" className="data-[state=active]:bg-purple-600 data-[state=active]:text-white">
+              <TabsTrigger
+                value="content"
+                className="data-[state=active]:bg-purple-600 data-[state=active]:text-white"
+              >
                 <Plus className="h-4 w-4 mr-2" />
                 Add Content
               </TabsTrigger>
               {isSuperAdmin && (
-                <TabsTrigger value="admins" className="data-[state=active]:bg-purple-600 data-[state=active]:text-white">
+                <TabsTrigger
+                  value="admins"
+                  className="data-[state=active]:bg-purple-600 data-[state=active]:text-white"
+                >
                   <UserPlus className="h-4 w-4 mr-2" />
                   Admin Roles
                 </TabsTrigger>
               )}
             </TabsList>
-            
+
             <TabsContent value="artists" className="mt-6">
               <ArtistsTable />
             </TabsContent>
-            
+
             <TabsContent value="content" className="mt-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <Card className="bg-white/10 backdrop-blur-md border-white/20">
@@ -120,7 +131,7 @@ export default function Admin() {
                     </CardDescription>
                   </CardHeader>
                   <CardContent>
-                    <Button 
+                    <Button
                       onClick={() => setAddArtistOpen(true)}
                       className="w-full bg-purple-600 hover:bg-purple-700 text-white"
                     >
@@ -141,7 +152,7 @@ export default function Admin() {
                     </CardDescription>
                   </CardHeader>
                   <CardContent>
-                    <Button 
+                    <Button
                       onClick={() => setAddGenreOpen(true)}
                       className="w-full bg-purple-600 hover:bg-purple-700 text-white"
                     >
@@ -152,7 +163,7 @@ export default function Admin() {
                 </Card>
               </div>
             </TabsContent>
-            
+
             {isSuperAdmin && (
               <TabsContent value="admins" className="mt-6">
                 <AdminRolesTable />
@@ -162,16 +173,13 @@ export default function Admin() {
         </div>
       </div>
 
-      <AddArtistDialog 
+      <AddArtistDialog
         open={addArtistOpen}
         onOpenChange={setAddArtistOpen}
         onSuccess={handleArtistAdded}
       />
 
-      <AddGenreDialog 
-        open={addGenreOpen}
-        onOpenChange={setAddGenreOpen}
-      />
+      <AddGenreDialog open={addGenreOpen} onOpenChange={setAddGenreOpen} />
     </div>
   );
 }

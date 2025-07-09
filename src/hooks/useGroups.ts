@@ -1,7 +1,6 @@
 import { useAuth } from "./useAuth";
 import {
   useUserGroupsQuery,
-  useUserPermissionsQuery,
   useCreateGroupMutation,
   useDeleteGroupMutation,
   useJoinGroupMutation,
@@ -10,7 +9,6 @@ import {
 import { groupService } from "@/services/groupService";
 import { useToast } from "@/components/ui/use-toast";
 import type { GroupMember } from "@/types/groups";
-import { useCallback } from "react";
 
 export const useGroups = () => {
   const { user, loading } = useAuth();
@@ -21,10 +19,6 @@ export const useGroups = () => {
     isLoading: groupsLoading,
     refetch: fetchUserGroups,
   } = useUserGroupsQuery(user?.id);
-  const { data: canEdit = false } = useUserPermissionsQuery(
-    user?.id,
-    "edit_artists"
-  );
 
   const createGroupMutation = useCreateGroupMutation();
   const deleteGroupMutation = useDeleteGroupMutation();
@@ -193,14 +187,6 @@ export const useGroups = () => {
     return groupService.getGroupById(groupId);
   };
 
-  const checkUserPermission = async (permission: "edit_artists") => {
-    return canEdit;
-  };
-
-  const canEditArtists = useCallback(async () => {
-    return canEdit;
-  }, [canEdit]);
-
   return {
     user,
     groups,
@@ -214,7 +200,5 @@ export const useGroups = () => {
     removeMemberFromGroup,
     getGroupById,
     fetchUserGroups,
-    checkUserPermission,
-    canEditArtists,
   };
 };

@@ -1,26 +1,22 @@
 import { useState, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
-import { useGroups } from "@/hooks/useGroups";
 import { useAuth } from "@/hooks/useAuth";
 import { Artist, useOfflineArtistData } from "@/hooks/useOfflineArtistData";
 import { useOfflineVoting } from "@/hooks/useOfflineVoting";
 import { offlineStorage } from "@/lib/offlineStorage";
+import { useUserPermissionsQuery } from "@/hooks/queries/useGroupsQuery";
 
 export const useArtistDetail = (id: string | undefined) => {
-  const [canEdit, setCanEdit] = useState(false);
+  const { user, loading: authLoading } = useAuth();
+  const { data: canEdit = false, isLoading: isLoadingPermissions } =
+    useUserPermissionsQuery(user?.id, "edit_artists");
+
   const [artist, setArtist] = useState<Artist | null>(null);
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
-  const { canEditArtists } = useGroups();
-  const { user } = useAuth();
+
   const { archiveArtist: archiveArtistOffline } = useOfflineArtistData();
   const { userVotes, handleVote } = useOfflineVoting(user);
-
-  useEffect(() => {
-    if (user) {
-      checkPermissions();
-    }
-  }, [user]);
 
   useEffect(() => {
     if (id) {
@@ -30,13 +26,13 @@ export const useArtistDetail = (id: string | undefined) => {
 
   const loadArtist = async () => {
     if (!id) return;
-    
+
     setLoading(true);
     try {
       const artistData = await offlineStorage.getArtist(id);
       setArtist(artistData);
     } catch (error) {
-      console.error('Error loading artist:', error);
+      console.error("Error loading artist:", error);
       toast({
         title: "Error",
         description: "Failed to load artist data",
@@ -45,11 +41,6 @@ export const useArtistDetail = (id: string | undefined) => {
     } finally {
       setLoading(false);
     }
-  };
-
-  const checkPermissions = async () => {
-    const editPermission = await canEditArtists();
-    setCanEdit(editPermission);
   };
 
   const handleVoteAction = async (voteType: number) => {
@@ -69,13 +60,13 @@ export const useArtistDetail = (id: string | undefined) => {
     await archiveArtistOffline(id);
   };
 
-  const userVote = userVotes[id || ''] || null;
+  const userVote = userVotes[id || ""] || null;
 
   return {
     artist,
     user,
     userVote,
-    loading,
+    loading: authLoading || isLoadingPermissions || loading,
     canEdit,
     handleVote: handleVoteAction,
     getVoteCount,

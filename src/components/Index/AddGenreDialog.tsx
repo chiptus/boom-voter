@@ -1,13 +1,20 @@
-
 import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { Plus } from "lucide-react";
-import { useGroups } from "@/hooks/useGroups";
+
+import { useUserPermissionsQuery } from "@/hooks/queries/useGroupsQuery";
+import { useAuth } from "@/hooks/useAuth";
 
 interface AddGenreDialogProps {
   open: boolean;
@@ -15,17 +22,26 @@ interface AddGenreDialogProps {
 }
 
 export const AddGenreDialog = ({ open, onOpenChange }: AddGenreDialogProps) => {
+  const { user, loading: authLoading } = useAuth();
+  const { data: canEdit = false, isLoading: isLoadingPermissions } =
+    useUserPermissionsQuery(user?.id, "edit_artists");
+
   const [name, setName] = useState("");
   const [loading, setLoading] = useState(false);
   const { toast } = useToast();
-  const { canEditArtists } = useGroups();
+
+  if (authLoading || isLoadingPermissions) {
+    return null;
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
 
-    const { data: { user } } = await supabase.auth.getUser();
-    
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
     if (!user) {
       toast({
         title: "Error",
@@ -37,8 +53,7 @@ export const AddGenreDialog = ({ open, onOpenChange }: AddGenreDialogProps) => {
     }
 
     // Check Core team permissions
-    const hasPermission = await canEditArtists();
-    if (!hasPermission) {
+    if (!canEdit) {
       toast({
         title: "Permission Denied",
         description: "Only Core team members can add genres",
@@ -48,15 +63,13 @@ export const AddGenreDialog = ({ open, onOpenChange }: AddGenreDialogProps) => {
       return;
     }
 
-    const { error } = await supabase
-      .from("music_genres")
-      .insert({
-        name,
-        created_by: user.id,
-      });
+    const { error } = await supabase.from("music_genres").insert({
+      name,
+      created_by: user.id,
+    });
 
     if (error) {
-      if (error.code === '23505') {
+      if (error.code === "23505") {
         toast({
           title: "Error",
           description: "This genre already exists",
@@ -92,7 +105,7 @@ export const AddGenreDialog = ({ open, onOpenChange }: AddGenreDialogProps) => {
             Add a new music genre that others can use when adding artists.
           </DialogDescription>
         </DialogHeader>
-        
+
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
             <Label htmlFor="genre-name">Genre Name</Label>
@@ -105,7 +118,7 @@ export const AddGenreDialog = ({ open, onOpenChange }: AddGenreDialogProps) => {
               placeholder="Enter genre name"
             />
           </div>
-          
+
           <Button type="submit" className="w-full" disabled={loading}>
             {loading ? "Adding genre..." : "Add Genre"}
           </Button>

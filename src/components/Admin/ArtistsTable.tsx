@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useArtistsQuery } from "@/hooks/queries/useArtistsQuery";
 import { useGenres } from "@/hooks/queries/useGenresQuery";
 import { supabase } from "@/integrations/supabase/client";
@@ -14,40 +14,10 @@ import {
 } from "@/components/ui/table";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Loader2, Search, Archive, Edit2, Check, X } from "lucide-react";
 import { StageSelector } from "@/components/StageSelector";
-import { formatTimeRange, formatDateTime } from "@/lib/timeUtils";
-
-// Helper functions for date/time conversion (reused from EditArtistDialog)
-const getUserTimeZone = () => Intl.DateTimeFormat().resolvedOptions().timeZone;
-
-const toDatetimeLocal = (isoString: string | null): string => {
-  if (!isoString) return "";
-  const utcDate = new Date(isoString);
-  const userTimeZone = getUserTimeZone();
-  
-  // Convert to user's timezone and format for datetime-local input
-  const localDate = new Date(utcDate.getTime() - (utcDate.getTimezoneOffset() * 60000));
-  return localDate.toISOString().slice(0, 16);
-};
-
-const toISOString = (datetimeLocal: string): string => {
-  if (!datetimeLocal) return "";
-  const localDate = new Date(datetimeLocal);
-  const userTimeZone = getUserTimeZone();
-  
-  // Convert from user's timezone to UTC
-  const utcDate = new Date(localDate.getTime() + (localDate.getTimezoneOffset() * 60000));
-  return utcDate.toISOString();
-};
+import { formatDateTime, toDatetimeLocal, toISOString } from "@/lib/timeUtils";
 
 interface EditingState {
   artistId: string;
@@ -57,30 +27,32 @@ interface EditingState {
 
 export const ArtistsTable = () => {
   const { data: artists, isLoading, refetch } = useArtistsQuery();
-  const { genres } = useGenres();
   const { toast } = useToast();
   const [editingState, setEditingState] = useState<EditingState | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
-  const [filteredArtists, setFilteredArtists] = useState<Artist[]>([]);
 
-  useEffect(() => {
-    if (artists) {
-      const filtered = artists.filter((artist) =>
-        !artist.archived && 
-        artist.name.toLowerCase().includes(searchTerm.toLowerCase())
-      );
-      setFilteredArtists(filtered);
-    }
-  }, [artists, searchTerm]);
+  const filteredArtists = useMemo(
+    () =>
+      artists?.filter(
+        (artist) =>
+          !artist.archived &&
+          artist.name.toLowerCase().includes(searchTerm.toLowerCase())
+      ),
+    [artists, searchTerm]
+  );
 
-  const startEditing = (artistId: string, field: string, currentValue: string) => {
+  const startEditing = (
+    artistId: string,
+    field: string,
+    currentValue: string
+  ) => {
     let value = currentValue;
-    
+
     // Convert ISO strings to datetime-local format for editing
-    if (field === 'time_start' || field === 'time_end') {
+    if (field === "time_start" || field === "time_end") {
       value = toDatetimeLocal(currentValue);
     }
-    
+
     setEditingState({ artistId, field, value });
   };
 
@@ -92,12 +64,12 @@ export const ArtistsTable = () => {
     if (!editingState) return;
 
     const { artistId, field, value } = editingState;
-    
+
     try {
-      let updateValue: any = value;
-      
+      let updateValue: string | null = value;
+
       // Convert datetime-local back to ISO string for time fields
-      if (field === 'time_start' || field === 'time_end') {
+      if (field === "time_start" || field === "time_end") {
         updateValue = value ? toISOString(value) : null;
       } else if (!value.trim()) {
         updateValue = null;
@@ -105,9 +77,9 @@ export const ArtistsTable = () => {
 
       const { error } = await supabase
         .from("artists")
-        .update({ 
+        .update({
           [field]: updateValue,
-          updated_at: new Date().toISOString()
+          updated_at: new Date().toISOString(),
         })
         .eq("id", artistId);
 
@@ -134,9 +106,9 @@ export const ArtistsTable = () => {
     try {
       const { error } = await supabase
         .from("artists")
-        .update({ 
+        .update({
           archived: true,
-          updated_at: new Date().toISOString()
+          updated_at: new Date().toISOString(),
         })
         .eq("id", artistId);
 
@@ -158,17 +130,22 @@ export const ArtistsTable = () => {
     }
   };
 
-  const renderEditableCell = (artist: Artist, field: keyof Artist, value: string | null) => {
-    const isEditing = editingState?.artistId === artist.id && editingState?.field === field;
+  const renderEditableCell = (
+    artist: Artist,
+    field: keyof Artist,
+    value: string | null
+  ) => {
+    const isEditing =
+      editingState?.artistId === artist.id && editingState?.field === field;
     const displayValue = value || "";
 
     if (isEditing) {
-      if (field === 'stage') {
+      if (field === "stage") {
         return (
           <div className="flex items-center gap-2">
             <StageSelector
               value={editingState.value}
-              onValueChange={(newValue) => 
+              onValueChange={(newValue) =>
                 setEditingState({ ...editingState, value: newValue })
               }
             />
@@ -182,19 +159,19 @@ export const ArtistsTable = () => {
         );
       }
 
-      if (field === 'time_start' || field === 'time_end') {
+      if (field === "time_start" || field === "time_end") {
         return (
           <div className="flex items-center gap-2">
             <Input
               type="datetime-local"
               value={editingState.value}
-              onChange={(e) => 
+              onChange={(e) =>
                 setEditingState({ ...editingState, value: e.target.value })
               }
               className="w-48"
               onKeyDown={(e) => {
-                if (e.key === 'Enter') saveEdit();
-                if (e.key === 'Escape') cancelEditing();
+                if (e.key === "Enter") saveEdit();
+                if (e.key === "Escape") cancelEditing();
               }}
             />
             <Button size="sm" variant="ghost" onClick={saveEdit}>
@@ -211,13 +188,13 @@ export const ArtistsTable = () => {
         <div className="flex items-center gap-2">
           <Input
             value={editingState.value}
-            onChange={(e) => 
+            onChange={(e) =>
               setEditingState({ ...editingState, value: e.target.value })
             }
             className="min-w-32"
             onKeyDown={(e) => {
-              if (e.key === 'Enter') saveEdit();
-              if (e.key === 'Escape') cancelEditing();
+              if (e.key === "Enter") saveEdit();
+              if (e.key === "Escape") cancelEditing();
             }}
             autoFocus
           />
@@ -233,12 +210,12 @@ export const ArtistsTable = () => {
 
     // Display mode
     let formattedValue = displayValue;
-    if (field === 'time_start' || field === 'time_end') {
+    if (field === "time_start" || field === "time_end") {
       formattedValue = value ? formatDateTime(value, true) || "" : "";
     }
 
     return (
-      <div 
+      <div
         className="cursor-pointer hover:bg-muted/20 p-2 rounded min-h-8 flex items-center group"
         onClick={() => startEditing(artist.id, field, value || "")}
       >
@@ -296,16 +273,20 @@ export const ArtistsTable = () => {
               {filteredArtists.map((artist) => (
                 <TableRow key={artist.id}>
                   <TableCell className="font-medium">
-                    {renderEditableCell(artist, 'name', artist.name)}
+                    {renderEditableCell(artist, "name", artist.name)}
                   </TableCell>
                   <TableCell>
-                    {renderEditableCell(artist, 'stage', artist.stage)}
+                    {renderEditableCell(artist, "stage", artist.stage)}
                   </TableCell>
                   <TableCell>
-                    {renderEditableCell(artist, 'time_start', artist.time_start)}
+                    {renderEditableCell(
+                      artist,
+                      "time_start",
+                      artist.time_start
+                    )}
                   </TableCell>
                   <TableCell>
-                    {renderEditableCell(artist, 'time_end', artist.time_end)}
+                    {renderEditableCell(artist, "time_end", artist.time_end)}
                   </TableCell>
                   <TableCell>
                     <Button
@@ -321,10 +302,12 @@ export const ArtistsTable = () => {
               ))}
             </TableBody>
           </Table>
-          
+
           {filteredArtists.length === 0 && (
             <div className="text-center py-8 text-muted-foreground">
-              {searchTerm ? "No artists found matching your search." : "No artists found."}
+              {searchTerm
+                ? "No artists found matching your search."
+                : "No artists found."}
             </div>
           )}
         </div>

@@ -1,4 +1,5 @@
 import { format, isValid, parseISO, isSameDay } from "date-fns";
+import { fromZonedTime, toZonedTime } from "date-fns-tz";
 
 export function formatTimeRange(startTime: string | null,
   endTime: string | null, use24Hour: boolean = false): string | null {
@@ -46,7 +47,7 @@ export function formatTimeRange(startTime: string | null,
   return null;
 }
 
-export const formatDateTime = (dateTime: string | null, use24Hour: boolean = false): string | null => {
+export function formatDateTime(dateTime: string | null, use24Hour: boolean = false): string | null {
   if (!dateTime) return null;
 
   const date = parseISO(dateTime);
@@ -72,3 +73,35 @@ export const formatTimeOnly = (startTime: string | null, endTime: string | null,
 
   return format(start, timeFormat);
 };
+
+
+// Get user's timezone
+function getUserTimeZone(): string {
+  return Intl.DateTimeFormat().resolvedOptions().timeZone;
+}
+
+// Helper function to convert UTC ISO string to local datetime-local format
+export function toDatetimeLocal(isoString: string | null): string {
+  if (!isoString) return "";
+  const utcDate = new Date(isoString);
+  const userTimeZone = getUserTimeZone();
+  const localDate = toZonedTime(utcDate, userTimeZone);
+
+  // Format the date in local timezone for datetime-local input
+  const year = localDate.getFullYear();
+  const month = String(localDate.getMonth() + 1).padStart(2, "0");
+  const day = String(localDate.getDate()).padStart(2, "0");
+  const hours = String(localDate.getHours()).padStart(2, "0");
+  const minutes = String(localDate.getMinutes()).padStart(2, "0");
+
+  return `${year}-${month}-${day}T${hours}:${minutes}`;
+};
+
+// Helper function to convert local datetime-local to UTC ISO string
+export function toISOString(datetimeLocal: string): string {
+  if (!datetimeLocal) return "";
+  const localDate = new Date(datetimeLocal);
+  const userTimeZone = getUserTimeZone();
+  const utcDate = fromZonedTime(localDate, userTimeZone);
+  return utcDate.toISOString();
+}
