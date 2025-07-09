@@ -6,18 +6,23 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 export default function Admin() {
-  const { user } = useAuth();
+  const { user, loading } = useAuth();
   const { canEditArtists } = useGroups();
   const [hasPermission, setHasPermission] = useState<boolean | null>(null);
   const navigate = useNavigate();
 
   useEffect(() => {
     const checkPermissions = async () => {
+      // Wait for auth loading to complete
+      if (loading) return;
+      
+      // If not authenticated, redirect
       if (!user) {
         navigate("/");
         return;
       }
       
+      // Check permissions
       const permission = await canEditArtists();
       setHasPermission(permission);
       
@@ -27,7 +32,7 @@ export default function Admin() {
     };
     
     checkPermissions();
-  }, [user, canEditArtists, navigate]);
+  }, [user, loading, canEditArtists, navigate]);
 
   if (hasPermission === null) {
     return (
