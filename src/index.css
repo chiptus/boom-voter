@@ -37,21 +37,61 @@
     --radius: 0.5rem;
 
     --sidebar-background: 0 0% 98%;
-
     --sidebar-foreground: 240 5.3% 26.1%;
-
     --sidebar-primary: 240 5.9% 10%;
-
     --sidebar-primary-foreground: 0 0% 98%;
-
     --sidebar-accent: 240 4.8% 95.9%;
-
     --sidebar-accent-foreground: 240 5.9% 10%;
-
     --sidebar-border: 220 13% 91%;
-
     --sidebar-ring: 217.2 91.2% 59.8%;
+
+    /* App Palette System - Default: Warm Earth */
+    --app-gradient-from: 34 12% 57%; /* #9d9484 */
+    --app-gradient-to: 186 32% 68%;   /* #91c8ce */
+    --app-primary: 34 12% 45%;
+    --app-primary-foreground: 0 0% 98%;
+    --app-accent: 186 32% 55%;
+    --app-accent-foreground: 0 0% 10%;
+    --app-button: 34 12% 50%;
+    --app-button-hover: 34 12% 40%;
   }
+
+  /* Warm Earth Palette */
+  :root[data-palette="warm-earth"] {
+    --app-gradient-from: 34 12% 57%; /* #9d9484 */
+    --app-gradient-to: 186 32% 68%;   /* #91c8ce */
+    --app-primary: 34 12% 45%;
+    --app-primary-foreground: 0 0% 98%;
+    --app-accent: 186 32% 55%;
+    --app-accent-foreground: 0 0% 10%;
+    --app-button: 34 12% 50%;
+    --app-button-hover: 34 12% 40%;
+  }
+
+  /* Festival Sunset Palette */
+  :root[data-palette="festival-sunset"] {
+    --app-gradient-from: 35 45% 65%;  /* #d4a574 */
+    --app-gradient-to: 357 62% 70%;   /* #e67e80 */
+    --app-primary: 35 45% 50%;
+    --app-primary-foreground: 0 0% 98%;
+    --app-accent: 357 62% 55%;
+    --app-accent-foreground: 0 0% 10%;
+    --app-button: 35 45% 55%;
+    --app-button-hover: 35 45% 45%;
+  }
+
+  /* Deep Ocean Palette */
+  :root[data-palette="deep-ocean"] {
+    --app-gradient-from: 210 25% 25%; /* #2d3748 */
+    --app-gradient-to: 195 85% 35%;   /* #1a365d */
+    --app-primary: 210 25% 35%;
+    --app-primary-foreground: 0 0% 98%;
+    --app-accent: 195 85% 45%;
+    --app-accent-foreground: 0 0% 98%;
+    --app-button: 195 85% 50%;
+    --app-button-hover: 195 85% 40%;
+  }
+}
 
   .dark {
     --background: 222.2 84% 4.9%;
@@ -99,5 +139,15 @@
 
   body {
     @apply bg-background text-foreground;
+  }
+}
+
+@layer utilities {
+  .bg-app-gradient {
+    @apply bg-gradient-to-br from-app-gradient-from to-app-gradient-to;
+  }
+
+  .bg-app-card-gradient {
+    @apply bg-gradient-to-br from-app-accent/40 to-app-button/40;
   }
 }

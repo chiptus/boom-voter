@@ -42,7 +42,7 @@ const Schedule = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900 flex items-center justify-center">
+      <div className="min-h-screen bg-app-gradient flex items-center justify-center">
         <div className="text-white text-xl">Loading schedule...</div>
       </div>
     );
@@ -50,7 +50,7 @@ const Schedule = () => {
 
   if (error) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900 flex items-center justify-center">
+      <div className="min-h-screen bg-app-gradient flex items-center justify-center">
         <div className="text-white text-xl">Error loading schedule. Please try again.</div>
       </div>
     );
@@ -58,7 +58,7 @@ const Schedule = () => {
 
   if (scheduleDays.length === 0) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900">
+      <div className="min-h-screen bg-app-gradient">
         <div className="container mx-auto px-4 py-8">
           <AppHeader 
             showBackButton
@@ -77,7 +77,7 @@ const Schedule = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900">
+    <div className="min-h-screen bg-app-gradient">
       <div className="container mx-auto px-4 py-8">
         <AppHeader 
           showBackButton

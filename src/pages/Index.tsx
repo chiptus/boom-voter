@@ -44,7 +44,7 @@ export default function Index() {
   // Show loading while validating invite
   if (isValidating) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900 flex items-center justify-center">
+      <div className="min-h-screen bg-app-gradient flex items-center justify-center">
         <div className="text-white text-xl">Validating invite...</div>
       </div>
     );
@@ -66,7 +66,7 @@ export default function Index() {
   // Show error page for invalid invites
   if (urlState.invite && inviteValidation && !inviteValidation.is_valid) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900 flex items-center justify-center p-4">
+      <div className="min-h-screen bg-app-gradient flex items-center justify-center p-4">
         <div className="text-center text-white">
           <h1 className="text-2xl font-bold mb-4">Invalid Invite</h1>
           <p className="mb-4">This invite link is no longer valid.</p>
@@ -83,14 +83,14 @@ export default function Index() {
 
   if (authLoading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900 flex items-center justify-center">
+      <div className="min-h-screen bg-app-gradient flex items-center justify-center">
         <div className="text-white text-xl">Loading...</div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900">
+    <div className="min-h-screen bg-app-gradient">
       <div className="container mx-auto px-4 py-8">
         <AppHeader 
           title="Boom Festival"

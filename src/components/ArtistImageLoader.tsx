@@ -23,7 +23,7 @@ export const ArtistImageLoader = ({ src, alt, className = "" }: ArtistImageLoade
 
   if (!src || imageError) {
     return (
-      <div className={`flex items-center justify-center bg-gradient-to-br from-purple-600 to-blue-600 ${className}`}>
+      <div className={`flex items-center justify-center bg-app-card-gradient ${className}`}>
         <Music className="h-16 w-16 text-white/70" />
       </div>
     );
@@ -32,7 +32,7 @@ export const ArtistImageLoader = ({ src, alt, className = "" }: ArtistImageLoade
   return (
     <div className={`relative ${className}`}>
       {isLoading && (
-        <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-purple-600 to-blue-600">
+        <div className="absolute inset-0 flex items-center justify-center bg-app-card-gradient">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-white"></div>
         </div>
       )}

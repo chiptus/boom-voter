@@ -76,7 +76,7 @@ const GroupDetail = () => {
   // Show loading while checking authentication
   if (authLoading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900 flex items-center justify-center">
+      <div className="min-h-screen bg-app-gradient flex items-center justify-center">
         <div className="text-white text-xl">Loading...</div>
       </div>
     );
@@ -84,7 +84,7 @@ const GroupDetail = () => {
 
   if (!user) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900 flex items-center justify-center">
+      <div className="min-h-screen bg-app-gradient flex items-center justify-center">
         <Card className="w-full max-w-md">
           <CardHeader>
             <CardTitle>Sign in required</CardTitle>
@@ -102,7 +102,7 @@ const GroupDetail = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900 flex items-center justify-center">
+      <div className="min-h-screen bg-app-gradient flex items-center justify-center">
         <div className="text-white text-xl">Loading group details...</div>
       </div>
     );
@@ -110,7 +110,7 @@ const GroupDetail = () => {
 
   if (!group) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900 flex items-center justify-center">
+      <div className="min-h-screen bg-app-gradient flex items-center justify-center">
         <Card className="w-full max-w-md">
           <CardHeader>
             <CardTitle>Group not found</CardTitle>
@@ -129,7 +129,7 @@ const GroupDetail = () => {
   const isCreator = group.created_by === user.id;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900">
+    <div className="min-h-screen bg-app-gradient">
       <div className="container mx-auto px-4 py-8">
         <AppHeader 
           showBackButton

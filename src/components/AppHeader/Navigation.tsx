@@ -6,6 +6,7 @@ import {
   TooltipContent,
   TooltipTrigger 
 } from "@/components/ui/tooltip";
+import { PaletteSelector } from "@/components/PaletteSelector";
 
 interface NavigationProps {
   showBackButton?: boolean;
@@ -49,6 +50,9 @@ export const Navigation = ({
 
   return (
     <div className="flex items-center gap-3">
+      {/* Palette Selector */}
+      <PaletteSelector />
+
       {/* Back Navigation */}
       {showBackButton && (
         <TooltipButton

@@ -16,7 +16,7 @@ export const InviteLandingPage = ({ inviteValidation, onSignupSuccess }: InviteL
 
   if (!inviteValidation.is_valid) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900 flex items-center justify-center p-4">
+      <div className="min-h-screen bg-app-gradient flex items-center justify-center p-4">
         <Card className="max-w-md w-full">
           <CardHeader className="text-center">
             <AlertCircle className="h-12 w-12 mx-auto mb-4 text-red-500" />
@@ -31,7 +31,7 @@ export const InviteLandingPage = ({ inviteValidation, onSignupSuccess }: InviteL
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-app-gradient flex items-center justify-center p-4">
       <Card className="max-w-md w-full">
         <CardHeader className="text-center">
           <Users className="h-12 w-12 mx-auto mb-4 text-purple-400" />
