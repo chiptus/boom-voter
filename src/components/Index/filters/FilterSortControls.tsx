@@ -9,7 +9,7 @@ import { Filter, RefreshCw } from "lucide-react";
 import { SortControls } from "./SortControls";
 import { MobileFilters } from "./MobileFilters";
 import { DesktopFilters } from "./DesktopFilters";
-import { ViewToggle } from "./ViewToggle";
+import { MainViewToggle } from "./MainViewToggle";
 import { TimeFormatToggle } from "./TimeFormatToggle";
 
 interface FilterSortControlsProps {
@@ -68,9 +68,9 @@ export const FilterSortControls = ({ state, onStateChange, onClear }: FilterSort
             use24Hour={state.use24Hour}
             onChange={(use24Hour) => onStateChange({ use24Hour })}
           />
-          <ViewToggle
-            view={state.view}
-            onViewChange={(view) => onStateChange({ view })}
+          <MainViewToggle
+            mainView={state.mainView}
+            onMainViewChange={(mainView) => onStateChange({ mainView })}
           />
           {isMobile ? (
           <Button

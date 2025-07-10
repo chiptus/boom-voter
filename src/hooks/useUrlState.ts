@@ -2,15 +2,14 @@ import { useCallback } from 'react';
 import { useSearchParams } from 'react-router-dom';
 
 export type SortOption = 'name-asc' | 'name-desc' | 'rating-desc' | 'popularity-desc' | 'date-asc';
-export type ScheduleViewOption = 'grid' | 'list' | 'horizontal';
+export type MainViewOption = 'list' | 'timeline';
 
 export interface FilterSortState {
   sort: SortOption;
   stages: string[];
   genres: string[];
   minRating: number;
-  view: 'grid' | 'list';
-  scheduleView: ScheduleViewOption;
+  mainView: MainViewOption;
   use24Hour: boolean;
   groupId?: string;
   invite?: string;
@@ -22,8 +21,7 @@ const defaultState: FilterSortState = {
   stages: [],
   genres: [],
   minRating: 0,
-  view: 'list',
-  scheduleView: 'horizontal',
+  mainView: 'list',
   use24Hour: true,
   groupId: undefined,
   invite: undefined,
@@ -39,8 +37,7 @@ export const useUrlState = () => {
       stages: searchParams.get('stages')?.split(',').filter(Boolean) || defaultState.stages,
       genres: searchParams.get('genres')?.split(',').filter(Boolean) || defaultState.genres,
       minRating: parseInt(searchParams.get('minRating') || '0') || defaultState.minRating,
-      view: (searchParams.get('view') as 'grid' | 'list') || defaultState.view,
-      scheduleView: (searchParams.get('scheduleView') as ScheduleViewOption) || defaultState.scheduleView,
+      mainView: (searchParams.get('mainView') as MainViewOption) || defaultState.mainView,
       use24Hour: searchParams.get('use24Hour') === 'true' || defaultState.use24Hour,
       groupId: searchParams.get('groupId') || defaultState.groupId,
       invite: searchParams.get('invite') || defaultState.invite,
@@ -67,11 +64,8 @@ export const useUrlState = () => {
     if (newState.minRating > 0) {
       newParams.set('minRating', newState.minRating.toString());
     }
-    if (newState.view !== defaultState.view) {
-      newParams.set('view', newState.view);
-    }
-    if (newState.scheduleView !== defaultState.scheduleView) {
-      newParams.set('scheduleView', newState.scheduleView);
+    if (newState.mainView !== defaultState.mainView) {
+      newParams.set('mainView', newState.mainView);
     }
     if (newState.use24Hour !== defaultState.use24Hour) {
       newParams.set('use24Hour', newState.use24Hour.toString());

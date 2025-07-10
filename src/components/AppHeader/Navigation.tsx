@@ -12,7 +12,6 @@ interface NavigationProps {
   showBackButton?: boolean;
   backTo?: string;
   backLabel?: string;
-  showScheduleButton?: boolean;
   showGroupsButton?: boolean;
   user?: any;
   isMobile: boolean;
@@ -23,7 +22,6 @@ export const Navigation = ({
   showBackButton, 
   backTo = "/", 
   backLabel = "Back",
-  showScheduleButton,
   showGroupsButton,
   user,
   isMobile,
@@ -67,20 +65,6 @@ export const Navigation = ({
         </TooltipButton>
       )}
       
-      {/* Schedule Button */}
-      {showScheduleButton && (
-        <Link to="/schedule">
-          <TooltipButton
-            variant="outline" 
-            size={isMobile ? "sm" : "default"}
-            className="border-purple-400/50 text-purple-300 hover:bg-purple-600 hover:text-white hover:border-purple-600 transition-colors"
-            tooltip="View Festival Schedule"
-          >
-            <Calendar className="h-4 w-4" />
-            {!isMobile && <span className="ml-2">Schedule</span>}
-          </TooltipButton>
-        </Link>
-      )}
       
       {/* Groups Button */}
       {showGroupsButton && user && (

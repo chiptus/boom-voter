@@ -28,7 +28,6 @@ interface AppHeaderProps {
   user?: User;
   onSignIn?: () => void;
   onSignOut?: () => void;
-  showScheduleButton?: boolean;
   showGroupsButton?: boolean;
 
   // Custom content section
@@ -47,7 +46,6 @@ export const AppHeader = ({
   onSignIn,
   onSignOut,
 
-  showScheduleButton = false,
   showGroupsButton = false,
   children,
 }: AppHeaderProps) => {
@@ -99,7 +97,6 @@ export const AppHeader = ({
               showBackButton={showBackButton}
               backTo={backTo}
               backLabel={backLabel}
-              showScheduleButton={showScheduleButton}
               showGroupsButton={showGroupsButton}
               user={user}
               isMobile={isMobile}

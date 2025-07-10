@@ -11,8 +11,11 @@ import { AppHeader } from "@/components/AppHeader";
 import { InviteLandingPage } from "@/components/Index/InviteLandingPage";
 import { useArtistFiltering } from "@/components/Index/useArtistFiltering";
 import { useOfflineArtistData } from "@/hooks/useOfflineArtistData";
+import { useOfflineVoting } from "@/hooks/useOfflineVoting";
 import { useUrlState } from "@/hooks/useUrlState";
 import { ArtistsPanel } from "@/components/Index/ArtistsPanel";
+import { ScheduleHorizontalTimelineView } from "@/components/schedule/ScheduleHorizontalTimelineView";
+import ErrorBoundary from "@/components/ErrorBoundary";
 
 export default function Index() {
   const { user, loading: authLoading, signOut, hasUsername } = useAuth();
@@ -23,6 +26,7 @@ export default function Index() {
   const { state: urlState, updateUrlState, clearFilters } = useUrlState();
   
   const { artists, fetchArtists, archiveArtist } = useOfflineArtistData();
+  const { userVotes, handleVote } = useOfflineVoting(user);
   
   const { filteredAndSortedArtists } = useArtistFiltering(artists, urlState);
 
@@ -89,6 +93,13 @@ export default function Index() {
     );
   }
 
+  const handleVoteAction = async (artistId: string, voteType: number) => {
+    const result = await handleVote(artistId, voteType);
+    if (result.requiresAuth) {
+      setShowAuthDialog(true);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-app-gradient">
       <div className="container mx-auto px-4 py-8">
@@ -99,7 +110,6 @@ export default function Index() {
           user={user}
           onSignIn={() => setShowAuthDialog(true)}
           onSignOut={signOut}
-          showScheduleButton={true}
           showGroupsButton={true}
         />
 
@@ -110,16 +120,26 @@ export default function Index() {
         />
 
         <div className="mt-8">
-            <ArtistsPanel
-              items={filteredAndSortedArtists}
-              isGrid={urlState.view === "grid"}
-              user={user}
-              use24Hour={urlState.use24Hour}
-              openAuthDialog={() => setShowAuthDialog(true)}
-              fetchArtists={fetchArtists}
-              archiveArtist={archiveArtist}
-              onLockSort={() => updateUrlState({ sortLocked: true })}
-            />
+          <ErrorBoundary>
+            {urlState.mainView === 'list' && (
+              <ArtistsPanel
+                items={filteredAndSortedArtists}
+                isGrid={false}
+                user={user}
+                use24Hour={urlState.use24Hour}
+                openAuthDialog={() => setShowAuthDialog(true)}
+                fetchArtists={fetchArtists}
+                archiveArtist={archiveArtist}
+                onLockSort={() => updateUrlState({ sortLocked: true })}
+              />
+            )}
+            {urlState.mainView === 'timeline' && (
+              <ScheduleHorizontalTimelineView
+                userVotes={userVotes}
+                onVote={handleVoteAction}
+              />
+            )}
+          </ErrorBoundary>
         </div>
 
         <AuthDialog
