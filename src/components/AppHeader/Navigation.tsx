@@ -1,39 +1,44 @@
 import { Link } from "react-router-dom";
-import { ArrowLeft, Calendar, Users } from "lucide-react";
+import { ArrowLeft, Users } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { 
+import {
   Tooltip,
   TooltipContent,
-  TooltipTrigger 
+  TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { PaletteSelector } from "@/components/PaletteSelector";
+// import { PaletteSelector } from "@/components/PaletteSelector";
+import { User } from "@supabase/supabase-js";
 
 interface NavigationProps {
   showBackButton?: boolean;
   backTo?: string;
   backLabel?: string;
   showGroupsButton?: boolean;
-  user?: any;
+  user?: User;
   isMobile: boolean;
   onBackClick?: () => void;
 }
 
-export const Navigation = ({ 
-  showBackButton, 
-  backTo = "/", 
+export const Navigation = ({
+  showBackButton,
+  backTo = "/",
   backLabel = "Back",
   showGroupsButton,
   user,
   isMobile,
-  onBackClick
+  onBackClick,
 }: NavigationProps) => {
-  const TooltipButton = ({ children, tooltip, ...props }: { 
-    children: React.ReactNode; 
-    tooltip: string; 
-    [key: string]: any 
+  const TooltipButton = ({
+    children,
+    tooltip,
+    ...props
+  }: {
+    children: React.ReactNode;
+    tooltip: string;
+    [key: string]: any;
   }) => {
     if (!isMobile) return <Button {...props}>{children}</Button>;
-    
+
     return (
       <Tooltip>
         <TooltipTrigger asChild>
@@ -49,12 +54,12 @@ export const Navigation = ({
   return (
     <div className="flex items-center gap-3">
       {/* Palette Selector */}
-      <PaletteSelector />
+      {/* <PaletteSelector /> */}
 
       {/* Back Navigation */}
       {showBackButton && (
         <TooltipButton
-          variant="outline" 
+          variant="outline"
           size={isMobile ? "sm" : "default"}
           onClick={onBackClick}
           className="border-purple-400/50 text-purple-300 hover:bg-purple-600 hover:text-white hover:border-purple-600 transition-colors"
@@ -64,13 +69,12 @@ export const Navigation = ({
           {!isMobile && <span className="ml-2">{backLabel}</span>}
         </TooltipButton>
       )}
-      
-      
+
       {/* Groups Button */}
       {showGroupsButton && user && (
         <Link to="/groups">
           <TooltipButton
-            variant="outline" 
+            variant="outline"
             size={isMobile ? "sm" : "default"}
             className="border-purple-400/50 text-purple-300 hover:bg-purple-600 hover:text-white hover:border-purple-600 transition-colors"
             tooltip="View Your Groups"
