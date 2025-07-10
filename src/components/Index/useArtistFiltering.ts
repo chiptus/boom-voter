@@ -132,13 +132,65 @@ export const useArtistFiltering = (artists: Artist[], filterSortState?: FilterSo
       return [...updatedLockedOrder, ...newArtists];
     }
 
-    // Store current order when sort gets locked
-    if (!filterSortState.sortLocked) {
+    return filtered;
+  }, [artists, filterSortState, groupMemberIds]);
+
+  // Manage locked order snapshot separately to avoid circular dependency
+  useEffect(() => {
+    if (!filterSortState?.sortLocked) {
+      // When sort is not locked, update the locked order with current results
+      const filtered = artists.map(artist => {
+        let filteredVotes = artist.votes;
+        if (filterSortState?.groupId && groupMemberIds.length > 0) {
+          filteredVotes = artist.votes.filter(vote => groupMemberIds.includes(vote.user_id));
+        }
+        return { ...artist, votes: filteredVotes };
+      }).filter(artist => {
+        if (filterSortState?.stages.length > 0 && artist.stage) {
+          if (!filterSortState.stages.includes(artist.stage)) return false;
+        }
+        if (filterSortState?.genres.length > 0 && artist.music_genres) {
+          if (!filterSortState.genres.includes(artist.genre_id)) return false;
+        }
+        if (filterSortState?.minRating > 0) {
+          const rating = calculateRating(artist);
+          if (rating < filterSortState.minRating) return false;
+        }
+        return true;
+      });
+
+      // Apply sorting
+      filtered.sort((a, b) => {
+        let primarySort = 0;
+        switch (filterSortState?.sort) {
+          case 'name-asc':
+            return a.name.localeCompare(b.name);
+          case 'name-desc':
+            return b.name.localeCompare(a.name);
+          case 'rating-desc':
+            primarySort = calculateRating(b) - calculateRating(a);
+            break;
+          case 'popularity-desc':
+            primarySort = getWeightedPopularityScore(b) - getWeightedPopularityScore(a);
+            break;
+          case 'date-asc':
+            if (!a.time_start && !b.time_start) {
+              primarySort = 0;
+              break;
+            }
+            if (!a.time_start) return 1;
+            if (!b.time_start) return -1;
+            primarySort = new Date(a.time_start).getTime() - new Date(b.time_start).getTime();
+            break;
+          default:
+            primarySort = 0;
+        }
+        return primarySort !== 0 ? primarySort : a.name.localeCompare(b.name);
+      });
+
       setLockedOrder(filtered);
     }
-
-    return filtered;
-  }, [artists, filterSortState, groupMemberIds, lockedOrder]);
+  }, [artists, filterSortState, groupMemberIds]);
 
   return {
     filteredAndSortedArtists,
