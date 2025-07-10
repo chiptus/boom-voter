@@ -1,12 +1,13 @@
 
 import { useEffect, useState, useMemo } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import type { Artist } from "./useOfflineArtistData";
+import type { Artist } from "@/hooks/useOfflineArtistData";
 import type { FilterSortState } from "../../hooks/useUrlState";
 import { STAGES } from "./filters/constants";
 
 export const useArtistFiltering = (artists: Artist[], filterSortState?: FilterSortState) => {
   const [groupMemberIds, setGroupMemberIds] = useState<string[]>([]);
+  const [lockedOrder, setLockedOrder] = useState<Artist[]>([]);
 
   useEffect(() => {
     const fetchGroupMembers = async () => {
@@ -119,8 +120,25 @@ export const useArtistFiltering = (artists: Artist[], filterSortState?: FilterSo
       return primarySort !== 0 ? primarySort : a.name.localeCompare(b.name);
     });
 
+    // If sort is locked, use the locked order but with updated vote data
+    if (filterSortState.sortLocked && lockedOrder.length > 0) {
+      // Update the locked order with fresh data while preserving positions
+      const updatedLockedOrder = lockedOrder.map(lockedArtist => {
+        const freshArtist = filtered.find(f => f.id === lockedArtist.id);
+        return freshArtist || lockedArtist;
+      });
+      // Add any new artists that weren't in the locked order
+      const newArtists = filtered.filter(f => !lockedOrder.some(l => l.id === f.id));
+      return [...updatedLockedOrder, ...newArtists];
+    }
+
+    // Store current order when sort gets locked
+    if (!filterSortState.sortLocked) {
+      setLockedOrder(filtered);
+    }
+
     return filtered;
-  }, [artists, filterSortState, groupMemberIds]);
+  }, [artists, filterSortState, groupMemberIds, lockedOrder]);
 
   return {
     filteredAndSortedArtists,

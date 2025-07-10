@@ -14,6 +14,7 @@ export interface FilterSortState {
   use24Hour: boolean;
   groupId?: string;
   invite?: string;
+  sortLocked?: boolean;
 }
 
 const defaultState: FilterSortState = {
@@ -26,6 +27,7 @@ const defaultState: FilterSortState = {
   use24Hour: true,
   groupId: undefined,
   invite: undefined,
+  sortLocked: false,
 };
 
 export const useUrlState = () => {
@@ -42,6 +44,7 @@ export const useUrlState = () => {
       use24Hour: searchParams.get('use24Hour') === 'true' || defaultState.use24Hour,
       groupId: searchParams.get('groupId') || defaultState.groupId,
       invite: searchParams.get('invite') || defaultState.invite,
+      sortLocked: searchParams.get('sortLocked') === 'true' || defaultState.sortLocked,
     };
   }, [searchParams]);
 
@@ -78,6 +81,9 @@ export const useUrlState = () => {
     }
     if (newState.invite) {
       newParams.set('invite', newState.invite);
+    }
+    if (newState.sortLocked) {
+      newParams.set('sortLocked', newState.sortLocked.toString());
     }
     
     setSearchParams(newParams, { replace: true });

@@ -118,6 +118,7 @@ export default function Index() {
               openAuthDialog={() => setShowAuthDialog(true)}
               fetchArtists={fetchArtists}
               archiveArtist={archiveArtist}
+              onLockSort={() => updateUrlState({ sortLocked: true })}
             />
         </div>
 

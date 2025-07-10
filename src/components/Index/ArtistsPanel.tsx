@@ -3,6 +3,7 @@ import { User } from "@supabase/supabase-js";
 import { useOfflineArtistData } from "@/hooks/useOfflineArtistData";
 import { useOfflineVoting } from "@/hooks/useOfflineVoting";
 import { Artist } from "@/services/queries";
+import { FilterSortState } from "@/hooks/useUrlState";
 
 import { ArtistCard } from "./ArtistCard";
 import { ArtistListItem } from "./ArtistListItem";
@@ -16,6 +17,7 @@ export function ArtistsPanel({
   openAuthDialog,
   fetchArtists,
   archiveArtist,
+  onLockSort,
 }: {
   items: Array<Artist>;
   isGrid: boolean;
@@ -24,10 +26,19 @@ export function ArtistsPanel({
   openAuthDialog(): void;
   fetchArtists(): void;
   archiveArtist(artistId: string): Promise<void>;
+  onLockSort: () => void;
 }) {
+  const handleVoteWithLock = async (artistId: string, voteType: number) => {
+    const result = await handleVote(artistId, voteType);
+    if (!result.requiresAuth) {
+      onLockSort();
+    }
+    return result;
+  };
+
   const { userVotes, votingLoading, handleVote } = useOfflineVoting(
     user,
-    () => {} //TODO? should we refretch on vote?
+    undefined // Remove the refresh callback to prevent auto re-sorting
   );
 
   if (items.length === 0) {
@@ -44,7 +55,7 @@ export function ArtistsPanel({
             userVote={userVotes[artist.id]}
             userKnowledge={false}
             votingLoading={votingLoading[artist.id]}
-            onVote={handleVote}
+            onVote={handleVoteWithLock}
             onKnowledgeToggle={async (artistId: string) => ({
               requiresAuth: !user,
             })}
@@ -66,7 +77,7 @@ export function ArtistsPanel({
           userVote={userVotes[artist.id]}
           userKnowledge={false}
           votingLoading={votingLoading[artist.id]}
-          onVote={handleVote}
+          onVote={handleVoteWithLock}
           onKnowledgeToggle={async (artistId: string) => ({
             requiresAuth: !user,
           })}

@@ -5,7 +5,7 @@ import { useGenres } from "@/hooks/queries/useGenresQuery";
 import { useGroups } from "@/hooks/useGroups";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Filter } from "lucide-react";
+import { Filter, RefreshCw } from "lucide-react";
 import { SortControls } from "./SortControls";
 import { MobileFilters } from "./MobileFilters";
 import { DesktopFilters } from "./DesktopFilters";
@@ -36,7 +36,11 @@ export const FilterSortControls = ({ state, onStateChange, onClear }: FilterSort
   }, []);
 
   const handleSortChange = (sort: SortOption) => {
-    onStateChange({ sort });
+    onStateChange({ sort, sortLocked: false });
+  };
+
+  const handleRefreshRankings = () => {
+    onStateChange({ sortLocked: false });
   };
 
   const hasActiveFilters = state.stages.length > 0 || state.genres.length > 0 || state.minRating > 0 || state.groupId;
@@ -49,6 +53,17 @@ export const FilterSortControls = ({ state, onStateChange, onClear }: FilterSort
           onSortChange={handleSortChange}
         />
         <div className="flex items-center gap-4">
+          {state.sortLocked && (
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleRefreshRankings}
+              className="text-orange-300 border-orange-400/50 hover:bg-orange-400/20 hover:text-orange-200 flex items-center gap-2"
+            >
+              <RefreshCw className="h-4 w-4" />
+              Refresh Rankings
+            </Button>
+          )}
           <TimeFormatToggle
             use24Hour={state.use24Hour}
             onChange={(use24Hour) => onStateChange({ use24Hour })}
