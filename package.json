@@ -15,8 +15,7 @@
     "test:e2e:debug": "playwright test --debug",
     "test:e2e:report": "playwright show-report",
     "test:setup": "bash scripts/setup-test-env.sh",
-    "test:setup:full": "bash scripts/setup-local-supabase.sh",
-    "test:data": "tsx scripts/setup-test-data.ts"
+    "test:setup:full": "bash scripts/setup-local-supabase.sh"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.9.0",
