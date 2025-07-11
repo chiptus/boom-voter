@@ -24,3 +24,13 @@ dist-ssr
 *.sw?
 
 supabase/.temp
+
+# Test artifacts
+playwright-report/
+test-results/
+tests/screenshots/
+
+.env
+
+supabase/.temp
+supabase/.branches
