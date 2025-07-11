@@ -30,27 +30,10 @@ export const MobileFilters = ({ state, genres, groups, onStateChange, onClear }:
     }
   };
 
-  const hasActiveFilters = state.stages.length > 0 || state.genres.length > 0 || state.minRating > 0 || state.groupId;
+  const hasActiveFilters = state.stages.length > 0 || state.genres.length > 0 || state.minRating > 0;
 
   return (
     <div className="space-y-4">
-      {/* Group Filter Select */}
-      <div>
-        <h4 className="text-sm font-medium text-purple-200 mb-2">Group</h4>
-        <Select value={state.groupId || "all"} onValueChange={(value) => onStateChange({ groupId: value === "all" ? undefined : value })}>
-          <SelectTrigger className="w-full bg-white/10 border-purple-400/30 text-purple-100">
-            <SelectValue placeholder="All Groups" />
-          </SelectTrigger>
-          <SelectContent className="bg-gray-800 border-purple-400/30">
-            <SelectItem value="all" className="text-purple-100">All Groups</SelectItem>
-            {groups.map(group => (
-              <SelectItem key={group.id} value={group.id} className="text-purple-100">
-                {group.name} {group.member_count ? `(${group.member_count})` : ''}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-      </div>
 
       {/* Stage Filter Select */}
       <div>

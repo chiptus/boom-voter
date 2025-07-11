@@ -27,41 +27,10 @@ export const DesktopFilters = ({ state, genres, groups, onStateChange, onClear }
     onStateChange({ genres: newGenres });
   };
 
-  const hasActiveFilters = state.stages.length > 0 || state.genres.length > 0 || state.minRating > 0 || state.groupId;
+  const hasActiveFilters = state.stages.length > 0 || state.genres.length > 0 || state.minRating > 0;
 
   return (
-    <div className="space-y-4 pt-2 border-t border-purple-400/20">
-      {/* Group Filter */}
-      <div>
-        <h4 className="text-sm font-medium text-purple-200 mb-2">Group</h4>
-        <div className="flex flex-wrap gap-2">
-          <Button
-            variant={!state.groupId ? "default" : "outline"}
-            size="sm"
-            onClick={() => onStateChange({ groupId: undefined })}
-            className={!state.groupId
-              ? "bg-purple-600 hover:bg-purple-700"
-              : "border-purple-400 text-purple-400 hover:bg-purple-400 hover:text-white"
-            }
-          >
-            All Groups
-          </Button>
-          {groups.map(group => (
-            <Button
-              key={group.id}
-              variant={state.groupId === group.id ? "default" : "outline"}
-              size="sm"
-              onClick={() => onStateChange({ groupId: group.id })}
-              className={state.groupId === group.id
-                ? "bg-purple-600 hover:bg-purple-700"
-                : "border-purple-400 text-purple-400 hover:bg-purple-400 hover:text-white"
-              }
-            >
-              {group.name} {group.member_count ? `(${group.member_count})` : ''}
-            </Button>
-          ))}
-        </div>
-      </div>
+    <div className="space-y-4">
 
       {/* Stage Filter */}
       <div>

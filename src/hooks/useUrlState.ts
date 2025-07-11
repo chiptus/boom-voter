@@ -14,6 +14,7 @@ export interface FilterSortState {
   groupId?: string;
   invite?: string;
   sortLocked?: boolean;
+  votePerspective?: string; // For filtering votes by group
 }
 
 const defaultState: FilterSortState = {
@@ -26,6 +27,7 @@ const defaultState: FilterSortState = {
   groupId: undefined,
   invite: undefined,
   sortLocked: false,
+  votePerspective: undefined,
 };
 
 export const useUrlState = () => {
@@ -42,6 +44,7 @@ export const useUrlState = () => {
       groupId: searchParams.get('groupId') || defaultState.groupId,
       invite: searchParams.get('invite') || defaultState.invite,
       sortLocked: searchParams.get('sortLocked') === 'true' || defaultState.sortLocked,
+      votePerspective: searchParams.get('votePerspective') || defaultState.votePerspective,
     };
   }, [searchParams]);
 
@@ -78,6 +81,9 @@ export const useUrlState = () => {
     }
     if (newState.sortLocked) {
       newParams.set('sortLocked', newState.sortLocked.toString());
+    }
+    if (newState.votePerspective) {
+      newParams.set('votePerspective', newState.votePerspective);
     }
     
     setSearchParams(newParams, { replace: true });
