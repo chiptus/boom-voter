@@ -19,6 +19,33 @@ interface NavigationProps {
   onBackClick?: () => void;
 }
 
+const TooltipButton = ({
+  children,
+  tooltip,
+  isMobile,
+  ...props
+}: {
+  children: React.ReactNode;
+  tooltip: string;
+  [key: string]: unknown;
+  isMobile: boolean;
+}) => {
+  if (!isMobile) {
+    return <Button {...props}>{children}</Button>;
+  }
+
+  return (
+    <Tooltip>
+      <TooltipTrigger asChild>
+        <Button {...props}>{children}</Button>
+      </TooltipTrigger>
+      <TooltipContent>
+        <p>{tooltip}</p>
+      </TooltipContent>
+    </Tooltip>
+  );
+};
+
 export const Navigation = ({
   showBackButton,
   backTo = "/",
@@ -28,29 +55,6 @@ export const Navigation = ({
   isMobile,
   onBackClick,
 }: NavigationProps) => {
-  const TooltipButton = ({
-    children,
-    tooltip,
-    ...props
-  }: {
-    children: React.ReactNode;
-    tooltip: string;
-    [key: string]: any;
-  }) => {
-    if (!isMobile) return <Button {...props}>{children}</Button>;
-
-    return (
-      <Tooltip>
-        <TooltipTrigger asChild>
-          <Button {...props}>{children}</Button>
-        </TooltipTrigger>
-        <TooltipContent>
-          <p>{tooltip}</p>
-        </TooltipContent>
-      </Tooltip>
-    );
-  };
-
   return (
     <div className="flex items-center gap-3">
       {/* Palette Selector */}
@@ -64,6 +68,7 @@ export const Navigation = ({
           onClick={onBackClick}
           className="border-purple-400/50 text-purple-300 hover:bg-purple-600 hover:text-white hover:border-purple-600 transition-colors"
           tooltip={backLabel}
+          isMobile={isMobile}
         >
           <ArrowLeft className="h-4 w-4" />
           {!isMobile && <span className="ml-2">{backLabel}</span>}
@@ -78,6 +83,7 @@ export const Navigation = ({
             size={isMobile ? "sm" : "default"}
             className="border-purple-400/50 text-purple-300 hover:bg-purple-600 hover:text-white hover:border-purple-600 transition-colors"
             tooltip="View Your Groups"
+            isMobile={isMobile}
           >
             <Users className="h-4 w-4" />
             {!isMobile && <span className="ml-2">Groups</span>}

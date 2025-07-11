@@ -1,9 +1,15 @@
-
 import { Button } from "@/components/ui/button";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { X } from "lucide-react";
 import type { FilterSortState } from "@/hooks/useUrlState";
 import { STAGES } from "./constants";
+import { TimeFormatToggle } from "./TimeFormatToggle";
 
 interface MobileFiltersProps {
   state: FilterSortState;
@@ -13,9 +19,15 @@ interface MobileFiltersProps {
   onClear: () => void;
 }
 
-export const MobileFilters = ({ state, genres, groups, onStateChange, onClear }: MobileFiltersProps) => {
+export const MobileFilters = ({
+  state,
+  genres,
+  groups,
+  onStateChange,
+  onClear,
+}: MobileFiltersProps) => {
   const handleStageSelect = (value: string) => {
-    if (value === 'all') {
+    if (value === "all") {
       onStateChange({ stages: [] });
     } else {
       onStateChange({ stages: [value] });
@@ -23,28 +35,35 @@ export const MobileFilters = ({ state, genres, groups, onStateChange, onClear }:
   };
 
   const handleGenreSelect = (value: string) => {
-    if (value === 'all') {
+    if (value === "all") {
       onStateChange({ genres: [] });
     } else {
       onStateChange({ genres: [value] });
     }
   };
 
-  const hasActiveFilters = state.stages.length > 0 || state.genres.length > 0 || state.minRating > 0;
+  const hasActiveFilters =
+    state.stages.length > 0 ||
+    state.genres.length > 0 ||
+    state.minRating > 0;
 
   return (
     <div className="space-y-4">
-
       {/* Stage Filter Select */}
       <div>
         <h4 className="text-sm font-medium text-purple-200 mb-2">Stage</h4>
-        <Select value={state.stages.length === 1 ? state.stages[0] : 'all'} onValueChange={handleStageSelect}>
+        <Select
+          value={state.stages.length === 1 ? state.stages[0] : "all"}
+          onValueChange={handleStageSelect}
+        >
           <SelectTrigger className="w-full bg-white/10 border-purple-400/30 text-purple-100">
             <SelectValue placeholder="All Stages" />
           </SelectTrigger>
           <SelectContent className="bg-gray-800 border-purple-400/30">
-            <SelectItem value="all" className="text-purple-100">All Stages</SelectItem>
-            {STAGES.map(stage => (
+            <SelectItem value="all" className="text-purple-100">
+              All Stages
+            </SelectItem>
+            {STAGES.map((stage) => (
               <SelectItem key={stage} value={stage} className="text-purple-100">
                 {stage}
               </SelectItem>
@@ -56,14 +75,23 @@ export const MobileFilters = ({ state, genres, groups, onStateChange, onClear }:
       {/* Genre Filter Select */}
       <div>
         <h4 className="text-sm font-medium text-purple-200 mb-2">Genre</h4>
-        <Select value={state.genres.length === 1 ? state.genres[0] : 'all'} onValueChange={handleGenreSelect}>
+        <Select
+          value={state.genres.length === 1 ? state.genres[0] : "all"}
+          onValueChange={handleGenreSelect}
+        >
           <SelectTrigger className="w-full bg-white/10 border-purple-400/30 text-purple-100">
             <SelectValue placeholder="All Genres" />
           </SelectTrigger>
           <SelectContent className="bg-gray-800 border-purple-400/30">
-            <SelectItem value="all" className="text-purple-100">All Genres</SelectItem>
-            {genres.map(genre => (
-              <SelectItem key={genre.id} value={genre.id} className="text-purple-100">
+            <SelectItem value="all" className="text-purple-100">
+              All Genres
+            </SelectItem>
+            {genres.map((genre) => (
+              <SelectItem
+                key={genre.id}
+                value={genre.id}
+                className="text-purple-100"
+              >
                 {genre.name}
               </SelectItem>
             ))}
@@ -73,19 +101,39 @@ export const MobileFilters = ({ state, genres, groups, onStateChange, onClear }:
 
       {/* Rating Filter */}
       <div>
-        <h4 className="text-sm font-medium text-purple-200 mb-2">Minimum Rating</h4>
-        <Select value={state.minRating.toString()} onValueChange={(value) => onStateChange({ minRating: parseInt(value) })}>
+        <h4 className="text-sm font-medium text-purple-200 mb-2">
+          Minimum Rating
+        </h4>
+        <Select
+          value={state.minRating.toString()}
+          onValueChange={(value) =>
+            onStateChange({ minRating: parseInt(value) })
+          }
+        >
           <SelectTrigger className="w-full bg-white/10 border-purple-400/30 text-purple-100">
             <SelectValue />
           </SelectTrigger>
           <SelectContent className="bg-gray-800 border-purple-400/30">
-            <SelectItem value="0" className="text-purple-100">Any Rating</SelectItem>
-            <SelectItem value="1" className="text-purple-100">1+ Rating</SelectItem>
-            <SelectItem value="2" className="text-purple-100">2+ Rating</SelectItem>
-            <SelectItem value="3" className="text-purple-100">3+ Rating</SelectItem>
+            <SelectItem value="0" className="text-purple-100">
+              Any Rating
+            </SelectItem>
+            <SelectItem value="1" className="text-purple-100">
+              1+ Rating
+            </SelectItem>
+            <SelectItem value="2" className="text-purple-100">
+              2+ Rating
+            </SelectItem>
+            <SelectItem value="3" className="text-purple-100">
+              3+ Rating
+            </SelectItem>
           </SelectContent>
         </Select>
       </div>
+
+      <TimeFormatToggle
+        use24Hour={state.use24Hour}
+        onChange={(use24Hour) => onStateChange({ use24Hour })}
+      />
 
       {/* Clear Filters */}
       {hasActiveFilters && (
