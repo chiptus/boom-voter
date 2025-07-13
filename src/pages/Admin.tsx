@@ -2,6 +2,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { AppHeader } from "@/components/AppHeader";
 import { ArtistsTable } from "@/components/Admin/ArtistsTable";
 import { AdminRolesTable } from "@/components/Admin/AdminRolesTable";
+import { AnalyticsTable } from "@/components/Admin/AnalyticsTable";
 import { AddArtistDialog } from "@/components/Index/AddArtistDialog";
 import { AddGenreDialog } from "@/components/Index/AddGenreDialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -15,7 +16,7 @@ import {
 } from "@/components/ui/card";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Music, Tag, UserPlus, Plus } from "lucide-react";
+import { Music, Tag, UserPlus, Plus, BarChart3 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useUserPermissionsQuery } from "@/hooks/queries/useGroupsQuery";
 
@@ -88,7 +89,7 @@ export default function Admin() {
 
         <div className="mt-8">
           <Tabs defaultValue="artists" className="w-full">
-            <TabsList className="grid w-full grid-cols-3 bg-white/10 backdrop-blur-md">
+            <TabsList className={`grid w-full ${isSuperAdmin ? 'grid-cols-4' : 'grid-cols-3'} bg-white/10 backdrop-blur-md`}>
               <TabsTrigger
                 value="artists"
                 className="data-[state=active]:bg-purple-600 data-[state=active]:text-white"
@@ -104,13 +105,22 @@ export default function Admin() {
                 Add Content
               </TabsTrigger>
               {isSuperAdmin && (
-                <TabsTrigger
-                  value="admins"
-                  className="data-[state=active]:bg-purple-600 data-[state=active]:text-white"
-                >
-                  <UserPlus className="h-4 w-4 mr-2" />
-                  Admin Roles
-                </TabsTrigger>
+                <>
+                  <TabsTrigger
+                    value="analytics"
+                    className="data-[state=active]:bg-purple-600 data-[state=active]:text-white"
+                  >
+                    <BarChart3 className="h-4 w-4 mr-2" />
+                    Analytics
+                  </TabsTrigger>
+                  <TabsTrigger
+                    value="admins"
+                    className="data-[state=active]:bg-purple-600 data-[state=active]:text-white"
+                  >
+                    <UserPlus className="h-4 w-4 mr-2" />
+                    Admin Roles
+                  </TabsTrigger>
+                </>
               )}
             </TabsList>
 
@@ -165,9 +175,14 @@ export default function Admin() {
             </TabsContent>
 
             {isSuperAdmin && (
-              <TabsContent value="admins" className="mt-6">
-                <AdminRolesTable />
-              </TabsContent>
+              <>
+                <TabsContent value="analytics" className="mt-6">
+                  <AnalyticsTable />
+                </TabsContent>
+                <TabsContent value="admins" className="mt-6">
+                  <AdminRolesTable />
+                </TabsContent>
+              </>
             )}
           </Tabs>
         </div>
