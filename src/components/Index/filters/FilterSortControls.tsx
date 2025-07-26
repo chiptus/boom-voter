@@ -76,7 +76,7 @@ export const FilterSortControls = ({
               }
             >
               <List className="h-4 w-4" />
-              <span className="hidden sm:inline ml-2">Artists</span>
+              <span className="hidden md:inline ml-2">Artists</span>
             </Button>
             <Button
               variant={state.mainView === "timeline" ? "default" : "ghost"}
@@ -89,7 +89,7 @@ export const FilterSortControls = ({
               }
             >
               <Calendar className="h-4 w-4" />
-              <span className="hidden sm:inline ml-2">Timeline</span>
+              <span className="hidden md:inline ml-2">Timeline</span>
             </Button>
           </div>
 
@@ -109,7 +109,7 @@ export const FilterSortControls = ({
                 className="text-orange-300 border-orange-400/50 hover:bg-orange-400/20 hover:text-orange-200 flex items-center gap-2"
               >
                 <RefreshCw className="h-4 w-4" />
-                <span className="hidden sm:inline">Refresh</span>
+                <span className="hidden md:inline">Refresh</span>
               </Button>
             )}
 
@@ -126,7 +126,7 @@ export const FilterSortControls = ({
                   }`}
                 >
                   <Users className="h-4 w-4" />
-                  <span className="hidden sm:inline">{groupDisplayText}</span>
+                  <span className="hidden md:inline">{groupDisplayText}</span>
                   <ChevronDown className="h-3 w-3" />
                 </Button>
               </DropdownMenuTrigger>
@@ -168,7 +168,7 @@ export const FilterSortControls = ({
               }`}
             >
               <Filter className="h-4 w-4" />
-              <span className="hidden sm:inline">Filters</span>
+              <span className="hidden md:inline">Filters</span>
               {hasActiveFilters && (
                 <Badge
                   variant="secondary"

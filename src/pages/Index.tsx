@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 
 import { useAuth } from "@/hooks/useAuth";
 import { useProfileQuery } from "@/hooks/queries/useProfileQuery";
@@ -22,27 +22,20 @@ export default function Index() {
   const { inviteValidation, isValidating, hasValidInvite } =
     useInviteValidation();
   const [showAuthDialog, setShowAuthDialog] = useState(false);
-  const [showUsernameSetup, setShowUsernameSetup] = useState(false);
   const { state: urlState, updateUrlState, clearFilters } = useUrlState();
   
   const { artists, fetchArtists, archiveArtist } = useOfflineArtistData();
   const { userVotes, handleVote } = useOfflineVoting(user);
   
-  const { filteredAndSortedArtists } = useArtistFiltering(artists, urlState);
+  const { filteredAndSortedArtists, lockCurrentOrder } = useArtistFiltering(artists, urlState);
 
   // Get profile loading state to prevent dialog flashing
   const { isLoading: profileLoading } = useProfileQuery(user?.id);
 
-  // Check if username setup is needed after authentication
-  useEffect(() => {
-    // Only show dialog when all data is loaded and user definitely needs username setup
-    if (user && !authLoading && !profileLoading && !hasUsername()) {
-      setShowUsernameSetup(true);
-    }
-    // Hide dialog when user gets a username or logs out or data is still loading
-    if (!user || (user && !authLoading && !profileLoading && hasUsername())) {
-      setShowUsernameSetup(false);
-    }
+  
+
+  const showUsernameSetup = useMemo(() => {
+    return user && !authLoading && !profileLoading && !hasUsername;
   }, [user, authLoading, profileLoading, hasUsername]);
 
   // Show loading while validating invite
@@ -128,9 +121,7 @@ export default function Index() {
                 user={user}
                 use24Hour={urlState.use24Hour}
                 openAuthDialog={() => setShowAuthDialog(true)}
-                fetchArtists={fetchArtists}
-                archiveArtist={archiveArtist}
-                onLockSort={() => updateUrlState({ sortLocked: true })}
+                onLockSort={() => lockCurrentOrder(updateUrlState)}
               />
             )}
             {urlState.mainView === 'timeline' && (
@@ -155,7 +146,7 @@ export default function Index() {
           open={showUsernameSetup}
           user={user}
           onSuccess={() => {
-            setShowUsernameSetup(false);
+            // setShowUsernameSetup(false);
           }}
         />
       </div>
