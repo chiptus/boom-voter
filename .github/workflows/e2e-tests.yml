@@ -94,7 +94,7 @@ jobs:
         merge-multiple: true
 
     - name: Merge JSON reports
-      run: npx playwright merge-reports --reporter json ./all-json-reports.json
+      run: npx playwright merge-reports --reporter json ./all-json-reports
 
     - name: Generate summary comment
       uses: daun/playwright-report-summary@v3
