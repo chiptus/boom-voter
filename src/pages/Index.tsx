@@ -24,7 +24,7 @@ export default function Index() {
   const [showAuthDialog, setShowAuthDialog] = useState(false);
   const { state: urlState, updateUrlState, clearFilters } = useUrlState();
   
-  const { artists, fetchArtists, archiveArtist } = useOfflineArtistData();
+  const { artists, loading: artistsLoading } = useOfflineArtistData();
   const { userVotes, handleVote } = useOfflineVoting(user);
   
   const { filteredAndSortedArtists, lockCurrentOrder } = useArtistFiltering(artists, urlState);
@@ -78,7 +78,7 @@ export default function Index() {
     );
   }
 
-  if (authLoading) {
+  if (authLoading || artistsLoading) {
     return (
       <div className="min-h-screen bg-app-gradient flex items-center justify-center">
         <div className="text-white text-xl">Loading...</div>
