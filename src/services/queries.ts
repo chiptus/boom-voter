@@ -21,7 +21,7 @@ type ArtistNote = {
 export const artistQueries = {
   all: () => ['artists'] as const,
   lists: () => [...artistQueries.all(), 'list'] as const,
-  list: (filters?: any) => [...artistQueries.lists(), filters] as const,
+  list: (filters?: unknown) => [...artistQueries.lists(), filters] as const,
   details: () => [...artistQueries.all(), 'detail'] as const,
   detail: (id: string) => [...artistQueries.details(), id] as const,
   notes: (artistId: string) => [...artistQueries.detail(artistId), 'notes'] as const,
@@ -527,7 +527,7 @@ export const mutationFunctions = {
     return true;
   },
 
-  async updateProfile(variables: { userId: string; updates: any }) {
+  async updateProfile(variables: { userId: string; updates: unknown }) {
     const { userId, updates } = variables;
     
     const { data, error } = await supabase

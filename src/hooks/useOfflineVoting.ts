@@ -3,8 +3,9 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
 import { offlineStorage } from '@/lib/offlineStorage';
 import { useOnlineStatus, useOfflineQueue } from './useOffline';
+import { User } from '@supabase/supabase-js';
 
-export const useOfflineVoting = (user: any, onVoteUpdate?: () => void) => {
+export const useOfflineVoting = (user: User, onVoteUpdate?: () => void) => {
   const [userVotes, setUserVotes] = useState<Record<string, number>>({});
   const [votingLoading, setVotingLoading] = useState<Record<string, boolean>>({});
   const { toast } = useToast();

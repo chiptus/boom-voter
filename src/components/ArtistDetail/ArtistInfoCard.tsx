@@ -21,7 +21,6 @@ interface ArtistInfoCardProps {
   netVoteScore: number;
   onVote: (voteType: number) => void;
   getVoteCount: (voteType: number) => number;
-  onArtistUpdate: () => void;
   onArchiveArtist?: () => Promise<void>;
   use24Hour?: boolean;
 }
@@ -33,7 +32,6 @@ export const ArtistInfoCard = ({
   netVoteScore,
   onVote,
   getVoteCount,
-  onArtistUpdate,
   onArchiveArtist,
   use24Hour = false,
 }: ArtistInfoCardProps) => {
@@ -98,7 +96,6 @@ export const ArtistInfoCard = ({
               <div className="flex gap-2">
                 <EditArtistDialog
                   artist={artist}
-                  onSuccess={onArtistUpdate}
                   trigger={
                     <Button
                       variant="outline"
