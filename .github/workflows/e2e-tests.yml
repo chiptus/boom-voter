@@ -54,6 +54,7 @@ jobs:
         path: |
           playwright-report/
           test-results/
+          blob-report/
         retention-days: 30
 
   report:
@@ -80,7 +81,7 @@ jobs:
         path: all-results/
 
     - name: Merge results
-      run: npx playwright merge-reports ./all-results --reporter html
+      run: npx playwright merge-reports ./all-results/playwright-report-*/blob-report --reporter html
 
     - uses: actions/upload-artifact@v4
       with:
