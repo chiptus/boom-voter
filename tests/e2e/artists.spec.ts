@@ -1,6 +1,5 @@
 import { test, expect } from "@playwright/test";
 import { TestHelpers } from "../utils/test-helpers";
-import { TEST_DATA } from "../config/test-env";
 
 test.describe("Artists", () => {
   let testHelpers: TestHelpers;
@@ -51,13 +50,13 @@ test.describe("Artists", () => {
 
     // Look for artist cards/items
     const artistCard = page
-      .locator('[data-testid="artist-card"]')
-      .or(page.locator(".artist-card"))
-      .or(page.getByRole("link").first());
+      .getByTestId("artist-item").first();
 
     if (await artistCard.isVisible()) {
-      const artistName = await artistCard.textContent();
-      await artistCard.click();
+
+      const artistName = await artistCard.getByRole("heading").textContent();
+      const link = artistCard.getByRole("link");
+      await link.click();
 
       // Should navigate to artist detail page
       await expect(page).toHaveURL(/\/artist\//);

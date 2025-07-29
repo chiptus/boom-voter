@@ -69,7 +69,7 @@ export const ArtistListItem = ({ artist, userVote, userKnowledge, votingLoading,
   };
 
   return (
-    <div className="bg-white/10 backdrop-blur-md border-purple-400/30 hover:bg-white/15 transition-all duration-300 rounded-lg p-4">
+    <div className="bg-white/10 backdrop-blur-md border-purple-400/30 hover:bg-white/15 transition-all duration-300 rounded-lg p-4" data-testid="artist-item">
       {/* Mobile Layout (sm and below) */}
       <div className="block md:hidden space-y-3">
         {/* Top Row: Image + Basic Info */}
