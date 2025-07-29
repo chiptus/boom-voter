@@ -9,7 +9,7 @@ test.describe('Authentication', () => {
       page.getByRole('link', { name: /sign in/i })
     ).or(
       page.getByText(/sign in/i)
-    );
+    ).first();;
     
     await expect(signInButton).toBeVisible();
     await signInButton.click();
@@ -21,6 +21,6 @@ test.describe('Authentication', () => {
 
   test('should have proper page title', async ({ page }) => {
     await page.goto('/');
-    await expect(page).toHaveTitle(/boom voter/i);
+    await expect(page).toHaveTitle(/UpLine/i);
   });
 }); 
