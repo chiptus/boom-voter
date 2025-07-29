@@ -48,14 +48,11 @@ jobs:
         TEST_SUPABASE_ANON_KEY: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6ImFub24iLCJleHAiOjE5ODM4MTI5OTZ9.CRXP1A7WOeoJeXxjNni43kdQwgnWNReilDMblYTn_I0
 
     - uses: actions/upload-artifact@v4
-      if: always()
+      if: ${{ !cancelled() }}
       with:
-        name: playwright-report-${{ matrix.shardIndex }}
-        path: |
-          playwright-report/
-          test-results/
-          blob-report/
-        retention-days: 30
+        name: blob-report-${{ matrix.shardIndex }}
+        path: blob-report
+        retention-days: 1
 
   report:
     needs: test
