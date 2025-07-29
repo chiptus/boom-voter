@@ -42,16 +42,23 @@ jobs:
       run: npm run build
 
     - name: Run Playwright tests
-      run: npx playwright test --shard=${{ matrix.shardIndex }}/${{ matrix.shardTotal }}
+      run: PLAYWRIGHT_JSON_OUTPUT_NAME=results-${{ matrix.shardIndex }}.json npx playwright test --shard=${{ matrix.shardIndex }}/${{ matrix.shardTotal }} --reporter=blob,json
       env:
         TEST_SUPABASE_URL: http://localhost:54321
-        TEST_SUPABASE_ANON_KEY: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6ImFub24iLCJleHAiOjE5ODM4MTI5OTZ9.CRXP1A7WOeoJeXxjNni43kdQwgnWNReilDMblYTn_I0
+        TEST_SUPABASE_ANON_KEY: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCN9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6ImFub24iLCJleHAiOjE5ODM4MTI5OTZ9.CRXP1A7WOeoJeXxjNni43kdQwgnWNReilDMblYTn_I0
 
     - uses: actions/upload-artifact@v4
       if: ${{ !cancelled() }}
       with:
         name: blob-report-${{ matrix.shardIndex }}
         path: blob-report
+        retention-days: 1
+
+    - uses: actions/upload-artifact@v4
+      if: ${{ !cancelled() }}
+      with:
+        name: json-report-${{ matrix.shardIndex }}
+        path: results-${{ matrix.shardIndex }}.json
         retention-days: 1
 
   report:
@@ -78,6 +85,22 @@ jobs:
 
     - name: Merge into HTML Report
       run: npx playwright merge-reports --reporter html ./all-blob-reports
+
+    - name: Download JSON reports
+      uses: actions/download-artifact@v4
+      with:
+        path: all-json-reports
+        pattern: json-report-*
+        merge-multiple: true
+
+    - name: Merge JSON reports
+      run: npx playwright merge-reports --reporter json ./all-blob-reports
+
+    - name: Generate summary comment
+      uses: daun/playwright-report-summary@v3
+      if: always()
+      with:
+        report-file: playwright-report.json
 
     - uses: actions/upload-artifact@v4
       with:
