@@ -1,5 +1,8 @@
 # E2E Testing with Playwright
 
+> For a full overview of all testing infrastructure, CI/CD, and general troubleshooting, see [docs/TESTING.md](../docs/TESTING.md).
+> All E2E test coverage, debugging, troubleshooting, and next steps are documented here.
+
 This directory contains end-to-end tests for the Boom Voter application using Playwright.
 
 ## 🚀 Quick Start
@@ -133,6 +136,45 @@ await testHelpers.takeScreenshot('test-name');
 4. **Use test data**: Leverage the test data setup for consistent scenarios
 5. **Handle conditional elements**: Use `.isVisible()` checks for optional UI elements
 
+## 📋 Test Coverage
+
+### Current Tests
+1. **Authentication**
+   - Sign in dialog display
+   - Page title verification
+2. **Navigation**
+   - Page routing
+   - 404 handling
+3. **Artists**
+   - Artists list display
+   - Filtering functionality
+   - Artist detail navigation
+   - Empty state handling
+
+### Planned Tests
+- User registration
+- Voting functionality
+- Group management
+- Schedule viewing
+- Admin features
+- Mobile responsiveness
+- Offline functionality
+
+## 📊 Test Reports
+
+### HTML Report
+After running tests, view the interactive report:
+```bash
+npm run test:e2e:report
+```
+
+### Report Features
+- Test results and timing
+- Screenshots and videos
+- Traces for debugging
+- Error details and stack traces
+- Filtering and search
+
 ## 🐛 Debugging
 
 ### Debug Mode
@@ -151,77 +193,38 @@ Use Playwright's UI for interactive debugging:
 npm run test:e2e:ui
 ```
 
-### Screenshots and Videos
+### Screenshots
+Tests automatically capture screenshots on failure in `tests/screenshots/`
 
-Tests automatically capture:
-- Screenshots on failure
-- Videos on failure
-- Traces on retry
+## 🔮 Next Steps
 
-View them in the `playwright-report/` directory after running tests.
+### Immediate
+1. **Run initial tests** to verify setup
+2. **Add more test scenarios** based on app features
+3. **Configure test users** in local Supabase
+4. **Add data-testid attributes** to components
 
-## 🔄 CI/CD Integration
-
-The tests are configured to run in GitHub Actions on:
-- Push to `main` and `develop` branches
-- Pull requests to `main` and `develop` branches
-
-The CI pipeline:
-1. Sets up local Supabase
-2. Populates test data
-3. Runs tests in parallel (sharded)
-4. Generates and uploads test reports
-
-## 🗄️ Local Supabase
-
-### Starting Local Supabase
-
-```bash
-supabase start
-```
-
-### Stopping Local Supabase
-
-```bash
-supabase stop
-```
-
-### Accessing Local Supabase
-
-- **API URL**: http://localhost:54321
-- **Studio URL**: http://localhost:54323
-- **Anon Key**: `eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6ImFub24iLCJleHAiOjE5ODM4MTI5OTZ9.CRXP1A7WOeoJeXxjNni43kdQwgnWNReilDMblYTn_I0`
-
-### Database Schema
-
-The local Supabase instance uses the same schema as your production database, defined in `supabase/migrations/`.
-
-## 📊 Test Reports
-
-After running tests, view the HTML report:
-
-```bash
-npm run test:e2e:report
-```
-
-The report includes:
-- Test results and timing
-- Screenshots and videos
-- Traces for debugging
-- Error details and stack traces
+### Future Enhancements
+1. **Visual regression testing**
+2. **Performance testing**
+3. **Accessibility testing**
+4. **API testing** with separate test suite
+5. **Load testing** for critical user flows
 
 ## 🚨 Troubleshooting
 
 ### Common Issues
-
-1. **Supabase not starting**: Ensure Docker is running
-2. **Tests timing out**: Increase timeouts in `playwright.config.ts`
-3. **Element not found**: Check if selectors match the current UI
-4. **Authentication failing**: Verify test user credentials in Supabase
+1. **Supabase not starting**: Check Docker is running
+2. **Tests timing out**: Increase timeouts in config
+3. **Element not found**: Update selectors to match UI
+4. **Authentication failing**: Verify test user setup
 
 ### Getting Help
-
-1. Check the Playwright documentation: https://playwright.dev/
+1. Check Playwright docs: https://playwright.dev/
 2. Review test logs and screenshots
-3. Use debug mode to step through failing tests
-4. Check Supabase logs: `supabase logs` 
+3. Use debug mode for step-by-step debugging
+4. Check Supabase logs: `supabase logs`
+
+## 🏆 Playwright & Testing Best Practices
+- [Playwright Documentation](https://playwright.dev/)
+- [Testing Best Practices](https://playwright.dev/docs/best-practices) 
