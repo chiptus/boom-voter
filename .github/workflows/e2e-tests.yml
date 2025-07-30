@@ -58,7 +58,7 @@ jobs:
       if: ${{ !cancelled() }}
       with:
         name: json-report-${{ matrix.shardIndex }}
-        path: results-${{ matrix.shardIndex }}.json
+        path: json-report
         retention-days: 1
 
   report:
