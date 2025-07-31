@@ -105,7 +105,7 @@ jobs:
         tree all-json-reports || find all-json-reports -type f
 
     - name: Merge JSON reports
-      run: npx playwright merge-reports --reporter json ./all-json-reports
+      run: npx playwright merge-reports --reporter json all-json-reports/*.json
 
     - name: Generate summary comment
       uses: daun/playwright-report-summary@v3
