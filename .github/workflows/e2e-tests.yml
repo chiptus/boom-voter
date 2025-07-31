@@ -91,6 +91,7 @@ jobs:
       with:
         path: all-json-reports
         pattern: json-report-*
+        merge-multiple: true
 
     - name: Debug JSON reports directory
       run: |
