@@ -41,8 +41,7 @@ jobs:
         run: npm run build
 
       - name: Run Playwright tests
-        # PLAYWRIGHT_JSON_OUTPUT_NAME=json-report-${{ matrix.shardIndex }}.json
-        run: npx playwright test --shard=${{ matrix.shardIndex }}/${{ matrix.shardTotal }} --reporter=blob,json
+        run: npx playwright test --shard=${{ matrix.shardIndex }}/${{ matrix.shardTotal }} --reporter=blob
         env:
           TEST_SUPABASE_URL: http://localhost:54321
           TEST_SUPABASE_ANON_KEY: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCN9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6ImFub24iLCJleHAiOjE5ODM4MTI5OTZ9.CRXP1A7WOeoJeXxjNni43kdQwgnWNReilDMblYTn_I0
@@ -54,12 +53,6 @@ jobs:
           path: blob-report
           retention-days: 1
 
-    # - uses: actions/upload-artifact@v4
-    #   if: ${{ !cancelled() }}
-    #   with:
-    #     name: json-report-${{ matrix.shardIndex }}.json
-    #     path: json-report-${{ matrix.shardIndex }}.json
-    #     retention-days: 1
 
   report:
     needs: test
@@ -76,23 +69,12 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      # - name: Download JSON reports
-      #   uses: actions/download-artifact@v4
-      #   with:
-      #     path: all-json-reports
-      #     pattern: json-report-*
-      #     merge-multiple: true
-
-      # - name: Debug JSON reports directory
-      #   run: |
-      #     echo "=== Contents of all-json-reports ==="
-      #     ls -la all-json-reports/
-      #     echo "=== Recursive listing ==="
-      #     find all-json-reports -type f -name "*.json"
-      #     echo "=== Current working directory ==="
-      #     pwd
-      #     echo "=== Directory structure ==="
-      #     tree all-json-reports || find all-json-reports -type f
+      - name: Download blob reports from GitHub Actions Artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: all-blob-reports
+          pattern: blob-report-*
+          merge-multiple: true
 
       - name: Merge JSON reports
         run: npx playwright merge-reports --reporter json ./all-blob-reports > ./all-json-reports.json
@@ -102,13 +84,6 @@ jobs:
         if: always()
         with:
           report-file: all-json-reports.json
-
-      - name: Download blob reports from GitHub Actions Artifacts
-        uses: actions/download-artifact@v4
-        with:
-          path: all-blob-reports
-          pattern: blob-report-*
-          merge-multiple: true
 
       - name: Merge into HTML Report
         run: npx playwright merge-reports --reporter html ./all-blob-reports
