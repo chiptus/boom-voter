@@ -2,9 +2,9 @@ name: E2E Tests
 
 on:
   push:
-    branches: [ main, develop ]
+    branches: [main, develop]
   pull_request:
-    branches: [ main, develop ]
+    branches: [main, develop]
 
 jobs:
   test:
@@ -18,42 +18,41 @@ jobs:
         # Add shardIndex: [1, 2, 3, 4, 5, 6, 7, 8] and shardTotal: [8] for more shards
 
     steps:
-    - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-    - uses: actions/setup-node@v4
-      with:
-        node-version: 18
-        cache: 'npm'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 18
+          cache: "npm"
 
-    - name: Install dependencies
-      run: npm ci
+      - name: Install dependencies
+        run: npm ci
 
-    - name: Install Playwright Browsers
-      run: npx playwright install --with-deps
+      - name: Install Playwright Browsers
+        run: npx playwright install --with-deps
 
-    - name: Setup Supabase
-      run: |
-        npx supabase start
-        sleep 10
-        npx supabase db reset
+      - name: Setup Supabase
+        run: |
+          npx supabase start
+          sleep 10
+          npx supabase db reset
 
+      - name: Build project
+        run: npm run build
 
-    - name: Build project
-      run: npm run build
+      - name: Run Playwright tests
+        # PLAYWRIGHT_JSON_OUTPUT_NAME=json-report-${{ matrix.shardIndex }}.json
+        run: npx playwright test --shard=${{ matrix.shardIndex }}/${{ matrix.shardTotal }} --reporter=blob,json
+        env:
+          TEST_SUPABASE_URL: http://localhost:54321
+          TEST_SUPABASE_ANON_KEY: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCN9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6ImFub24iLCJleHAiOjE5ODM4MTI5OTZ9.CRXP1A7WOeoJeXxjNni43kdQwgnWNReilDMblYTn_I0
 
-    - name: Run Playwright tests
-    # PLAYWRIGHT_JSON_OUTPUT_NAME=json-report-${{ matrix.shardIndex }}.json
-      run: npx playwright test --shard=${{ matrix.shardIndex }}/${{ matrix.shardTotal }} --reporter=blob,json
-      env:
-        TEST_SUPABASE_URL: http://localhost:54321
-        TEST_SUPABASE_ANON_KEY: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCN9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6ImFub24iLCJleHAiOjE5ODM4MTI5OTZ9.CRXP1A7WOeoJeXxjNni43kdQwgnWNReilDMblYTn_I0
-
-    - uses: actions/upload-artifact@v4
-      if: ${{ !cancelled() }}
-      with:
-        name: blob-report-${{ matrix.shardIndex }}
-        path: blob-report
-        retention-days: 1
+      - uses: actions/upload-artifact@v4
+        if: ${{ !cancelled() }}
+        with:
+          name: blob-report-${{ matrix.shardIndex }}
+          path: blob-report
+          retention-days: 1
 
     # - uses: actions/upload-artifact@v4
     #   if: ${{ !cancelled() }}
@@ -67,55 +66,55 @@ jobs:
     runs-on: ubuntu-latest
     if: always()
     steps:
-    - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-    - uses: actions/setup-node@v4
-      with:
-        node-version: 18
-        cache: 'npm'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 18
+          cache: "npm"
 
-    - name: Install dependencies
-      run: npm ci
+      - name: Install dependencies
+        run: npm ci
 
-    - name: Download blob reports from GitHub Actions Artifacts
-      uses: actions/download-artifact@v4
-      with:
-        path: all-blob-reports
-        pattern: blob-report-*
-        merge-multiple: true
+      # - name: Download JSON reports
+      #   uses: actions/download-artifact@v4
+      #   with:
+      #     path: all-json-reports
+      #     pattern: json-report-*
+      #     merge-multiple: true
 
-    # - name: Merge into HTML Report
-    #   run: npx playwright merge-reports --reporter html ./all-blob-reports
+      # - name: Debug JSON reports directory
+      #   run: |
+      #     echo "=== Contents of all-json-reports ==="
+      #     ls -la all-json-reports/
+      #     echo "=== Recursive listing ==="
+      #     find all-json-reports -type f -name "*.json"
+      #     echo "=== Current working directory ==="
+      #     pwd
+      #     echo "=== Directory structure ==="
+      #     tree all-json-reports || find all-json-reports -type f
 
-    # - name: Download JSON reports
-    #   uses: actions/download-artifact@v4
-    #   with:
-    #     path: all-json-reports
-    #     pattern: json-report-*
-    #     merge-multiple: true
+      - name: Merge JSON reports
+        run: npx playwright merge-reports --reporter json ./all-blob-reports > ./all-json-reports.json
 
-    # - name: Debug JSON reports directory
-    #   run: |
-    #     echo "=== Contents of all-json-reports ==="
-    #     ls -la all-json-reports/
-    #     echo "=== Recursive listing ==="
-    #     find all-json-reports -type f -name "*.json"
-    #     echo "=== Current working directory ==="
-    #     pwd
-    #     echo "=== Directory structure ==="
-    #     tree all-json-reports || find all-json-reports -type f
+      - name: Generate summary comment
+        uses: daun/playwright-report-summary@v3
+        if: always()
+        with:
+          report-file: all-json-reports.json
 
-    - name: Merge JSON reports
-      run: npx playwright merge-reports --reporter json ./all-blob-reports > ./all-json-reports.json
+      - name: Download blob reports from GitHub Actions Artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: all-blob-reports
+          pattern: blob-report-*
+          merge-multiple: true
 
-    - name: Generate summary comment
-      uses: daun/playwright-report-summary@v3
-      if: always()
-      with:
-        report-file: all-json-reports.json
+      - name: Merge into HTML Report
+        run: npx playwright merge-reports --reporter html ./all-blob-reports
 
-    - uses: actions/upload-artifact@v4
-      with:
-        name: playwright-report
-        path: playwright-report/
-        retention-days: 30 
+      - uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: playwright-report/
+          retention-days: 30
