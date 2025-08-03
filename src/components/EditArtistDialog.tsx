@@ -21,7 +21,7 @@ import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useGroups } from "@/hooks/useGroups";
 import { Edit } from "lucide-react";
-import { Artist } from "@/services/queries";
+import { Artist, artistQueries } from "@/services/queries";
 import { useGenres } from "@/hooks/queries/useGenresQuery";
 import { toZonedTime, fromZonedTime } from "date-fns-tz";
 import { StageSelector } from "./StageSelector";
@@ -29,14 +29,14 @@ import { formatISO } from "date-fns";
 import { useUserPermissionsQuery } from "@/hooks/queries/useGroupsQuery";
 import { useAuth } from "@/hooks/useAuth";
 import { toDatetimeLocal, toISOString } from "@/lib/timeUtils";
-
+import { useQueryClient } from "@tanstack/react-query";
 
 // Helper function to subtract one hour from datetime-local string
 const subtractOneHour = (datetimeLocal: string): string => {
   if (!datetimeLocal) return "";
   const date = new Date(datetimeLocal);
   date.setHours(date.getHours() - 1);
-  
+
   const year = date.getFullYear();
   const month = String(date.getMonth() + 1).padStart(2, "0");
   const day = String(date.getDate()).padStart(2, "0");
@@ -54,17 +54,13 @@ interface EditArtistDialogProps {
 
 export const EditArtistDialog = ({
   artist,
-  onSuccess,
   trigger,
 }: EditArtistDialogProps) => {
+  const queryClient = useQueryClient();
   const { user, loading: authLoading } = useAuth();
-  const { data: canEdit = false, isLoading: isLoadingPermissions } = useUserPermissionsQuery(
-    user?.id,
-    "edit_artists"
-  );
+  const { data: canEdit = false, isLoading: isLoadingPermissions } =
+    useUserPermissionsQuery(user?.id, "edit_artists");
 
-  
-  
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
@@ -127,7 +123,7 @@ export const EditArtistDialog = ({
       });
 
       setOpen(false);
-      onSuccess?.();
+      queryClient.invalidateQueries({ queryKey: artistQueries.all() });
     } catch (error) {
       console.error("Error updating artist:", error);
       toast({
@@ -216,8 +212,12 @@ export const EditArtistDialog = ({
                 if (formData.time_start || formData.time_end) {
                   setFormData({
                     ...formData,
-                    time_start: formData.time_start ? subtractOneHour(formData.time_start) : "",
-                    time_end: formData.time_end ? subtractOneHour(formData.time_end) : "",
+                    time_start: formData.time_start
+                      ? subtractOneHour(formData.time_start)
+                      : "",
+                    time_end: formData.time_end
+                      ? subtractOneHour(formData.time_end)
+                      : "",
                   });
                 }
               }}

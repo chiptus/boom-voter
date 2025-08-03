@@ -23,7 +23,6 @@ const ArtistDetail = () => {
     handleVote,
     getVoteCount,
     netVoteScore,
-    fetchArtist,
     archiveArtist,
   } = useArtistDetail(id);
 
@@ -60,7 +59,6 @@ const ArtistDetail = () => {
             netVoteScore={netVoteScore}
             onVote={handleVote}
             getVoteCount={getVoteCount}
-            onArtistUpdate={fetchArtist}
             onArchiveArtist={canEdit ? handleArchiveArtist : undefined}
             use24Hour={urlState.use24Hour}
           />

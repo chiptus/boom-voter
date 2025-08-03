@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useProfileQuery } from "@/hooks/queries/useProfileQuery";
 import { profileOfflineService } from "@/services/profileOfflineService";
@@ -95,13 +95,15 @@ export const useAuth = () => {
     await supabase.auth.signOut();
   };
 
-  function hasUsername() {
+ 
+
+  const hasUsername = useMemo(() => {
     return (
       // loading ||
       // profileQuery.isLoading ||
       (profile?.username && profile?.username.trim() !== "")
     );
-  }
+  }, [profile]);
 
   return {
     user,
