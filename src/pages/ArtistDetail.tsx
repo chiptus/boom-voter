@@ -9,13 +9,14 @@ import { ArtistGroupVoting } from "@/components/ArtistDetail/ArtistGroupVoting";
 import { ArtistNotes } from "@/components/ArtistDetail/ArtistNotes";
 import { useArtistDetail } from "@/components/ArtistDetail/useArtistDetail";
 import { useUrlState } from "@/hooks/useUrlState";
+import { setToArtist } from "@/utils/setToArtistAdapter";
 
 const ArtistDetail = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { state: urlState } = useUrlState();
   const {
-    artist,
+    artist: setData,
     user,
     userVote,
     loading,
@@ -25,6 +26,9 @@ const ArtistDetail = () => {
     netVoteScore,
     archiveArtist,
   } = useArtistDetail(id);
+
+  // Convert set to artist for backward compatibility
+  const artist = setData ? setToArtist(setData) : null;
 
 
 

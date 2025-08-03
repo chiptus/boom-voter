@@ -1,12 +1,12 @@
 
 import { useEffect, useState, useMemo, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import type { Set } from "@/hooks/useOfflineArtistData";
+import type { Artist } from "@/hooks/useOfflineArtistData";
 import type { FilterSortState } from "../../hooks/useUrlState";
 
-export const useArtistFiltering = (artists: Set[], filterSortState?: FilterSortState) => {
+export const useArtistFiltering = (artists: Artist[], filterSortState?: FilterSortState) => {
   const [groupMemberIds, setGroupMemberIds] = useState<string[]>([]);
-  const [lockedOrder, setLockedOrder] = useState<Set[]>([]);
+  const [lockedOrder, setLockedOrder] = useState<Artist[]>([]);
 
   useEffect(() => {
     const fetchGroupMembers = async () => {
@@ -28,23 +28,23 @@ export const useArtistFiltering = (artists: Set[], filterSortState?: FilterSortS
     fetchGroupMembers();
   }, [filterSortState?.groupId]);
 
-  // Calculate rating for a set based on vote weights
-  const calculateRating = (set: Set): number => {
-    if (!set.votes || set.votes.length === 0) return 0;
+  // Calculate rating for an artist based on vote weights
+  const calculateRating = (artist: Artist): number => {
+    if (!artist.votes || artist.votes.length === 0) return 0;
     
-    const totalScore = set.votes.reduce((sum, vote) => {
+    const totalScore = artist.votes.reduce((sum, vote) => {
       // Use the actual vote type values: 2 (Must go), 1 (Interested), -1 (Won't go)
       return sum + vote.vote_type;
     }, 0);
     
-    return totalScore / set.votes.length;
+    return totalScore / artist.votes.length;
   };
 
   // Get weighted popularity score: 2 * (must go votes) + interested votes
-  const getWeightedPopularityScore = (set: Set): number => {
-    if (!set.votes) return 0;
-    const mustGoVotes = set.votes.filter(vote => vote.vote_type === 2).length;
-    const interestedVotes = set.votes.filter(vote => vote.vote_type === 1).length;
+  const getWeightedPopularityScore = (artist: Artist): number => {
+    if (!artist.votes) return 0;
+    const mustGoVotes = artist.votes.filter(vote => vote.vote_type === 2).length;
+    const interestedVotes = artist.votes.filter(vote => vote.vote_type === 1).length;
     
     return (2 * mustGoVotes) + interestedVotes;
   };
@@ -53,34 +53,31 @@ export const useArtistFiltering = (artists: Set[], filterSortState?: FilterSortS
   const filteredAndSortedArtists = useMemo(() => {
     if (!filterSortState) return artists;
 
-    const filtered = artists.map(set => {
+    const filtered = artists.map(artist => {
       // Filter votes by group if groupId is selected
-      let filteredVotes = set.votes || [];
+      let filteredVotes = artist.votes || [];
       if (filterSortState.groupId && groupMemberIds.length > 0) {
         filteredVotes = filteredVotes.filter(vote => groupMemberIds.includes(vote.user_id));
       }
 
       return {
-        ...set,
+        ...artist,
         votes: filteredVotes,
       };
-    }).filter(set => {
+    }).filter(artist => {
       // Stage filter
-      if (filterSortState.stages.length > 0 && set.stage) {
-        if (!filterSortState.stages.includes(set.stage)) return false;
+      if (filterSortState.stages.length > 0 && artist.stage) {
+        if (!filterSortState.stages.includes(artist.stage)) return false;
       }
 
-      // Genre filter - check if any artists in the set match the genre
-      if (filterSortState.genres.length > 0 && set.artists) {
-        const hasMatchingGenre = set.artists.some(artist => 
-          artist.music_genres && filterSortState.genres.includes(artist.genre_id)
-        );
-        if (!hasMatchingGenre) return false;
+      // Genre filter 
+      if (filterSortState.genres.length > 0 && artist.music_genres) {
+        if (!filterSortState.genres.includes(artist.genre_id)) return false;
       }
 
       // Rating filter
       if (filterSortState.minRating > 0) {
-        const rating = calculateRating(set);
+        const rating = calculateRating(artist);
         if (rating < filterSortState.minRating) return false;
       }
 

@@ -4,6 +4,7 @@ import { useGenres } from "@/hooks/queries/useGenresQuery";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { Artist } from "@/services/queries";
+import { setsToArtists } from "@/utils/setToArtistAdapter";
 import {
   Table,
   TableBody,
@@ -31,14 +32,19 @@ export const ArtistsTable = () => {
   const [editingState, setEditingState] = useState<EditingState | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
 
+  // Convert sets to artists for backward compatibility
+  const artistsData = useMemo(() => {
+    return artists ? setsToArtists(artists) : [];
+  }, [artists]);
+
   const filteredArtists = useMemo(
     () =>
-      artists?.filter(
+      artistsData?.filter(
         (artist) =>
           !artist.archived &&
           artist.name.toLowerCase().includes(searchTerm.toLowerCase())
       ),
-    [artists, searchTerm]
+    [artistsData, searchTerm]
   );
 
   const startEditing = (

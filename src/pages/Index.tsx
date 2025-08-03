@@ -16,6 +16,7 @@ import { useUrlState } from "@/hooks/useUrlState";
 import { ArtistsPanel } from "@/components/Index/ArtistsPanel";
 import { ScheduleHorizontalTimelineView } from "@/components/schedule/ScheduleHorizontalTimelineView";
 import ErrorBoundary from "@/components/ErrorBoundary";
+import { setsToArtists } from "@/utils/setToArtistAdapter";
 
 export default function Index() {
   const { user, loading: authLoading, signOut, hasUsername } = useAuth();
@@ -24,9 +25,11 @@ export default function Index() {
   const [showAuthDialog, setShowAuthDialog] = useState(false);
   const { state: urlState, updateUrlState, clearFilters } = useUrlState();
   
-  const { artists, loading: artistsLoading } = useOfflineArtistData();
+  const { artists: sets, loading: artistsLoading } = useOfflineArtistData();
   const { userVotes, handleVote } = useOfflineVoting(user);
   
+  // Convert sets to artists for backward compatibility
+  const artists = setsToArtists(sets || []);
   const { filteredAndSortedArtists, lockCurrentOrder } = useArtistFiltering(artists, urlState);
 
   // Get profile loading state to prevent dialog flashing
