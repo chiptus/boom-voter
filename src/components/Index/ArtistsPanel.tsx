@@ -1,7 +1,8 @@
 import { User } from "@supabase/supabase-js";
 
 import { useOfflineVoting } from "@/hooks/useOfflineVoting";
-import { Artist } from "@/services/queries";
+import { Set } from "@/services/queries";
+import { setsToArtists } from "@/utils/setToArtistAdapter";
 
 import { ArtistCard } from "./ArtistCard";
 import { ArtistListItem } from "./ArtistListItem";
@@ -16,7 +17,7 @@ export function ArtistsPanel({
 
   onLockSort,
 }: {
-  items: Array<Artist>;
+  items: Array<Set>;
   isGrid: boolean;
   user: User;
   use24Hour: boolean;
@@ -36,6 +37,9 @@ export function ArtistsPanel({
     undefined // Remove the refresh callback to prevent auto re-sorting
   );
 
+  // Convert sets to artists for backward compatibility with existing card components
+  const artists = setsToArtists(items);
+
   if (items.length === 0) {
     return <EmptyArtistsState />;
   }
@@ -43,7 +47,7 @@ export function ArtistsPanel({
   if (isGrid) {
     return (
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6" data-testid="artists-grid">
-        {items.map((artist) => (
+        {artists.map((artist) => (
             <ArtistCard
             key={artist.id}
             artist={artist}
@@ -65,7 +69,7 @@ export function ArtistsPanel({
 
   return (
     <div className="space-y-4" data-testid="artists-list">
-      {items.map((artist) => (
+      {artists.map((artist) => (
         <ArtistListItem
           key={artist.id}
           artist={artist}

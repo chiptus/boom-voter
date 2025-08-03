@@ -3,6 +3,7 @@ import { AppHeader } from "@/components/AppHeader";
 import { ArtistsTable } from "@/components/Admin/ArtistsTable";
 import { AdminRolesTable } from "@/components/Admin/AdminRolesTable";
 import { AnalyticsTable } from "@/components/Admin/AnalyticsTable";
+import { FestivalHierarchyManagement } from "@/components/Admin/FestivalHierarchyManagement";
 import { AddArtistDialog } from "@/components/Index/AddArtistDialog";
 import { AddGenreDialog } from "@/components/Index/AddGenreDialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -15,10 +16,11 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { Music, Tag, UserPlus, Plus, BarChart3 } from "lucide-react";
+import { useNavigate, useParams } from "react-router-dom";
+import { Music, Tag, UserPlus, Plus, BarChart3, Calendar } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useUserPermissionsQuery } from "@/hooks/queries/useGroupsQuery";
+import { ArtistsManagement } from "@/components/Admin/ArtistsManagement";
 
 export default function Admin() {
   const { user, loading: authLoading } = useAuth();
@@ -26,6 +28,7 @@ export default function Admin() {
   const [addGenreOpen, setAddGenreOpen] = useState(false);
 
   const navigate = useNavigate();
+  const { tab, festivalId } = useParams<{ tab?: string; festivalId?: string }>();
   const { toast } = useToast();
 
   const { data: canEdit = false, isLoading: isLoadingPermissions } =
@@ -75,6 +78,17 @@ export default function Admin() {
     });
   };
 
+  // If we're in a festival management route, always show festivals tab
+  const currentTab = festivalId ? "festivals" : (tab || "artists");
+
+  const handleTabChange = (value: string) => {
+    if (value === "artists") {
+      navigate("/admin");
+    } else {
+      navigate(`/admin/${value}`);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-app-gradient">
       <div className="container mx-auto px-4 py-8">
@@ -88,14 +102,21 @@ export default function Admin() {
         />
 
         <div className="mt-8">
-          <Tabs defaultValue="artists" className="w-full">
-            <TabsList className={`grid w-full ${isSuperAdmin ? 'grid-cols-4' : 'grid-cols-3'} bg-white/10 backdrop-blur-md`}>
+          <Tabs value={currentTab} onValueChange={handleTabChange} className="w-full">
+            <TabsList className={`grid w-full ${isSuperAdmin ? 'grid-cols-5' : 'grid-cols-4'} bg-white/10 backdrop-blur-md`}>
               <TabsTrigger
                 value="artists"
                 className="data-[state=active]:bg-purple-600 data-[state=active]:text-white"
               >
                 <Music className="h-4 w-4 mr-2" />
                 Artists
+              </TabsTrigger>
+              <TabsTrigger
+                value="festivals"
+                className="data-[state=active]:bg-purple-600 data-[state=active]:text-white"
+              >
+                <Calendar className="h-4 w-4 mr-2" />
+                Festival Management
               </TabsTrigger>
               <TabsTrigger
                 value="content"
@@ -125,7 +146,11 @@ export default function Admin() {
             </TabsList>
 
             <TabsContent value="artists" className="mt-6">
-              <ArtistsTable />
+              <ArtistsManagement />
+            </TabsContent>
+
+            <TabsContent value="festivals" className="mt-6">
+              <FestivalHierarchyManagement />
             </TabsContent>
 
             <TabsContent value="content" className="mt-6">

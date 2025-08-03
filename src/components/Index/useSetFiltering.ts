@@ -1,14 +1,13 @@
-
 import { useEffect, useState, useMemo, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import type { Artist } from "@/hooks/useOfflineArtistData";
+import type { Set } from "@/services/queries";
 import type { FilterSortState } from "../../hooks/useUrlState";
 import { useStagesQuery } from "@/hooks/queries/useStagesQuery";
 
-export const useArtistFiltering = (artists: Artist[], filterSortState?: FilterSortState) => {
+export const useSetFiltering = (sets: Set[], filterSortState?: FilterSortState) => {
   const [groupMemberIds, setGroupMemberIds] = useState<string[]>([]);
   const { data: stages = [] } = useStagesQuery();
-  const [lockedOrder, setLockedOrder] = useState<Artist[]>([]);
+  const [lockedOrder, setLockedOrder] = useState<Set[]>([]);
 
   useEffect(() => {
     const fetchGroupMembers = async () => {
@@ -30,66 +29,64 @@ export const useArtistFiltering = (artists: Artist[], filterSortState?: FilterSo
     fetchGroupMembers();
   }, [filterSortState?.groupId]);
 
-  // Calculate rating for an artist based on vote weights
-  const calculateRating = (artist: Artist): number => {
-    if (!artist.votes || artist.votes.length === 0) return 0;
+  // Calculate rating for a set based on vote weights
+  const calculateRating = (set: Set): number => {
+    if (!set.votes || set.votes.length === 0) return 0;
     
-    const totalScore = artist.votes.reduce((sum, vote) => {
+    const totalScore = set.votes.reduce((sum, vote) => {
       // Use the actual vote type values: 2 (Must go), 1 (Interested), -1 (Won't go)
       return sum + vote.vote_type;
     }, 0);
     
-    return totalScore / artist.votes.length;
+    return totalScore / set.votes.length;
   };
 
   // Get weighted popularity score: 2 * (must go votes) + interested votes
-  const getWeightedPopularityScore = (artist: Artist): number => {
-    if (!artist.votes) return 0;
-    const mustGoVotes = artist.votes.filter(vote => vote.vote_type === 2).length;
-    const interestedVotes = artist.votes.filter(vote => vote.vote_type === 1).length;
+  const getWeightedPopularityScore = (set: Set): number => {
+    if (!set.votes) return 0;
+    const mustGoVotes = set.votes.filter(vote => vote.vote_type === 2).length;
+    const interestedVotes = set.votes.filter(vote => vote.vote_type === 1).length;
     
     return (2 * mustGoVotes) + interestedVotes;
   };
 
-  // Filter and sort artists based on current state
-  const filteredAndSortedArtists = useMemo(() => {
-    if (!filterSortState) return artists;
+  // Filter and sort sets based on current state
+  const filteredAndSortedSets = useMemo(() => {
+    if (!filterSortState) return sets;
 
-    const filtered = artists.map(artist => {
+    const filtered = sets.map(set => {
       // Filter votes by group if groupId is selected
-      let filteredVotes = artist.votes || [];
+      let filteredVotes = set.votes || [];
       if (filterSortState.groupId && groupMemberIds.length > 0) {
         filteredVotes = filteredVotes.filter(vote => groupMemberIds.includes(vote.user_id));
       }
 
       return {
-        ...artist,
+        ...set,
         votes: filteredVotes,
       };
-    }).filter(artist => {
-      // Stage filter - convert stage IDs to stage names for comparison
-      if (filterSortState.stages.length > 0 && artist.stage) {
-        const stageNames = filterSortState.stages
-          .map(stageId => stages.find(s => s.id === stageId)?.name)
-          .filter(Boolean);
-        if (!stageNames.includes(artist.stage)) return false;
+    }).filter(set => {
+      // Stage filter - use set's stage_id directly
+      if (filterSortState.stages.length > 0 && set.stage_id) {
+        if (!filterSortState.stages.includes(set.stage_id)) return false;
       }
 
-      // Genre filter 
-      if (filterSortState.genres.length > 0 && artist.music_genres) {
-        if (!filterSortState.genres.includes(artist.genre_id)) return false;
+      // Genre filter - check first artist's genre
+      if (filterSortState.genres.length > 0 && set.artists && set.artists.length > 0) {
+        const firstArtist = set.artists[0];
+        if (!filterSortState.genres.includes(firstArtist.genre_id)) return false;
       }
 
       // Rating filter
       if (filterSortState.minRating > 0) {
-        const rating = calculateRating(artist);
+        const rating = calculateRating(set);
         if (rating < filterSortState.minRating) return false;
       }
 
       return true;
     });
 
-    // Sort artists
+    // Sort sets
     filtered.sort((a, b) => {
       let primarySort = 0;
       
@@ -124,17 +121,17 @@ export const useArtistFiltering = (artists: Artist[], filterSortState?: FilterSo
     // If sort is locked, use the locked order but with updated vote data
     if (filterSortState.sortLocked && lockedOrder.length > 0) {
       // Update the locked order with fresh data while preserving positions
-      const updatedLockedOrder = lockedOrder.map(lockedArtist => {
-        const freshArtist = filtered.find(f => f.id === lockedArtist.id);
-        return freshArtist || lockedArtist;
+      const updatedLockedOrder = lockedOrder.map(lockedSet => {
+        const freshSet = filtered.find(f => f.id === lockedSet.id);
+        return freshSet || lockedSet;
       });
-      // Add any new artists that weren't in the locked order
-      const newArtists = filtered.filter(f => !lockedOrder.some(l => l.id === f.id));
-      return [...updatedLockedOrder, ...newArtists];
+      // Add any new sets that weren't in the locked order
+      const newSets = filtered.filter(f => !lockedOrder.some(l => l.id === f.id));
+      return [...updatedLockedOrder, ...newSets];
     }
 
     return filtered;
-  }, [artists, filterSortState, groupMemberIds, lockedOrder]);
+  }, [sets, filterSortState, groupMemberIds, lockedOrder]);
 
   // Update locked order when sort is unlocked
   useEffect(() => {
@@ -145,12 +142,12 @@ export const useArtistFiltering = (artists: Artist[], filterSortState?: FilterSo
 
   // Function to lock the current order and update URL state
   const lockCurrentOrder = useCallback((updateUrlState: (state: Partial<FilterSortState>) => void) => {
-    setLockedOrder([...filteredAndSortedArtists]);
+    setLockedOrder([...filteredAndSortedSets]);
     updateUrlState({ sortLocked: true });
-  }, [filteredAndSortedArtists]);
+  }, [filteredAndSortedSets]);
 
   return {
-    filteredAndSortedArtists,
+    filteredAndSortedSets,
     lockCurrentOrder,
   };
 };

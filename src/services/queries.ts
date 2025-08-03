@@ -93,7 +93,6 @@ export const queryFunctions = {
       .from("sets")
       .select(`
         *,
-        stages (name),
         set_artists!inner (
           artists (
             *,
@@ -109,6 +108,16 @@ export const queryFunctions = {
       throw new Error('Failed to fetch sets');
     }
 
+    // Get stages separately since the FK relationship isn't working
+    const { data: stagesData } = await supabase
+      .from("stages")
+      .select("*");
+
+    const stagesMap = stagesData?.reduce((acc, stage) => {
+      acc[stage.id] = stage;
+      return acc;
+    }, {} as Record<string, any>) || {};
+
     // Transform the data to match expected structure
     const transformedData = data?.map(set => ({
       ...set,
@@ -116,6 +125,7 @@ export const queryFunctions = {
         ...sa.artists,
         votes: [] // Artists in sets don't have individual votes
       })).filter(Boolean) || [],
+      stages: set.stage_id ? stagesMap[set.stage_id] : null,
       set_artists: undefined // Remove junction data from final response
     })) || [];
 
@@ -356,12 +366,17 @@ export const queryFunctions = {
     return data || [];
   },
 
-  async fetchFestivalEditions(festivalId: string): Promise<FestivalEdition[]> {
-    const { data, error } = await supabase
+  async fetchFestivalEditions(festivalId?: string): Promise<FestivalEdition[]> {
+    let query = supabase
       .from('festival_editions')
       .select('*')
-      .eq('festival_id', festivalId)
       .order('year', { ascending: false });
+
+    if (festivalId) {
+      query = query.eq('festival_id', festivalId);
+    }
+
+    const { data, error } = await query;
     
     if (error) {
       throw new Error('Failed to load festival editions');
@@ -537,6 +552,203 @@ export const queryFunctions = {
     }
 
     return data;
+  },
+
+  // Management Functions for Admin Interface
+  async createFestival(festival: Omit<Festival, 'id' | 'created_at' | 'updated_at'>): Promise<Festival> {
+    const { data, error } = await supabase
+      .from("festivals")
+      .insert(festival)
+      .select()
+      .single();
+
+    if (error) {
+      console.error('Error creating festival:', error);
+      throw new Error('Failed to create festival');
+    }
+
+    return data;
+  },
+
+  async updateFestival(id: string, updates: Partial<Festival>): Promise<Festival> {
+    const { data, error } = await supabase
+      .from("festivals")
+      .update({ ...updates, updated_at: new Date().toISOString() })
+      .eq("id", id)
+      .select()
+      .single();
+
+    if (error) {
+      console.error('Error updating festival:', error);
+      throw new Error('Failed to update festival');
+    }
+
+    return data;
+  },
+
+  async deleteFestival(id: string): Promise<void> {
+    const { error } = await supabase
+      .from("festivals")
+      .delete()
+      .eq("id", id);
+
+    if (error) {
+      console.error('Error deleting festival:', error);
+      throw new Error('Failed to delete festival');
+    }
+  },
+
+  async createFestivalEdition(edition: Omit<FestivalEdition, 'id' | 'created_at' | 'updated_at'>): Promise<FestivalEdition> {
+    const { data, error } = await supabase
+      .from("festival_editions")
+      .insert(edition)
+      .select()
+      .single();
+
+    if (error) {
+      console.error('Error creating festival edition:', error);
+      throw new Error('Failed to create festival edition');
+    }
+
+    return data;
+  },
+
+  async updateFestivalEdition(id: string, updates: Partial<FestivalEdition>): Promise<FestivalEdition> {
+    const { data, error } = await supabase
+      .from("festival_editions")
+      .update({ ...updates, updated_at: new Date().toISOString() })
+      .eq("id", id)
+      .select()
+      .single();
+
+    if (error) {
+      console.error('Error updating festival edition:', error);
+      throw new Error('Failed to update festival edition');
+    }
+
+    return data;
+  },
+
+  async deleteFestivalEdition(id: string): Promise<void> {
+    const { error } = await supabase
+      .from("festival_editions")
+      .delete()
+      .eq("id", id);
+
+    if (error) {
+      console.error('Error deleting festival edition:', error);
+      throw new Error('Failed to delete festival edition');
+    }
+  },
+
+  async createStage(stage: Omit<Stage, 'id' | 'created_at' | 'updated_at'>): Promise<Stage> {
+    const { data, error } = await supabase
+      .from("stages")
+      .insert(stage)
+      .select()
+      .single();
+
+    if (error) {
+      console.error('Error creating stage:', error);
+      throw new Error('Failed to create stage');
+    }
+
+    return data;
+  },
+
+  async updateStage(id: string, updates: Partial<Stage>): Promise<Stage> {
+    const { data, error } = await supabase
+      .from("stages")
+      .update({ ...updates, updated_at: new Date().toISOString() })
+      .eq("id", id)
+      .select()
+      .single();
+
+    if (error) {
+      console.error('Error updating stage:', error);
+      throw new Error('Failed to update stage');
+    }
+
+    return data;
+  },
+
+  async deleteStage(id: string): Promise<void> {
+    const { error } = await supabase
+      .from("stages")
+      .delete()
+      .eq("id", id);
+
+    if (error) {
+      console.error('Error deleting stage:', error);
+      throw new Error('Failed to delete stage');
+    }
+  },
+
+  async createSet(set: Omit<Set, 'id' | 'created_at' | 'updated_at' | 'artists' | 'votes' | 'stages'>): Promise<Set> {
+    const { data, error } = await supabase
+      .from("sets")
+      .insert(set)
+      .select()
+      .single();
+
+    if (error) {
+      console.error('Error creating set:', error);
+      throw new Error('Failed to create set');
+    }
+
+    return data as any;
+  },
+
+  async updateSet(id: string, updates: Partial<Omit<Set, 'artists' | 'votes' | 'stages'>>): Promise<Set> {
+    const { data, error } = await supabase
+      .from("sets")
+      .update({ ...updates, updated_at: new Date().toISOString() })
+      .eq("id", id)
+      .select()
+      .single();
+
+    if (error) {
+      console.error('Error updating set:', error);
+      throw new Error('Failed to update set');
+    }
+
+    return data as any;
+  },
+
+  async deleteSet(id: string): Promise<void> {
+    const { error } = await supabase
+      .from("sets")
+      .delete()
+      .eq("id", id);
+
+    if (error) {
+      console.error('Error deleting set:', error);
+      throw new Error('Failed to delete set');
+    }
+  },
+
+  async addArtistToSet(setId: string, artistId: string): Promise<void> {
+    const { error } = await supabase
+      .from("set_artists")
+      .insert({ set_id: setId, artist_id: artistId });
+
+    if (error) {
+      console.error('Error adding artist to set:', error);
+      throw new Error('Failed to add artist to set');
+    }
+  },
+
+  async removeArtistFromSet(setId: string, artistId: string): Promise<void> {
+    const { error } = await supabase
+      .from("set_artists")
+      .delete()
+      .eq("set_id", setId)
+      .eq("artist_id", artistId);
+
+    if (error) {
+      console.error('Error removing artist from set:', error);
+      throw new Error('Failed to remove artist from set');
+    }
   },
 };
 

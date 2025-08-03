@@ -9,14 +9,13 @@ import { UsernameSetupDialog } from "@/components/Index/UsernameSetupDialog";
 import { FilterSortControls } from "@/components/Index/filters/FilterSortControls";
 import { AppHeader } from "@/components/AppHeader";
 import { InviteLandingPage } from "@/components/Index/InviteLandingPage";
-import { useArtistFiltering } from "@/components/Index/useArtistFiltering";
+import { useSetFiltering } from "@/components/Index/useSetFiltering";
 import { useOfflineArtistData } from "@/hooks/useOfflineArtistData";
 import { useOfflineVoting } from "@/hooks/useOfflineVoting";
 import { useUrlState } from "@/hooks/useUrlState";
 import { ArtistsPanel } from "@/components/Index/ArtistsPanel";
 import { ScheduleHorizontalTimelineView } from "@/components/schedule/ScheduleHorizontalTimelineView";
 import ErrorBoundary from "@/components/ErrorBoundary";
-import { setsToArtists } from "@/utils/setToArtistAdapter";
 
 export default function Index() {
   const { user, loading: authLoading, signOut, hasUsername } = useAuth();
@@ -28,9 +27,7 @@ export default function Index() {
   const { artists: sets, loading: artistsLoading } = useOfflineArtistData();
   const { userVotes, handleVote } = useOfflineVoting(user);
   
-  // Convert sets to artists for backward compatibility
-  const artists = setsToArtists(sets || []);
-  const { filteredAndSortedArtists, lockCurrentOrder } = useArtistFiltering(artists, urlState);
+  const { filteredAndSortedSets, lockCurrentOrder } = useSetFiltering(sets || [], urlState);
 
   // Get profile loading state to prevent dialog flashing
   const { isLoading: profileLoading } = useProfileQuery(user?.id);
@@ -102,7 +99,7 @@ export default function Index() {
         <AppHeader 
           title="Boom Festival"
           subtitle="Vote for your favorite artists!"
-          description={`${filteredAndSortedArtists.length} artists available for voting`}
+          description={`${filteredAndSortedSets.length} artists available for voting`}
           user={user}
           onSignIn={() => setShowAuthDialog(true)}
           onSignOut={signOut}
@@ -119,7 +116,7 @@ export default function Index() {
           <ErrorBoundary>
             {urlState.mainView === 'list' && (
               <ArtistsPanel
-                items={filteredAndSortedArtists}
+                items={filteredAndSortedSets}
                 isGrid={false}
                 user={user}
                 use24Hour={urlState.use24Hour}

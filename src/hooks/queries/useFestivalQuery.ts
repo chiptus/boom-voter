@@ -16,6 +16,14 @@ export const useFestivalEditionsQuery = (festivalId: string | undefined) => {
   });
 };
 
+// Hook to get ALL festival editions (for admin management)
+export const useAllFestivalEditionsQuery = () => {
+  return useQuery({
+    queryKey: ['festival-editions'],
+    queryFn: () => queryFunctions.fetchFestivalEditions(), // Without festivalId gets all
+  });
+};
+
 // Hook to get the default Boom Festival 2025 edition ID
 export const useBoomFestival2025 = () => {
   const { data: festivals } = useFestivalsQuery();
@@ -30,4 +38,12 @@ export const useBoomFestival2025 = () => {
     festival: boomFestival,
     edition: boom2025,
   };
+};
+
+// Export object for easier importing
+export const useFestivalQuery = {
+  useFestivals: useFestivalsQuery,
+  useFestivalEditions: useAllFestivalEditionsQuery,
+  useFestivalEditionsForFestival: useFestivalEditionsQuery,
+  useBoomFestival2025,
 };

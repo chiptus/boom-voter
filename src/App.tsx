@@ -31,6 +31,8 @@ const App = () => (
             <Route path="/groups/:groupId" element={<GroupDetail />} />
             <Route path="/schedule" element={<Schedule />} />
             <Route path="/admin" element={<Admin />} />
+            <Route path="/admin/:tab" element={<Admin />} />
+            <Route path="/admin/festivals/:festivalId/:subtab" element={<Admin />} />
             <Route path="/privacy" element={<PrivacyPolicy />} />
             <Route path="/terms" element={<TermsOfService />} />
             <Route path="/cookies" element={<CookiePolicy />} />
