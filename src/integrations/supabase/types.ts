@@ -434,7 +434,7 @@ export type Database = {
           festival_edition_id: string
           id: string
           name: string
-          stage: string | null
+          stage_id: string | null
           time_end: string | null
           time_start: string | null
           updated_at: string
@@ -446,7 +446,7 @@ export type Database = {
           festival_edition_id: string
           id?: string
           name: string
-          stage?: string | null
+          stage_id?: string | null
           time_end?: string | null
           time_start?: string | null
           updated_at?: string
@@ -458,7 +458,7 @@ export type Database = {
           festival_edition_id?: string
           id?: string
           name?: string
-          stage?: string | null
+          stage_id?: string | null
           time_end?: string | null
           time_start?: string | null
           updated_at?: string
@@ -472,6 +472,30 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      stages: {
+        Row: {
+          created_at: string
+          festival_edition_id: string
+          id: string
+          name: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          festival_edition_id: string
+          id?: string
+          name: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          festival_edition_id?: string
+          id?: string
+          name?: string
+          updated_at?: string
+        }
+        Relationships: []
       }
       votes: {
         Row: {
