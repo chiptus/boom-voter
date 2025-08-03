@@ -86,26 +86,26 @@ jobs:
     - name: Merge into HTML Report
       run: npx playwright merge-reports --reporter html ./all-blob-reports
 
-    - name: Download JSON reports
-      uses: actions/download-artifact@v4
-      with:
-        path: all-json-reports
-        pattern: json-report-*
-        merge-multiple: true
+    # - name: Download JSON reports
+    #   uses: actions/download-artifact@v4
+    #   with:
+    #     path: all-json-reports
+    #     pattern: json-report-*
+    #     merge-multiple: true
 
-    - name: Debug JSON reports directory
-      run: |
-        echo "=== Contents of all-json-reports ==="
-        ls -la all-json-reports/
-        echo "=== Recursive listing ==="
-        find all-json-reports -type f -name "*.json"
-        echo "=== Current working directory ==="
-        pwd
-        echo "=== Directory structure ==="
-        tree all-json-reports || find all-json-reports -type f
+    # - name: Debug JSON reports directory
+    #   run: |
+    #     echo "=== Contents of all-json-reports ==="
+    #     ls -la all-json-reports/
+    #     echo "=== Recursive listing ==="
+    #     find all-json-reports -type f -name "*.json"
+    #     echo "=== Current working directory ==="
+    #     pwd
+    #     echo "=== Directory structure ==="
+    #     tree all-json-reports || find all-json-reports -type f
 
     - name: Merge JSON reports
-      run: npx playwright merge-reports --reporter json all-json-reports/*.json
+      run: npx playwright merge-reports --reporter json ./all-blob-reports
 
     - name: Generate summary comment
       uses: daun/playwright-report-summary@v3
