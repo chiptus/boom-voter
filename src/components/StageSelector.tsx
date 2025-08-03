@@ -1,18 +1,20 @@
-import { STAGES } from "@/components/Index/filters/constants";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { useStagesQuery } from "@/hooks/queries/useStagesQuery";
 
 export function StageSelector({ value, onValueChange }: { value: string, onValueChange: (value: string) => void }) {
+    const { data: stages = [], isLoading } = useStagesQuery();
+    
     return <div className="space-y-2">
       <Label htmlFor="stage">Stage</Label>
-      <Select value={value} onValueChange={onValueChange}>
+      <Select value={value} onValueChange={onValueChange} disabled={isLoading}>
         <SelectTrigger>
-          <SelectValue placeholder="Select a stage" />
+          <SelectValue placeholder={isLoading ? "Loading stages..." : "Select a stage"} />
         </SelectTrigger>
         <SelectContent>
-          {STAGES.map((stage) => (
-            <SelectItem key={stage} value={stage}>
-              {stage}
+          {stages.map((stage) => (
+            <SelectItem key={stage.id} value={stage.id}>
+              {stage.name}
             </SelectItem>
           ))}
         </SelectContent>

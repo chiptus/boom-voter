@@ -19,7 +19,7 @@ export const setToArtist = (set: Set): Artist => {
     id: set.id,
     name: set.name,
     description: set.description || firstArtist.description,
-    stage: set.stage || firstArtist.stage,
+    stage: set.stages?.name || firstArtist.stage,
     time_start: set.time_start || firstArtist.time_start,
     time_end: set.time_end || firstArtist.time_end,
     created_at: set.created_at,

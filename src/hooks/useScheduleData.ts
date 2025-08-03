@@ -51,7 +51,7 @@ export const useScheduleData = (use24Hour: boolean = false) => {
     }
 
     // Filter sets with performance times and stages
-    const performingSets = artists.filter(set => set.time_start && set.stage);
+    const performingSets = artists.filter(set => set.time_start && set.stages?.name);
 
     // Parse and enhance set data
     const enhancedSets: ScheduleSet[] = performingSets.map(set => {
@@ -61,7 +61,7 @@ export const useScheduleData = (use24Hour: boolean = false) => {
       return {
         id: set.id,
         name: set.name,
-        stage: set.stage,
+        stage: set.stages?.name || '',
         startTime,
         endTime,
         votes: set.votes || [],

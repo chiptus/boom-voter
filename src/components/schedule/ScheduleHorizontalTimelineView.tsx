@@ -84,28 +84,14 @@ export const ScheduleHorizontalTimelineView = ({ userVotes, onVote }: ScheduleHo
       });
     });
 
-    // Create unified stages array with custom ordering
-    const stageOrder = ["Dance Temple", "Alchemy Circle", "The Gardens"];
+    // Create unified stages array - stages will be sorted alphabetically by default
     const unifiedStages = Object.entries(allStageGroups).map(([stageName, sets]) => ({
       name: stageName,
       artists: sets.sort((a, b) => {
         if (!a.startTime || !b.startTime) return 0;
         return a.startTime.getTime() - b.startTime.getTime();
       })
-    })).sort((a, b) => {
-      const aIndex = stageOrder.indexOf(a.name);
-      const bIndex = stageOrder.indexOf(b.name);
-      
-      if (aIndex !== -1 && bIndex !== -1) {
-        return aIndex - bIndex;
-      } else if (aIndex !== -1) {
-        return -1;
-      } else if (bIndex !== -1) {
-        return 1;
-      } else {
-        return a.name.localeCompare(b.name);
-      }
-    });
+    })).sort((a, b) => a.name.localeCompare(b.name));
 
     return {
       timeSlots,

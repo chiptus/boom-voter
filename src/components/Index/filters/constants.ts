@@ -7,4 +7,5 @@ export const SORT_OPTIONS = [
   { value: 'date-asc', label: 'By Date' },
 ] as const;
 
-export const STAGES = ['Alchemy Circle', 'Dance Temple', 'Sacred Fire', 'The Gardens'];
+// Stages are now loaded dynamically from the database
+export const STAGES: string[] = [];

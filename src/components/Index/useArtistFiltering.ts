@@ -3,9 +3,11 @@ import { useEffect, useState, useMemo, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import type { Artist } from "@/hooks/useOfflineArtistData";
 import type { FilterSortState } from "../../hooks/useUrlState";
+import { useStagesQuery } from "@/hooks/queries/useStagesQuery";
 
 export const useArtistFiltering = (artists: Artist[], filterSortState?: FilterSortState) => {
   const [groupMemberIds, setGroupMemberIds] = useState<string[]>([]);
+  const { data: stages = [] } = useStagesQuery();
   const [lockedOrder, setLockedOrder] = useState<Artist[]>([]);
 
   useEffect(() => {
@@ -65,9 +67,12 @@ export const useArtistFiltering = (artists: Artist[], filterSortState?: FilterSo
         votes: filteredVotes,
       };
     }).filter(artist => {
-      // Stage filter
+      // Stage filter - convert stage IDs to stage names for comparison
       if (filterSortState.stages.length > 0 && artist.stage) {
-        if (!filterSortState.stages.includes(artist.stage)) return false;
+        const stageNames = filterSortState.stages
+          .map(stageId => stages.find(s => s.id === stageId)?.name)
+          .filter(Boolean);
+        if (!stageNames.includes(artist.stage)) return false;
       }
 
       // Genre filter 

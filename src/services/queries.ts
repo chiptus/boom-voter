@@ -9,10 +9,12 @@ type Artist = Database["public"]["Tables"]["artists"]["Row"] & {
 type Set = Database["public"]["Tables"]["sets"]["Row"] & {
   artists: Artist[];
   votes: { vote_type: number; user_id: string }[];
+  stages?: { name: string } | null;
 };
 
 type Festival = Database["public"]["Tables"]["festivals"]["Row"];
 type FestivalEdition = Database["public"]["Tables"]["festival_editions"]["Row"];
+type Stage = Database["public"]["Tables"]["stages"]["Row"];
 
 type ArtistNote = {
   id: string;
@@ -71,6 +73,12 @@ export const groupQueries = {
   members: (groupId: string) => [...groupQueries.detail(groupId), 'members'] as const,
 };
 
+// Stage Queries
+export const stageQueries = {
+  all: () => ['stages'] as const,
+  byEdition: (editionId: string) => [...stageQueries.all(), 'edition', editionId] as const,
+};
+
 // Auth Queries
 export const authQueries = {
   user: () => ['auth', 'user'] as const,
@@ -85,6 +93,7 @@ export const queryFunctions = {
       .from("sets")
       .select(`
         *,
+        stages (name),
         set_artists!inner (
           artists (
             *,
@@ -110,7 +119,7 @@ export const queryFunctions = {
       set_artists: undefined // Remove junction data from final response
     })) || [];
 
-    return transformedData as Set[];
+    return transformedData as any[];
   },
 
   // Artists (legacy support)
@@ -138,6 +147,7 @@ export const queryFunctions = {
       .from("sets")
       .select(`
         *,
+        stages (name),
         set_artists!inner (
           artists (
             *,
@@ -164,7 +174,7 @@ export const queryFunctions = {
       set_artists: undefined // Remove junction data from final response
     };
 
-    return transformedData as Set;
+    return transformedData as any;
   },
 
   async fetchArtist(id: string): Promise<Artist> {
@@ -365,6 +375,7 @@ export const queryFunctions = {
       .from("sets")
       .select(`
         *,
+        stages (name),
         set_artists!inner (
           artists (
             *,
@@ -391,7 +402,35 @@ export const queryFunctions = {
       set_artists: undefined // Remove junction data from final response
     })) || [];
 
-    return transformedData as Set[];
+    return transformedData as any[];
+  },
+
+  // Stages
+  async fetchStages(): Promise<Stage[]> {
+    const { data, error } = await supabase
+      .from('stages')
+      .select('*')
+      .order('name');
+    
+    if (error) {
+      throw new Error('Failed to load stages');
+    }
+
+    return data || [];
+  },
+
+  async fetchStagesByEdition(editionId: string): Promise<Stage[]> {
+    const { data, error } = await supabase
+      .from('stages')
+      .select('*')
+      .eq('festival_edition_id', editionId)
+      .order('name');
+    
+    if (error) {
+      throw new Error('Failed to load stages for edition');
+    }
+
+    return data || [];
   },
 
   // Groups
@@ -719,4 +758,4 @@ export const mutationFunctions = {
   },
 };
 
-export type { Artist, ArtistNote, Set, Festival, FestivalEdition };
+export type { Artist, ArtistNote, Set, Festival, FestivalEdition, Stage };

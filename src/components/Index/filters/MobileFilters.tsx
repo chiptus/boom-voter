@@ -8,7 +8,7 @@ import {
 } from "@/components/ui/select";
 import { X } from "lucide-react";
 import type { FilterSortState } from "@/hooks/useUrlState";
-import { STAGES } from "./constants";
+import { useStagesQuery } from "@/hooks/queries/useStagesQuery";
 import { TimeFormatToggle } from "./TimeFormatToggle";
 
 interface MobileFiltersProps {
@@ -26,6 +26,8 @@ export const MobileFilters = ({
   onStateChange,
   onClear,
 }: MobileFiltersProps) => {
+  const { data: stages = [], isLoading: stagesLoading } = useStagesQuery();
+  
   const handleStageSelect = (value: string) => {
     if (value === "all") {
       onStateChange({ stages: [] });
@@ -63,11 +65,17 @@ export const MobileFilters = ({
             <SelectItem value="all" className="text-purple-100">
               All Stages
             </SelectItem>
-            {STAGES.map((stage) => (
-              <SelectItem key={stage} value={stage} className="text-purple-100">
-                {stage}
+            {stagesLoading ? (
+              <SelectItem value="loading" disabled className="text-purple-300">
+                Loading stages...
               </SelectItem>
-            ))}
+            ) : (
+              stages.map((stage) => (
+                <SelectItem key={stage.id} value={stage.id} className="text-purple-100">
+                  {stage.name}
+                </SelectItem>
+              ))
+            )}
           </SelectContent>
         </Select>
       </div>

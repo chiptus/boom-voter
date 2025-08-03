@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { X } from "lucide-react";
 import type { FilterSortState } from "@/hooks/useUrlState";
-import { STAGES } from "./constants";
+import { useStagesQuery } from "@/hooks/queries/useStagesQuery";
 import { TimeFormatToggle } from "./TimeFormatToggle";
 
 interface DesktopFiltersProps {
@@ -19,10 +19,12 @@ export const DesktopFilters = ({
   onStateChange,
   onClear,
 }: DesktopFiltersProps) => {
-  const handleStageToggle = (stage: string) => {
-    const newStages = state.stages.includes(stage)
-      ? state.stages.filter((s) => s !== stage)
-      : [...state.stages, stage];
+  const { data: stages = [], isLoading: stagesLoading } = useStagesQuery();
+  
+  const handleStageToggle = (stageId: string) => {
+    const newStages = state.stages.includes(stageId)
+      ? state.stages.filter((s) => s !== stageId)
+      : [...state.stages, stageId];
     onStateChange({ stages: newStages });
   };
 
@@ -44,21 +46,25 @@ export const DesktopFilters = ({
       <div>
         <h4 className="text-sm font-medium text-purple-200 mb-2">Stages</h4>
         <div className="flex flex-wrap gap-2">
-          {STAGES.map((stage) => (
-            <Button
-              key={stage}
-              variant={state.stages.includes(stage) ? "default" : "outline"}
-              size="sm"
-              onClick={() => handleStageToggle(stage)}
-              className={
-                state.stages.includes(stage)
-                  ? "bg-purple-600 hover:bg-purple-700"
-                  : "border-purple-400 text-purple-400 hover:bg-purple-400 hover:text-white"
-              }
-            >
-              {stage}
-            </Button>
-          ))}
+          {stagesLoading ? (
+            <div className="text-sm text-purple-300">Loading stages...</div>
+          ) : (
+            stages.map((stage) => (
+              <Button
+                key={stage.id}
+                variant={state.stages.includes(stage.id) ? "default" : "outline"}
+                size="sm"
+                onClick={() => handleStageToggle(stage.id)}
+                className={
+                  state.stages.includes(stage.id)
+                    ? "bg-purple-600 hover:bg-purple-700"
+                    : "border-purple-400 text-purple-400 hover:bg-purple-400 hover:text-white"
+                }
+              >
+                {stage.name}
+              </Button>
+            ))
+          )}
         </div>
       </div>
 
