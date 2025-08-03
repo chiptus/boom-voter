@@ -3,9 +3,9 @@ import { format, differenceInMinutes, startOfDay } from "date-fns";
 import { ArtistScheduleBlock } from "./ArtistScheduleBlock";
 import { DaySelector } from "./DaySelector";
 import { useScheduleData } from "@/hooks/useScheduleData";
-import type { ScheduleDay, ScheduleArtist } from "@/hooks/useScheduleData";
+import type { ScheduleDay, ScheduleSet } from "@/hooks/useScheduleData";
 
-interface HorizontalTimelineArtist extends ScheduleArtist {
+interface HorizontalTimelineSet extends ScheduleSet {
   horizontalPosition?: {
     left: number;
     width: number;
@@ -51,8 +51,8 @@ export const ScheduleHorizontalTimelineView = ({ userVotes, onVote }: ScheduleHo
       timeSlots.push(timeSlot);
     }
 
-    // Collect all artists from all days/stages into unified stage groups
-    const allStageGroups: Record<string, HorizontalTimelineArtist[]> = {};
+    // Collect all sets from all days/stages into unified stage groups
+    const allStageGroups: Record<string, HorizontalTimelineSet[]> = {};
     
     scheduleDays.forEach(day => {
       day.stages.forEach(stage => {
@@ -60,19 +60,19 @@ export const ScheduleHorizontalTimelineView = ({ userVotes, onVote }: ScheduleHo
           allStageGroups[stage.name] = [];
         }
         
-        // Calculate positions for artists relative to festival start
-        const enhancedArtists = stage.artists.map((artist): HorizontalTimelineArtist => {
-          if (!artist.startTime || !artist.endTime) return artist;
+        // Calculate positions for sets relative to festival start
+        const enhancedSets = stage.artists.map((set): HorizontalTimelineSet => {
+          if (!set.startTime || !set.endTime) return set;
 
-          const startMinutes = differenceInMinutes(artist.startTime, earliestTime);
-          const duration = differenceInMinutes(artist.endTime, artist.startTime);
+          const startMinutes = differenceInMinutes(set.startTime, earliestTime);
+          const duration = differenceInMinutes(set.endTime, set.startTime);
           
           // Calculate positions (1 minute = 2px)
           const left = startMinutes * 2;
           const width = Math.max(duration * 2, 100); // Minimum width of 100px
 
           return {
-            ...artist,
+            ...set,
             horizontalPosition: {
               left,
               width
@@ -80,15 +80,15 @@ export const ScheduleHorizontalTimelineView = ({ userVotes, onVote }: ScheduleHo
           };
         });
         
-        allStageGroups[stage.name].push(...enhancedArtists);
+        allStageGroups[stage.name].push(...enhancedSets);
       });
     });
 
     // Create unified stages array with custom ordering
     const stageOrder = ["Dance Temple", "Alchemy Circle", "The Gardens"];
-    const unifiedStages = Object.entries(allStageGroups).map(([stageName, artists]) => ({
+    const unifiedStages = Object.entries(allStageGroups).map(([stageName, sets]) => ({
       name: stageName,
-      artists: artists.sort((a, b) => {
+      artists: sets.sort((a, b) => {
         if (!a.startTime || !b.startTime) return 0;
         return a.startTime.getTime() - b.startTime.getTime();
       })
@@ -197,22 +197,22 @@ export const ScheduleHorizontalTimelineView = ({ userVotes, onVote }: ScheduleHo
                   className="relative h-20 bg-white/5 rounded-lg border border-purple-400/20"
                   style={{ minWidth: timelineData.totalWidth }}
                 >
-                  {stage.artists.map((artist) => {
-                    if (!artist.horizontalPosition) return null;
+                  {stage.artists.map((set) => {
+                    if (!set.horizontalPosition) return null;
                     
                     return (
                       <div
-                        key={artist.id}
+                        key={set.id}
                         className="absolute h-16"
                         style={{
-                          left: `${artist.horizontalPosition.left}px`,
-                          width: `${artist.horizontalPosition.width}px`
+                          left: `${set.horizontalPosition.left}px`,
+                          width: `${set.horizontalPosition.width}px`
                         }}
                       >
                         <div className="h-full">
                           <ArtistScheduleBlock
-                            artist={artist}
-                            userVote={userVotes[artist.id]}
+                            artist={set}
+                            userVote={userVotes[set.id]}
                             onVote={onVote}
                             compact={true}
                           />

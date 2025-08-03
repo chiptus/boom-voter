@@ -1,18 +1,19 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
-import { artistQueries, queryFunctions, mutationFunctions } from "@/services/queries";
+import { artistQueries, setQueries, queryFunctions, mutationFunctions } from "@/services/queries";
 
+// Legacy artist queries - these will fetch sets by default for Boom 2025
 export const useArtistsQuery = () => {
   return useQuery({
-    queryKey: artistQueries.lists(),
-    queryFn: queryFunctions.fetchArtists,
+    queryKey: setQueries.lists(),
+    queryFn: queryFunctions.fetchSets,
   });
 };
 
 export const useArtistQuery = (id: string | undefined) => {
   return useQuery({
-    queryKey: artistQueries.detail(id || ''),
-    queryFn: () => queryFunctions.fetchArtist(id!),
+    queryKey: setQueries.detail(id || ''),
+    queryFn: () => queryFunctions.fetchSet(id!),
     enabled: !!id,
   });
 };
@@ -24,8 +25,9 @@ export const useArchiveArtistMutation = () => {
   return useMutation({
     mutationFn: mutationFunctions.archiveArtist,
     onSuccess: () => {
-      // Invalidate and refetch artists list
+      // Invalidate both artists and sets lists
       queryClient.invalidateQueries({ queryKey: artistQueries.lists() });
+      queryClient.invalidateQueries({ queryKey: setQueries.lists() });
       toast({
         title: "Success",
         description: "Artist archived successfully",

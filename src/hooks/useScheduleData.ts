@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import { useOfflineArtistData, type Artist } from './useOfflineArtistData';
+import { useOfflineArtistData, type Set } from './useOfflineArtistData';
 import { formatDateTime } from '@/lib/timeUtils';
 import { parse, isValid, format, startOfDay, isSameDay } from 'date-fns';
 
@@ -11,18 +11,27 @@ export interface ScheduleDay {
 
 export interface ScheduleStage {
   name: string;
-  artists: ScheduleArtist[];
+  artists: ScheduleSet[]; // Now represents sets, not individual artists
 }
 
-export interface ScheduleArtist extends Artist {
+export interface ScheduleArtist {
+  id: string;
+  name: string;
+  stage?: string;
   startTime?: Date;
   endTime?: Date;
+  votes?: { vote_type: number; user_id: string }[];
   formattedTimeRange?: string;
   conflictsWith?: string[];
   position?: {
     top: number;
     height: number;
   };
+}
+
+// Schedule Set type for the new system
+export interface ScheduleSet extends ScheduleArtist {
+  artists: ScheduleArtist[];
 }
 
 export const useScheduleData = (use24Hour: boolean = false) => {
@@ -41,54 +50,62 @@ export const useScheduleData = (use24Hour: boolean = false) => {
       return [];
     }
 
-    // Filter artists with performance times and stages
-    const performingArtists = artists.filter(artist => artist.time_start && artist.stage);
+    // Filter sets with performance times and stages
+    const performingSets = artists.filter(set => set.time_start && set.stage);
 
-    // Parse and enhance artist data
-    const enhancedArtists: ScheduleArtist[] = performingArtists.map(artist => {
-      const startTime = artist.time_start ? new Date(artist.time_start) : undefined;
-      const endTime = artist.time_end ? new Date(artist.time_end) : undefined;
+    // Parse and enhance set data
+    const enhancedSets: ScheduleSet[] = performingSets.map(set => {
+      const startTime = set.time_start ? new Date(set.time_start) : undefined;
+      const endTime = set.time_end ? new Date(set.time_end) : undefined;
 
       return {
-        ...artist,
+        id: set.id,
+        name: set.name,
+        stage: set.stage,
         startTime,
         endTime,
-        formattedTimeRange: formatDateTime(artist.time_start, use24Hour),
+        votes: set.votes || [],
+        formattedTimeRange: formatDateTime(set.time_start, use24Hour),
+        artists: (set.artists || []).map(artist => ({
+          id: artist.id,
+          name: artist.name,
+          votes: artist.votes || []
+        })),
       };
     });
 
-    // Group artists by day
-    const dayGroups = enhancedArtists.reduce((acc, artist) => {
-      if (!artist.startTime) return acc;
+    // Group sets by day
+    const dayGroups = enhancedSets.reduce((acc, set) => {
+      if (!set.startTime) return acc;
       
-      const dayKey = format(startOfDay(artist.startTime), 'yyyy-MM-dd');
+      const dayKey = format(startOfDay(set.startTime), 'yyyy-MM-dd');
       if (!acc[dayKey]) {
         acc[dayKey] = [];
       }
-      acc[dayKey].push(artist);
+      acc[dayKey].push(set);
       return acc;
-    }, {} as Record<string, ScheduleArtist[]>);
+    }, {} as Record<string, ScheduleSet[]>);
 
     // Convert to ScheduleDay format
     const scheduleDays: ScheduleDay[] = Object.entries(dayGroups)
       .sort(([a], [b]) => a.localeCompare(b))
-      .map(([dateKey, dayArtists]) => {
+      .map(([dateKey, daySets]) => {
         const date = new Date(dateKey);
         
         // Group by stage
-        const stageGroups = dayArtists.reduce((acc, artist) => {
-          const stageName = artist.stage || 'Main Stage';
+        const stageGroups = daySets.reduce((acc, set) => {
+          const stageName = set.stage || 'Main Stage';
           if (!acc[stageName]) {
             acc[stageName] = [];
           }
-          acc[stageName].push(artist);
+          acc[stageName].push(set);
           return acc;
-        }, {} as Record<string, ScheduleArtist[]>);
+        }, {} as Record<string, ScheduleSet[]>);
 
-        // Sort artists within each stage by time
-        const stages: ScheduleStage[] = Object.entries(stageGroups).map(([stageName, stageArtists]) => ({
+        // Sort sets within each stage by time
+        const stages: ScheduleStage[] = Object.entries(stageGroups).map(([stageName, stageSets]) => ({
           name: stageName,
-          artists: stageArtists.sort((a, b) => {
+          artists: stageSets.sort((a, b) => {
             if (!a.startTime || !b.startTime) return 0;
             return a.startTime.getTime() - b.startTime.getTime();
           }),

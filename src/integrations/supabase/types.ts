@@ -162,6 +162,83 @@ export type Database = {
           },
         ]
       }
+      festival_editions: {
+        Row: {
+          created_at: string
+          description: string | null
+          end_date: string | null
+          festival_id: string
+          id: string
+          is_active: boolean
+          location: string | null
+          name: string
+          start_date: string | null
+          updated_at: string
+          year: number
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          end_date?: string | null
+          festival_id: string
+          id?: string
+          is_active?: boolean
+          location?: string | null
+          name: string
+          start_date?: string | null
+          updated_at?: string
+          year: number
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          end_date?: string | null
+          festival_id?: string
+          id?: string
+          is_active?: boolean
+          location?: string | null
+          name?: string
+          start_date?: string | null
+          updated_at?: string
+          year?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "festival_editions_festival_id_fkey"
+            columns: ["festival_id"]
+            isOneToOne: false
+            referencedRelation: "festivals"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      festivals: {
+        Row: {
+          created_at: string
+          description: string | null
+          id: string
+          name: string
+          updated_at: string
+          website_url: string | null
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          name: string
+          updated_at?: string
+          website_url?: string | null
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          name?: string
+          updated_at?: string
+          website_url?: string | null
+        }
+        Relationships: []
+      }
       group_invites: {
         Row: {
           created_at: string
@@ -310,11 +387,98 @@ export type Database = {
         }
         Relationships: []
       }
+      set_artists: {
+        Row: {
+          artist_id: string
+          created_at: string
+          id: string
+          role: string | null
+          set_id: string
+        }
+        Insert: {
+          artist_id: string
+          created_at?: string
+          id?: string
+          role?: string | null
+          set_id: string
+        }
+        Update: {
+          artist_id?: string
+          created_at?: string
+          id?: string
+          role?: string | null
+          set_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "set_artists_artist_id_fkey"
+            columns: ["artist_id"]
+            isOneToOne: false
+            referencedRelation: "artists"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "set_artists_set_id_fkey"
+            columns: ["set_id"]
+            isOneToOne: false
+            referencedRelation: "sets"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      sets: {
+        Row: {
+          created_at: string
+          created_by: string
+          description: string | null
+          festival_edition_id: string
+          id: string
+          name: string
+          stage: string | null
+          time_end: string | null
+          time_start: string | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          created_by: string
+          description?: string | null
+          festival_edition_id: string
+          id?: string
+          name: string
+          stage?: string | null
+          time_end?: string | null
+          time_start?: string | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string
+          description?: string | null
+          festival_edition_id?: string
+          id?: string
+          name?: string
+          stage?: string | null
+          time_end?: string | null
+          time_start?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sets_festival_edition_id_fkey"
+            columns: ["festival_edition_id"]
+            isOneToOne: false
+            referencedRelation: "festival_editions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       votes: {
         Row: {
           artist_id: string
           created_at: string
           id: string
+          set_id: string | null
           updated_at: string
           user_id: string
           vote_type: number
@@ -323,6 +487,7 @@ export type Database = {
           artist_id: string
           created_at?: string
           id?: string
+          set_id?: string | null
           updated_at?: string
           user_id: string
           vote_type: number
@@ -331,6 +496,7 @@ export type Database = {
           artist_id?: string
           created_at?: string
           id?: string
+          set_id?: string | null
           updated_at?: string
           user_id?: string
           vote_type?: number
@@ -341,6 +507,13 @@ export type Database = {
             columns: ["artist_id"]
             isOneToOne: false
             referencedRelation: "artists"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "votes_set_id_fkey"
+            columns: ["set_id"]
+            isOneToOne: false
+            referencedRelation: "sets"
             referencedColumns: ["id"]
           },
         ]

@@ -6,6 +6,14 @@ type Artist = Database["public"]["Tables"]["artists"]["Row"] & {
   votes: { vote_type: number; user_id: string }[];
 };
 
+type Set = Database["public"]["Tables"]["sets"]["Row"] & {
+  artists: Artist[];
+  votes: { vote_type: number; user_id: string }[];
+};
+
+type Festival = Database["public"]["Tables"]["festivals"]["Row"];
+type FestivalEdition = Database["public"]["Tables"]["festival_editions"]["Row"];
+
 type ArtistNote = {
   id: string;
   artist_id: string;
@@ -17,7 +25,7 @@ type ArtistNote = {
   author_email?: string;
 };
 
-// Artist Queries
+// Artist Queries (legacy)
 export const artistQueries = {
   all: () => ['artists'] as const,
   lists: () => [...artistQueries.all(), 'list'] as const,
@@ -25,6 +33,23 @@ export const artistQueries = {
   details: () => [...artistQueries.all(), 'detail'] as const,
   detail: (id: string) => [...artistQueries.details(), id] as const,
   notes: (artistId: string) => [...artistQueries.detail(artistId), 'notes'] as const,
+};
+
+// Set Queries
+export const setQueries = {
+  all: () => ['sets'] as const,
+  lists: () => [...setQueries.all(), 'list'] as const,
+  list: (filters?: unknown) => [...setQueries.lists(), filters] as const,
+  details: () => [...setQueries.all(), 'detail'] as const,
+  detail: (id: string) => [...setQueries.details(), id] as const,
+  notes: (setId: string) => [...setQueries.detail(setId), 'notes'] as const,
+  byEdition: (editionId: string) => [...setQueries.all(), 'edition', editionId] as const,
+};
+
+// Festival Queries
+export const festivalQueries = {
+  all: () => ['festivals'] as const,
+  editions: (festivalId: string) => [...festivalQueries.all(), festivalId, 'editions'] as const,
 };
 
 // Voting Queries
@@ -54,9 +79,42 @@ export const authQueries = {
 
 // Query Functions
 export const queryFunctions = {
-  // Artists
+  // Sets (main data source)
+  async fetchSets(): Promise<Set[]> {
+    const { data, error } = await supabase
+      .from("sets")
+      .select(`
+        *,
+        set_artists!inner (
+          artists (
+            *,
+            music_genres (name)
+          )
+        ),
+        votes (vote_type, user_id)
+      `)
+      .order("created_at", { ascending: false });
+
+    if (error) {
+      console.error('Error fetching sets:', error);
+      throw new Error('Failed to fetch sets');
+    }
+
+    // Transform the data to match expected structure
+    const transformedData = data?.map(set => ({
+      ...set,
+      artists: set.set_artists?.map(sa => ({
+        ...sa.artists,
+        votes: [] // Artists in sets don't have individual votes
+      })).filter(Boolean) || [],
+      set_artists: undefined // Remove junction data from final response
+    })) || [];
+
+    return transformedData as Set[];
+  },
+
+  // Artists (legacy support)
   async fetchArtists(): Promise<Artist[]> {
-    
     const { data, error } = await supabase
       .from("artists")
       .select(`
@@ -72,12 +130,44 @@ export const queryFunctions = {
       throw new Error('Failed to fetch artists');
     }
 
-    
     return data || [];
   },
 
+  async fetchSet(id: string): Promise<Set> {
+    const { data, error } = await supabase
+      .from("sets")
+      .select(`
+        *,
+        set_artists!inner (
+          artists (
+            *,
+            music_genres (name)
+          )
+        ),
+        votes (vote_type, user_id)
+      `)
+      .eq("id", id)
+      .single();
+
+    if (error) {
+      console.error('Error fetching set:', error);
+      throw new Error('Failed to fetch set details');
+    }
+
+    // Transform the data to match expected structure
+    const transformedData = {
+      ...data,
+      artists: data.set_artists?.map(sa => ({
+        ...sa.artists,
+        votes: [] // Artists in sets don't have individual votes
+      })).filter(Boolean) || [],
+      set_artists: undefined // Remove junction data from final response
+    };
+
+    return transformedData as Set;
+  },
+
   async fetchArtist(id: string): Promise<Artist> {
-    
     const { data, error } = await supabase
       .from("artists")
       .select(`
@@ -94,24 +184,31 @@ export const queryFunctions = {
       throw new Error('Failed to fetch artist details');
     }
 
-    
     return data;
   },
 
   async fetchUserVotes(userId: string): Promise<Record<string, number>> {
     const { data, error } = await supabase
       .from("votes")
-      .select("artist_id, vote_type")
+      .select("set_id, artist_id, vote_type")
       .eq("user_id", userId);
 
     if (error) {
       throw new Error('Failed to fetch user votes');
     }
 
-    return (data || []).reduce((acc, vote) => {
-      acc[vote.artist_id] = vote.vote_type;
-      return acc;
-    }, {} as Record<string, number>);
+    const votes: Record<string, number> = {};
+    
+    (data || []).forEach(vote => {
+      // Prioritize set-based votes over legacy artist votes
+      if (vote.set_id) {
+        votes[vote.set_id] = vote.vote_type;
+      } else if (vote.artist_id && !votes[vote.artist_id]) {
+        votes[vote.artist_id] = vote.vote_type;
+      }
+    });
+
+    return votes;
   },
 
   async fetchUserKnowledge(userId: string): Promise<Record<string, boolean>> {
@@ -235,6 +332,68 @@ export const queryFunctions = {
     return data || [];
   },
 
+  // Festival functions
+  async fetchFestivals(): Promise<Festival[]> {
+    const { data, error } = await supabase
+      .from('festivals')
+      .select('*')
+      .order('name');
+    
+    if (error) {
+      throw new Error('Failed to load festivals');
+    }
+
+    return data || [];
+  },
+
+  async fetchFestivalEditions(festivalId: string): Promise<FestivalEdition[]> {
+    const { data, error } = await supabase
+      .from('festival_editions')
+      .select('*')
+      .eq('festival_id', festivalId)
+      .order('year', { ascending: false });
+    
+    if (error) {
+      throw new Error('Failed to load festival editions');
+    }
+
+    return data || [];
+  },
+
+  async fetchSetsByEdition(editionId: string): Promise<Set[]> {
+    const { data, error } = await supabase
+      .from("sets")
+      .select(`
+        *,
+        set_artists!inner (
+          artists (
+            *,
+            music_genres (name)
+          )
+        ),
+        votes (vote_type, user_id)
+      `)
+      .eq('festival_edition_id', editionId)
+      .order("time_start", { ascending: true });
+
+    if (error) {
+      console.error('Error fetching sets by edition:', error);
+      throw new Error('Failed to fetch sets');
+    }
+
+    // Transform the data to match expected structure
+    const transformedData = data?.map(set => ({
+      ...set,
+      artists: set.set_artists?.map(sa => ({
+        ...sa.artists,
+        votes: [] // Artists in sets don't have individual votes
+      })).filter(Boolean) || [],
+      set_artists: undefined // Remove junction data from final response
+    })) || [];
+
+    return transformedData as Set[];
+  },
+
   // Groups
   async fetchUserGroups(userId: string) {
     const { data: groupsData, error } = await supabase
@@ -344,8 +503,16 @@ export const queryFunctions = {
 
 // Mutation Functions
 export const mutationFunctions = {
-  async vote(variables: { artistId: string; voteType: number; userId: string; existingVote?: number }) {
-    const { artistId, voteType, userId, existingVote } = variables;
+  async vote(variables: { setId?: string; artistId?: string; voteType: number; userId: string; existingVote?: number }) {
+    const { setId, artistId, voteType, userId, existingVote } = variables;
+    
+    // Prioritize set voting over artist voting
+    const targetField = setId ? 'set_id' : 'artist_id';
+    const targetId = setId || artistId;
+    
+    if (!targetId) {
+      throw new Error('Either setId or artistId must be provided');
+    }
     
     if (existingVote === voteType) {
       // Remove vote if clicking the same vote type
@@ -353,20 +520,27 @@ export const mutationFunctions = {
         .from("votes")
         .delete()
         .eq("user_id", userId)
-        .eq("artist_id", artistId);
+        .eq(targetField, targetId);
 
       if (error) throw new Error('Failed to remove vote');
       return null;
     } else {
       // Add or update vote
+      const voteData: any = {
+        user_id: userId,
+        vote_type: voteType,
+      };
+      
+      if (setId) {
+        voteData.set_id = setId;
+      } else {
+        voteData.artist_id = artistId;
+      }
+
       const { error } = await supabase
         .from("votes")
-        .upsert({
-          user_id: userId,
-          artist_id: artistId,
-          vote_type: voteType,
-        }, {
-          onConflict: 'user_id,artist_id'
+        .upsert(voteData, {
+          onConflict: setId ? 'user_id,set_id' : 'user_id,artist_id'
         });
 
       if (error) throw new Error('Failed to save vote');
@@ -545,4 +719,4 @@ export const mutationFunctions = {
   },
 };
 
-export type { Artist, ArtistNote };
+export type { Artist, ArtistNote, Set, Festival, FestivalEdition };

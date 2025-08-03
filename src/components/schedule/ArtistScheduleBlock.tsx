@@ -2,12 +2,12 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Clock, MapPin, Heart, ThumbsUp, ThumbsDown } from "lucide-react";
 import { Link } from "react-router-dom";
 import { formatTimeOnly } from "@/lib/timeUtils";
-import type { ScheduleArtist } from "@/hooks/useScheduleData";
+import type { ScheduleSet } from "@/hooks/useScheduleData";
 
 interface ArtistScheduleBlockProps {
-  artist: ScheduleArtist;
+  artist: ScheduleSet;
   userVote?: number;
-  onVote?: (artistId: string, voteType: number) => void;
+  onVote?: (setId: string, voteType: number) => void;
   compact?: boolean;
 }
 
@@ -18,7 +18,7 @@ export const ArtistScheduleBlock = ({
   compact = false 
 }: ArtistScheduleBlockProps) => {
   const getVoteCount = (voteType: number) => {
-    return artist.votes.filter(vote => vote.vote_type === voteType).length;
+    return (artist.votes || []).filter(vote => vote.vote_type === voteType).length;
   };
 
   const handleVote = (voteType: number) => {
@@ -37,14 +37,21 @@ export const ArtistScheduleBlock = ({
           >
             {artist.name}
           </Link>
+          
+          {/* Show artists in this set */}
+          {artist.artists && artist.artists.length > 0 && (
+            <div className="text-purple-300 text-sm mt-1">
+              {artist.artists.map(a => a.name).join(", ")}
+            </div>
+          )}
         </div>
 
         <div className="space-y-1 text-sm text-purple-200">
-          {(artist.time_start || artist.time_end) && (
+          {(artist.startTime || artist.endTime) && (
             <div className="flex items-center gap-2">
               <Clock className="h-3 w-3" />
               <span className="text-xs">
-                {formatTimeOnly(artist.time_start, artist.time_end, true)}
+                {artist.startTime && artist.endTime && formatTimeOnly(artist.startTime.toISOString(), artist.endTime.toISOString(), true)}
               </span>
             </div>
           )}
