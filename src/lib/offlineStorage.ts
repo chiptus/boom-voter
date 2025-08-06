@@ -36,7 +36,7 @@ export type OfflineSetting = {
 class OfflineStorageManager {
   private db: IDBPDatabase | null = null;
   private dbName = "festival-offline-db";
-  private version = 1;
+  private version = 2;
 
   async init(): Promise<void> {
     this.db = await openDB(this.dbName, this.version, {
@@ -44,6 +44,11 @@ class OfflineStorageManager {
         // Artists store
         if (!db.objectStoreNames.contains("artists")) {
           db.createObjectStore("artists", { keyPath: "id" });
+        }
+
+        // Sets store
+        if (!db.objectStoreNames.contains("sets")) {
+          db.createObjectStore("sets", { keyPath: "id" });
         }
 
         // Votes store
@@ -286,11 +291,12 @@ class OfflineStorageManager {
   async clear(): Promise<void> {
     const db = await this.ensureDB();
     const tx = db.transaction(
-      ["artists", "votes", "notes", "schedule", "settings"],
+      ["artists", "sets", "votes", "notes", "schedule", "settings"],
       "readwrite"
     );
     await Promise.all([
       tx.objectStore("artists").clear(),
+      tx.objectStore("sets").clear(),
       tx.objectStore("votes").clear(),
       tx.objectStore("notes").clear(),
       tx.objectStore("schedule").clear(),
