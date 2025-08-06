@@ -1,13 +1,13 @@
 import { useEffect, useState, useMemo, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import type { Set } from "@/services/queries";
+import type { FestivalSet } from "@/services/queries";
 import type { FilterSortState } from "../../hooks/useUrlState";
 import { useStagesQuery } from "@/hooks/queries/useStagesQuery";
 
-export const useSetFiltering = (sets: Set[], filterSortState?: FilterSortState) => {
+export const useSetFiltering = (sets: FestivalSet[], filterSortState?: FilterSortState) => {
   const [groupMemberIds, setGroupMemberIds] = useState<string[]>([]);
   const { data: _stages = [] } = useStagesQuery();
-  const [lockedOrder, setLockedOrder] = useState<Set[]>([]);
+  const [lockedOrder, setLockedOrder] = useState<FestivalSet[]>([]);
 
   useEffect(() => {
     const fetchGroupMembers = async () => {
@@ -30,7 +30,7 @@ export const useSetFiltering = (sets: Set[], filterSortState?: FilterSortState) 
   }, [filterSortState?.groupId]);
 
   // Calculate rating for a set based on vote weights
-  const calculateRating = (set: Set): number => {
+  const calculateRating = (set: FestivalSet): number => {
     if (!set.votes || set.votes.length === 0) return 0;
     
     const totalScore = set.votes.reduce((sum, vote) => {
@@ -42,7 +42,7 @@ export const useSetFiltering = (sets: Set[], filterSortState?: FilterSortState) 
   };
 
   // Get weighted popularity score: 2 * (must go votes) + interested votes
-  const getWeightedPopularityScore = (set: Set): number => {
+  const getWeightedPopularityScore = (set: FestivalSet): number => {
     if (!set.votes) return 0;
     const mustGoVotes = set.votes.filter(vote => vote.vote_type === 2).length;
     const interestedVotes = set.votes.filter(vote => vote.vote_type === 1).length;

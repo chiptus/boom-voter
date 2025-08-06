@@ -4,7 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 
 import { setQueries, voteQueries } from "@/services/queries";
 import { useOnlineStatus, useOfflineData } from "./useOffline";
-import type { Set } from "@/services/queries";
+import type { FestivalSet } from "@/services/queries";
 import { RealtimeChannel } from "@supabase/supabase-js";
 import { useSetsQuery } from "./queries/useSetsQuery";
 
@@ -15,7 +15,7 @@ export const useOfflineSetsData = () => {
   const channelRef = useRef<RealtimeChannel | null>(null);
   const isOnline = useOnlineStatus();
   const { offlineReady, saveSetsOffline, getSetsOffline } = useOfflineData();
-  const [offlineSets, setOfflineSets] = useState<Set[]>([]);
+  const [offlineSets, setOfflineSets] = useState<FestivalSet[]>([]);
   const [dataSource, setDataSource] = useState<"online" | "offline">("online");
 
   // Load offline data when ready
@@ -130,5 +130,5 @@ export const useOfflineSetsData = () => {
   };
 };
 
-export type { Set };
+export type { FestivalSet };
 export type { Artist } from "@/services/queries"; // Re-export for backward compatibility

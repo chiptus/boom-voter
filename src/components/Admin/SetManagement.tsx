@@ -22,7 +22,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Badge } from "@/components/ui/badge";
 import { Loader2, Plus, Edit2, Trash2, Music, Users, X } from "lucide-react";
 import { formatTimeRange } from "@/lib/timeUtils";
-import type { Set } from "@/services/queries";
+import type { FestivalSet } from "@/services/queries";
 import { useSetsQuery } from "@/hooks/queries/useSetsQuery";
 
 interface SetFormData {
@@ -47,7 +47,7 @@ export const SetManagement = ({ festivalId }: SetManagementProps) => {
   const queryClient = useQueryClient();
   
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [editingSet, setEditingSet] = useState<Set | null>(null);
+  const [editingSet, setEditingSet] = useState<FestivalSet | null>(null);
   const [formData, setFormData] = useState<SetFormData>({
     name: '',
     description: '',
@@ -79,7 +79,7 @@ export const SetManagement = ({ festivalId }: SetManagementProps) => {
     setIsDialogOpen(true);
   };
 
-  const handleEdit = (set: Set) => {
+  const handleEdit = (set: FestivalSet) => {
     setFormData({
       name: set.name,
       description: set.description || '',
@@ -160,7 +160,7 @@ export const SetManagement = ({ festivalId }: SetManagementProps) => {
     }
   };
 
-  const handleDelete = async (set: Set) => {
+  const handleDelete = async (set: FestivalSet) => {
     if (!confirm(`Are you sure you want to delete "${set.name}"? This will also delete all votes for this set.`)) {
       return;
     }

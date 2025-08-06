@@ -6,7 +6,7 @@ export type Artist = Database["public"]["Tables"]["artists"]["Row"] & {
   votes: { vote_type: number; user_id: string }[];
 };
 
-export type Set = Database["public"]["Tables"]["sets"]["Row"] & {
+export type FestivalSet = Database["public"]["Tables"]["sets"]["Row"] & {
   artists: Artist[];
   votes: { vote_type: number; user_id: string }[];
   stages?: { name: string } | null;
@@ -94,7 +94,7 @@ export const authQueries = {
 // Query Functions
 export const queryFunctions = {
   // Sets (main data source)
-  async fetchSets(): Promise<Set[]> {
+  async fetchSets(): Promise<FestivalSet[]> {
     const { data, error } = await supabase
       .from("sets")
       .select(
@@ -170,7 +170,7 @@ export const queryFunctions = {
     return data || [];
   },
 
-  async fetchSet(id: string): Promise<Set> {
+  async fetchSet(id: string): Promise<FestivalSet> {
     const { data, error } = await supabase
       .from("sets")
       .select(
@@ -423,7 +423,7 @@ export const queryFunctions = {
     return data || [];
   },
 
-  async fetchSetsByEdition(editionId: string): Promise<Set[]> {
+  async fetchSetsByEdition(editionId: string): Promise<FestivalSet[]> {
     const { data, error } = await supabase
       .from("sets")
       .select(
@@ -768,7 +768,7 @@ export const queryFunctions = {
 
   async createSet(
     set: Omit<
-      Set,
+      FestivalSet,
       | "id"
       | "created_at"
       | "updated_at"
@@ -777,7 +777,7 @@ export const queryFunctions = {
       | "stages"
       | "archived"
     >
-  ): Promise<Set> {
+  ): Promise<FestivalSet> {
     const { data, error } = await supabase
       .from("sets")
       .insert({
@@ -801,7 +801,7 @@ export const queryFunctions = {
 
   async updateSet(
     id: string,
-    updates: Partial<Omit<Set, "artists" | "votes" | "stages">>
+    updates: Partial<Omit<FestivalSet, "artists" | "votes" | "stages">>
   ) {
     const { data, error } = await supabase
       .from("sets")

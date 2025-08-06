@@ -1,4 +1,4 @@
-import { Artist, Set } from "@/services/queries";
+import { Artist, FestivalSet } from "@/services/queries";
 import { openDB, IDBPDatabase } from "idb";
 
 interface OfflineVote {
@@ -100,7 +100,7 @@ class OfflineStorageManager {
   }
 
   // Sets methods
-  async saveSets(sets: Set[]): Promise<void> {
+  async saveSets(sets: FestivalSet[]): Promise<void> {
     const db = await this.ensureDB();
     const tx = db.transaction("sets", "readwrite");
     const store = tx.objectStore("sets");
@@ -108,12 +108,12 @@ class OfflineStorageManager {
     await tx.done;
   }
 
-  async getSets(): Promise<Set[]> {
+  async getSets(): Promise<FestivalSet[]> {
     const db = await this.ensureDB();
     return db.getAll("sets");
   }
 
-  async getSet(id: string): Promise<Set | null> {
+  async getSet(id: string): Promise<FestivalSet | null> {
     const db = await this.ensureDB();
     const set = await db.get("sets", id);
 

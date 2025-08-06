@@ -8,7 +8,7 @@ import {
 import { setQueries, voteQueries } from "@/services/queries";
 import { useOnlineStatus, useOfflineData } from "./useOffline";
 import { offlineStorage } from "@/lib/offlineStorage";
-import type { Artist, Set } from "@/services/queries";
+import type { Artist, FestivalSet } from "@/services/queries";
 import { RealtimeChannel } from "@supabase/supabase-js";
 
 export const useOfflineArtistData = () => {
@@ -150,5 +150,5 @@ export const useOfflineArtistData = () => {
   };
 };
 
-export type { Set };
+export type { FestivalSet };
 export type { Artist } from "@/services/queries"; // Re-export for backward compatibility

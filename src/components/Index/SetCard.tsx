@@ -11,11 +11,11 @@ import { Star, Heart, X, MapPin, Clock, Eye, EyeOff } from "lucide-react";
 import { ArtistImageLoader } from "@/components/ArtistImageLoader";
 import { useToast } from "@/hooks/use-toast";
 import { formatTimeRange } from "@/lib/timeUtils";
-import { Set } from "@/services/queries";
+import { FestivalSet } from "@/services/queries";
 import { GenreBadge } from "./GenreBadge";
 
 interface ArtistCardProps {
-  set: Set;
+  set: FestivalSet;
   userVote?: number;
   userKnowledge?: boolean;
   votingLoading?: boolean;

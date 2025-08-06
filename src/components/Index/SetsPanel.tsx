@@ -1,7 +1,7 @@
 import { User } from "@supabase/supabase-js";
 
 import { useOfflineVoting } from "@/hooks/useOfflineVoting";
-import { Set } from "@/services/queries";
+import { FestivalSet } from "@/services/queries";
 
 import { SetCard } from "./SetCard";
 import { SetListItem } from "./SetListItem";
@@ -15,7 +15,7 @@ export function SetsPanel({
   openAuthDialog,
   onLockSort,
 }: {
-  sets: Array<Set>;
+  sets: Array<FestivalSet>;
   isGrid: boolean;
   user: User | null;
   use24Hour: boolean;

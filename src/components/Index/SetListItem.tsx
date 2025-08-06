@@ -4,12 +4,12 @@ import { Star, Heart, X, MapPin, Clock, Eye, EyeOff } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { formatTimeRange } from "@/lib/timeUtils";
 import { User } from "@supabase/supabase-js";
-import { Set } from "@/services/queries";
+import { FestivalSet } from "@/services/queries";
 import { ArtistImageLoader } from "../ArtistImageLoader";
 import { GenreBadge } from "./GenreBadge";
 
 interface SetListItemProps {
-  set: Set;
+  set: FestivalSet;
   userVote?: number;
   userKnowledge?: boolean;
   votingLoading?: boolean;

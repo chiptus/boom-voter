@@ -1,6 +1,5 @@
 import { useMemo } from "react";
 import { useAuth } from "@/hooks/useAuth";
-import { useOfflineArtistData } from "@/hooks/useOfflineArtistData";
 import { useOfflineVoting } from "@/hooks/useOfflineVoting";
 import { useUserPermissionsQuery } from "@/hooks/queries/useGroupsQuery";
 import { useOfflineSetsData } from "@/hooks/useOfflineSetsData";

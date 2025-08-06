@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import { offlineStorage } from "@/lib/offlineStorage";
-import { Artist, Set } from "@/services/queries";
+import { Artist, FestivalSet } from "@/services/queries";
 export const useOnlineStatus = () => {
   const [isOnline, setIsOnline] = useState(navigator.onLine);
 
@@ -122,7 +122,7 @@ export const useOfflineData = () => {
     }
   }, []);
 
-  const saveSetsOffline = useCallback(async (artists: Set[]) => {
+  const saveSetsOffline = useCallback(async (artists: FestivalSet[]) => {
     try {
       await offlineStorage.saveSets(artists);
     } catch (error) {
