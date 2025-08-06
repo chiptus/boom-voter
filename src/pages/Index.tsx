@@ -23,16 +23,17 @@ export default function Index() {
     useInviteValidation();
   const [showAuthDialog, setShowAuthDialog] = useState(false);
   const { state: urlState, updateUrlState, clearFilters } = useUrlState();
-  
+
   const { sets, loading: artistsLoading } = useOfflineSetsData();
   const { userVotes, handleVote } = useOfflineVoting(user);
-  
-  const { filteredAndSortedSets, lockCurrentOrder } = useSetFiltering(sets || [], urlState);
+
+  const { filteredAndSortedSets, lockCurrentOrder } = useSetFiltering(
+    sets || [],
+    urlState
+  );
 
   // Get profile loading state to prevent dialog flashing
   const { isLoading: profileLoading } = useProfileQuery(user?.id);
-
-  
 
   const showUsernameSetup = useMemo(() => {
     return !!user && !authLoading && !profileLoading && !hasUsername;
@@ -96,7 +97,8 @@ export default function Index() {
   return (
     <div className="min-h-screen bg-app-gradient">
       <div className="container mx-auto px-4 py-8">
-        <AppHeader 
+        <AppHeader
+          user={user || undefined}
           title="Boom Festival"
           subtitle="Vote for your favorite artists!"
           description={`${filteredAndSortedSets.length} artists available for voting`}
@@ -113,7 +115,7 @@ export default function Index() {
 
         <div className="mt-8">
           <ErrorBoundary>
-            {urlState.mainView === 'list' && (
+            {urlState.mainView === "list" && (
               <SetsPanel
                 sets={filteredAndSortedSets}
                 isGrid={false}
@@ -123,7 +125,7 @@ export default function Index() {
                 onLockSort={() => lockCurrentOrder(updateUrlState)}
               />
             )}
-            {urlState.mainView === 'timeline' && (
+            {urlState.mainView === "timeline" && (
               <ScheduleHorizontalTimelineView
                 userVotes={userVotes}
                 onVote={handleVoteAction}
@@ -140,14 +142,15 @@ export default function Index() {
           groupName={hasValidInvite ? inviteValidation?.group_name : undefined}
         />
 
-
-       {user && <UsernameSetupDialog
-          open={showUsernameSetup}
-          user={user}
-          onSuccess={() => {
-            // setShowUsernameSetup(false);
-          }}
-        />}
+        {user && (
+          <UsernameSetupDialog
+            open={showUsernameSetup}
+            user={user}
+            onSuccess={() => {
+              // setShowUsernameSetup(false);
+            }}
+          />
+        )}
       </div>
     </div>
   );
