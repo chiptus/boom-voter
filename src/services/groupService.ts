@@ -1,4 +1,3 @@
-
 import { supabase } from "@/integrations/supabase/client";
 import type { Group, GroupMember } from "@/types/groups";
 
@@ -24,7 +23,7 @@ export const groupService = {
           .from("group_members")
           .select("*", { count: "exact", head: true })
           .eq("group_id", group.id);
-        
+
         return {
           ...group,
           member_count: count || 0,
@@ -32,11 +31,15 @@ export const groupService = {
         };
       })
     );
-    
+
     return groupsWithCounts;
   },
 
-  async createGroup(name: string, description: string | undefined, userId: string) {
+  async createGroup(
+    name: string,
+    description: string | undefined,
+    userId: string
+  ) {
     const { data: group, error } = await supabase
       .from("groups")
       .insert({
@@ -52,13 +55,11 @@ export const groupService = {
     }
 
     // Add creator as first member
-    const { error: memberError } = await supabase
-      .from("group_members")
-      .insert({
-        group_id: group.id,
-        user_id: userId,
-        role: "creator",
-      });
+    const { error: memberError } = await supabase.from("group_members").insert({
+      group_id: group.id,
+      user_id: userId,
+      role: "creator",
+    });
 
     if (memberError) {
       throw new Error("Group created but failed to add you as member");
@@ -68,12 +69,10 @@ export const groupService = {
   },
 
   async joinGroup(groupId: string, userId: string): Promise<void> {
-    const { error } = await supabase
-      .from("group_members")
-      .insert({
-        group_id: groupId,
-        user_id: userId,
-      });
+    const { error } = await supabase.from("group_members").insert({
+      group_id: groupId,
+      user_id: userId,
+    });
 
     if (error) {
       throw new Error("Failed to join group");
@@ -118,20 +117,22 @@ export const groupService = {
       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
       if (emailRegex.test(usernameOrEmail)) {
         // Try to find by email in auth system
-        const { data: authData, error: authError } = await supabase
-          .rpc('get_user_id_by_email', { user_email: usernameOrEmail });
-        
+        const { data: authData, error: authError } = await supabase.rpc(
+          "get_user_id_by_email",
+          { user_email: usernameOrEmail }
+        );
+
         if (authError || !authData) {
-          return { found: false, userId: null, foundBy: 'email' as const };
+          return { found: false, userId: null, foundBy: "email" as const };
         }
-        
-        return { found: true, userId: authData, foundBy: 'email' as const };
+
+        return { found: true, userId: authData, foundBy: "email" as const };
       } else {
-        return { found: false, userId: null, foundBy: 'username' as const };
+        return { found: false, userId: null, foundBy: "username" as const };
       }
     }
 
-    return { found: true, userId: profile.id, foundBy: 'profile' as const };
+    return { found: true, userId: profile.id, foundBy: "profile" as const };
   },
 
   async checkIfUserInGroup(groupId: string, userId: string): Promise<boolean> {
@@ -146,12 +147,10 @@ export const groupService = {
   },
 
   async addUserToGroup(groupId: string, userId: string): Promise<void> {
-    const { error } = await supabase
-      .from("group_members")
-      .insert({
-        group_id: groupId,
-        user_id: userId,
-      });
+    const { error } = await supabase.from("group_members").insert({
+      group_id: groupId,
+      user_id: userId,
+    });
 
     if (error) {
       throw new Error("Failed to invite user to group");
@@ -167,7 +166,7 @@ export const groupService = {
       .order("joined_at", { ascending: true });
 
     if (error) {
-      console.error('Error fetching group members:', error);
+      console.error("Error fetching group members:", error);
       return [];
     }
 
@@ -186,7 +185,10 @@ export const groupService = {
 
         return {
           ...member,
-          profiles: profile || { username: null, email: null }
+          profiles: {
+            username: profile?.username || undefined,
+            email: profile?.email || undefined,
+          },
         };
       })
     );
@@ -194,7 +196,11 @@ export const groupService = {
     return membersWithProfiles;
   },
 
-  async removeMemberFromGroup(groupId: string, userId: string, currentUserId: string): Promise<void> {
+  async removeMemberFromGroup(
+    groupId: string,
+    userId: string,
+    currentUserId: string
+  ): Promise<void> {
     // First check if current user is the group creator
     const { data: group, error: groupError } = await supabase
       .from("groups")
@@ -242,8 +248,9 @@ export const groupService = {
 
   // New invite-related functions
   async validateInviteToken(token: string) {
-    const { data, error } = await supabase
-      .rpc('validate_invite_token', { token });
+    const { data, error } = await supabase.rpc("validate_invite_token", {
+      token,
+    });
 
     if (error) {
       throw new Error(error.message || "Failed to validate invite");
@@ -253,11 +260,10 @@ export const groupService = {
   },
 
   async useInviteToken(token: string, userId: string) {
-    const { data, error } = await supabase
-      .rpc('use_invite_token', { 
-        token, 
-        user_id: userId 
-      });
+    const { data, error } = await supabase.rpc("use_invite_token", {
+      token,
+      user_id: userId,
+    });
 
     if (error) {
       throw new Error(error.message || "Failed to use invite");

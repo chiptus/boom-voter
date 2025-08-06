@@ -3,7 +3,6 @@ import { useQueryClient } from "@tanstack/react-query";
 import { queryFunctions } from "@/services/queries";
 import { useFestivalQuery } from "@/hooks/queries/useFestivalQuery";
 import { useStagesQuery } from "@/hooks/queries/useStagesQuery";
-import { useArtistsQuery } from "@/hooks/queries/useArtistsQuery";
 import { useToast } from "@/hooks/use-toast";
 import {
   Table,
@@ -21,9 +20,10 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
-import { Loader2, Plus, Edit2, Trash2, Music, Clock, Users, X } from "lucide-react";
+import { Loader2, Plus, Edit2, Trash2, Music, Users, X } from "lucide-react";
 import { formatTimeRange } from "@/lib/timeUtils";
-import type { Set, Festival, FestivalEdition, Stage, Artist } from "@/services/queries";
+import type { Set } from "@/services/queries";
+import { useSetsQuery } from "@/hooks/queries/useSetsQuery";
 
 interface SetFormData {
   name: string;
@@ -42,7 +42,7 @@ export const SetManagement = ({ festivalId }: SetManagementProps) => {
   const { data: festivals = [] } = useFestivalQuery.useFestivals();
   const { data: editions = [] } = useFestivalQuery.useFestivalEditionsForFestival(festivalId);
   const { data: stages = [] } = useStagesQuery();
-  const { data: sets = [], isLoading } = useArtistsQuery(); // This gets sets
+  const { data: sets = [], isLoading } = useSetsQuery(); // This gets sets
   const { toast } = useToast();
   const queryClient = useQueryClient();
   

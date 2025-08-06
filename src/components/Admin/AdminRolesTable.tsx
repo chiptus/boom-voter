@@ -92,7 +92,7 @@ export const AdminRolesTable = () => {
       }
 
       // Check if user already has an admin role
-      const { data: existingRole, error: checkError } = await supabase
+      const { data: existingRole } = await supabase
         .from("admin_roles")
         .select("*")
         .eq("user_id", userId)
@@ -109,12 +109,23 @@ export const AdminRolesTable = () => {
 
       // Add the admin role
       const { data: { user } } = await supabase.auth.getUser();
+
+      if (!user?.id) {
+        toast({
+          title: "Error",
+          description: "User not found",
+          variant: "destructive",
+        });
+        
+        throw new Error("User not found");
+      }
+
       const { error: insertError } = await supabase
         .from("admin_roles")
         .insert({
           user_id: userId,
           role: newUserRole,
-          created_by: user?.id!,
+          created_by: user?.id,
         });
 
       if (insertError) throw insertError;

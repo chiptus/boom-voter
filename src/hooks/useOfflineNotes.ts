@@ -3,10 +3,10 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
 import { offlineStorage } from '@/lib/offlineStorage';
 import { useOnlineStatus, useOfflineQueue } from './useOffline';
-import type { ArtistNote } from '@/services/queries';
+import type { SetNote } from '@/services/queries';
 
-export const useOfflineNotes = (artistId: string, userId: string | null) => {
-  const [notes, setNotes] = useState<ArtistNote[]>([]);
+export const useOfflineNotes = (setId: string, userId: string | null) => {
+  const [notes, setNotes] = useState<SetNote[]>([]);
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
   const { toast } = useToast();
@@ -14,15 +14,15 @@ export const useOfflineNotes = (artistId: string, userId: string | null) => {
   const { updateQueueSize } = useOfflineQueue();
 
   const loadNotes = useCallback(async () => {
-    if (!artistId || !userId) return;
+    if (!setId || !userId) return;
     
     setLoading(true);
     try {
       // Load offline notes first
-      const offlineNotes = await offlineStorage.getNotes(artistId);
+      const offlineNotes = await offlineStorage.getNotes(setId);
       const processedOfflineNotes = offlineNotes.map(note => ({
         id: note.id,
-        artist_id: note.artistId,
+        set_id: note.setId,
         user_id: note.userId,
         note_content: note.content,
         created_at: new Date(note.timestamp).toISOString(),
@@ -39,7 +39,7 @@ export const useOfflineNotes = (artistId: string, userId: string | null) => {
           const { data: serverNotes, error } = await supabase
             .from("artist_notes")
             .select("*")
-            .eq("artist_id", artistId)
+            .eq("artist_id", setId)
             .order("created_at", { ascending: false });
 
           if (!error && serverNotes) {
@@ -50,12 +50,13 @@ export const useOfflineNotes = (artistId: string, userId: string | null) => {
               .select("id, username, email")
               .in("id", userIds);
 
-            const serverNotesWithAuthor = serverNotes.map(note => {
+            const serverNotesWithAuthor = serverNotes.map(({artist_id,...note}) => {
               const profile = profilesData?.find(p => p.id === note.user_id);
               return {
                 ...note,
-                author_username: profile?.username,
-                author_email: profile?.email,
+                set_id: artist_id,
+                author_username: profile?.username || undefined,
+                author_email: profile?.email || undefined,
               };
             });
 
@@ -83,22 +84,22 @@ export const useOfflineNotes = (artistId: string, userId: string | null) => {
     } finally {
       setLoading(false);
     }
-  }, [artistId, userId, isOnline, toast]);
+  }, [setId, userId, isOnline, toast]);
 
   useEffect(() => {
-    if (artistId && userId) {
+    if (setId && userId) {
       loadNotes();
     }
   }, [loadNotes]);
 
   const saveNote = useCallback(async (noteContent: string) => {
-    if (!artistId || !userId) return false;
+    if (!setId || !userId) return false;
 
     setSaving(true);
     try {
       // Save to offline storage
       const offlineNoteId = await offlineStorage.saveNote({
-        artistId,
+        setId: setId,
         content: noteContent,
         userId,
         timestamp: Date.now(),
@@ -106,9 +107,9 @@ export const useOfflineNotes = (artistId: string, userId: string | null) => {
       });
 
       // Update local state immediately
-      const newNote: ArtistNote = {
+      const newNote: SetNote = {
         id: offlineNoteId,
-        artist_id: artistId,
+        set_id: setId,
         user_id: userId,
         note_content: noteContent,
         created_at: new Date().toISOString(),
@@ -125,7 +126,7 @@ export const useOfflineNotes = (artistId: string, userId: string | null) => {
           const { data, error } = await supabase
             .from("artist_notes")
             .upsert({
-              artist_id: artistId,
+              artist_id: setId,
               user_id: userId,
               note_content: noteContent,
             })
@@ -133,13 +134,14 @@ export const useOfflineNotes = (artistId: string, userId: string | null) => {
             .single();
 
           if (!error && data) {
+            const {artist_id, ...noteData} = data;
             // Mark as synced and update with server data
             await offlineStorage.markNoteSynced(offlineNoteId);
             
             // Update the note with server data
             setNotes(prev => prev.map(note => 
               note.id === offlineNoteId 
-                ? { ...data, author_username: 'You', author_email: '' }
+                ? { ...noteData, author_username: 'You', author_email: '', set_id: artist_id }
                 : note
             ));
           }
@@ -167,7 +169,7 @@ export const useOfflineNotes = (artistId: string, userId: string | null) => {
     } finally {
       setSaving(false);
     }
-  }, [artistId, userId, isOnline, toast, updateQueueSize]);
+  }, [setId, userId, isOnline, toast, updateQueueSize]);
 
   const deleteNote = useCallback(async (noteId: string) => {
     if (!noteId) return false;

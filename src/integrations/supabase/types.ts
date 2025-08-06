@@ -67,6 +67,42 @@ export type Database = {
           },
         ]
       }
+      artist_music_genres: {
+        Row: {
+          artist_id: string
+          created_at: string
+          id: string
+          music_genre_id: string
+        }
+        Insert: {
+          artist_id: string
+          created_at?: string
+          id?: string
+          music_genre_id: string
+        }
+        Update: {
+          artist_id?: string
+          created_at?: string
+          id?: string
+          music_genre_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "artist_music_genres_artist_id_fkey"
+            columns: ["artist_id"]
+            isOneToOne: false
+            referencedRelation: "artists"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "artist_music_genres_music_genre_id_fkey"
+            columns: ["music_genre_id"]
+            isOneToOne: false
+            referencedRelation: "music_genres"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       artist_notes: {
         Row: {
           artist_id: string
@@ -101,7 +137,6 @@ export type Database = {
           created_at: string
           description: string | null
           estimated_date: string | null
-          genre_id: string | null
           id: string
           image_url: string | null
           last_soundcloud_sync: string | null
@@ -120,7 +155,6 @@ export type Database = {
           created_at?: string
           description?: string | null
           estimated_date?: string | null
-          genre_id?: string | null
           id?: string
           image_url?: string | null
           last_soundcloud_sync?: string | null
@@ -139,7 +173,6 @@ export type Database = {
           created_at?: string
           description?: string | null
           estimated_date?: string | null
-          genre_id?: string | null
           id?: string
           image_url?: string | null
           last_soundcloud_sync?: string | null
@@ -152,18 +185,11 @@ export type Database = {
           time_start?: string | null
           updated_at?: string
         }
-        Relationships: [
-          {
-            foreignKeyName: "artists_genre_id_fkey"
-            columns: ["genre_id"]
-            isOneToOne: false
-            referencedRelation: "music_genres"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
       festival_editions: {
         Row: {
+          archived: boolean
           created_at: string
           description: string | null
           end_date: string | null
@@ -177,6 +203,7 @@ export type Database = {
           year: number
         }
         Insert: {
+          archived?: boolean
           created_at?: string
           description?: string | null
           end_date?: string | null
@@ -190,6 +217,7 @@ export type Database = {
           year: number
         }
         Update: {
+          archived?: boolean
           created_at?: string
           description?: string | null
           end_date?: string | null
@@ -214,6 +242,7 @@ export type Database = {
       }
       festivals: {
         Row: {
+          archived: boolean
           created_at: string
           description: string | null
           id: string
@@ -222,6 +251,7 @@ export type Database = {
           website_url: string | null
         }
         Insert: {
+          archived?: boolean
           created_at?: string
           description?: string | null
           id?: string
@@ -230,6 +260,7 @@ export type Database = {
           website_url?: string | null
         }
         Update: {
+          archived?: boolean
           created_at?: string
           description?: string | null
           id?: string
@@ -428,6 +459,7 @@ export type Database = {
       }
       sets: {
         Row: {
+          archived: boolean
           created_at: string
           created_by: string
           description: string | null
@@ -440,6 +472,7 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          archived?: boolean
           created_at?: string
           created_by: string
           description?: string | null
@@ -452,6 +485,7 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          archived?: boolean
           created_at?: string
           created_by?: string
           description?: string | null
@@ -471,10 +505,18 @@ export type Database = {
             referencedRelation: "festival_editions"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "sets_stage_id_fkey"
+            columns: ["stage_id"]
+            isOneToOne: false
+            referencedRelation: "stages"
+            referencedColumns: ["id"]
+          },
         ]
       }
       stages: {
         Row: {
+          archived: boolean
           created_at: string
           festival_edition_id: string
           id: string
@@ -482,6 +524,7 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          archived?: boolean
           created_at?: string
           festival_edition_id: string
           id?: string
@@ -489,6 +532,7 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          archived?: boolean
           created_at?: string
           festival_edition_id?: string
           id?: string

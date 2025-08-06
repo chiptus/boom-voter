@@ -1,20 +1,47 @@
-
-import { useState, useEffect } from "react";
-import { supabase } from "@/integrations/supabase/client";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
 import { useToast } from "@/components/ui/use-toast";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
 import { Music } from "lucide-react";
-import type { Database } from "@/integrations/supabase/types";
 import { StageSelector } from "../StageSelector";
 import { useAuth } from "@/hooks/useAuth";
 import { useUserPermissionsQuery } from "@/hooks/queries/useGroupsQuery";
+import { useGenresQuery } from "@/hooks/queries/useGenresQuery";
+import { useCreateArtistMutation } from "@/hooks/queries/useArtistsQuery";
+import { GenreMultiSelect } from "../ui/genre-multi-select";
 
-type MusicGenre = Database["public"]["Tables"]["music_genres"]["Row"];
+// Form validation schema
+const artistFormSchema = z.object({
+  name: z.string().min(1, "Artist name is required"),
+  description: z.string().optional(),
+  genre_ids: z.array(z.string()).optional(),
+  spotifyUrl: z.string().url().optional().or(z.literal("")),
+  soundcloudUrl: z.string().url().optional().or(z.literal("")),
+  imageUrl: z.string().url().optional().or(z.literal("")),
+  stage: z.string().optional(),
+  timeStart: z.string().optional(),
+  timeEnd: z.string().optional(),
+});
+
+type ArtistFormData = z.infer<typeof artistFormSchema>;
 
 interface AddArtistDialogProps {
   open: boolean;
@@ -22,66 +49,48 @@ interface AddArtistDialogProps {
   onSuccess: () => void;
 }
 
-export const AddArtistDialog = ({ open, onOpenChange, onSuccess }: AddArtistDialogProps) => {
+export const AddArtistDialog = ({
+  open,
+  onOpenChange,
+  onSuccess,
+}: AddArtistDialogProps) => {
   const { user, loading: authLoading } = useAuth();
   const { data: canEdit = false, isLoading: isLoadingPermissions } =
     useUserPermissionsQuery(user?.id, "edit_artists");
 
-  const [name, setName] = useState("");
-  const [description, setDescription] = useState("");
-  const [genreId, setGenreId] = useState("");
-  const [spotifyUrl, setSpotifyUrl] = useState("");
-  const [soundcloudUrl, setSoundcloudUrl] = useState("");
-  const [imageUrl, setImageUrl] = useState("");
-  const [stage, setStage] = useState("");
-  const [timeStart, setTimeStart] = useState("");
-  const [timeEnd, setTimeEnd] = useState("");
-  const [genres, setGenres] = useState<MusicGenre[]>([]);
-  const [loading, setLoading] = useState(false);
   const { toast } = useToast();
 
-  useEffect(() => {
-    if (open) {
-      fetchGenres();
-    }
-  }, [open]);
+  // React Query hooks
+  const { data: genres = [], isLoading: isLoadingGenres } = useGenresQuery();
+  const createArtistMutation = useCreateArtistMutation();
+
+  // Form setup
+  const form = useForm<ArtistFormData>({
+    resolver: zodResolver(artistFormSchema),
+    defaultValues: {
+      name: "",
+      description: "",
+      genre_ids: [],
+      spotifyUrl: "",
+      soundcloudUrl: "",
+      imageUrl: "",
+      stage: "",
+      timeStart: "",
+      timeEnd: "",
+    },
+  });
 
   if (authLoading || isLoadingPermissions) {
     return null;
   }
 
- 
-
-  const fetchGenres = async () => {
-    const { data, error } = await supabase
-      .from("music_genres")
-      .select("*")
-      .order("name");
-
-    if (error) {
-      toast({
-        title: "Error",
-        description: "Failed to fetch genres",
-        variant: "destructive",
-      });
-    } else {
-      setGenres(data || []);
-    }
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
-
-    const { data: { user } } = await supabase.auth.getUser();
-    
+  const onSubmit = async (data: ArtistFormData) => {
     if (!user) {
       toast({
         title: "Error",
         description: "You must be logged in to add an artist",
         variant: "destructive",
       });
-      setLoading(false);
       return;
     }
 
@@ -92,48 +101,29 @@ export const AddArtistDialog = ({ open, onOpenChange, onSuccess }: AddArtistDial
         description: "Only Core team members can add artists",
         variant: "destructive",
       });
-      setLoading(false);
       return;
     }
 
-    const { error } = await supabase
-      .from("artists")
-      .insert({
-        name,
-        description,
-        genre_id: genreId,
+    try {
+      await createArtistMutation.mutateAsync({
+        name: data.name,
+        description: data.description || "",
+        genre_ids: data.genre_ids || [],
         added_by: user.id,
-        spotify_url: spotifyUrl || null,
-        soundcloud_url: soundcloudUrl || null,
-        image_url: imageUrl || null,
-        stage: stage || null,
-        time_start: timeStart || null,
-        time_end: timeEnd || null,
+        spotify_url: data.spotifyUrl || null,
+        soundcloud_url: data.soundcloudUrl || null,
+        image_url: data.imageUrl || null,
+        stage: data.stage || null,
+        time_start: data.timeStart || null,
+        time_end: data.timeEnd || null,
       });
 
-    if (error) {
-      toast({
-        title: "Error",
-        description: error.message,
-        variant: "destructive",
-      });
-    } else {
-      toast({
-        title: "Success",
-        description: "Artist added successfully!",
-      });
-      setName("");
-      setDescription("");
-      setGenreId("");
-      setSpotifyUrl("");
-      setSoundcloudUrl("");
-      setImageUrl("");
-      setStage("");
-      setTimeStart("");
-      setTimeEnd("");
+      // Reset form
+      form.reset();
       onSuccess();
+    } catch (error) {
+      // Error handling is done in the mutation hook
     }
-    setLoading(false);
   };
 
   return (
@@ -148,106 +138,175 @@ export const AddArtistDialog = ({ open, onOpenChange, onSuccess }: AddArtistDial
             Add an artist to the Boom Festival voting list.
           </DialogDescription>
         </DialogHeader>
-        
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <Label htmlFor="artist-name">Artist Name</Label>
-            <Input
-              id="artist-name"
-              type="text"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              required
-              placeholder="Enter artist name"
-            />
-          </div>
-          
-          <div>
-            <Label htmlFor="artist-genre">Music Genre</Label>
-            <Select value={genreId} onValueChange={setGenreId} required>
-              <SelectTrigger>
-                <SelectValue placeholder="Select a genre" />
-              </SelectTrigger>
-              <SelectContent>
-                {genres.map((genre) => (
-                  <SelectItem key={genre.id} value={genre.id}>
-                    {genre.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-          
-          <div>
-            <Label htmlFor="artist-description">Description (Optional)</Label>
-            <Textarea
-              id="artist-description"
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              placeholder="Tell us about this artist..."
-              rows={3}
-            />
-          </div>
 
-          <StageSelector value={stage} onValueChange={setStage} />
-
-          <div>
-            <Label htmlFor="time-start">Performance Start Time (Optional)</Label>
-            <Input
-              id="time-start"
-              type="datetime-local"
-              value={timeStart}
-              onChange={(e) => setTimeStart(e.target.value)}
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+            <FormField
+              control={form.control}
+              name="name"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Artist Name</FormLabel>
+                  <FormControl>
+                    <Input placeholder="Enter artist name" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
             />
-          </div>
 
-          <div>
-            <Label htmlFor="time-end">Performance End Time (Optional)</Label>
-            <Input
-              id="time-end"
-              type="datetime-local"
-              value={timeEnd}
-              onChange={(e) => setTimeEnd(e.target.value)}
+            <FormField
+              control={form.control}
+              name="genre_ids"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Genres</FormLabel>
+                  <FormControl>
+                    <GenreMultiSelect
+                      genres={genres}
+                      value={field.value || []}
+                      onValueChange={field.onChange}
+                      placeholder={
+                        isLoadingGenres
+                          ? "Loading genres..."
+                          : "Select genres..."
+                      }
+                      disabled={isLoadingGenres}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
             />
-          </div>
 
-          <div>
-            <Label htmlFor="spotify-url">Spotify URL (Optional)</Label>
-            <Input
-              id="spotify-url"
-              type="url"
-              value={spotifyUrl}
-              onChange={(e) => setSpotifyUrl(e.target.value)}
-              placeholder="https://open.spotify.com/artist/..."
+            <FormField
+              control={form.control}
+              name="description"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Description (Optional)</FormLabel>
+                  <FormControl>
+                    <Textarea
+                      placeholder="Tell us about this artist..."
+                      rows={3}
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
             />
-          </div>
 
-          <div>
-            <Label htmlFor="soundcloud-url">SoundCloud URL (Optional)</Label>
-            <Input
-              id="soundcloud-url"
-              type="url"
-              value={soundcloudUrl}
-              onChange={(e) => setSoundcloudUrl(e.target.value)}
-              placeholder="https://soundcloud.com/..."
+            <FormField
+              control={form.control}
+              name="stage"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Stage (Optional)</FormLabel>
+                  <FormControl>
+                    <StageSelector
+                      value={field.value || ""}
+                      onValueChange={field.onChange}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
             />
-          </div>
 
-          <div>
-            <Label htmlFor="image-url">Image URL (Optional)</Label>
-            <Input
-              id="image-url"
-              type="url"
-              value={imageUrl}
-              onChange={(e) => setImageUrl(e.target.value)}
-              placeholder="https://example.com/image.jpg"
+            <FormField
+              control={form.control}
+              name="timeStart"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Performance Start Time (Optional)</FormLabel>
+                  <FormControl>
+                    <Input type="datetime-local" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
             />
-          </div>
-          
-          <Button type="submit" className="w-full" disabled={loading}>
-            {loading ? "Adding artist..." : "Add Artist"}
-          </Button>
-        </form>
+
+            <FormField
+              control={form.control}
+              name="timeEnd"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Performance End Time (Optional)</FormLabel>
+                  <FormControl>
+                    <Input type="datetime-local" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="spotifyUrl"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Spotify URL (Optional)</FormLabel>
+                  <FormControl>
+                    <Input
+                      type="url"
+                      placeholder="https://open.spotify.com/artist/..."
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="soundcloudUrl"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>SoundCloud URL (Optional)</FormLabel>
+                  <FormControl>
+                    <Input
+                      type="url"
+                      placeholder="https://soundcloud.com/..."
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="imageUrl"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Image URL (Optional)</FormLabel>
+                  <FormControl>
+                    <Input
+                      type="url"
+                      placeholder="https://example.com/image.jpg"
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <Button
+              type="submit"
+              className="w-full"
+              disabled={createArtistMutation.isPending || isLoadingGenres}
+            >
+              {createArtistMutation.isPending
+                ? "Adding artist..."
+                : "Add Artist"}
+            </Button>
+          </form>
+        </Form>
       </DialogContent>
     </Dialog>
   );

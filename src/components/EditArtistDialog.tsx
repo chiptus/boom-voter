@@ -1,35 +1,45 @@
-import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { GenreMultiSelect } from "@/components/ui/genre-multi-select";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { useToast } from "@/hooks/use-toast";
-import { supabase } from "@/integrations/supabase/client";
-import { useGroups } from "@/hooks/useGroups";
-import { Edit } from "lucide-react";
-import { Artist, artistQueries } from "@/services/queries";
-import { useGenres } from "@/hooks/queries/useGenresQuery";
-import { toZonedTime, fromZonedTime } from "date-fns-tz";
-import { StageSelector } from "./StageSelector";
-import { formatISO } from "date-fns";
-import { useUserPermissionsQuery } from "@/hooks/queries/useGroupsQuery";
 import { useAuth } from "@/hooks/useAuth";
+import { useUserPermissionsQuery } from "@/hooks/queries/useGroupsQuery";
+import { useGenresQuery } from "@/hooks/queries/useGenresQuery";
+import { useUpdateArtistMutation } from "@/hooks/queries/useArtistsQuery";
+import { StageSelector } from "./StageSelector";
 import { toDatetimeLocal, toISOString } from "@/lib/timeUtils";
-import { useQueryClient } from "@tanstack/react-query";
+import type { Database } from "@/integrations/supabase/types";
+
+type Artist = Database["public"]["Tables"]["artists"]["Row"] & {
+  artist_music_genres: { music_genre_id: string }[] | null;
+  votes: { vote_type: number; user_id: string }[];
+};
+
+// Form validation schema
+const editArtistFormSchema = z.object({
+  name: z.string().min(1, "Artist name is required"),
+  description: z.string().optional(),
+  genre_ids: z.array(z.string()).optional(),
+  spotify_url: z.string().url().optional().or(z.literal("")),
+  soundcloud_url: z.string().url().optional().or(z.literal("")),
+  image_url: z.string().url().optional().or(z.literal("")),
+  stage: z.string().optional(),
+  time_start: z.string().optional(),
+  time_end: z.string().optional(),
+});
+
+type EditArtistFormData = z.infer<typeof editArtistFormSchema>;
 
 // Helper function to subtract one hour from datetime-local string
 const subtractOneHour = (datetimeLocal: string): string => {
@@ -48,43 +58,41 @@ const subtractOneHour = (datetimeLocal: string): string => {
 
 interface EditArtistDialogProps {
   artist: Artist;
-  onSuccess?: () => void;
-  trigger?: React.ReactNode;
+  onClose?: () => void;
 }
 
-export const EditArtistDialog = ({
-  artist,
-  trigger,
-}: EditArtistDialogProps) => {
-  const queryClient = useQueryClient();
+export function EditArtistDialog({ artist, onClose }: EditArtistDialogProps) {
   const { user, loading: authLoading } = useAuth();
   const { data: canEdit = false, isLoading: isLoadingPermissions } =
     useUserPermissionsQuery(user?.id, "edit_artists");
 
-  const [open, setOpen] = useState(false);
-  const [loading, setLoading] = useState(false);
-  const [formData, setFormData] = useState({
-    name: artist.name,
-    description: artist.description || "",
-    genre_id: artist.genre_id,
-    stage: artist.stage || "",
-    time_start: toDatetimeLocal(artist.time_start),
-    time_end: toDatetimeLocal(artist.time_end),
-    spotify_url: artist.spotify_url || "",
-    soundcloud_url: artist.soundcloud_url || "",
-    image_url: artist.image_url || "",
+  const { toast } = useToast();
+
+  // React Query hooks
+  const { data: genres = [], isLoading: isLoadingGenres } = useGenresQuery();
+  const updateArtistMutation = useUpdateArtistMutation();
+
+  // Form setup
+  const form = useForm<EditArtistFormData>({
+    resolver: zodResolver(editArtistFormSchema),
+    defaultValues: {
+      name: artist.name,
+      description: artist.description || "",
+      genre_ids: artist.artist_music_genres?.map(g => g.music_genre_id) || [],
+      stage: artist.stage || "",
+      time_start: toDatetimeLocal(artist.time_start),
+      time_end: toDatetimeLocal(artist.time_end),
+      spotify_url: artist.spotify_url || "",
+      soundcloud_url: artist.soundcloud_url || "",
+      image_url: artist.image_url || "",
+    },
   });
 
-  const { genres } = useGenres();
-  const { toast } = useToast();
   if (authLoading || isLoadingPermissions) {
     return null;
   }
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
-
+  const onSubmit = async (data: EditArtistFormData) => {
     // Check Core team permissions
     if (!canEdit) {
       toast({
@@ -92,209 +100,228 @@ export const EditArtistDialog = ({
         description: "Only Core team members can edit artists",
         variant: "destructive",
       });
-      setLoading(false);
       return;
     }
 
     try {
-      const { error } = await supabase
-        .from("artists")
-        .update({
-          name: formData.name,
-          description: formData.description || null,
-          genre_id: formData.genre_id,
-          stage: formData.stage || null,
-          time_start: formData.time_start
-            ? toISOString(formData.time_start)
-            : null,
-          time_end: formData.time_end ? toISOString(formData.time_end) : null,
-          spotify_url: formData.spotify_url || null,
-          soundcloud_url: formData.soundcloud_url || null,
-          image_url: formData.image_url || null,
-          updated_at: new Date().toISOString(),
-        })
-        .eq("id", artist.id);
-
-      if (error) throw error;
-
-      toast({
-        title: "Success!",
-        description: "Artist updated successfully",
+      await updateArtistMutation.mutateAsync({
+        id: artist.id,
+        updates: {
+          name: data.name,
+          description: data.description || null,
+          genre_ids: data.genre_ids,
+          stage: data.stage || null,
+          time_start: data.time_start ? toISOString(data.time_start) : null,
+          time_end: data.time_end ? toISOString(data.time_end) : null,
+          spotify_url: data.spotify_url || null,
+          soundcloud_url: data.soundcloud_url || null,
+          image_url: data.image_url || null,
+        },
       });
 
-      setOpen(false);
-      queryClient.invalidateQueries({ queryKey: artistQueries.all() });
+      onClose?.();
     } catch (error) {
-      console.error("Error updating artist:", error);
-      toast({
-        title: "Error",
-        description: "Failed to update artist",
-        variant: "destructive",
-      });
-    } finally {
-      setLoading(false);
+      // Error handling is done in the mutation hook
     }
   };
 
-  const defaultTrigger = (
-    <Button variant="outline" size="sm">
-      <Edit className="h-4 w-4 mr-2" />
-      Edit
-    </Button>
-  );
+  const handleSubtractOneHour = () => {
+    const currentTimeStart = form.getValues("time_start");
+    const currentTimeEnd = form.getValues("time_end");
+    
+    if (currentTimeStart || currentTimeEnd) {
+      form.setValue("time_start", currentTimeStart ? subtractOneHour(currentTimeStart) : "");
+      form.setValue("time_end", currentTimeEnd ? subtractOneHour(currentTimeEnd) : "");
+    }
+  };
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>{trigger || defaultTrigger}</DialogTrigger>
+    <Dialog open onOpenChange={() => onClose?.()}>
       <DialogContent className="sm:max-w-[425px] max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Edit Artist</DialogTitle>
         </DialogHeader>
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="name">Artist Name *</Label>
-            <Input
-              id="name"
-              value={formData.name}
-              onChange={(e) =>
-                setFormData({ ...formData, name: e.target.value })
-              }
-              required
+        
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+            <FormField
+              control={form.control}
+              name="name"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Artist Name *</FormLabel>
+                  <FormControl>
+                    <Input {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
             />
-          </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="genre">Genre *</Label>
-            <Select
-              value={formData.genre_id}
-              onValueChange={(value) =>
-                setFormData({ ...formData, genre_id: value })
-              }
-            >
-              <SelectTrigger>
-                <SelectValue placeholder="Select a genre" />
-              </SelectTrigger>
-              <SelectContent>
-                {genres.map((genre) => (
-                  <SelectItem key={genre.id} value={genre.id}>
-                    {genre.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-
-          <StageSelector
-            value={formData.stage}
-            onValueChange={(value) =>
-              setFormData({ ...formData, stage: value })
-            }
-          />
-
-          <div className="space-y-2">
-            <Label htmlFor="time_start">Performance Start Time</Label>
-            <Input
-              id="time_start"
-              type="datetime-local"
-              value={formData.time_start}
-              onChange={(e) =>
-                setFormData({ ...formData, time_start: e.target.value })
-              }
+            <FormField
+              control={form.control}
+              name="genre_ids"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Genres</FormLabel>
+                  <FormControl>
+                    <GenreMultiSelect
+                      genres={genres}
+                      value={field.value || []}
+                      onValueChange={field.onChange}
+                      placeholder={isLoadingGenres ? "Loading genres..." : "Select genres..."}
+                      disabled={isLoadingGenres}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
             />
-          </div>
 
-          <div className="flex justify-center">
-            <Button
-              type="button"
-              variant="outline"
-              size="sm"
-              onClick={() => {
-                if (formData.time_start || formData.time_end) {
-                  setFormData({
-                    ...formData,
-                    time_start: formData.time_start
-                      ? subtractOneHour(formData.time_start)
-                      : "",
-                    time_end: formData.time_end
-                      ? subtractOneHour(formData.time_end)
-                      : "",
-                  });
-                }
-              }}
-              disabled={!formData.time_start && !formData.time_end}
+            <FormField
+              control={form.control}
+              name="stage"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Stage (Optional)</FormLabel>
+                  <FormControl>
+                    <StageSelector 
+                      value={field.value || ""} 
+                      onValueChange={field.onChange} 
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="time_start"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Performance Start Time</FormLabel>
+                  <FormControl>
+                    <Input
+                      type="datetime-local"
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <div className="flex justify-center">
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={handleSubtractOneHour}
+                disabled={!form.getValues("time_start") && !form.getValues("time_end")}
+              >
+                -1 Hour
+              </Button>
+            </div>
+
+            <FormField
+              control={form.control}
+              name="time_end"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Performance End Time</FormLabel>
+                  <FormControl>
+                    <Input
+                      type="datetime-local"
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="description"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Description</FormLabel>
+                  <FormControl>
+                    <Textarea
+                      placeholder="Tell us about this artist..."
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="image_url"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Image URL</FormLabel>
+                  <FormControl>
+                    <Input
+                      type="url"
+                      placeholder="https://example.com/image.jpg"
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="spotify_url"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Spotify URL</FormLabel>
+                  <FormControl>
+                    <Input
+                      type="url"
+                      placeholder="https://open.spotify.com/artist/..."
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="soundcloud_url"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>SoundCloud URL</FormLabel>
+                  <FormControl>
+                    <Input
+                      type="url"
+                      placeholder="https://soundcloud.com/artist"
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <Button 
+              type="submit" 
+              className="w-full" 
+              disabled={updateArtistMutation.isPending || isLoadingGenres}
             >
-              -1 Hour
+              {updateArtistMutation.isPending ? "Updating..." : "Update Artist"}
             </Button>
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="time_end">Performance End Time</Label>
-            <Input
-              id="time_end"
-              type="datetime-local"
-              value={formData.time_end}
-              onChange={(e) =>
-                setFormData({ ...formData, time_end: e.target.value })
-              }
-            />
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="description">Description</Label>
-            <Textarea
-              id="description"
-              value={formData.description}
-              onChange={(e) =>
-                setFormData({ ...formData, description: e.target.value })
-              }
-              placeholder="Tell us about this artist..."
-            />
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="image_url">Image URL</Label>
-            <Input
-              id="image_url"
-              type="url"
-              value={formData.image_url}
-              onChange={(e) =>
-                setFormData({ ...formData, image_url: e.target.value })
-              }
-              placeholder="https://example.com/image.jpg"
-            />
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="spotify_url">Spotify URL</Label>
-            <Input
-              id="spotify_url"
-              type="url"
-              value={formData.spotify_url}
-              onChange={(e) =>
-                setFormData({ ...formData, spotify_url: e.target.value })
-              }
-              placeholder="https://open.spotify.com/artist/..."
-            />
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="soundcloud_url">SoundCloud URL</Label>
-            <Input
-              id="soundcloud_url"
-              type="url"
-              value={formData.soundcloud_url}
-              onChange={(e) =>
-                setFormData({ ...formData, soundcloud_url: e.target.value })
-              }
-              placeholder="https://soundcloud.com/artist"
-            />
-          </div>
-
-          <Button type="submit" className="w-full" disabled={loading}>
-            {loading ? "Updating..." : "Update Artist"}
-          </Button>
-        </form>
+          </form>
+        </Form>
       </DialogContent>
     </Dialog>
   );
-};
+}

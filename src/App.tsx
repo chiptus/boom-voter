@@ -15,6 +15,7 @@ import PrivacyPolicy from "./pages/PrivacyPolicy";
 import TermsOfService from "./pages/TermsOfService";
 import CookiePolicy from "./pages/CookiePolicy";
 import NotFound from "./pages/NotFound";
+import { SetDetails } from "./pages/SetDetails";
 
 const App = () => (
   <TooltipProvider>
@@ -26,6 +27,7 @@ const App = () => (
         <div className="flex-1">
           <Routes>
             <Route path="/" element={<Index />} />
+            <Route path="/set/:id" element={<SetDetails />} />
             <Route path="/artist/:id" element={<ArtistDetail />} />
             <Route path="/groups" element={<Groups />} />
             <Route path="/groups/:groupId" element={<GroupDetail />} />

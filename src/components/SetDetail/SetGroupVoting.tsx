@@ -8,8 +8,8 @@ import { offlineStorage } from "@/lib/offlineStorage";
 import { useOnlineStatus } from "@/hooks/useOffline";
 import { Users, ThumbsUp, Heart, ThumbsDown } from "lucide-react";
 
-interface ArtistGroupVotingProps {
-  artistId: string;
+interface SetGroupVotingProps {
+  setId: string;
 }
 
 interface GroupVote {
@@ -45,7 +45,7 @@ const getVoteColor = (voteType: number) => {
   }
 };
 
-export const ArtistGroupVoting = ({ artistId }: ArtistGroupVotingProps) => {
+export const SetGroupVoting = ({ setId: artistId }: SetGroupVotingProps) => {
   const { groups, user } = useGroups();
   const [selectedGroupId, setSelectedGroupId] = useState<string>("");
   const [groupVotes, setGroupVotes] = useState<GroupVote[]>([]);

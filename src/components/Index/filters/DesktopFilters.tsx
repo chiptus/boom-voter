@@ -15,7 +15,6 @@ interface DesktopFiltersProps {
 export const DesktopFilters = ({
   state,
   genres,
-  groups,
   onStateChange,
   onClear,
 }: DesktopFiltersProps) => {

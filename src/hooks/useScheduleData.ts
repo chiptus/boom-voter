@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
-import { useOfflineArtistData, type Set } from './useOfflineArtistData';
 import { formatDateTime } from '@/lib/timeUtils';
-import { parse, isValid, format, startOfDay, isSameDay } from 'date-fns';
+import {format, startOfDay } from 'date-fns';
+import { useOfflineSetsData } from './useOfflineSetsData';
 
 export interface ScheduleDay {
   date: string;
@@ -21,7 +21,7 @@ export interface ScheduleArtist {
   startTime?: Date;
   endTime?: Date;
   votes?: { vote_type: number; user_id: string }[];
-  formattedTimeRange?: string;
+  formattedTimeRange?: string | null;
   conflictsWith?: string[];
   position?: {
     top: number;
@@ -35,23 +35,23 @@ export interface ScheduleSet extends ScheduleArtist {
 }
 
 export const useScheduleData = (use24Hour: boolean = false) => {
-  const { artists, loading, error } = useOfflineArtistData();
+  const { sets, loading, error } = useOfflineSetsData();
 
   const scheduleDays = useMemo(() => {
     
     
     // Enhanced defensive checks
-    if (!artists) {
+    if (!sets) {
       
       return [];
     }
     
-    if (!Array.isArray(artists) || artists.length === 0) {
+    if (!Array.isArray(sets) || sets.length === 0) {
       return [];
     }
 
     // Filter sets with performance times and stages
-    const performingSets = artists.filter(set => set.time_start && set.stages?.name);
+    const performingSets = sets.filter(set => set.time_start && set.stages?.name);
 
     // Parse and enhance set data
     const enhancedSets: ScheduleSet[] = performingSets.map(set => {
@@ -119,7 +119,7 @@ export const useScheduleData = (use24Hour: boolean = false) => {
       });
 
     return scheduleDays;
-  }, [artists, use24Hour]);
+  }, [sets, use24Hour]);
 
   const allStages = useMemo(() => {
     const stageSet = new Set<string>();

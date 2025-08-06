@@ -1,9 +1,8 @@
 import { useMemo } from "react";
-import { format, differenceInMinutes, startOfDay } from "date-fns";
+import { format, differenceInMinutes } from "date-fns";
 import { ArtistScheduleBlock } from "./ArtistScheduleBlock";
-import { DaySelector } from "./DaySelector";
 import { useScheduleData } from "@/hooks/useScheduleData";
-import type { ScheduleDay, ScheduleSet } from "@/hooks/useScheduleData";
+import type { ScheduleSet } from "@/hooks/useScheduleData";
 
 interface HorizontalTimelineSet extends ScheduleSet {
   horizontalPosition?: {

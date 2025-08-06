@@ -17,8 +17,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Loader2, Plus, Edit2, Trash2, Calendar, CalendarDays } from "lucide-react";
-import type { Festival, FestivalEdition } from "@/services/queries";
+import { Loader2, Plus, Edit2, Trash2, CalendarDays } from "lucide-react";
+import type { FestivalEdition } from "@/services/queries";
 
 interface EditionFormData {
   festival_id: string;

@@ -22,7 +22,6 @@ interface MobileFiltersProps {
 export const MobileFilters = ({
   state,
   genres,
-  groups,
   onStateChange,
   onClear,
 }: MobileFiltersProps) => {

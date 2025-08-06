@@ -1,7 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
-import { voteQueries, queryFunctions, mutationFunctions, artistQueries } from "@/services/queries";
-import { useAuth } from "@/hooks/useAuth";
+import { voteQueries, queryFunctions, mutationFunctions, setQueries } from "@/services/queries";
 
 export const useUserVotesQuery = (userId: string | undefined) => {
   return useQuery({
@@ -18,7 +17,7 @@ export const useVoteMutation = () => {
   return useMutation({
     mutationFn: mutationFunctions.vote,
     onMutate: async (variables) => {
-      const { artistId, voteType, userId, existingVote } = variables;
+      const { setId, voteType, userId, existingVote } = variables;
       
       // Cancel any outgoing refetches
       await queryClient.cancelQueries({ queryKey: voteQueries.user(userId) });
@@ -33,10 +32,10 @@ export const useVoteMutation = () => {
         
         if (existingVote === voteType) {
           // Remove vote
-          delete newVotes[artistId];
+          delete newVotes[setId];
         } else {
           // Add/update vote
-          newVotes[artistId] = voteType;
+          newVotes[setId] = voteType;
         }
         
         return newVotes;
@@ -44,7 +43,7 @@ export const useVoteMutation = () => {
       
       return { previousVotes, userId };
     },
-    onError: (error, variables, context) => {
+    onError: (_error, _variables, context) => {
       // If the mutation fails, use the context returned from onMutate to roll back
       if (context?.previousVotes) {
         queryClient.setQueryData(voteQueries.user(context.userId), context.previousVotes);
@@ -56,11 +55,11 @@ export const useVoteMutation = () => {
         variant: "destructive",
       });
     },
-    onSettled: (data, error, variables) => {
+    onSettled: (_data, _error, variables) => {
       // Always refetch after error or success to ensure consistency
       queryClient.invalidateQueries({ queryKey: voteQueries.user(variables.userId) });
-      queryClient.invalidateQueries({ queryKey: artistQueries.lists() });
-      queryClient.invalidateQueries({ queryKey: artistQueries.detail(variables.artistId) });
+      queryClient.invalidateQueries({ queryKey: setQueries.list() });
+      queryClient.invalidateQueries({ queryKey: setQueries.detail(variables.setId) });
     },
   });
 };

@@ -11,7 +11,6 @@ import { User } from "@supabase/supabase-js";
 
 interface NavigationProps {
   showBackButton?: boolean;
-  backTo?: string;
   backLabel?: string;
   showGroupsButton?: boolean;
   user?: User;
@@ -48,7 +47,6 @@ const TooltipButton = ({
 
 export const Navigation = ({
   showBackButton,
-  backTo = "/",
   backLabel = "Back",
   showGroupsButton,
   user,

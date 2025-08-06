@@ -2,7 +2,6 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { authQueries, queryFunctions, mutationFunctions } from "@/services/queries";
 import { profileOfflineService } from "@/services/profileOfflineService";
 import { useOfflineProfileToast } from "@/hooks/useOfflineProfileToast";
-import type { Database } from "@/integrations/supabase/types";
 
 
 export const useProfileQuery = (userId?: string) => {
@@ -45,7 +44,7 @@ export const useProfileQuery = (userId?: string) => {
     enabled: !!userId,
     staleTime: 5 * 60 * 1000, // 5 minutes
     gcTime: 24 * 60 * 60 * 1000, // 24 hours (was cacheTime)
-    retry: (failureCount, error) => {
+    retry: (failureCount, _error) => {
       // Don't retry if we're offline and have cached data
       if (!isOnline) return false;
       return failureCount < 2;

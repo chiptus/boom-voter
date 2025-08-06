@@ -6,7 +6,7 @@ import { useStagesQuery } from "@/hooks/queries/useStagesQuery";
 
 export const useSetFiltering = (sets: Set[], filterSortState?: FilterSortState) => {
   const [groupMemberIds, setGroupMemberIds] = useState<string[]>([]);
-  const { data: stages = [] } = useStagesQuery();
+  const { data: _stages = [] } = useStagesQuery();
   const [lockedOrder, setLockedOrder] = useState<Set[]>([]);
 
   useEffect(() => {
@@ -71,10 +71,14 @@ export const useSetFiltering = (sets: Set[], filterSortState?: FilterSortState) 
         if (!filterSortState.stages.includes(set.stage_id)) return false;
       }
 
-      // Genre filter - check first artist's genre
+      // Genre filter - check all artists' genres
       if (filterSortState.genres.length > 0 && set.artists && set.artists.length > 0) {
-        const firstArtist = set.artists[0];
-        if (!filterSortState.genres.includes(firstArtist.genre_id)) return false;
+        const hasMatchingGenre = set.artists.some(artist => 
+          artist.artist_music_genres?.some(genre => 
+            filterSortState.genres.includes(genre.music_genre_id)
+          )
+        );
+        if (!hasMatchingGenre) return false;
       }
 
       // Rating filter

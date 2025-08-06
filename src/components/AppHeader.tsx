@@ -95,7 +95,6 @@ export const AppHeader = ({
             {/* Navigation Buttons */}
             <Navigation
               showBackButton={showBackButton}
-              backTo={backTo}
               backLabel={backLabel}
               showGroupsButton={showGroupsButton}
               user={user}

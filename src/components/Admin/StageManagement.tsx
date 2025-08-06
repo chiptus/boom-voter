@@ -19,7 +19,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Loader2, Plus, Edit2, Trash2, MapPin } from "lucide-react";
-import type { Stage, Festival, FestivalEdition } from "@/services/queries";
+import type { Stage } from "@/services/queries";
 
 interface StageFormData {
   name: string;

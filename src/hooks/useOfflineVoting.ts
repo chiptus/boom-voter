@@ -5,7 +5,7 @@ import { offlineStorage } from '@/lib/offlineStorage';
 import { useOnlineStatus, useOfflineQueue } from './useOffline';
 import { User } from '@supabase/supabase-js';
 
-export const useOfflineVoting = (user: User, onVoteUpdate?: () => void) => {
+export const useOfflineVoting = (user: User | null, onVoteUpdate?: () => void) => {
   const [userVotes, setUserVotes] = useState<Record<string, number>>({});
   const [votingLoading, setVotingLoading] = useState<Record<string, boolean>>({});
   const { toast } = useToast();
@@ -28,7 +28,10 @@ export const useOfflineVoting = (user: User, onVoteUpdate?: () => void) => {
       
       // Create votes map from offline data
       const offlineVotesMap = userOfflineVotes.reduce((acc, vote) => {
-        acc[vote.artistId] = vote.voteType;
+        const id = vote.setId;
+        if (id) {
+          acc[id] = vote.voteType;
+        }
         return acc;
       }, {} as Record<string, number>);
 
@@ -39,12 +42,15 @@ export const useOfflineVoting = (user: User, onVoteUpdate?: () => void) => {
         try {
           const { data, error } = await supabase
             .from("votes")
-            .select("artist_id, vote_type")
-            .eq("user_id", userId);
+            .select("set_id, vote_type")
+            .eq("user_id", userId)
+            .not("set_id", "is", null);
 
           if (!error && data) {
             const serverVotesMap = data.reduce((acc, vote) => {
-              acc[vote.artist_id] = vote.vote_type;
+              if (vote.set_id) {
+                acc[vote.set_id] = vote.vote_type;
+              }
               return acc;
             }, {} as Record<string, number>);
 
@@ -60,23 +66,23 @@ export const useOfflineVoting = (user: User, onVoteUpdate?: () => void) => {
     }
   }, [isOnline]);
 
-  const handleVote = useCallback(async (artistId: string, voteType: number) => {
+  const handleVote = useCallback(async (setId: string, voteType: number) => {
     if (!user) {
       return { requiresAuth: true };
     }
 
-    if (votingLoading[artistId]) {
+    if (votingLoading[setId]) {
       return { requiresAuth: false };
     }
 
-    setVotingLoading(prev => ({ ...prev, [artistId]: true }));
+    setVotingLoading(prev => ({ ...prev, [setId]: true }));
 
     try {
-      const existingVote = userVotes[artistId];
+      const existingVote = userVotes[setId];
       
       if (existingVote === voteType) {
         // Remove vote
-        const offlineVotes = await offlineStorage.getVotes(artistId);
+        const offlineVotes = await offlineStorage.getVotes(setId);
         const userVote = offlineVotes.find(vote => vote.userId === user.id);
         
         if (userVote) {
@@ -86,7 +92,7 @@ export const useOfflineVoting = (user: User, onVoteUpdate?: () => void) => {
         // Update local state
         setUserVotes(prev => {
           const newVotes = { ...prev };
-          delete newVotes[artistId];
+          delete newVotes[setId];
           return newVotes;
         });
 
@@ -97,7 +103,7 @@ export const useOfflineVoting = (user: User, onVoteUpdate?: () => void) => {
               .from("votes")
               .delete()
               .eq("user_id", user.id)
-              .eq("artist_id", artistId);
+              .eq("artist_id", setId);
           } catch (error) {
             console.error('Error removing vote from server:', error);
           }
@@ -110,7 +116,7 @@ export const useOfflineVoting = (user: User, onVoteUpdate?: () => void) => {
       } else {
         // Add or update vote
         await offlineStorage.saveVote({
-          artistId,
+          setId,
           voteType,
           userId: user.id,
           timestamp: Date.now(),
@@ -118,7 +124,7 @@ export const useOfflineVoting = (user: User, onVoteUpdate?: () => void) => {
         });
 
         // Update local state
-        setUserVotes(prev => ({ ...prev, [artistId]: voteType }));
+        setUserVotes(prev => ({ ...prev, [setId]: voteType }));
 
         // If online, sync to server immediately
         if (isOnline) {
@@ -127,7 +133,8 @@ export const useOfflineVoting = (user: User, onVoteUpdate?: () => void) => {
               .from("votes")
               .upsert({
                 user_id: user.id,
-                artist_id: artistId,
+                artist_id: setId, // Using artist_id to store set_id for now
+                set_id: setId,
                 vote_type: voteType,
               }, {
                 onConflict: 'user_id,artist_id'
@@ -153,7 +160,7 @@ export const useOfflineVoting = (user: User, onVoteUpdate?: () => void) => {
         variant: "destructive",
       });
     } finally {
-      setVotingLoading(prev => ({ ...prev, [artistId]: false }));
+      setVotingLoading(prev => ({ ...prev, [setId]: false }));
     }
 
     return { requiresAuth: false };

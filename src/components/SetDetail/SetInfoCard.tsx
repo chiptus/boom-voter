@@ -14,7 +14,7 @@ import {
   Clock,
   MapPin,
 } from "lucide-react";
-import { ArtistVotingButtons } from "./ArtistVotingButtons";
+import { ArtistVotingButtons } from "./SetVotingButtons";
 import { Artist } from "@/services/queries";
 import { formatTimeRange } from "@/lib/timeUtils";
 import { GenreBadge } from "../Index/GenreBadge";

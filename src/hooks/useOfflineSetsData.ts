@@ -1,40 +1,36 @@
 import { useEffect, useRef, useState, useCallback } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import {
-  useArtistsQuery,
-  useArchiveArtistMutation,
-} from "./queries/useArtistsQuery";
+
 import { setQueries, voteQueries } from "@/services/queries";
 import { useOnlineStatus, useOfflineData } from "./useOffline";
-import { offlineStorage } from "@/lib/offlineStorage";
-import type { Artist, Set } from "@/services/queries";
+import type { Set } from "@/services/queries";
 import { RealtimeChannel } from "@supabase/supabase-js";
+import { useSetsQuery } from "./queries/useSetsQuery";
 
-export const useOfflineArtistData = () => {
+export const useOfflineSetsData = () => {
   const queryClient = useQueryClient();
-  const { data: artists = [], isLoading, error, refetch } = useArtistsQuery();
-  const archiveArtistMutation = useArchiveArtistMutation();
+  const { data: sets = [], isLoading, error, refetch } = useSetsQuery();
+
   const channelRef = useRef<RealtimeChannel | null>(null);
   const isOnline = useOnlineStatus();
-  const { offlineReady, saveArtistsOffline, getArtistsOffline } =
-    useOfflineData();
-  const [offlineArtists, setOfflineArtists] = useState<Artist[]>([]);
+  const { offlineReady, saveSetsOffline, getSetsOffline } = useOfflineData();
+  const [offlineSets, setOfflineSets] = useState<Set[]>([]);
   const [dataSource, setDataSource] = useState<"online" | "offline">("online");
 
   // Load offline data when ready
   useEffect(() => {
     if (offlineReady && !isOnline) {
-      loadOfflineArtists();
+      loadOfflineSets();
     }
   }, [offlineReady, isOnline]);
 
   // Save online data to offline storage when available
   useEffect(() => {
-    if (artists.length > 0 && offlineReady && isOnline) {
-      saveArtistsOffline(artists);
+    if (sets.length > 0 && offlineReady && isOnline) {
+      saveSetsOffline(sets);
     }
-  }, [artists, offlineReady, isOnline, saveArtistsOffline]);
+  }, [sets, offlineReady, isOnline, saveSetsOffline]);
 
   // Set up real-time subscriptions with proper cleanup (only when online)
   useEffect(() => {
@@ -47,13 +43,20 @@ export const useOfflineArtistData = () => {
     }
 
     // Create unique channel name to prevent conflicts
-    const channelName = `artists-changes-${Date.now()}-${Math.random()
+    const channelName = `sets-changes-${Date.now()}-${Math.random()
       .toString(36)
       .substr(2, 9)}`;
 
     try {
-      const artistsChannel = supabase
+      const setChannel = supabase
         .channel(channelName)
+        .on(
+          "postgres_changes",
+          { event: "*", schema: "public", table: "sets" },
+          (_) => {
+            queryClient.invalidateQueries({ queryKey: setQueries.lists() });
+          }
+        )
         .on(
           "postgres_changes",
           { event: "*", schema: "public", table: "artists" },
@@ -75,7 +78,7 @@ export const useOfflineArtistData = () => {
           }
         });
 
-      channelRef.current = artistsChannel;
+      channelRef.current = setChannel;
     } catch (err) {
       console.error("Failed to create subscription channel:", err);
     }
@@ -92,57 +95,34 @@ export const useOfflineArtistData = () => {
     };
   }, [queryClient, isOnline]);
 
-  const loadOfflineArtists = useCallback(async () => {
+  const loadOfflineSets = useCallback(async () => {
     try {
-      const cachedArtists = await getArtistsOffline();
-      if (cachedArtists.length > 0) {
-        setOfflineArtists(cachedArtists);
+      const cachedSets = await getSetsOffline();
+      if (cachedSets.length > 0) {
+        setOfflineSets(cachedSets);
         setDataSource("offline");
       }
     } catch (error) {
-      console.error("Error loading offline artists:", error);
+      console.error("Error loading offline sets:", error);
     }
-  }, [getArtistsOffline]);
+  }, [getSetsOffline]);
 
   const fetchArtists = async () => {
     if (isOnline) {
       refetch();
     } else {
-      await loadOfflineArtists();
-    }
-  };
-
-  const archiveArtist = async (artistId: string) => {
-    if (isOnline) {
-      await archiveArtistMutation.mutateAsync(artistId);
-    } else {
-      // When offline, queue the action
-      await offlineStorage.saveSetting(`archive_${artistId}`, {
-        action: "archive",
-        artistId,
-        timestamp: Date.now(),
-        synced: false,
-      });
-
-      // Update local data - find set containing this artist
-      const updatedArtists = offlineArtists.map((artist) =>
-        artist.id === artistId ? { ...artist, archived: true } : artist
-      );
-
-      setOfflineArtists(updatedArtists);
-      await saveArtistsOffline(updatedArtists);
+      await loadOfflineSets();
     }
   };
 
   // Determine which data to return
-  const currentArtists = isOnline ? artists : offlineArtists;
+  const currentSets = isOnline ? sets : offlineSets;
   const currentLoading = isOnline ? isLoading : !offlineReady;
   const currentError = isOnline ? error : null;
 
   return {
-    artists: currentArtists, // Keep same interface for backward compatibility
+    sets: currentSets, // Keep same interface for backward compatibility
     fetchArtists,
-    archiveArtist,
     loading: currentLoading,
     error: currentError,
     dataSource,

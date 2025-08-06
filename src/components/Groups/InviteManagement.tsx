@@ -133,7 +133,7 @@ export const InviteManagement = ({ groupId, groupName }: InviteManagementProps) 
   };
 
   const isOverused = (invite: GroupInvite) => {
-    return invite.max_uses !== null && invite.used_count >= invite.max_uses;
+    return invite.max_uses !== undefined && invite.used_count >= invite.max_uses;
   };
 
   return (

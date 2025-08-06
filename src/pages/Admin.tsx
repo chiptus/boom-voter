@@ -1,6 +1,5 @@
 import { useAuth } from "@/hooks/useAuth";
 import { AppHeader } from "@/components/AppHeader";
-import { ArtistsTable } from "@/components/Admin/ArtistsTable";
 import { AdminRolesTable } from "@/components/Admin/AdminRolesTable";
 import { AnalyticsTable } from "@/components/Admin/AnalyticsTable";
 import { FestivalHierarchyManagement } from "@/components/Admin/FestivalHierarchyManagement";

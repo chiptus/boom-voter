@@ -1,6 +1,6 @@
-import { useState, useEffect, useCallback } from 'react';
-import { offlineStorage } from '@/lib/offlineStorage';
-
+import { useState, useEffect, useCallback } from "react";
+import { offlineStorage } from "@/lib/offlineStorage";
+import { Artist, Set } from "@/services/queries";
 export const useOnlineStatus = () => {
   const [isOnline, setIsOnline] = useState(navigator.onLine);
 
@@ -8,12 +8,12 @@ export const useOnlineStatus = () => {
     const handleOnline = () => setIsOnline(true);
     const handleOffline = () => setIsOnline(false);
 
-    window.addEventListener('online', handleOnline);
-    window.addEventListener('offline', handleOffline);
+    window.addEventListener("online", handleOnline);
+    window.addEventListener("offline", handleOffline);
 
     return () => {
-      window.removeEventListener('online', handleOnline);
-      window.removeEventListener('offline', handleOffline);
+      window.removeEventListener("online", handleOnline);
+      window.removeEventListener("offline", handleOffline);
     };
   }, []);
 
@@ -32,13 +32,13 @@ export const useOfflineQueue = () => {
       ]);
       setQueueSize(unsyncedVotes.length + unsyncedNotes.length);
     } catch (error) {
-      console.error('Error updating queue size:', error);
+      console.error("Error updating queue size:", error);
     }
   }, []);
 
   const syncQueue = useCallback(async () => {
     if (syncing) return;
-    
+
     setSyncing(true);
     try {
       // Get unsynced items
@@ -54,7 +54,7 @@ export const useOfflineQueue = () => {
           // For now, we'll just mark as synced
           await offlineStorage.markVoteSynced(vote.id);
         } catch (error) {
-          console.error('Error syncing vote:', error);
+          console.error("Error syncing vote:", error);
         }
       }
 
@@ -65,13 +65,13 @@ export const useOfflineQueue = () => {
           // For now, we'll just mark as synced
           await offlineStorage.markNoteSynced(note.id);
         } catch (error) {
-          console.error('Error syncing note:', error);
+          console.error("Error syncing note:", error);
         }
       }
 
       await updateQueueSize();
     } catch (error) {
-      console.error('Error syncing queue:', error);
+      console.error("Error syncing queue:", error);
     } finally {
       setSyncing(false);
     }
@@ -98,18 +98,18 @@ export const useOfflineData = () => {
         await offlineStorage.init();
         setOfflineReady(true);
       } catch (error) {
-        console.error('Error initializing offline storage:', error);
+        console.error("Error initializing offline storage:", error);
       }
     };
 
     initOfflineStorage();
   }, []);
 
-  const saveArtistsOffline = useCallback(async (artists: any[]) => {
+  const saveArtistsOffline = useCallback(async (artists: Artist[]) => {
     try {
       await offlineStorage.saveArtists(artists);
     } catch (error) {
-      console.error('Error saving artists offline:', error);
+      console.error("Error saving artists offline:", error);
     }
   }, []);
 
@@ -117,25 +117,25 @@ export const useOfflineData = () => {
     try {
       return await offlineStorage.getArtists();
     } catch (error) {
-      console.error('Error getting artists offline:', error);
+      console.error("Error getting artists offline:", error);
       return [];
     }
   }, []);
 
-  const saveScheduleOffline = useCallback(async (schedule: any) => {
+  const saveSetsOffline = useCallback(async (artists: Set[]) => {
     try {
-      await offlineStorage.saveSchedule(schedule);
+      await offlineStorage.saveSets(artists);
     } catch (error) {
-      console.error('Error saving schedule offline:', error);
+      console.error("Error saving artists offline:", error);
     }
   }, []);
 
-  const getScheduleOffline = useCallback(async () => {
+  const getSetsOffline = useCallback(async () => {
     try {
-      return await offlineStorage.getSchedule();
+      return await offlineStorage.getSets();
     } catch (error) {
-      console.error('Error getting schedule offline:', error);
-      return null;
+      console.error("Error getting artists offline:", error);
+      return [];
     }
   }, []);
 
@@ -143,7 +143,7 @@ export const useOfflineData = () => {
     offlineReady,
     saveArtistsOffline,
     getArtistsOffline,
-    saveScheduleOffline,
-    getScheduleOffline,
+    saveSetsOffline,
+    getSetsOffline,
   };
 };

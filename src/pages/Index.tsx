@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useMemo } from "react";
 
 import { useAuth } from "@/hooks/useAuth";
 import { useProfileQuery } from "@/hooks/queries/useProfileQuery";
@@ -10,12 +10,12 @@ import { FilterSortControls } from "@/components/Index/filters/FilterSortControl
 import { AppHeader } from "@/components/AppHeader";
 import { InviteLandingPage } from "@/components/Index/InviteLandingPage";
 import { useSetFiltering } from "@/components/Index/useSetFiltering";
-import { useOfflineArtistData } from "@/hooks/useOfflineArtistData";
 import { useOfflineVoting } from "@/hooks/useOfflineVoting";
 import { useUrlState } from "@/hooks/useUrlState";
-import { ArtistsPanel } from "@/components/Index/ArtistsPanel";
+import { SetsPanel } from "@/components/Index/SetsPanel";
 import { ScheduleHorizontalTimelineView } from "@/components/schedule/ScheduleHorizontalTimelineView";
 import ErrorBoundary from "@/components/ErrorBoundary";
+import { useOfflineSetsData } from "@/hooks/useOfflineSetsData";
 
 export default function Index() {
   const { user, loading: authLoading, signOut, hasUsername } = useAuth();
@@ -24,7 +24,7 @@ export default function Index() {
   const [showAuthDialog, setShowAuthDialog] = useState(false);
   const { state: urlState, updateUrlState, clearFilters } = useUrlState();
   
-  const { artists: sets, loading: artistsLoading } = useOfflineArtistData();
+  const { sets, loading: artistsLoading } = useOfflineSetsData();
   const { userVotes, handleVote } = useOfflineVoting(user);
   
   const { filteredAndSortedSets, lockCurrentOrder } = useSetFiltering(sets || [], urlState);
@@ -35,7 +35,7 @@ export default function Index() {
   
 
   const showUsernameSetup = useMemo(() => {
-    return user && !authLoading && !profileLoading && !hasUsername;
+    return !!user && !authLoading && !profileLoading && !hasUsername;
   }, [user, authLoading, profileLoading, hasUsername]);
 
   // Show loading while validating invite
@@ -100,7 +100,6 @@ export default function Index() {
           title="Boom Festival"
           subtitle="Vote for your favorite artists!"
           description={`${filteredAndSortedSets.length} artists available for voting`}
-          user={user}
           onSignIn={() => setShowAuthDialog(true)}
           onSignOut={signOut}
           showGroupsButton={true}
@@ -115,8 +114,8 @@ export default function Index() {
         <div className="mt-8">
           <ErrorBoundary>
             {urlState.mainView === 'list' && (
-              <ArtistsPanel
-                items={filteredAndSortedSets}
+              <SetsPanel
+                sets={filteredAndSortedSets}
                 isGrid={false}
                 user={user}
                 use24Hour={urlState.use24Hour}
@@ -142,13 +141,13 @@ export default function Index() {
         />
 
 
-        <UsernameSetupDialog
+       {user && <UsernameSetupDialog
           open={showUsernameSetup}
           user={user}
           onSuccess={() => {
             // setShowUsernameSetup(false);
           }}
-        />
+        />}
       </div>
     </div>
   );

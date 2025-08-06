@@ -1,35 +1,31 @@
 import { useParams } from "react-router-dom";
 import { AppHeader } from "@/components/AppHeader";
-import { ArtistImageCard } from "@/components/ArtistDetail/ArtistImageCard";
-import { ArtistInfoCard } from "@/components/ArtistDetail/ArtistInfoCard";
-import { ArtistNotFoundState } from "@/components/ArtistDetail/ArtistNotFoundState";
-import { ArtistLoadingState } from "@/components/ArtistDetail/ArtistLoadingState";
-import { ArtistGroupVoting } from "@/components/ArtistDetail/ArtistGroupVoting";
-import { ArtistNotes } from "@/components/ArtistDetail/ArtistNotes";
-import { useArtistDetail } from "@/components/ArtistDetail/useArtistDetail";
+import { ArtistImageCard } from "@/components/SetDetail/SetImageCard";
+import { ArtistInfoCard } from "@/components/SetDetail/SetInfoCard";
+import { ArtistNotFoundState } from "@/components/SetDetail/SetNotFoundState";
+import { ArtistLoadingState } from "@/components/SetDetail/SetLoadingState";
+import { SetGroupVoting } from "@/components/SetDetail/SetGroupVoting";
+import { ArtistNotes } from "@/components/SetDetail/SetNotes";
 import { useUrlState } from "@/hooks/useUrlState";
+import { useSetDetail } from "@/components/SetDetail/useSetDetail";
 
-const ArtistDetail = () => {
-  const { id } = useParams<{ id: string }>();
+export function SetDetails() {
+  const { id } = useParams<{ id: string; }>();
 
   const { state: urlState } = useUrlState();
   const {
-    artist,
-    user,
-    userVote,
-    loading,
-    handleVote,
-    getVoteCount,
-    netVoteScore,
-  } = useArtistDetail(id);
+    currentSet, user, userVote, loading, handleVote, getVoteCount, netVoteScore,
+  } = useSetDetail(id);
 
   if (loading) {
     return <ArtistLoadingState />;
   }
 
-  if (!artist) {
+  if (!currentSet) {
     return <ArtistNotFoundState />;
   }
+
+  const artist = currentSet.artists[0]
 
   return (
     <div className="min-h-screen bg-app-gradient">
@@ -40,8 +36,7 @@ const ArtistDetail = () => {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
           <ArtistImageCard
             imageUrl={artist.image_url}
-            artistName={artist.name}
-          />
+            artistName={currentSet.name} />
 
           <ArtistInfoCard
             artist={artist}
@@ -49,13 +44,12 @@ const ArtistDetail = () => {
             netVoteScore={netVoteScore}
             onVote={handleVote}
             getVoteCount={getVoteCount}
-            use24Hour={urlState.use24Hour}
-          />
+            use24Hour={urlState.use24Hour} />
         </div>
 
         {/* Artist Group Voting Section */}
         <div className="mb-8">
-          <ArtistGroupVoting artistId={id!} />
+          <SetGroupVoting setId={id!} />
         </div>
 
         {/* Artist Notes Section */}
@@ -65,6 +59,4 @@ const ArtistDetail = () => {
       </div>
     </div>
   );
-};
-
-export default ArtistDetail;
+}

@@ -1,21 +1,25 @@
-
 import { supabase } from "@/integrations/supabase/client";
-import type { GroupInvite } from "@/types/invites";
+import { GroupInvite } from "@/types/invites";
 
 export const inviteService = {
-  async generateInviteLink(groupId: string, options?: {
-    expiresAt?: Date;
-    maxUses?: number;
-  }): Promise<string> {
+  async generateInviteLink(
+    groupId: string,
+    options?: {
+      expiresAt?: Date;
+      maxUses?: number;
+    }
+  ): Promise<string> {
     // Generate a cryptographically secure random token
-    const token = crypto.randomUUID() + '-' + Date.now().toString(36);
-    
+    const token = crypto.randomUUID() + "-" + Date.now().toString(36);
+
     // Get current user
-    const { data: { user } } = await supabase.auth.getUser();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
     if (!user) {
       throw new Error("Authentication required");
     }
-    
+
     const inviteData = {
       group_id: groupId,
       invite_token: token,
@@ -24,9 +28,7 @@ export const inviteService = {
       max_uses: options?.maxUses,
     };
 
-    const { error } = await supabase
-      .from("group_invites")
-      .insert(inviteData);
+    const { error } = await supabase.from("group_invites").insert(inviteData);
 
     if (error) {
       throw new Error("Failed to generate invite link");
@@ -37,7 +39,7 @@ export const inviteService = {
     return `${baseUrl}/?invite=${token}`;
   },
 
-  async getGroupInvites(groupId: string): Promise<GroupInvite[]> {
+  async getGroupInvites(groupId: string): Promise<Array<GroupInvite>> {
     const { data, error } = await supabase
       .from("group_invites")
       .select("*")
@@ -49,7 +51,13 @@ export const inviteService = {
       throw new Error("Failed to fetch group invites");
     }
 
-    return data || [];
+    return (
+      data.map((i) => ({
+        ...i,
+        expires_at: i.expires_at || "",
+        max_uses: i.max_uses || 0,
+      })) || []
+    );
   },
 
   async deactivateInvite(inviteId: string): Promise<void> {

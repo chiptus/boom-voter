@@ -58,112 +58,96 @@ INSERT INTO public.group_invites (group_id, created_by, invite_token, expires_at
 
 -- Insert festival artists with realistic schedule (July 12-14, 2025)
 INSERT INTO public.artists (
-  id, name, description, genre_id, stage, time_start, time_end, 
+  id, name, description, stage, time_start, time_end, 
   added_by, spotify_url, soundcloud_url, soundcloud_followers, created_at
 ) VALUES 
   -- July 12, 2025 (Friday)
   ('a1111111-1111-1111-1111-111111111111', 'Maya Jane Coles', 'British DJ and producer known for her deep house and techno sets', 
-   (SELECT id FROM music_genres WHERE name = 'House'), 'Main Stage', 
-   '2025-07-12 22:00:00+00', '2025-07-12 23:30:00+00', '11111111-1111-1111-1111-111111111111',
+   'Main Stage', '2025-07-12 22:00:00+00', '2025-07-12 23:30:00+00', '11111111-1111-1111-1111-111111111111',
    'https://open.spotify.com/artist/1234567', 'https://soundcloud.com/mayajanecoles', 125000, now()),
-   
   ('a2222222-2222-2222-2222-222222222222', 'Ben Böhmer', 'German melodic house and techno producer', 
-   (SELECT id FROM music_genres WHERE name = 'Progressive'), 'Club Stage', 
-   '2025-07-12 20:00:00+00', '2025-07-12 21:30:00+00', '22222222-2222-2222-2222-222222222222',
+   'Club Stage', '2025-07-12 20:00:00+00', '2025-07-12 21:30:00+00', '22222222-2222-2222-2222-222222222222',
    'https://open.spotify.com/artist/2345678', 'https://soundcloud.com/benbohmer', 89000, now()),
-   
   ('a3333333-3333-3333-3333-333333333333', 'Kiara Scuro', 'Rising star in dark techno', 
-   (SELECT id FROM music_genres WHERE name = 'Techno'), 'Club Stage', 
-   '2025-07-12 23:30:00+00', '2025-07-13 01:00:00+00', '33333333-3333-3333-3333-333333333333',
+   'Club Stage', '2025-07-12 23:30:00+00', '2025-07-13 01:00:00+00', '33333333-3333-3333-3333-333333333333',
    NULL, 'https://soundcloud.com/kiarascuro', 45000, now()),
-   
   ('a4444444-4444-4444-4444-444444444444', 'Nils Frahm', 'Ambient electronic composer and pianist', 
-   (SELECT id FROM music_genres WHERE name = 'Ambient'), 'Ambient Garden', 
-   '2025-07-12 18:00:00+00', '2025-07-12 19:30:00+00', '44444444-4444-4444-4444-444444444444',
+   'Ambient Garden', '2025-07-12 18:00:00+00', '2025-07-12 19:30:00+00', '44444444-4444-4444-4444-444444444444',
    'https://open.spotify.com/artist/3456789', NULL, NULL, now()),
-   
   ('a5555555-5555-5555-5555-555555555555', 'Charlotte de Witte', 'Belgian techno DJ and producer', 
-   (SELECT id FROM music_genres WHERE name = 'Techno'), 'Main Stage', 
-   '2025-07-13 01:00:00+00', '2025-07-13 02:30:00+00', '22222222-2222-2222-2222-222222222222',
+   'Main Stage', '2025-07-13 01:00:00+00', '2025-07-13 02:30:00+00', '22222222-2222-2222-2222-222222222222',
    'https://open.spotify.com/artist/4567890', 'https://soundcloud.com/charlottedewitte', 234000, now()),
-
   -- July 13, 2025 (Saturday)
   ('a6666666-6666-6666-6666-666666666666', 'Stephan Bodzin', 'German techno producer and live performer', 
-   (SELECT id FROM music_genres WHERE name = 'Techno'), 'Main Stage', 
-   '2025-07-13 21:00:00+00', '2025-07-13 22:30:00+00', '33333333-3333-3333-3333-333333333333',
+   'Main Stage', '2025-07-13 21:00:00+00', '2025-07-13 22:30:00+00', '33333333-3333-3333-3333-333333333333',
    'https://open.spotify.com/artist/5678901', 'https://soundcloud.com/stephanbodzin', 156000, now()),
-   
   ('a7777777-7777-7777-7777-777777777777', 'Lane 8', 'American deep house and progressive house producer', 
-   (SELECT id FROM music_genres WHERE name = 'Progressive'), 'Main Stage', 
-   '2025-07-13 19:00:00+00', '2025-07-13 20:30:00+00', '55555555-5555-5555-5555-555555555555',
+   'Main Stage', '2025-07-13 19:00:00+00', '2025-07-13 20:30:00+00', '55555555-5555-5555-5555-555555555555',
    'https://open.spotify.com/artist/6789012', 'https://soundcloud.com/lane8music', 189000, now()),
-   
   ('a8888888-8888-8888-8888-888888888888', 'Netsky', 'Belgian drum and bass producer', 
-   (SELECT id FROM music_genres WHERE name = 'Drum & Bass'), 'Club Stage', 
-   '2025-07-13 22:30:00+00', '2025-07-14 00:00:00+00', '66666666-6666-6666-6666-666666666666',
+   'Club Stage', '2025-07-13 22:30:00+00', '2025-07-14 00:00:00+00', '66666666-6666-6666-6666-666666666666',
    'https://open.spotify.com/artist/7890123', 'https://soundcloud.com/netsky', 178000, now()),
-   
   ('a9999999-9999-9999-9999-999999999999', 'Bonobo', 'British downtempo and electronic artist', 
-   (SELECT id FROM music_genres WHERE name = 'Downtempo'), 'Ambient Garden', 
-   '2025-07-13 17:00:00+00', '2025-07-13 18:30:00+00', '44444444-4444-4444-4444-444444444444',
+   'Ambient Garden', '2025-07-13 17:00:00+00', '2025-07-13 18:30:00+00', '44444444-4444-4444-4444-444444444444',
    'https://open.spotify.com/artist/8901234', 'https://soundcloud.com/bonobomusic', 267000, now()),
-   
   ('aaaaaaa1-aaaa-aaaa-aaaa-aaaaaaaaaaaa', 'Amelie Lens', 'Belgian techno DJ', 
-   (SELECT id FROM music_genres WHERE name = 'Techno'), 'Club Stage', 
-   '2025-07-14 00:00:00+00', '2025-07-14 01:30:00+00', '22222222-2222-2222-2222-222222222222',
+   'Club Stage', '2025-07-14 00:00:00+00', '2025-07-14 01:30:00+00', '22222222-2222-2222-2222-222222222222',
    'https://open.spotify.com/artist/9012345', 'https://soundcloud.com/amelielens', 145000, now()),
-
   -- July 14, 2025 (Sunday)
   ('aaaaaaa2-aaaa-aaaa-aaaa-aaaaaaaaaaaa', 'Maceo Plex', 'Cuban-American techno and house producer', 
-   (SELECT id FROM music_genres WHERE name = 'House'), 'Main Stage', 
-   '2025-07-14 20:00:00+00', '2025-07-14 21:30:00+00', '33333333-3333-3333-3333-333333333333',
+   'Main Stage', '2025-07-14 20:00:00+00', '2025-07-14 21:30:00+00', '33333333-3333-3333-3333-333333333333',
    'https://open.spotify.com/artist/0123456', 'https://soundcloud.com/maceoplex', 198000, now()),
-   
   ('aaaaaaa3-aaaa-aaaa-aaaa-aaaaaaaaaaaa', 'Paul Kalkbrenner', 'German techno producer and live act', 
-   (SELECT id FROM music_genres WHERE name = 'Techno'), 'Main Stage', 
-   '2025-07-14 22:00:00+00', '2025-07-14 23:30:00+00', '55555555-5555-5555-5555-555555555555',
+   'Main Stage', '2025-07-14 22:00:00+00', '2025-07-14 23:30:00+00', '55555555-5555-5555-5555-555555555555',
    'https://open.spotify.com/artist/1234567', 'https://soundcloud.com/paulkalkbrenner', 289000, now()),
-   
   ('aaaaaaa4-aaaa-aaaa-aaaa-aaaaaaaaaaaa', 'Ott', 'British dub and psychedelic producer', 
-   (SELECT id FROM music_genres WHERE name = 'Dub'), 'Ambient Garden', 
-   '2025-07-14 16:00:00+00', '2025-07-14 17:30:00+00', '66666666-6666-6666-6666-666666666666',
+   'Ambient Garden', '2025-07-14 16:00:00+00', '2025-07-14 17:30:00+00', '66666666-6666-6666-6666-666666666666',
    'https://open.spotify.com/artist/2345678', 'https://soundcloud.com/ottsonic', 67000, now()),
-   
   ('aaaaaaa5-aaaa-aaaa-aaaa-aaaaaaaaaaaa', 'Hybrid Minds', 'British liquid drum and bass duo', 
-   (SELECT id FROM music_genres WHERE name = 'Drum & Bass'), 'Club Stage', 
-   '2025-07-14 19:00:00+00', '2025-07-14 20:30:00+00', '44444444-4444-4444-4444-444444444444',
+   'Club Stage', '2025-07-14 19:00:00+00', '2025-07-14 20:30:00+00', '44444444-4444-4444-4444-444444444444',
    'https://open.spotify.com/artist/3456789', 'https://soundcloud.com/hybridminds', 112000, now()),
-   
   ('aaaaaaa6-aaaa-aaaa-aaaa-aaaaaaaaaaaa', 'Tourist', 'British electronic music producer', 
-   (SELECT id FROM music_genres WHERE name = 'Electronic'), 'Club Stage', 
-   '2025-07-14 17:30:00+00', '2025-07-14 18:30:00+00', '22222222-2222-2222-2222-222222222222',
+   'Club Stage', '2025-07-14 17:30:00+00', '2025-07-14 18:30:00+00', '22222222-2222-2222-2222-222222222222',
    'https://open.spotify.com/artist/4567890', 'https://soundcloud.com/touristmusic', 89000, now()),
-
   -- Additional artists for variety
   ('aaaaaaa7-aaaa-aaaa-aaaa-aaaaaaaaaaaa', 'Four Tet', 'British electronic music producer', 
-   (SELECT id FROM music_genres WHERE name = 'Electronic'), 'Ambient Garden', 
-   '2025-07-12 19:30:00+00', '2025-07-12 21:00:00+00', '33333333-3333-3333-3333-333333333333',
+   'Ambient Garden', '2025-07-12 19:30:00+00', '2025-07-12 21:00:00+00', '33333333-3333-3333-3333-333333333333',
    'https://open.spotify.com/artist/5678901', 'https://soundcloud.com/fourtet', 234000, now()),
-   
   ('aaaaaaa8-aaaa-aaaa-aaaa-aaaaaaaaaaaa', 'Moderat', 'German electronic music group', 
-   (SELECT id FROM music_genres WHERE name = 'Electronic'), 'Main Stage', 
-   '2025-07-12 16:00:00+00', '2025-07-12 17:30:00+00', '55555555-5555-5555-5555-555555555555',
+   'Main Stage', '2025-07-12 16:00:00+00', '2025-07-12 17:30:00+00', '55555555-5555-5555-5555-555555555555',
    'https://open.spotify.com/artist/6789012', 'https://soundcloud.com/moderat-band', 167000, now()),
-   
   ('aaaaaaa9-aaaa-aaaa-aaaa-aaaaaaaaaaaa', 'Disclosure', 'British electronic music duo', 
-   (SELECT id FROM music_genres WHERE name = 'House'), 'Main Stage', 
-   '2025-07-13 23:00:00+00', '2025-07-14 00:30:00+00', '66666666-6666-6666-6666-666666666666',
+   'Main Stage', '2025-07-13 23:00:00+00', '2025-07-14 00:30:00+00', '66666666-6666-6666-6666-666666666666',
    'https://open.spotify.com/artist/7890123', 'https://soundcloud.com/disclosure', 345000, now()),
-   
   ('aaaaaaab-aaaa-aaaa-aaaa-aaaaaaaaaaaa', 'Shpongle', 'British psychedelic electronic duo', 
-   (SELECT id FROM music_genres WHERE name = 'Experimental'), 'Ambient Garden', 
-   '2025-07-13 20:30:00+00', '2025-07-13 22:00:00+00', '44444444-4444-4444-4444-444444444444',
+   'Ambient Garden', '2025-07-13 20:30:00+00', '2025-07-13 22:00:00+00', '44444444-4444-4444-4444-444444444444',
    'https://open.spotify.com/artist/8901234', 'https://soundcloud.com/shpongle', 78000, now()),
-   
   ('aaaaaccc-aaaa-aaaa-aaaa-aaaaaaaaaaaa', 'Floating Points', 'British electronic musician and neuroscientist', 
-   (SELECT id FROM music_genres WHERE name = 'Experimental'), 'Club Stage', 
-   '2025-07-14 21:30:00+00', '2025-07-14 23:00:00+00', '22222222-2222-2222-2222-222222222222',
+   'Club Stage', '2025-07-14 21:30:00+00', '2025-07-14 23:00:00+00', '22222222-2222-2222-2222-222222222222',
    'https://open.spotify.com/artist/9012345', 'https://soundcloud.com/floatingpoints', 89000, now());
+
+-- Now insert artist-genre relationships
+INSERT INTO public.artist_music_genres (artist_id, music_genre_id) VALUES
+  ('a1111111-1111-1111-1111-111111111111', (SELECT id FROM music_genres WHERE name = 'House')),
+  ('a2222222-2222-2222-2222-222222222222', (SELECT id FROM music_genres WHERE name = 'Progressive')),
+  ('a3333333-3333-3333-3333-333333333333', (SELECT id FROM music_genres WHERE name = 'Techno')),
+  ('a4444444-4444-4444-4444-444444444444', (SELECT id FROM music_genres WHERE name = 'Ambient')),
+  ('a5555555-5555-5555-5555-555555555555', (SELECT id FROM music_genres WHERE name = 'Techno')),
+  ('a6666666-6666-6666-6666-666666666666', (SELECT id FROM music_genres WHERE name = 'Techno')),
+  ('a7777777-7777-7777-7777-777777777777', (SELECT id FROM music_genres WHERE name = 'Progressive')),
+  ('a8888888-8888-8888-8888-888888888888', (SELECT id FROM music_genres WHERE name = 'Drum & Bass')),
+  ('a9999999-9999-9999-9999-999999999999', (SELECT id FROM music_genres WHERE name = 'Downtempo')),
+  ('aaaaaaa1-aaaa-aaaa-aaaa-aaaaaaaaaaaa', (SELECT id FROM music_genres WHERE name = 'Techno')),
+  ('aaaaaaa2-aaaa-aaaa-aaaa-aaaaaaaaaaaa', (SELECT id FROM music_genres WHERE name = 'House')),
+  ('aaaaaaa3-aaaa-aaaa-aaaa-aaaaaaaaaaaa', (SELECT id FROM music_genres WHERE name = 'Techno')),
+  ('aaaaaaa4-aaaa-aaaa-aaaa-aaaaaaaaaaaa', (SELECT id FROM music_genres WHERE name = 'Dub')),
+  ('aaaaaaa5-aaaa-aaaa-aaaa-aaaaaaaaaaaa', (SELECT id FROM music_genres WHERE name = 'Drum & Bass')),
+  ('aaaaaaa6-aaaa-aaaa-aaaa-aaaaaaaaaaaa', (SELECT id FROM music_genres WHERE name = 'Electronic')),
+  ('aaaaaaa7-aaaa-aaaa-aaaa-aaaaaaaaaaaa', (SELECT id FROM music_genres WHERE name = 'Electronic')),
+  ('aaaaaaa8-aaaa-aaaa-aaaa-aaaaaaaaaaaa', (SELECT id FROM music_genres WHERE name = 'Electronic')),
+  ('aaaaaaa9-aaaa-aaaa-aaaa-aaaaaaaaaaaa', (SELECT id FROM music_genres WHERE name = 'House')),
+  ('aaaaaaab-aaaa-aaaa-aaaa-aaaaaaaaaaaa', (SELECT id FROM music_genres WHERE name = 'Experimental')),
+  ('aaaaaccc-aaaa-aaaa-aaaa-aaaaaaaaaaaa', (SELECT id FROM music_genres WHERE name = 'Experimental'));
 
 -- Insert realistic votes (rating scale 1-5)
 INSERT INTO public.votes (user_id, artist_id, vote_type, created_at) VALUES 

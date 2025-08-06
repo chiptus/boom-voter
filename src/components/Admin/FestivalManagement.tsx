@@ -14,7 +14,13 @@ import {
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Loader2, Plus, Edit2, Trash2, Calendar } from "lucide-react";
@@ -30,21 +36,21 @@ export const FestivalManagement = () => {
   const { data: festivals = [], isLoading } = useFestivalQuery.useFestivals();
   const { toast } = useToast();
   const queryClient = useQueryClient();
-  
+
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingFestival, setEditingFestival] = useState<Festival | null>(null);
   const [formData, setFormData] = useState<FestivalFormData>({
-    name: '',
-    description: '',
-    website_url: '',
+    name: "",
+    description: "",
+    website_url: "",
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const resetForm = () => {
     setFormData({
-      name: '',
-      description: '',
-      website_url: '',
+      name: "",
+      description: "",
+      website_url: "",
     });
     setEditingFestival(null);
   };
@@ -57,8 +63,8 @@ export const FestivalManagement = () => {
   const handleEdit = (festival: Festival) => {
     setFormData({
       name: festival.name,
-      description: festival.description || '',
-      website_url: festival.website_url || '',
+      description: festival.description || "",
+      website_url: festival.website_url || "",
     });
     setEditingFestival(festival);
     setIsDialogOpen(true);
@@ -84,20 +90,25 @@ export const FestivalManagement = () => {
           description: "Festival updated successfully",
         });
       } else {
-        await queryFunctions.createFestival(formData);
+        await queryFunctions.createFestival({
+          ...formData,
+          description: formData.description || null,
+          website_url: formData.website_url || null,
+        });
         toast({
           title: "Success",
           description: "Festival created successfully",
         });
       }
 
-      queryClient.invalidateQueries({ queryKey: ['festivals'] });
+      queryClient.invalidateQueries({ queryKey: ["festivals"] });
       setIsDialogOpen(false);
       resetForm();
     } catch (error) {
       toast({
         title: "Error",
-        description: error instanceof Error ? error.message : "Failed to save festival",
+        description:
+          error instanceof Error ? error.message : "Failed to save festival",
         variant: "destructive",
       });
     } finally {
@@ -106,7 +117,11 @@ export const FestivalManagement = () => {
   };
 
   const handleDelete = async (festival: Festival) => {
-    if (!confirm(`Are you sure you want to delete "${festival.name}"? This will also delete all associated editions, stages, and sets.`)) {
+    if (
+      !confirm(
+        `Are you sure you want to delete "${festival.name}"? This will also delete all associated editions, stages, and sets.`
+      )
+    ) {
       return;
     }
 
@@ -116,11 +131,12 @@ export const FestivalManagement = () => {
         title: "Success",
         description: "Festival deleted successfully",
       });
-      queryClient.invalidateQueries({ queryKey: ['festivals'] });
+      queryClient.invalidateQueries({ queryKey: ["festivals"] });
     } catch (error) {
       toast({
         title: "Error",
-        description: error instanceof Error ? error.message : "Failed to delete festival",
+        description:
+          error instanceof Error ? error.message : "Failed to delete festival",
         variant: "destructive",
       });
     }
@@ -147,7 +163,10 @@ export const FestivalManagement = () => {
           </span>
           <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
             <DialogTrigger asChild>
-              <Button onClick={handleCreate} className="bg-purple-600 hover:bg-purple-700">
+              <Button
+                onClick={handleCreate}
+                className="bg-purple-600 hover:bg-purple-700"
+              >
                 <Plus className="h-4 w-4 mr-2" />
                 Add Festival
               </Button>
@@ -155,7 +174,7 @@ export const FestivalManagement = () => {
             <DialogContent>
               <DialogHeader>
                 <DialogTitle>
-                  {editingFestival ? 'Edit Festival' : 'Create New Festival'}
+                  {editingFestival ? "Edit Festival" : "Create New Festival"}
                 </DialogTitle>
               </DialogHeader>
               <form onSubmit={handleSubmit} className="space-y-4">
@@ -164,7 +183,9 @@ export const FestivalManagement = () => {
                   <Input
                     id="name"
                     value={formData.name}
-                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                    onChange={(e) =>
+                      setFormData({ ...formData, name: e.target.value })
+                    }
                     placeholder="e.g., Boom Festival"
                     required
                   />
@@ -174,7 +195,9 @@ export const FestivalManagement = () => {
                   <Textarea
                     id="description"
                     value={formData.description}
-                    onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                    onChange={(e) =>
+                      setFormData({ ...formData, description: e.target.value })
+                    }
                     placeholder="Festival description..."
                     rows={3}
                   />
@@ -185,22 +208,26 @@ export const FestivalManagement = () => {
                     id="website"
                     type="url"
                     value={formData.website_url}
-                    onChange={(e) => setFormData({ ...formData, website_url: e.target.value })}
+                    onChange={(e) =>
+                      setFormData({ ...formData, website_url: e.target.value })
+                    }
                     placeholder="https://example.com"
                   />
                 </div>
                 <div className="flex justify-end gap-2">
-                  <Button 
-                    type="button" 
-                    variant="outline" 
+                  <Button
+                    type="button"
+                    variant="outline"
                     onClick={() => setIsDialogOpen(false)}
                     disabled={isSubmitting}
                   >
                     Cancel
                   </Button>
                   <Button type="submit" disabled={isSubmitting}>
-                    {isSubmitting && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
-                    {editingFestival ? 'Update' : 'Create'}
+                    {isSubmitting && (
+                      <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                    )}
+                    {editingFestival ? "Update" : "Create"}
                   </Button>
                 </div>
               </form>
@@ -223,18 +250,20 @@ export const FestivalManagement = () => {
               {festivals.map((festival) => (
                 <TableRow key={festival.id}>
                   <TableCell className="font-medium">{festival.name}</TableCell>
-                  <TableCell>{festival.description || '—'}</TableCell>
+                  <TableCell>{festival.description || "—"}</TableCell>
                   <TableCell>
                     {festival.website_url ? (
-                      <a 
-                        href={festival.website_url} 
-                        target="_blank" 
+                      <a
+                        href={festival.website_url}
+                        target="_blank"
                         rel="noopener noreferrer"
                         className="text-purple-600 hover:underline"
                       >
                         Visit
                       </a>
-                    ) : '—'}
+                    ) : (
+                      "—"
+                    )}
                   </TableCell>
                   <TableCell>
                     <div className="flex gap-2">
