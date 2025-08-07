@@ -1,35 +1,50 @@
 import { useQuery } from "@tanstack/react-query";
-import { festivalQueries, queryFunctions } from "@/services/queries";
+import {
+  editionQueries,
+  festivalQueries,
+  queryFunctions,
+} from "@/services/queries";
 
-export const useFestivalsQuery = () => {
+export function useFestivalsQuery() {
   return useQuery({
     queryKey: festivalQueries.all(),
     queryFn: queryFunctions.fetchFestivals,
   });
-};
+}
 
-export const useFestivalQuery = (festivalId: string | undefined) => {
+export function useFestivalQuery(festivalId: string | undefined) {
   return useQuery({
     queryKey: festivalQueries.item(festivalId!),
     queryFn: () => queryFunctions.fetchFestival(festivalId!),
     enabled: !!festivalId,
   });
-};
+}
 
-export const useFestivalEditionsForFestival = (
-  festivalId: string | undefined,
-) => {
+export function useFestivalEditionsForFestival(festivalId: string | undefined) {
   return useQuery({
-    queryKey: festivalQueries.editions(festivalId || ""),
+    queryKey: editionQueries.all(festivalId || ""),
     queryFn: () => queryFunctions.fetchFestivalEditions(festivalId!),
     enabled: !!festivalId,
   });
-};
+}
 
-// Hook to get ALL festival editions (for admin management)
-export const useAllFestivalEditionsQuery = () => {
+export function useFestivalEditionQuery({
+  editionId,
+  festivalId,
+}: {
+  festivalId?: string;
+  editionId?: string;
+}) {
   return useQuery({
-    queryKey: ["festival-editions"],
-    queryFn: () => queryFunctions.fetchFestivalEditions(), // Without festivalId gets all
+    queryKey: editionQueries.item({
+      festivalId: festivalId!,
+      editionId: editionId!,
+    }),
+    queryFn: () =>
+      queryFunctions.fetchFestivalEdition({
+        festivalId: festivalId!,
+        editionId: editionId!,
+      }),
+    enabled: !!festivalId && !!editionId,
   });
-};
+}

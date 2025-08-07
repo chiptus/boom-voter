@@ -57,7 +57,7 @@ src/
 
 ### Core Application Concepts
 
-**VibeTribe** is a collaborative festival voting platform with these key features:
+**UpLine** is a collaborative festival voting platform with these key features:
 
 1. **Artist Management**: Core team can add/edit artists with genres, stages, and metadata
 2. **Voting System**: Three vote types - "Must Go" (2), "Interested" (1), "Won't Go" (-1)

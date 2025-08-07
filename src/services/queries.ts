@@ -55,8 +55,18 @@ export const setQueries = {
 export const festivalQueries = {
   all: () => ["festivals"] as const,
   item: (festivalId: string) => [...festivalQueries.all(), festivalId] as const,
-  editions: (festivalId: string) =>
+};
+
+export const editionQueries = {
+  all: (festivalId: string) =>
     [...festivalQueries.all(), festivalId, "editions"] as const,
+  item: ({
+    editionId,
+    festivalId,
+  }: {
+    festivalId: string;
+    editionId: string;
+  }) => [...editionQueries.all(festivalId), editionId] as const,
 };
 
 // Voting Queries
@@ -456,6 +466,30 @@ export const queryFunctions = {
     }
 
     return data || [];
+  },
+
+  async fetchFestivalEdition({
+    editionId,
+    festivalId,
+  }: {
+    festivalId: string;
+    editionId: string;
+  }): Promise<FestivalEdition> {
+    const query = supabase
+      .from("festival_editions")
+      .select("*")
+      .eq("archived", false)
+      .eq("festival_id", festivalId)
+      .eq("id", editionId)
+      .single();
+
+    const { data, error } = await query;
+
+    if (error) {
+      throw new Error("Failed to load festival editions");
+    }
+
+    return data;
   },
 
   async fetchSetsByEdition(editionId: string): Promise<FestivalSet[]> {

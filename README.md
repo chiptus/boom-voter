@@ -1,4 +1,4 @@
-# VibeTribe - Festival Artist Voting App
+# UpLine - Festival Artist Voting App
 
 ## Application Overview
 
@@ -98,7 +98,7 @@
 
 ## Project History & Evolution
 
-**Initial Development**: VibeTribe was originally built for Boom Festival as a proof-of-concept for collaborative festival lineup voting. The platform successfully demonstrated how communities can democratically influence artist selection through group-based voting and real-time collaboration.
+**Initial Development**: UpLine was originally built for Boom Festival as a proof-of-concept for collaborative festival lineup voting. The platform successfully demonstrated how communities can democratically influence artist selection through group-based voting and real-time collaboration.
 
 ## Unique Features
 

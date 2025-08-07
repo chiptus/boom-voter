@@ -1,5 +1,5 @@
 import { ReactNode } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { Music, Heart, LogIn } from "lucide-react";
@@ -75,10 +75,12 @@ export const AppHeader = ({
         <div className="flex items-center justify-between mb-6 pb-6 border-b border-purple-400/20">
           {/* Left Side - Branding */}
           <div className="flex items-center gap-4">
-            <div className="flex items-center gap-3">
-              <Music className="h-6 w-6 text-purple-400" />
-              <h1 className="text-2xl font-bold text-white">UpLine</h1>
-            </div>
+            <Link to="/">
+              <div className="flex items-center gap-3">
+                <Music className="h-6 w-6 text-purple-400" />
+                <h1 className="text-2xl font-bold text-white">UpLine</h1>
+              </div>
+            </Link>
 
             {/* User Greeting - Desktop Only */}
             {user && !isMobile && (
