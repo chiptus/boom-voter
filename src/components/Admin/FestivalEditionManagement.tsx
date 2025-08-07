@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { queryFunctions } from "@/services/queries";
-import { useFestivalQuery } from "@/hooks/queries/useFestivalQuery";
+import { useFestivalEditionsForFestival } from "@/hooks/queries/useFestivalQuery";
 import { useToast } from "@/hooks/use-toast";
 import {
   Table,
@@ -43,7 +43,7 @@ export const FestivalEditionManagement = ({
   selected: string;
 }) => {
   const { data: editions = [], isLoading } =
-    useFestivalQuery.useFestivalEditionsForFestival(festivalId);
+    useFestivalEditionsForFestival(festivalId);
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
@@ -179,7 +179,7 @@ export const FestivalEditionManagement = ({
   }
 
   return (
-    <div>
+    <Card>
       <CardHeader>
         <CardTitle className="flex items-center justify-between">
           <span className="flex items-center gap-2">
@@ -342,6 +342,6 @@ export const FestivalEditionManagement = ({
           )}
         </div>
       </CardContent>
-    </div>
+    </Card>
   );
 };

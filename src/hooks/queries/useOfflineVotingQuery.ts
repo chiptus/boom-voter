@@ -15,10 +15,10 @@ interface OfflineVote {
   synced: boolean;
 }
 
-const mergeOfflineAndServerVotes = (
+function mergeOfflineAndServerVotes(
   offlineVotes: OfflineVote[],
   serverVotes: Record<string, number>,
-): Record<string, number> => {
+): Record<string, number> {
   // Start with server votes (authoritative when online)
   const mergedVotes = { ...serverVotes };
 
@@ -32,12 +32,12 @@ const mergeOfflineAndServerVotes = (
   });
 
   return mergedVotes;
-};
+}
 
-const fetchUserVotesWithOffline = async (
+async function fetchUserVotesWithOffline(
   userId: string,
   isOnline: boolean,
-): Promise<Record<string, number>> => {
+): Promise<Record<string, number>> {
   // Always load offline votes first
   const offlineVotes = await offlineStorage.getVotes();
   const userOfflineVotes = offlineVotes.filter(
@@ -59,7 +59,7 @@ const fetchUserVotesWithOffline = async (
   try {
     const { data, error } = await supabase
       .from("votes")
-      .select("set_id, artist_id, vote_type")
+      .select("set_id, vote_type")
       .eq("user_id", userId);
 
     if (error) {
@@ -79,8 +79,6 @@ const fetchUserVotesWithOffline = async (
       // Prioritize set-based votes over legacy artist votes
       if (vote.set_id) {
         serverVotes[vote.set_id] = vote.vote_type;
-      } else if (vote.artist_id && !serverVotes[vote.artist_id]) {
-        serverVotes[vote.artist_id] = vote.vote_type;
       }
     });
 
@@ -97,9 +95,9 @@ const fetchUserVotesWithOffline = async (
       {} as Record<string, number>,
     );
   }
-};
+}
 
-export const useOfflineVotingQuery = (user: User | null) => {
+export function useOfflineVotingQuery(user: User | null) {
   const isOnline = useOnlineStatus();
 
   return useQuery({
@@ -109,12 +107,12 @@ export const useOfflineVotingQuery = (user: User | null) => {
     staleTime: isOnline ? 30 * 1000 : Infinity, // 30 seconds for online, infinite for offline
     refetchOnWindowFocus: isOnline,
   });
-};
+}
 
-export const useOfflineVoteMutation = (
+export function useOfflineVoteMutation(
   user: User | null,
   onVoteUpdate?: () => void,
-) => {
+) {
   const queryClient = useQueryClient();
   const { toast } = useToast();
   const isOnline = useOnlineStatus();
@@ -251,4 +249,4 @@ export const useOfflineVoteMutation = (
       });
     },
   });
-};
+}

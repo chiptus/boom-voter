@@ -8,7 +8,17 @@ export const useFestivalsQuery = () => {
   });
 };
 
-export const useFestivalEditionsQuery = (festivalId: string | undefined) => {
+export const useFestivalQuery = (festivalId: string | undefined) => {
+  return useQuery({
+    queryKey: festivalQueries.item(festivalId!),
+    queryFn: () => queryFunctions.fetchFestival(festivalId!),
+    enabled: !!festivalId,
+  });
+};
+
+export const useFestivalEditionsForFestival = (
+  festivalId: string | undefined,
+) => {
   return useQuery({
     queryKey: festivalQueries.editions(festivalId || ""),
     queryFn: () => queryFunctions.fetchFestivalEditions(festivalId!),
@@ -22,11 +32,4 @@ export const useAllFestivalEditionsQuery = () => {
     queryKey: ["festival-editions"],
     queryFn: () => queryFunctions.fetchFestivalEditions(), // Without festivalId gets all
   });
-};
-
-// Export object for easier importing
-export const useFestivalQuery = {
-  useFestivals: useFestivalsQuery,
-  useFestivalEditions: useAllFestivalEditionsQuery,
-  useFestivalEditionsForFestival: useFestivalEditionsQuery,
 };

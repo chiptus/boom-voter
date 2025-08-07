@@ -9,7 +9,15 @@ import ArtistDetail from "./pages/ArtistDetail";
 import Groups from "./pages/Groups";
 import GroupDetail from "./pages/GroupDetail";
 import Schedule from "./pages/Schedule";
-import Admin from "./pages/Admin";
+import AdminLayout from "./pages/AdminLayout";
+import AdminDashboard from "./pages/admin/AdminDashboard";
+import AdminAnalytics from "./pages/admin/AdminAnalytics";
+import AdminRoles from "./pages/admin/AdminRoles";
+import AdminFestivals from "./pages/admin/AdminFestivals";
+import FestivalDetail from "./pages/admin/FestivalDetail";
+import FestivalEdition from "./pages/admin/FestivalEdition";
+import FestivalStages from "./pages/admin/FestivalStages";
+import FestivalSets from "./pages/admin/FestivalSets";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
 import TermsOfService from "./pages/TermsOfService";
 import CookiePolicy from "./pages/CookiePolicy";
@@ -31,13 +39,24 @@ const App = () => (
             <Route path="/groups" element={<Groups />} />
             <Route path="/groups/:groupId" element={<GroupDetail />} />
             <Route path="/schedule" element={<Schedule />} />
-            <Route path="/admin" element={<Admin />} />
-            <Route path="/admin/:tab" element={<Admin />} />
-            <Route path="/admin/festivals/:festivalId" element={<Admin />} />
-            <Route
-              path="/admin/festivals/:festivalId/:editionId/:subtab"
-              element={<Admin />}
-            />
+            <Route path="/admin" element={<AdminLayout />}>
+              <Route index element={<AdminDashboard />} />
+              <Route path="artists" element={<AdminDashboard />} />
+              <Route path="analytics" element={<AdminAnalytics />} />
+              <Route path="admins" element={<AdminRoles />} />
+              <Route path="festivals" element={<AdminFestivals />}>
+                <Route path=":festivalId" element={<FestivalDetail />}>
+                  <Route
+                    path="editions/:editionId"
+                    element={<FestivalEdition />}
+                  >
+                    <Route index element={<FestivalStages />} />
+                    <Route path="stages" element={<FestivalStages />} />
+                    <Route path="sets" element={<FestivalSets />} />
+                  </Route>
+                </Route>
+              </Route>
+            </Route>
             <Route path="/privacy" element={<PrivacyPolicy />} />
             <Route path="/terms" element={<TermsOfService />} />
             <Route path="/cookies" element={<CookiePolicy />} />

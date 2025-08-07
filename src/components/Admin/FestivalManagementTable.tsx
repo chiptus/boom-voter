@@ -1,6 +1,6 @@
 import { useQueryClient } from "@tanstack/react-query";
 import { queryFunctions } from "@/services/queries";
-import { useFestivalQuery } from "@/hooks/queries/useFestivalQuery";
+import { useFestivalsQuery } from "@/hooks/queries/useFestivalQuery";
 import { useToast } from "@/hooks/use-toast";
 import {
   Table,
@@ -25,7 +25,7 @@ export function FestivalManagementTable({
   onSelect: (festival: Festival) => void;
   selected: string;
 }) {
-  const { data: festivals = [], isLoading } = useFestivalQuery.useFestivals();
+  const { data: festivals = [], isLoading } = useFestivalsQuery();
   const { toast } = useToast();
   const queryClient = useQueryClient();
 

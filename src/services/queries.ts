@@ -54,6 +54,7 @@ export const setQueries = {
 // Festival Queries
 export const festivalQueries = {
   all: () => ["festivals"] as const,
+  item: (festivalId: string) => [...festivalQueries.all(), festivalId] as const,
   editions: (festivalId: string) =>
     [...festivalQueries.all(), festivalId, "editions"] as const,
 };
@@ -419,6 +420,22 @@ export const queryFunctions = {
     }
 
     return data || [];
+  },
+
+  async fetchFestival(festivalId: string): Promise<Festival> {
+    const { data, error } = await supabase
+      .from("festivals")
+      .select("*")
+      .eq("archived", false)
+      .eq("id", festivalId)
+      .order("name")
+      .single();
+
+    if (error) {
+      throw new Error("Failed to load festivals");
+    }
+
+    return data;
   },
 
   async fetchFestivalEditions(festivalId?: string): Promise<FestivalEdition[]> {
