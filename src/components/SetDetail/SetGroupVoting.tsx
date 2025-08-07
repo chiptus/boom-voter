@@ -9,19 +9,11 @@ import {
 } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { useGroups } from "@/hooks/useGroups";
-import { queryFunctions } from "@/services/queries";
-import { offlineStorage } from "@/lib/offlineStorage";
-import { useOnlineStatus } from "@/hooks/useOffline";
+import { useGroupVotesQuery } from "@/hooks/queries/useGroupVotesQuery";
 import { Users, ThumbsUp, Heart, ThumbsDown } from "lucide-react";
 
 interface SetGroupVotingProps {
   setId: string;
-}
-
-interface GroupVote {
-  vote_type: number;
-  user_id: string;
-  username: string | null;
 }
 
 const getVoteIcon = (voteType: number) => {
@@ -66,9 +58,6 @@ const getVoteColor = (voteType: number) => {
 export const SetGroupVoting = ({ setId: artistId }: SetGroupVotingProps) => {
   const { groups, user } = useGroups();
   const [selectedGroupId, setSelectedGroupId] = useState<string>("");
-  const [groupVotes, setGroupVotes] = useState<GroupVote[]>([]);
-  const [loading, setLoading] = useState(false);
-  const isOnline = useOnlineStatus();
 
   // Set default group when groups load
   useEffect(() => {
@@ -77,38 +66,11 @@ export const SetGroupVoting = ({ setId: artistId }: SetGroupVotingProps) => {
     }
   }, [groups, selectedGroupId]);
 
-  // Fetch group votes when selection changes
-  useEffect(() => {
-    if (selectedGroupId && artistId) {
-      fetchGroupVotes();
-    }
-  }, [selectedGroupId, artistId]);
-
-  const fetchGroupVotes = async () => {
-    if (!selectedGroupId) return;
-
-    setLoading(true);
-    try {
-      let votes;
-      if (isOnline) {
-        votes = await queryFunctions.fetchSetGroupVotes(
-          artistId,
-          selectedGroupId,
-        );
-      } else {
-        votes = await offlineStorage.getSetGroupVotes(
-          artistId,
-          selectedGroupId,
-        );
-      }
-      setGroupVotes(votes);
-    } catch (error) {
-      console.error("Error fetching group votes:", error);
-      setGroupVotes([]);
-    } finally {
-      setLoading(false);
-    }
-  };
+  // Use React Query to fetch group votes
+  const { data: groupVotes = [], isLoading: loading } = useGroupVotesQuery(
+    artistId,
+    selectedGroupId,
+  );
 
   // Don't show if user has no groups
   if (!user || groups.length === 0) {

@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import {
   Card,
   CardContent,
@@ -10,9 +10,13 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
-import { useToast } from "@/components/ui/use-toast";
 import { Link, Copy, Trash2, Calendar, Users } from "lucide-react";
-import { inviteService } from "@/services/inviteService";
+import { useToast } from "@/components/ui/use-toast";
+import {
+  useGroupInvitesQuery,
+  useGenerateInviteMutation,
+  useDeleteInviteMutation,
+} from "@/hooks/queries/useInvitesQuery";
 import type { GroupInvite } from "@/types/invites";
 
 interface InviteManagementProps {
@@ -24,78 +28,39 @@ export const InviteManagement = ({
   groupId,
   groupName,
 }: InviteManagementProps) => {
-  const [invites, setInvites] = useState<GroupInvite[]>([]);
-
-  const [generating, setGenerating] = useState(false);
   const [expirationDays, setExpirationDays] = useState<string>("");
   const [maxUses, setMaxUses] = useState<string>("");
+
   const { toast } = useToast();
 
-  useEffect(() => {
-    fetchInvites();
-  }, [groupId]);
+  // React Query hooks
+  const { data: invites = [] } = useGroupInvitesQuery(groupId);
+  const generateInviteMutation = useGenerateInviteMutation(groupId);
+  const deleteInviteMutation = useDeleteInviteMutation(groupId);
 
-  const fetchInvites = async () => {
-    try {
-      const data = await inviteService.getGroupInvites(groupId);
-      setInvites(data);
-    } catch (error) {
-      console.error("Error fetching invites:", error);
-      toast({
-        title: "Error",
-        description: "Failed to load invites",
-        variant: "destructive",
-      });
+  const generateInvite = () => {
+    const options: {
+      expiresAt?: Date;
+      maxUses?: number;
+    } = {};
+
+    if (expirationDays) {
+      const expireDate = new Date();
+      expireDate.setDate(expireDate.getDate() + parseInt(expirationDays));
+      options.expiresAt = expireDate;
     }
-  };
 
-  const generateInvite = async () => {
-    setGenerating(true);
-    try {
-      const options: {
-        expiresAt?: Date;
-        maxUses?: number;
-      } = {};
-
-      if (expirationDays) {
-        const expireDate = new Date();
-        expireDate.setDate(expireDate.getDate() + parseInt(expirationDays));
-        options.expiresAt = expireDate;
-      }
-
-      if (maxUses) {
-        options.maxUses = parseInt(maxUses);
-      }
-
-      const inviteUrl = await inviteService.generateInviteLink(
-        groupId,
-        options,
-      );
-
-      // Copy to clipboard
-      await navigator.clipboard.writeText(inviteUrl);
-
-      toast({
-        title: "Invite Created",
-        description: "Invite link has been copied to your clipboard!",
-      });
-
-      // Reset form
-      setExpirationDays("");
-      setMaxUses("");
-
-      // Refresh invites list
-      fetchInvites();
-    } catch (error) {
-      console.error("Error generating invite:", error);
-      toast({
-        title: "Error",
-        description: "Failed to generate invite link",
-        variant: "destructive",
-      });
-    } finally {
-      setGenerating(false);
+    if (maxUses) {
+      options.maxUses = parseInt(maxUses);
     }
+
+    generateInviteMutation.mutate(options, {
+      onSuccess: () => {
+        // Reset form
+        setExpirationDays("");
+        setMaxUses("");
+      },
+    });
   };
 
   const copyInviteLink = async (token: string) => {
@@ -115,23 +80,9 @@ export const InviteManagement = ({
     }
   };
 
-  const deleteInvite = async (inviteId: string) => {
+  const deleteInvite = (inviteId: string) => {
     if (!window.confirm("Are you sure you want to delete this invite?")) return;
-
-    try {
-      await inviteService.deleteInvite(inviteId);
-      toast({
-        title: "Success",
-        description: "Invite deleted successfully",
-      });
-      fetchInvites();
-    } catch (error) {
-      toast({
-        title: "Error",
-        description: "Failed to delete invite",
-        variant: "destructive",
-      });
-    }
+    deleteInviteMutation.mutate(inviteId);
   };
 
   const formatDate = (dateString: string) => {
@@ -189,10 +140,12 @@ export const InviteManagement = ({
           </div>
           <Button
             onClick={generateInvite}
-            disabled={generating}
+            disabled={generateInviteMutation.isPending}
             className="w-full"
           >
-            {generating ? "Generating..." : "Generate Invite Link"}
+            {generateInviteMutation.isPending
+              ? "Generating..."
+              : "Generate Invite Link"}
           </Button>
         </CardContent>
       </Card>

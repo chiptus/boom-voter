@@ -77,6 +77,8 @@ export const groupQueries = {
     [...groupQueries.all(), "detail", groupId] as const,
   members: (groupId: string) =>
     [...groupQueries.detail(groupId), "members"] as const,
+  votes: (setId: string, groupId: string) =>
+    [...groupQueries.all(), "votes", setId, groupId] as const,
 };
 
 // Stage Queries
@@ -90,6 +92,13 @@ export const stageQueries = {
 export const authQueries = {
   user: () => ["auth", "user"] as const,
   profile: (userId?: string) => ["auth", "profile", userId] as const,
+};
+
+// Invite Queries
+export const inviteQueries = {
+  all: () => ["invites"] as const,
+  group: (groupId: string) =>
+    [...inviteQueries.all(), "group", groupId] as const,
 };
 
 // Query Functions
