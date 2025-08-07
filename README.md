@@ -119,3 +119,34 @@
 - Real-time collaborative features
 - Seamless invite-based onboarding flow
 - Progressive enhancement from anonymous to authenticated usage
+
+## License
+
+This project is licensed under the GNU Affero General Public License
+v3.0 or later (AGPL-3.0-or-later) - see the [LICENSE](LICENSE) file for
+details.
+
+### What this means:
+
+- ✅ You can use, study, modify, and distribute this code
+- ✅ You can contribute improvements back to the project
+- ❌ If you use this code in a web service/SaaS, you must make your
+  entire application open source under AGPL-3.0
+- ❌ You cannot create proprietary/closed-source products using this
+  code
+
+### For devs
+
+Add this to the top of your main source files:
+
+```
+/*
+ * Copyright (C) 2025 [Chaim Lev-Ari]
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as
+published
+ * by the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ */
+```
