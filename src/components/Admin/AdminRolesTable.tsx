@@ -1,6 +1,10 @@
-import { useState, useEffect } from "react";
-import { supabase } from "@/integrations/supabase/client";
-import { useToast } from "@/hooks/use-toast";
+import { useState } from "react";
+import {
+  useAdminRolesQuery,
+  useAddAdminMutation,
+  useRemoveAdminMutation,
+  useUpdateAdminRoleMutation,
+} from "@/hooks/queries/useAdminRolesQuery";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -49,198 +53,45 @@ import {
 import { UserPlus, Trash2, Crown } from "lucide-react";
 import type { Database } from "@/integrations/supabase/types";
 
-type AdminRole = Database["public"]["Tables"]["admin_roles"]["Row"] & {
-  profile?: {
-    username: string | null;
-    email: string | null;
-  };
-};
-
 export const AdminRolesTable = () => {
-  const [adminRoles, setAdminRoles] = useState<AdminRole[]>([]);
-  const [loading, setLoading] = useState(true);
   const [addDialogOpen, setAddDialogOpen] = useState(false);
   const [newUserEmail, setNewUserEmail] = useState("");
   const [newUserRole, setNewUserRole] =
     useState<Database["public"]["Enums"]["admin_role"]>("moderator");
-  const [addingUser, setAddingUser] = useState(false);
-  const { toast } = useToast();
 
-  useEffect(() => {
-    fetchAdminRoles();
-  }, []);
-
-  const fetchAdminRoles = async () => {
-    try {
-      const { data: roles, error } = await supabase
-        .from("admin_roles")
-        .select("*")
-        .order("created_at", { ascending: false });
-
-      if (error) throw error;
-
-      if (roles) {
-        // Fetch profile information for each admin
-        const rolesWithProfiles = await Promise.all(
-          roles.map(async (role) => {
-            const { data: profile } = await supabase
-              .from("profiles")
-              .select("username, email")
-              .eq("id", role.user_id)
-              .single();
-
-            return {
-              ...role,
-              profile: profile || { username: null, email: null },
-            };
-          }),
-        );
-
-        setAdminRoles(rolesWithProfiles);
-      }
-    } catch (error) {
-      console.error("Error fetching admin roles:", error);
-      toast({
-        title: "Error",
-        description: "Failed to fetch admin roles",
-        variant: "destructive",
-      });
-    } finally {
-      setLoading(false);
-    }
-  };
+  // React Query hooks
+  const { data: adminRoles = [], isLoading } = useAdminRolesQuery();
+  const addAdminMutation = useAddAdminMutation();
+  const removeAdminMutation = useRemoveAdminMutation();
+  const updateRoleMutation = useUpdateAdminRoleMutation();
 
   const handleAddAdmin = async (e: React.FormEvent) => {
     e.preventDefault();
-    setAddingUser(true);
 
-    try {
-      // First, get the user ID by email
-      const { data: userId, error: userError } = await supabase.rpc(
-        "get_user_id_by_email",
-        { user_email: newUserEmail },
-      );
-
-      if (userError || !userId) {
-        toast({
-          title: "User not found",
-          description: "No user found with this email address",
-          variant: "destructive",
-        });
-        return;
-      }
-
-      // Check if user already has an admin role
-      const { data: existingRole } = await supabase
-        .from("admin_roles")
-        .select("*")
-        .eq("user_id", userId)
-        .single();
-
-      if (existingRole) {
-        toast({
-          title: "User already has admin role",
-          description: `This user already has the ${existingRole.role} role`,
-          variant: "destructive",
-        });
-        return;
-      }
-
-      // Add the admin role
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
-
-      if (!user?.id) {
-        toast({
-          title: "Error",
-          description: "User not found",
-          variant: "destructive",
-        });
-
-        throw new Error("User not found");
-      }
-
-      const { error: insertError } = await supabase.from("admin_roles").insert({
-        user_id: userId,
+    addAdminMutation.mutate(
+      {
+        email: newUserEmail,
         role: newUserRole,
-        created_by: user?.id,
-      });
-
-      if (insertError) throw insertError;
-
-      toast({
-        title: "Success",
-        description: `User added as ${newUserRole}`,
-      });
-
-      setNewUserEmail("");
-      setNewUserRole("moderator");
-      setAddDialogOpen(false);
-      fetchAdminRoles();
-    } catch (error) {
-      console.error("Error adding admin:", error);
-      toast({
-        title: "Error",
-        description: "Failed to add admin role",
-        variant: "destructive",
-      });
-    } finally {
-      setAddingUser(false);
-    }
+      },
+      {
+        onSuccess: () => {
+          setNewUserEmail("");
+          setNewUserRole("moderator");
+          setAddDialogOpen(false);
+        },
+      },
+    );
   };
 
-  const handleRemoveAdmin = async (roleId: string) => {
-    try {
-      const { error } = await supabase
-        .from("admin_roles")
-        .delete()
-        .eq("id", roleId);
-
-      if (error) throw error;
-
-      toast({
-        title: "Success",
-        description: "Admin role removed",
-      });
-
-      fetchAdminRoles();
-    } catch (error) {
-      console.error("Error removing admin:", error);
-      toast({
-        title: "Error",
-        description: "Failed to remove admin role",
-        variant: "destructive",
-      });
-    }
+  const handleRemoveAdmin = (roleId: string) => {
+    removeAdminMutation.mutate(roleId);
   };
 
-  const handleRoleChange = async (
+  const handleRoleChange = (
     roleId: string,
     newRole: Database["public"]["Enums"]["admin_role"],
   ) => {
-    try {
-      const { error } = await supabase
-        .from("admin_roles")
-        .update({ role: newRole })
-        .eq("id", roleId);
-
-      if (error) throw error;
-
-      toast({
-        title: "Success",
-        description: "Admin role updated",
-      });
-
-      fetchAdminRoles();
-    } catch (error) {
-      console.error("Error updating admin role:", error);
-      toast({
-        title: "Error",
-        description: "Failed to update admin role",
-        variant: "destructive",
-      });
-    }
+    updateRoleMutation.mutate({ roleId, newRole });
   };
 
   const getRoleBadgeVariant = (role: string) => {
@@ -256,7 +107,7 @@ export const AdminRolesTable = () => {
     }
   };
 
-  if (loading) {
+  if (isLoading) {
     return (
       <Card>
         <CardContent className="p-6">
@@ -322,8 +173,12 @@ export const AdminRolesTable = () => {
                     </SelectContent>
                   </Select>
                 </div>
-                <Button type="submit" className="w-full" disabled={addingUser}>
-                  {addingUser ? "Adding Admin..." : "Add Admin"}
+                <Button
+                  type="submit"
+                  className="w-full"
+                  disabled={addAdminMutation.isPending}
+                >
+                  {addAdminMutation.isPending ? "Adding Admin..." : "Add Admin"}
                 </Button>
               </form>
             </DialogContent>
