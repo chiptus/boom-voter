@@ -1,7 +1,5 @@
 import { OffineProfile, offlineStorage } from "@/lib/offlineStorage";
 
-
-
 export const profileOfflineService = {
   async cacheProfile(userId: string, profile: OffineProfile): Promise<void> {
     try {

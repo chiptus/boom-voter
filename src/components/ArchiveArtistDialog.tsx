@@ -14,14 +14,17 @@ import { Button } from "@/components/ui/button";
 import { Trash } from "lucide-react";
 import { Artist } from "@/services/queries";
 
-
 interface ArchiveArtistDialogProps {
   artist: Artist;
   onArchive: ((artistId: string) => Promise<void>) | (() => Promise<void>);
   trigger?: React.ReactNode;
 }
 
-export const ArchiveArtistDialog = ({ artist, onArchive, trigger }: ArchiveArtistDialogProps) => {
+export const ArchiveArtistDialog = ({
+  artist,
+  onArchive,
+  trigger,
+}: ArchiveArtistDialogProps) => {
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
 
@@ -36,14 +39,18 @@ export const ArchiveArtistDialog = ({ artist, onArchive, trigger }: ArchiveArtis
       }
       setOpen(false);
     } catch (error) {
-      console.error('Failed to archive artist:', error);
+      console.error("Failed to archive artist:", error);
     } finally {
       setLoading(false);
     }
   };
 
   const defaultTrigger = (
-    <Button variant="outline" size="sm" className="border-red-400 text-red-400 hover:bg-red-400 hover:text-white">
+    <Button
+      variant="outline"
+      size="sm"
+      className="border-red-400 text-red-400 hover:bg-red-400 hover:text-white"
+    >
       <Trash className="h-4 w-4" />
     </Button>
   );
@@ -57,9 +64,9 @@ export const ArchiveArtistDialog = ({ artist, onArchive, trigger }: ArchiveArtis
         <AlertDialogHeader>
           <AlertDialogTitle>Archive Artist</AlertDialogTitle>
           <AlertDialogDescription>
-            Are you sure you want to archive <strong>{artist.name}</strong>? 
-            This will hide the artist from the main list but preserve all data and votes. 
-            The artist can be restored later by Core team members.
+            Are you sure you want to archive <strong>{artist.name}</strong>?
+            This will hide the artist from the main list but preserve all data
+            and votes. The artist can be restored later by Core team members.
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>

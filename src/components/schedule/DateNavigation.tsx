@@ -9,11 +9,15 @@ interface DateNavigationProps {
   containerRef: React.RefObject<HTMLDivElement>;
 }
 
-export const DateNavigation = ({ onScrollToDate, onScrollToNow, containerRef }: DateNavigationProps) => {
+export const DateNavigation = ({
+  onScrollToDate,
+  onScrollToNow,
+  containerRef,
+}: DateNavigationProps) => {
   const { scheduleDays } = useScheduleData();
 
   const scrollToTop = useCallback(() => {
-    containerRef.current?.scrollTo({ top: 0, behavior: 'smooth' });
+    containerRef.current?.scrollTo({ top: 0, behavior: "smooth" });
   }, [containerRef]);
 
   if (scheduleDays.length === 0) return null;
@@ -31,7 +35,7 @@ export const DateNavigation = ({ onScrollToDate, onScrollToNow, containerRef }: 
             className="border-purple-400/50 text-purple-300 hover:bg-purple-600/50 hover:text-white"
           >
             <Calendar className="h-3 w-3 mr-1" />
-            {day.displayDate.split(',')[1]?.trim() || day.displayDate}
+            {day.displayDate.split(",")[1]?.trim() || day.displayDate}
           </Button>
         ))}
       </div>
@@ -46,7 +50,7 @@ export const DateNavigation = ({ onScrollToDate, onScrollToNow, containerRef }: 
           <Clock className="h-4 w-4 mr-2" />
           Now
         </Button>
-        
+
         <Button
           onClick={scrollToTop}
           variant="outline"

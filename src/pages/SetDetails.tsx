@@ -10,11 +10,17 @@ import { useUrlState } from "@/hooks/useUrlState";
 import { useSetDetail } from "@/components/SetDetail/useSetDetail";
 
 export function SetDetails() {
-  const { id } = useParams<{ id: string; }>();
+  const { id } = useParams<{ id: string }>();
 
   const { state: urlState } = useUrlState();
   const {
-    currentSet, user, userVote, loading, handleVote, getVoteCount, netVoteScore,
+    currentSet,
+    user,
+    userVote,
+    loading,
+    handleVote,
+    getVoteCount,
+    netVoteScore,
   } = useSetDetail(id);
 
   if (loading) {
@@ -25,7 +31,7 @@ export function SetDetails() {
     return <ArtistNotFoundState />;
   }
 
-  const artist = currentSet.artists[0]
+  const artist = currentSet.artists[0];
 
   return (
     <div className="min-h-screen bg-app-gradient">
@@ -36,7 +42,8 @@ export function SetDetails() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
           <ArtistImageCard
             imageUrl={artist.image_url}
-            artistName={currentSet.name} />
+            artistName={currentSet.name}
+          />
 
           <ArtistInfoCard
             artist={artist}
@@ -44,7 +51,8 @@ export function SetDetails() {
             netVoteScore={netVoteScore}
             onVote={handleVote}
             getVoteCount={getVoteCount}
-            use24Hour={urlState.use24Hour} />
+            use24Hour={urlState.use24Hour}
+          />
         </div>
 
         {/* Artist Group Voting Section */}

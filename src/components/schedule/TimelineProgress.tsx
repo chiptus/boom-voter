@@ -6,10 +6,10 @@ interface TimelineProgressProps {
   visible?: boolean;
 }
 
-export const TimelineProgress = ({ 
-  currentPosition, 
-  totalItems, 
-  visible = true 
+export const TimelineProgress = ({
+  currentPosition,
+  totalItems,
+  visible = true,
 }: TimelineProgressProps) => {
   if (!visible || totalItems === 0) return null;
 
@@ -24,10 +24,7 @@ export const TimelineProgress = ({
             {Math.round(progress)}%
           </span>
         </div>
-        <Progress 
-          value={progress} 
-          className="h-2 bg-purple-800/50"
-        />
+        <Progress value={progress} className="h-2 bg-purple-800/50" />
       </div>
     </div>
   );

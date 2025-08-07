@@ -1,6 +1,10 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
-import { setQueries, queryFunctions, mutationFunctions } from "@/services/queries";
+import {
+  setQueries,
+  queryFunctions,
+  mutationFunctions,
+} from "@/services/queries";
 
 export const useSetsQuery = () => {
   return useQuery({
@@ -11,7 +15,7 @@ export const useSetsQuery = () => {
 
 export const useSetQuery = (id: string | undefined) => {
   return useQuery({
-    queryKey: setQueries.detail(id || ''),
+    queryKey: setQueries.detail(id || ""),
     queryFn: () => queryFunctions.fetchSet(id!),
     enabled: !!id,
   });
@@ -19,7 +23,7 @@ export const useSetQuery = (id: string | undefined) => {
 
 export const useSetsByEditionQuery = (editionId: string | undefined) => {
   return useQuery({
-    queryKey: setQueries.byEdition(editionId || ''),
+    queryKey: setQueries.byEdition(editionId || ""),
     queryFn: () => queryFunctions.fetchSetsByEdition(editionId!),
     enabled: !!editionId,
   });
@@ -34,10 +38,10 @@ export const useVoteMutation = () => {
     onSuccess: () => {
       // Invalidate both sets and votes queries
       queryClient.invalidateQueries({ queryKey: setQueries.lists() });
-      queryClient.invalidateQueries({ queryKey: ['votes'] });
+      queryClient.invalidateQueries({ queryKey: ["votes"] });
     },
     onError: (error) => {
-      console.error('Error voting:', error);
+      console.error("Error voting:", error);
       toast({
         title: "Error",
         description: "Failed to save vote",

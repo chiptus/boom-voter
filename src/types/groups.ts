@@ -6,9 +6,10 @@ export type Group = Database["public"]["Tables"]["groups"]["Row"] & {
   archived?: boolean;
 };
 
-export type GroupMember = Database["public"]["Tables"]["group_members"]["Row"] & {
-  profiles?: {
-    username?: string;
-    email?: string;
+export type GroupMember =
+  Database["public"]["Tables"]["group_members"]["Row"] & {
+    profiles?: {
+      username?: string;
+      email?: string;
+    };
   };
-};

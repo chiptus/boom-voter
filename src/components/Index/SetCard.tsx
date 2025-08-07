@@ -21,7 +21,7 @@ interface ArtistCardProps {
   votingLoading?: boolean;
   onVote: (
     setId: string,
-    voteType: number
+    voteType: number,
   ) => Promise<{ requiresAuth: boolean }>;
   onKnowledgeToggle: (setId: string) => Promise<{ requiresAuth: boolean }>;
   onAuthRequired: () => void;
@@ -194,8 +194,8 @@ export const SetCard = ({
               .filter(
                 (genre, index, self) =>
                   self.findIndex(
-                    (g) => g.music_genre_id === genre.music_genre_id
-                  ) === index
+                    (g) => g.music_genre_id === genre.music_genre_id,
+                  ) === index,
               )
               .map((genre) => (
                 <GenreBadge

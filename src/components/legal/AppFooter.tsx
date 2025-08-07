@@ -23,11 +23,10 @@ export const AppFooter = () => {
             <div className="space-y-4">
               <h3 className="font-semibold text-lg">Festival Voting App</h3>
               <p className="text-sm text-muted-foreground">
-                Collaborate with your group to discover and vote on the best festival artists.
+                Collaborate with your group to discover and vote on the best
+                festival artists.
               </p>
-              <p className="text-xs text-muted-foreground">
-                GDPR Compliant
-              </p>
+              <p className="text-xs text-muted-foreground">GDPR Compliant</p>
             </div>
 
             {/* Legal Links */}
@@ -40,14 +39,14 @@ export const AppFooter = () => {
                 >
                   Privacy Policy
                 </button>
-                <Link 
-                  to="/terms" 
+                <Link
+                  to="/terms"
                   className="hover:text-primary transition-colors"
                 >
                   Terms of Service
                 </Link>
-                <Link 
-                  to="/cookies" 
+                <Link
+                  to="/cookies"
                   className="hover:text-primary transition-colors"
                 >
                   Cookie Policy
@@ -86,8 +85,8 @@ export const AppFooter = () => {
             <p>© {currentYear} Festival Voting App. All rights reserved.</p>
             <p className="mt-2 sm:mt-0">
               Questions? Contact us at{" "}
-              <a 
-                href="mailto:chiptus@pm.me" 
+              <a
+                href="mailto:chiptus@pm.me"
                 className="hover:text-primary transition-colors"
               >
                 chiptus@pm.me

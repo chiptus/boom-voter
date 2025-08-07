@@ -9,7 +9,11 @@ export const useArtistDetail = (id: string | undefined) => {
   const { data: canEdit = false, isLoading: isLoadingPermissions } =
     useUserPermissionsQuery(user?.id, "edit_artists");
 
-  const { artists, loading: artistsLoading, archiveArtist: archiveArtistOffline } = useOfflineArtistData();
+  const {
+    artists,
+    loading: artistsLoading,
+    archiveArtist: archiveArtistOffline,
+  } = useOfflineArtistData();
   const { userVotes, handleVote } = useOfflineVoting(user);
 
   // Find the artist from offline-first data
@@ -25,7 +29,9 @@ export const useArtistDetail = (id: string | undefined) => {
 
   const getVoteCount = (voteType: number) => {
     if (!artist) return 0;
-    return artist.votes?.filter((vote) => vote.vote_type === voteType).length || 0;
+    return (
+      artist.votes?.filter((vote) => vote.vote_type === voteType).length || 0
+    );
   };
 
   const netVoteScore = artist ? getVoteCount(1) - getVoteCount(-1) : 0;

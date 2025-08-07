@@ -10,7 +10,14 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Filter, RefreshCw, Users, Calendar, List, ChevronDown } from "lucide-react";
+import {
+  Filter,
+  RefreshCw,
+  Users,
+  Calendar,
+  List,
+  ChevronDown,
+} from "lucide-react";
 import { SortControls } from "./SortControls";
 import { MobileFilters } from "./MobileFilters";
 import { DesktopFilters } from "./DesktopFilters";
@@ -55,7 +62,7 @@ export const FilterSortControls = ({
   const hasActiveGroupFilter = state.groupId;
 
   // Get the current group name for display
-  const currentGroup = groups.find(g => g.id === state.groupId);
+  const currentGroup = groups.find((g) => g.id === state.groupId);
   const groupDisplayText = currentGroup ? currentGroup.name : "All Votes";
 
   return (
@@ -149,7 +156,9 @@ export const FilterSortControls = ({
                   >
                     {group.name}
                     {group.member_count && (
-                      <span className="text-purple-400 ml-2">({group.member_count})</span>
+                      <span className="text-purple-400 ml-2">
+                        ({group.member_count})
+                      </span>
                     )}
                   </DropdownMenuItem>
                 ))}
@@ -174,7 +183,9 @@ export const FilterSortControls = ({
                   variant="secondary"
                   className="bg-purple-800/50 text-purple-100 ml-1"
                 >
-                  {state.stages.length + state.genres.length + (state.minRating > 0 ? 1 : 0)}
+                  {state.stages.length +
+                    state.genres.length +
+                    (state.minRating > 0 ? 1 : 0)}
                 </Badge>
               )}
             </Button>

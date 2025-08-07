@@ -1,5 +1,10 @@
-
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Users, UserPlus, AlertCircle } from "lucide-react";
 import { AuthDialog } from "../AuthDialog";
@@ -11,7 +16,10 @@ interface InviteLandingPageProps {
   onSignupSuccess: () => void;
 }
 
-export const InviteLandingPage = ({ inviteValidation, onSignupSuccess }: InviteLandingPageProps) => {
+export const InviteLandingPage = ({
+  inviteValidation,
+  onSignupSuccess,
+}: InviteLandingPageProps) => {
   const [showAuthDialog, setShowAuthDialog] = useState(false);
 
   if (!inviteValidation.is_valid) {
@@ -46,11 +54,12 @@ export const InviteLandingPage = ({ inviteValidation, onSignupSuccess }: InviteL
               {inviteValidation.group_name}
             </h2>
             <p className="text-muted-foreground">
-              Create an account to join this group and start voting for your favorite festival artists!
+              Create an account to join this group and start voting for your
+              favorite festival artists!
             </p>
           </div>
-          
-          <Button 
+
+          <Button
             onClick={() => setShowAuthDialog(true)}
             className="w-full bg-purple-600 hover:bg-purple-700"
             size="lg"

@@ -10,7 +10,7 @@ export const useStagesQuery = () => {
 
 export const useStagesByEditionQuery = (editionId: string | undefined) => {
   return useQuery({
-    queryKey: stageQueries.byEdition(editionId || ''),
+    queryKey: stageQueries.byEdition(editionId || ""),
     queryFn: () => queryFunctions.fetchStagesByEdition(editionId!),
     enabled: !!editionId,
   });

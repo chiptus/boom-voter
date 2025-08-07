@@ -15,9 +15,21 @@ import {
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Loader2, Plus, Edit2, Trash2, MapPin } from "lucide-react";
 import type { Stage } from "@/services/queries";
 
@@ -32,24 +44,26 @@ interface StageManagementProps {
 
 export const StageManagement = ({ festivalId }: StageManagementProps) => {
   const { data: festivals = [] } = useFestivalQuery.useFestivals();
-  const { data: editions = [] } = useFestivalQuery.useFestivalEditionsForFestival(festivalId);
+  const { data: editions = [] } =
+    useFestivalQuery.useFestivalEditionsForFestival(festivalId);
   const { data: stages = [], isLoading } = useStagesQuery();
   const { toast } = useToast();
   const queryClient = useQueryClient();
-  
+
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingStage, setEditingStage] = useState<Stage | null>(null);
   const [formData, setFormData] = useState<StageFormData>({
-    name: '',
-    festival_edition_id: '',
+    name: "",
+    festival_edition_id: "",
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [selectedEditionFilter, setSelectedEditionFilter] = useState<string>('all');
+  const [selectedEditionFilter, setSelectedEditionFilter] =
+    useState<string>("all");
 
   const resetForm = () => {
     setFormData({
-      name: '',
-      festival_edition_id: '',
+      name: "",
+      festival_edition_id: "",
     });
     setEditingStage(null);
   };
@@ -95,13 +109,14 @@ export const StageManagement = ({ festivalId }: StageManagementProps) => {
         });
       }
 
-      queryClient.invalidateQueries({ queryKey: ['stages'] });
+      queryClient.invalidateQueries({ queryKey: ["stages"] });
       setIsDialogOpen(false);
       resetForm();
     } catch (error) {
       toast({
         title: "Error",
-        description: error instanceof Error ? error.message : "Failed to save stage",
+        description:
+          error instanceof Error ? error.message : "Failed to save stage",
         variant: "destructive",
       });
     } finally {
@@ -110,7 +125,11 @@ export const StageManagement = ({ festivalId }: StageManagementProps) => {
   };
 
   const handleDelete = async (stage: Stage) => {
-    if (!confirm(`Are you sure you want to delete "${stage.name}"? This will also affect all sets assigned to this stage.`)) {
+    if (
+      !confirm(
+        `Are you sure you want to delete "${stage.name}"? This will also affect all sets assigned to this stage.`,
+      )
+    ) {
       return;
     }
 
@@ -120,26 +139,32 @@ export const StageManagement = ({ festivalId }: StageManagementProps) => {
         title: "Success",
         description: "Stage deleted successfully",
       });
-      queryClient.invalidateQueries({ queryKey: ['stages'] });
+      queryClient.invalidateQueries({ queryKey: ["stages"] });
     } catch (error) {
       toast({
         title: "Error",
-        description: error instanceof Error ? error.message : "Failed to delete stage",
+        description:
+          error instanceof Error ? error.message : "Failed to delete stage",
         variant: "destructive",
       });
     }
   };
 
   const getEditionName = (editionId: string) => {
-    const edition = editions.find(e => e.id === editionId);
-    const festival = festivals.find(f => f.id === edition?.festival_id);
-    return edition ? `${festival?.name || 'Unknown'} - ${edition.name}` : 'Unknown Edition';
+    const edition = editions.find((e) => e.id === editionId);
+    const festival = festivals.find((f) => f.id === edition?.festival_id);
+    return edition
+      ? `${festival?.name || "Unknown"} - ${edition.name}`
+      : "Unknown Edition";
   };
 
   // Filter stages by selected edition
-  const filteredStages = selectedEditionFilter && selectedEditionFilter !== "all"
-    ? stages.filter(stage => stage.festival_edition_id === selectedEditionFilter)
-    : stages;
+  const filteredStages =
+    selectedEditionFilter && selectedEditionFilter !== "all"
+      ? stages.filter(
+          (stage) => stage.festival_edition_id === selectedEditionFilter,
+        )
+      : stages;
 
   if (isLoading) {
     return (
@@ -161,7 +186,10 @@ export const StageManagement = ({ festivalId }: StageManagementProps) => {
             Stage Management
           </span>
           <div className="flex gap-2">
-            <Select value={selectedEditionFilter} onValueChange={setSelectedEditionFilter}>
+            <Select
+              value={selectedEditionFilter}
+              onValueChange={setSelectedEditionFilter}
+            >
               <SelectTrigger className="w-64">
                 <SelectValue placeholder="Filter by edition" />
               </SelectTrigger>
@@ -176,7 +204,10 @@ export const StageManagement = ({ festivalId }: StageManagementProps) => {
             </Select>
             <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
               <DialogTrigger asChild>
-                <Button onClick={handleCreate} className="bg-purple-600 hover:bg-purple-700">
+                <Button
+                  onClick={handleCreate}
+                  className="bg-purple-600 hover:bg-purple-700"
+                >
                   <Plus className="h-4 w-4 mr-2" />
                   Add Stage
                 </Button>
@@ -184,7 +215,7 @@ export const StageManagement = ({ festivalId }: StageManagementProps) => {
               <DialogContent>
                 <DialogHeader>
                   <DialogTitle>
-                    {editingStage ? 'Edit Stage' : 'Create New Stage'}
+                    {editingStage ? "Edit Stage" : "Create New Stage"}
                   </DialogTitle>
                 </DialogHeader>
                 <form onSubmit={handleSubmit} className="space-y-4">
@@ -192,7 +223,9 @@ export const StageManagement = ({ festivalId }: StageManagementProps) => {
                     <Label htmlFor="edition">Festival Edition</Label>
                     <Select
                       value={formData.festival_edition_id}
-                      onValueChange={(value) => setFormData({ ...formData, festival_edition_id: value })}
+                      onValueChange={(value) =>
+                        setFormData({ ...formData, festival_edition_id: value })
+                      }
                       required
                     >
                       <SelectTrigger>
@@ -212,23 +245,27 @@ export const StageManagement = ({ festivalId }: StageManagementProps) => {
                     <Input
                       id="name"
                       value={formData.name}
-                      onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                      onChange={(e) =>
+                        setFormData({ ...formData, name: e.target.value })
+                      }
                       placeholder="e.g., Dance Temple, Sacred Ground"
                       required
                     />
                   </div>
                   <div className="flex justify-end gap-2">
-                    <Button 
-                      type="button" 
-                      variant="outline" 
+                    <Button
+                      type="button"
+                      variant="outline"
                       onClick={() => setIsDialogOpen(false)}
                       disabled={isSubmitting}
                     >
                       Cancel
                     </Button>
                     <Button type="submit" disabled={isSubmitting}>
-                      {isSubmitting && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
-                      {editingStage ? 'Update' : 'Create'}
+                      {isSubmitting && (
+                        <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                      )}
+                      {editingStage ? "Update" : "Create"}
                     </Button>
                   </div>
                 </form>
@@ -252,8 +289,12 @@ export const StageManagement = ({ festivalId }: StageManagementProps) => {
               {filteredStages.map((stage) => (
                 <TableRow key={stage.id}>
                   <TableCell className="font-medium">{stage.name}</TableCell>
-                  <TableCell>{getEditionName(stage.festival_edition_id)}</TableCell>
-                  <TableCell>{new Date(stage.created_at).toLocaleDateString()}</TableCell>
+                  <TableCell>
+                    {getEditionName(stage.festival_edition_id)}
+                  </TableCell>
+                  <TableCell>
+                    {new Date(stage.created_at).toLocaleDateString()}
+                  </TableCell>
                   <TableCell>
                     <div className="flex gap-2">
                       <Button
@@ -281,9 +322,8 @@ export const StageManagement = ({ festivalId }: StageManagementProps) => {
           {filteredStages.length === 0 && (
             <div className="text-center py-8 text-muted-foreground">
               {selectedEditionFilter && selectedEditionFilter !== "all"
-                ? "No stages found for the selected edition." 
-                : "No stages found. Create your first stage to get started."
-              }
+                ? "No stages found for the selected edition."
+                : "No stages found. Create your first stage to get started."}
             </div>
           )}
         </div>

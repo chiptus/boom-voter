@@ -4,7 +4,13 @@ import { AppHeader } from "@/components/AppHeader";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Label } from "@/components/ui/label";
 import { Users, Trash2, UserPlus, Crown, Link } from "lucide-react";
@@ -16,17 +22,29 @@ import { DeleteGroupDialog } from "@/components/DeleteGroupDialog";
 
 const Groups = () => {
   const navigate = useNavigate();
-  const { user, groups, loading, createGroup, leaveGroup, deleteGroup, inviteToGroup } = useGroups();
+  const {
+    user,
+    groups,
+    loading,
+    createGroup,
+    leaveGroup,
+    deleteGroup,
+    inviteToGroup,
+  } = useGroups();
   const { toast } = useToast();
   const [newGroupName, setNewGroupName] = useState("");
   const [newGroupDescription, setNewGroupDescription] = useState("");
   const [inviteUsername, setInviteUsername] = useState("");
   const [invitingToGroup, setInvitingToGroup] = useState<string | null>(null);
-  const [selectedGroupForInvites, setSelectedGroupForInvites] = useState<string>("");
+  const [selectedGroupForInvites, setSelectedGroupForInvites] =
+    useState<string>("");
   const [creating, setCreating] = useState(false);
   const [inviting, setInviting] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-  const [groupToDelete, setGroupToDelete] = useState<{ id: string; name: string } | null>(null);
+  const [groupToDelete, setGroupToDelete] = useState<{
+    id: string;
+    name: string;
+  } | null>(null);
   const [deleting, setDeleting] = useState(false);
 
   const handleCreateGroup = async () => {
@@ -40,7 +58,10 @@ const Groups = () => {
     }
 
     setCreating(true);
-    const result = await createGroup(newGroupName.trim(), newGroupDescription.trim() || undefined);
+    const result = await createGroup(
+      newGroupName.trim(),
+      newGroupDescription.trim() || undefined,
+    );
     if (result) {
       setNewGroupName("");
       setNewGroupDescription("");
@@ -74,7 +95,7 @@ const Groups = () => {
 
   const confirmDeleteGroup = async () => {
     if (!groupToDelete) return;
-    
+
     setDeleting(true);
     await deleteGroup(groupToDelete.id);
     setDeleting(false);
@@ -109,7 +130,7 @@ const Groups = () => {
   return (
     <div className="min-h-screen bg-app-gradient">
       <div className="container mx-auto px-4 py-8">
-        <AppHeader 
+        <AppHeader
           showBackButton
           backTo="/"
           backLabel="Back to Artists"
@@ -119,9 +140,24 @@ const Groups = () => {
 
         <Tabs defaultValue="my-groups" className="w-full">
           <TabsList className="grid w-full grid-cols-3 bg-white/10">
-            <TabsTrigger value="my-groups" className="text-white data-[state=active]:bg-purple-600">My Groups</TabsTrigger>
-            <TabsTrigger value="create-group" className="text-white data-[state=active]:bg-purple-600">Create Group</TabsTrigger>
-            <TabsTrigger value="invite-links" className="text-white data-[state=active]:bg-purple-600">Invite Links</TabsTrigger>
+            <TabsTrigger
+              value="my-groups"
+              className="text-white data-[state=active]:bg-purple-600"
+            >
+              My Groups
+            </TabsTrigger>
+            <TabsTrigger
+              value="create-group"
+              className="text-white data-[state=active]:bg-purple-600"
+            >
+              Create Group
+            </TabsTrigger>
+            <TabsTrigger
+              value="invite-links"
+              className="text-white data-[state=active]:bg-purple-600"
+            >
+              Invite Links
+            </TabsTrigger>
           </TabsList>
 
           <TabsContent value="my-groups" className="space-y-4">
@@ -131,21 +167,31 @@ const Groups = () => {
               <Card className="bg-white/10 border-purple-400/30">
                 <CardContent className="text-center py-12">
                   <Users className="h-12 w-12 mx-auto mb-4 text-purple-300" />
-                  <h3 className="text-xl font-semibold text-white mb-2">No groups yet</h3>
-                  <p className="text-purple-200 mb-4">Create your first group to start sharing votes with friends</p>
+                  <h3 className="text-xl font-semibold text-white mb-2">
+                    No groups yet
+                  </h3>
+                  <p className="text-purple-200 mb-4">
+                    Create your first group to start sharing votes with friends
+                  </p>
                 </CardContent>
               </Card>
             ) : (
               <div className="space-y-4">
                 {groups.map((group) => (
-                  <Card key={group.id} className="bg-white/10 border-purple-400/30">
+                  <Card
+                    key={group.id}
+                    className="bg-white/10 border-purple-400/30"
+                  >
                     <CardHeader className="pb-3">
                       <div className="flex items-start justify-between">
                         <div>
                           <CardTitle className="flex items-center space-x-2 text-white">
                             <span>{group.name}</span>
                             {group.is_creator && (
-                              <Badge variant="secondary" className="text-xs bg-purple-600/50 text-purple-100">
+                              <Badge
+                                variant="secondary"
+                                className="text-xs bg-purple-600/50 text-purple-100"
+                              >
                                 <Crown className="h-3 w-3 mr-1" />
                                 Creator
                               </Badge>
@@ -171,7 +217,9 @@ const Groups = () => {
                               <Button
                                 variant="outline"
                                 size="sm"
-                                onClick={() => setSelectedGroupForInvites(group.id)}
+                                onClick={() =>
+                                  setSelectedGroupForInvites(group.id)
+                                }
                                 className="bg-white/10 border-purple-400/30 text-white hover:bg-white/20"
                               >
                                 <Link className="h-4 w-4" />
@@ -179,7 +227,9 @@ const Groups = () => {
                               <Button
                                 variant="destructive"
                                 size="sm"
-                                onClick={() => handleDeleteGroup(group.id, group.name)}
+                                onClick={() =>
+                                  handleDeleteGroup(group.id, group.name)
+                                }
                               >
                                 <Trash2 className="h-4 w-4" />
                               </Button>
@@ -207,7 +257,11 @@ const Groups = () => {
                           <div className="flex items-center space-x-2">
                             <Input
                               placeholder="Username or email"
-                              value={invitingToGroup === group.id ? inviteUsername : ""}
+                              value={
+                                invitingToGroup === group.id
+                                  ? inviteUsername
+                                  : ""
+                              }
                               onChange={(e) => {
                                 setInvitingToGroup(group.id);
                                 setInviteUsername(e.target.value);
@@ -217,7 +271,11 @@ const Groups = () => {
                             <Button
                               size="sm"
                               onClick={() => handleInviteUser(group.id)}
-                              disabled={!inviteUsername.trim() || inviting || invitingToGroup !== group.id}
+                              disabled={
+                                !inviteUsername.trim() ||
+                                inviting ||
+                                invitingToGroup !== group.id
+                              }
                               className="bg-purple-600 hover:bg-purple-700"
                             >
                               <UserPlus className="h-4 w-4" />
@@ -242,7 +300,9 @@ const Groups = () => {
               </CardHeader>
               <CardContent className="space-y-4">
                 <div>
-                  <Label htmlFor="group-name" className="text-white">Group Name</Label>
+                  <Label htmlFor="group-name" className="text-white">
+                    Group Name
+                  </Label>
                   <Input
                     id="group-name"
                     placeholder="e.g., Festival Squad, Close Friends, Work Colleagues"
@@ -252,7 +312,9 @@ const Groups = () => {
                   />
                 </div>
                 <div>
-                  <Label htmlFor="group-description" className="text-white">Description (Optional)</Label>
+                  <Label htmlFor="group-description" className="text-white">
+                    Description (Optional)
+                  </Label>
                   <Textarea
                     id="group-description"
                     placeholder="What's this group for?"
@@ -285,29 +347,40 @@ const Groups = () => {
                 </Button>
                 <InviteManagement
                   groupId={selectedGroupForInvites}
-                  groupName={groups.find(g => g.id === selectedGroupForInvites)?.name || ""}
+                  groupName={
+                    groups.find((g) => g.id === selectedGroupForInvites)
+                      ?.name || ""
+                  }
                 />
               </div>
             ) : (
               <div>
-                <h3 className="text-lg font-semibold mb-4 text-white">Select a Group to Manage Invites</h3>
+                <h3 className="text-lg font-semibold mb-4 text-white">
+                  Select a Group to Manage Invites
+                </h3>
                 <div className="space-y-2">
-                  {groups.filter(g => g.is_creator).map((group) => (
-                    <Card 
-                      key={group.id} 
-                      className="cursor-pointer hover:bg-white/20 bg-white/10 border-purple-400/30" 
-                      onClick={() => setSelectedGroupForInvites(group.id)}
-                    >
-                      <CardContent className="flex items-center justify-between p-4">
-                        <div>
-                          <h4 className="font-medium text-white">{group.name}</h4>
-                          <p className="text-sm text-purple-200">{group.member_count} members</p>
-                        </div>
-                        <Link className="h-5 w-5 text-purple-300" />
-                      </CardContent>
-                    </Card>
-                  ))}
-                  {groups.filter(g => g.is_creator).length === 0 && (
+                  {groups
+                    .filter((g) => g.is_creator)
+                    .map((group) => (
+                      <Card
+                        key={group.id}
+                        className="cursor-pointer hover:bg-white/20 bg-white/10 border-purple-400/30"
+                        onClick={() => setSelectedGroupForInvites(group.id)}
+                      >
+                        <CardContent className="flex items-center justify-between p-4">
+                          <div>
+                            <h4 className="font-medium text-white">
+                              {group.name}
+                            </h4>
+                            <p className="text-sm text-purple-200">
+                              {group.member_count} members
+                            </p>
+                          </div>
+                          <Link className="h-5 w-5 text-purple-300" />
+                        </CardContent>
+                      </Card>
+                    ))}
+                  {groups.filter((g) => g.is_creator).length === 0 && (
                     <Card className="bg-white/10 border-purple-400/30">
                       <CardContent className="text-center py-8">
                         <p className="text-purple-200">

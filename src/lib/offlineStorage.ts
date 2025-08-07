@@ -192,12 +192,11 @@ class OfflineStorageManager {
     const db = await this.ensureDB();
     if (id) {
       try {
-
         const tx = db.transaction("notes", "readonly");
         const setIndex = tx.objectStore("notes").index("setId");
         return setIndex.getAll(id);
-      } catch(err) {
-        return []
+      } catch (err) {
+        return [];
       }
     }
     return db.getAll("notes");
@@ -262,7 +261,7 @@ class OfflineStorageManager {
   // Group voting methods
   async getSetGroupVotes(
     setId: string,
-    _groupId: string
+    _groupId: string,
   ): Promise<
     Array<{
       vote_type: number;
@@ -292,7 +291,7 @@ class OfflineStorageManager {
     const db = await this.ensureDB();
     const tx = db.transaction(
       ["artists", "sets", "votes", "notes", "schedule", "settings"],
-      "readwrite"
+      "readwrite",
     );
     await Promise.all([
       tx.objectStore("artists").clear(),

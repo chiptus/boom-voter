@@ -55,14 +55,14 @@ export const useOfflineSetsData = () => {
           { event: "*", schema: "public", table: "sets" },
           (_) => {
             queryClient.invalidateQueries({ queryKey: setQueries.lists() });
-          }
+          },
         )
         .on(
           "postgres_changes",
           { event: "*", schema: "public", table: "artists" },
           (_) => {
             queryClient.invalidateQueries({ queryKey: setQueries.lists() });
-          }
+          },
         )
         .on(
           "postgres_changes",
@@ -70,7 +70,7 @@ export const useOfflineSetsData = () => {
           (_) => {
             queryClient.invalidateQueries({ queryKey: setQueries.lists() });
             queryClient.invalidateQueries({ queryKey: voteQueries.all() });
-          }
+          },
         )
         .subscribe((_, err) => {
           if (err) {

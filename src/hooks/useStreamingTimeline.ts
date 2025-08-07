@@ -1,8 +1,8 @@
-import { useMemo } from 'react';
-import { useScheduleData, type ScheduleArtist } from './useScheduleData';
+import { useMemo } from "react";
+import { useScheduleData, type ScheduleArtist } from "./useScheduleData";
 
 export interface StreamingTimelineItem {
-  type: 'day-divider' | 'artist';
+  type: "day-divider" | "artist";
   id: string;
   date?: string;
   displayDate?: string;
@@ -14,10 +14,12 @@ export const useStreamingTimeline = () => {
   const { scheduleDays, loading, error } = useScheduleData();
 
   const streamingItems = useMemo(() => {
-    
-    
     // Enhanced defensive checks
-    if (!scheduleDays || !Array.isArray(scheduleDays) || scheduleDays.length === 0) {
+    if (
+      !scheduleDays ||
+      !Array.isArray(scheduleDays) ||
+      scheduleDays.length === 0
+    ) {
       return [];
     }
 
@@ -27,7 +29,7 @@ export const useStreamingTimeline = () => {
     scheduleDays.forEach((day) => {
       // Add day divider
       items.push({
-        type: 'day-divider',
+        type: "day-divider",
         id: `day-${day.date}`,
         date: day.date,
         displayDate: day.displayDate,
@@ -36,7 +38,7 @@ export const useStreamingTimeline = () => {
 
       // Flatten all artists from all stages for this day and sort by time
       const dayArtists = day.stages
-        .flatMap(stage => stage.artists)
+        .flatMap((stage) => stage.artists)
         .sort((a, b) => {
           if (!a.startTime || !b.startTime) return 0;
           return a.startTime.getTime() - b.startTime.getTime();
@@ -45,7 +47,7 @@ export const useStreamingTimeline = () => {
       // Add artists
       dayArtists.forEach((artist) => {
         items.push({
-          type: 'artist',
+          type: "artist",
           id: `artist-${artist.id}`,
           artist,
           position: position++,
@@ -57,11 +59,11 @@ export const useStreamingTimeline = () => {
   }, [scheduleDays]);
 
   const totalArtists = useMemo(() => {
-    return streamingItems.filter(item => item.type === 'artist').length;
+    return streamingItems.filter((item) => item.type === "artist").length;
   }, [streamingItems]);
 
   const totalDays = useMemo(() => {
-    return streamingItems.filter(item => item.type === 'day-divider').length;
+    return streamingItems.filter((item) => item.type === "day-divider").length;
   }, [streamingItems]);
 
   return {

@@ -1,4 +1,4 @@
-import React from 'react';
+import React from "react";
 
 interface ErrorBoundaryState {
   hasError: boolean;
@@ -10,7 +10,10 @@ interface ErrorBoundaryProps {
   fallback?: React.ComponentType<{ error?: Error; retry: () => void }>;
 }
 
-export class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoundaryState> {
+export class ErrorBoundary extends React.Component<
+  ErrorBoundaryProps,
+  ErrorBoundaryState
+> {
   constructor(props: ErrorBoundaryProps) {
     super(props);
     this.state = { hasError: false };
@@ -21,15 +24,15 @@ export class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoun
   }
 
   componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
-    console.error('ErrorBoundary caught an error:', error, errorInfo);
+    console.error("ErrorBoundary caught an error:", error, errorInfo);
   }
 
   render() {
     if (this.state.hasError) {
       const FallbackComponent = this.props.fallback || DefaultErrorFallback;
       return (
-        <FallbackComponent 
-          error={this.state.error} 
+        <FallbackComponent
+          error={this.state.error}
           retry={() => this.setState({ hasError: false, error: undefined })}
         />
       );
@@ -39,11 +42,14 @@ export class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoun
   }
 }
 
-const DefaultErrorFallback: React.FC<{ error?: Error; retry: () => void }> = ({ error, retry }) => (
+const DefaultErrorFallback: React.FC<{ error?: Error; retry: () => void }> = ({
+  error,
+  retry,
+}) => (
   <div className="text-center text-purple-300 py-12">
     <h2 className="text-xl font-semibold mb-4">Something went wrong</h2>
     <p className="text-purple-400 mb-6">
-      {error?.message || 'An unexpected error occurred'}
+      {error?.message || "An unexpected error occurred"}
     </p>
     <button
       onClick={retry}

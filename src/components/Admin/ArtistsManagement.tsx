@@ -38,15 +38,15 @@ export const ArtistsManagement = () => {
       (artists || []).filter(
         (artist) =>
           artist.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          artist.description?.toLowerCase().includes(searchTerm.toLowerCase())
+          artist.description?.toLowerCase().includes(searchTerm.toLowerCase()),
       ),
-    [artists, searchTerm]
+    [artists, searchTerm],
   );
 
   const handleArchive = async (artist: Artist) => {
     if (
       !confirm(
-        `Are you sure you want to archive "${artist.name}"? This will hide the artist from the main interface but preserve all data.`
+        `Are you sure you want to archive "${artist.name}"? This will hide the artist from the main interface but preserve all data.`,
       )
     ) {
       return;

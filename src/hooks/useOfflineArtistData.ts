@@ -59,7 +59,7 @@ export const useOfflineArtistData = () => {
           { event: "*", schema: "public", table: "artists" },
           (_) => {
             queryClient.invalidateQueries({ queryKey: setQueries.lists() });
-          }
+          },
         )
         .on(
           "postgres_changes",
@@ -67,7 +67,7 @@ export const useOfflineArtistData = () => {
           (_) => {
             queryClient.invalidateQueries({ queryKey: setQueries.lists() });
             queryClient.invalidateQueries({ queryKey: voteQueries.all() });
-          }
+          },
         )
         .subscribe((_, err) => {
           if (err) {
@@ -126,7 +126,7 @@ export const useOfflineArtistData = () => {
 
       // Update local data - find set containing this artist
       const updatedArtists = offlineArtists.map((artist) =>
-        artist.id === artistId ? { ...artist, archived: true } : artist
+        artist.id === artistId ? { ...artist, archived: true } : artist,
       );
 
       setOfflineArtists(updatedArtists);

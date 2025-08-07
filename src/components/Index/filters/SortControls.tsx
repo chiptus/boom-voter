@@ -1,14 +1,23 @@
-
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { 
-  SortAsc, 
-  HelpCircle, 
-  ArrowUpAZ, 
-  ArrowDownAZ, 
-  Star, 
-  TrendingUp, 
-  Calendar 
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import {
+  SortAsc,
+  HelpCircle,
+  ArrowUpAZ,
+  ArrowDownAZ,
+  Star,
+  TrendingUp,
+  Calendar,
 } from "lucide-react";
 import type { SortOption } from "@/hooks/useUrlState";
 import { SORT_OPTIONS } from "./constants";
@@ -20,16 +29,16 @@ interface SortControlsProps {
 
 // Map sort options to their icons
 const SORT_ICONS = {
-  'name-asc': ArrowUpAZ,
-  'name-desc': ArrowDownAZ,
-  'rating-desc': Star,
-  'popularity-desc': TrendingUp,
-  'date-asc': Calendar,
+  "name-asc": ArrowUpAZ,
+  "name-desc": ArrowDownAZ,
+  "rating-desc": Star,
+  "popularity-desc": TrendingUp,
+  "date-asc": Calendar,
 } as const;
 
 export const SortControls = ({ sort, onSortChange }: SortControlsProps) => {
   const CurrentSortIcon = SORT_ICONS[sort];
-  
+
   return (
     <div className="flex items-center gap-2">
       <SortAsc className="h-4 w-4 text-purple-300 hidden sm:block" />
@@ -43,10 +52,14 @@ export const SortControls = ({ sort, onSortChange }: SortControlsProps) => {
           </div>
         </SelectTrigger>
         <SelectContent className="bg-gray-800 border-purple-400/30">
-          {SORT_OPTIONS.map(option => {
+          {SORT_OPTIONS.map((option) => {
             const Icon = SORT_ICONS[option.value as keyof typeof SORT_ICONS];
             return (
-              <SelectItem key={option.value} value={option.value} className="text-purple-100">
+              <SelectItem
+                key={option.value}
+                value={option.value}
+                className="text-purple-100"
+              >
                 <div className="flex items-center gap-2">
                   <Icon className="h-4 w-4" />
                   <span>{option.label}</span>
@@ -56,10 +69,10 @@ export const SortControls = ({ sort, onSortChange }: SortControlsProps) => {
           })}
         </SelectContent>
       </Select>
-      
+
       <Popover>
         <PopoverTrigger asChild>
-          <button 
+          <button
             type="button"
             className="p-1 hover:bg-white/10 rounded transition-colors hidden sm:block"
             title="Click for sorting help"
@@ -69,46 +82,61 @@ export const SortControls = ({ sort, onSortChange }: SortControlsProps) => {
         </PopoverTrigger>
         <PopoverContent className="bg-gray-800 border-purple-400/30 text-purple-100 w-80">
           <div className="space-y-3">
-            <h3 className="font-semibold text-purple-200 mb-2">Sort Options Explained</h3>
-            
+            <h3 className="font-semibold text-purple-200 mb-2">
+              Sort Options Explained
+            </h3>
+
             <div className="space-y-2 text-sm">
               <div className="flex items-center gap-2">
                 <ArrowUpAZ className="h-4 w-4 text-purple-300" />
                 <div>
                   <strong className="text-purple-300">Name (A-Z):</strong>
-                  <p className="text-purple-100/80">Sort artists alphabetically from A to Z</p>
+                  <p className="text-purple-100/80">
+                    Sort artists alphabetically from A to Z
+                  </p>
                 </div>
               </div>
-              
+
               <div className="flex items-center gap-2">
                 <ArrowDownAZ className="h-4 w-4 text-purple-300" />
                 <div>
                   <strong className="text-purple-300">Name (Z-A):</strong>
-                  <p className="text-purple-100/80">Sort artists alphabetically from Z to A</p>
+                  <p className="text-purple-100/80">
+                    Sort artists alphabetically from Z to A
+                  </p>
                 </div>
               </div>
-              
+
               <div className="flex items-center gap-2">
                 <Star className="h-4 w-4 text-purple-300" />
                 <div>
                   <strong className="text-purple-300">Highest Rated:</strong>
-                  <p className="text-purple-100/80">Sort by weighted average rating based on votes (Must go = 2 points, Interested = 1 point, Won't go = -1 point)</p>
+                  <p className="text-purple-100/80">
+                    Sort by weighted average rating based on votes (Must go = 2
+                    points, Interested = 1 point, Won't go = -1 point)
+                  </p>
                 </div>
               </div>
-              
+
               <div className="flex items-center gap-2">
                 <TrendingUp className="h-4 w-4 text-purple-300" />
                 <div>
                   <strong className="text-purple-300">Most Popular:</strong>
-                  <p className="text-purple-100/80">Sort by weighted popularity score (Must go = 2 points, Interested = 1 point)</p>
+                  <p className="text-purple-100/80">
+                    Sort by weighted popularity score (Must go = 2 points,
+                    Interested = 1 point)
+                  </p>
                 </div>
               </div>
-              
+
               <div className="flex items-center gap-2">
                 <Calendar className="h-4 w-4 text-purple-300" />
                 <div>
                   <strong className="text-purple-300">By Date:</strong>
-                  <p className="text-purple-100/80">Sort by estimated performance date (earliest performances first)</p>
+                  <p className="text-purple-100/80">
+                    Sort by estimated performance date (earliest performances
+                    first)
+                  </p>
                 </div>
               </div>
             </div>

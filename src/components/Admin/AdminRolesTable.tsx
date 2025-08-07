@@ -4,12 +4,48 @@ import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 import { Badge } from "@/components/ui/badge";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { UserPlus, Trash2, Crown } from "lucide-react";
 import type { Database } from "@/integrations/supabase/types";
 
@@ -25,7 +61,8 @@ export const AdminRolesTable = () => {
   const [loading, setLoading] = useState(true);
   const [addDialogOpen, setAddDialogOpen] = useState(false);
   const [newUserEmail, setNewUserEmail] = useState("");
-  const [newUserRole, setNewUserRole] = useState<Database["public"]["Enums"]["admin_role"]>("moderator");
+  const [newUserRole, setNewUserRole] =
+    useState<Database["public"]["Enums"]["admin_role"]>("moderator");
   const [addingUser, setAddingUser] = useState(false);
   const { toast } = useToast();
 
@@ -54,9 +91,9 @@ export const AdminRolesTable = () => {
 
             return {
               ...role,
-              profile: profile || { username: null, email: null }
+              profile: profile || { username: null, email: null },
             };
-          })
+          }),
         );
 
         setAdminRoles(rolesWithProfiles);
@@ -79,8 +116,10 @@ export const AdminRolesTable = () => {
 
     try {
       // First, get the user ID by email
-      const { data: userId, error: userError } = await supabase
-        .rpc("get_user_id_by_email", { user_email: newUserEmail });
+      const { data: userId, error: userError } = await supabase.rpc(
+        "get_user_id_by_email",
+        { user_email: newUserEmail },
+      );
 
       if (userError || !userId) {
         toast({
@@ -108,7 +147,9 @@ export const AdminRolesTable = () => {
       }
 
       // Add the admin role
-      const { data: { user } } = await supabase.auth.getUser();
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
 
       if (!user?.id) {
         toast({
@@ -116,17 +157,15 @@ export const AdminRolesTable = () => {
           description: "User not found",
           variant: "destructive",
         });
-        
+
         throw new Error("User not found");
       }
 
-      const { error: insertError } = await supabase
-        .from("admin_roles")
-        .insert({
-          user_id: userId,
-          role: newUserRole,
-          created_by: user?.id,
-        });
+      const { error: insertError } = await supabase.from("admin_roles").insert({
+        user_id: userId,
+        role: newUserRole,
+        created_by: user?.id,
+      });
 
       if (insertError) throw insertError;
 
@@ -176,7 +215,10 @@ export const AdminRolesTable = () => {
     }
   };
 
-  const handleRoleChange = async (roleId: string, newRole: Database["public"]["Enums"]["admin_role"]) => {
+  const handleRoleChange = async (
+    roleId: string,
+    newRole: Database["public"]["Enums"]["admin_role"],
+  ) => {
     try {
       const { error } = await supabase
         .from("admin_roles")
@@ -265,7 +307,12 @@ export const AdminRolesTable = () => {
                 </div>
                 <div>
                   <Label htmlFor="admin-role">Admin Role</Label>
-                  <Select value={newUserRole} onValueChange={(value: Database["public"]["Enums"]["admin_role"]) => setNewUserRole(value)}>
+                  <Select
+                    value={newUserRole}
+                    onValueChange={(
+                      value: Database["public"]["Enums"]["admin_role"],
+                    ) => setNewUserRole(value)}
+                  >
                     <SelectTrigger>
                       <SelectValue />
                     </SelectTrigger>
@@ -309,9 +356,9 @@ export const AdminRolesTable = () => {
                   ) : (
                     <Select
                       value={adminRole.role}
-                      onValueChange={(value: Database["public"]["Enums"]["admin_role"]) => 
-                        handleRoleChange(adminRole.id, value)
-                      }
+                      onValueChange={(
+                        value: Database["public"]["Enums"]["admin_role"],
+                      ) => handleRoleChange(adminRole.id, value)}
                     >
                       <SelectTrigger className="w-32">
                         <SelectValue />
@@ -338,8 +385,10 @@ export const AdminRolesTable = () => {
                         <AlertDialogHeader>
                           <AlertDialogTitle>Remove Admin Role</AlertDialogTitle>
                           <AlertDialogDescription>
-                            Are you sure you want to remove the admin role from {adminRole.profile?.username || adminRole.profile?.email}?
-                            This action cannot be undone.
+                            Are you sure you want to remove the admin role from{" "}
+                            {adminRole.profile?.username ||
+                              adminRole.profile?.email}
+                            ? This action cannot be undone.
                           </AlertDialogDescription>
                         </AlertDialogHeader>
                         <AlertDialogFooter>

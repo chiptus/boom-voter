@@ -46,7 +46,7 @@ export const useKnowledgeToggleMutation = () => {
           }
 
           return newKnowledge;
-        }
+        },
       );
 
       return { previousKnowledge, userId };
@@ -56,7 +56,7 @@ export const useKnowledgeToggleMutation = () => {
       if (context?.previousKnowledge) {
         queryClient.setQueryData(
           ["knowledge", "user", context.userId],
-          context.previousKnowledge
+          context.previousKnowledge,
         );
       }
 

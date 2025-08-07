@@ -1,4 +1,10 @@
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Users } from "lucide-react";
 import { useGroups } from "@/hooks/useGroups";
 
@@ -7,7 +13,10 @@ interface GroupSelectorProps {
   onGroupChange: (groupId: string | undefined) => void;
 }
 
-export const GroupSelector = ({ selectedGroupId, onGroupChange }: GroupSelectorProps) => {
+export const GroupSelector = ({
+  selectedGroupId,
+  onGroupChange,
+}: GroupSelectorProps) => {
   const { groups, loading } = useGroups();
 
   if (loading) {
@@ -24,7 +33,9 @@ export const GroupSelector = ({ selectedGroupId, onGroupChange }: GroupSelectorP
       <Users className="h-4 w-4 text-muted-foreground" />
       <Select
         value={selectedGroupId || "all"}
-        onValueChange={(value) => onGroupChange(value === "all" ? undefined : value)}
+        onValueChange={(value) =>
+          onGroupChange(value === "all" ? undefined : value)
+        }
       >
         <SelectTrigger className="w-[180px] bg-white/10 border-purple-400/30 text-white">
           <SelectValue placeholder="All votes" />

@@ -13,7 +13,8 @@ export type FestivalSet = Database["public"]["Tables"]["sets"]["Row"] & {
 };
 
 export type Festival = Database["public"]["Tables"]["festivals"]["Row"];
-export type FestivalEdition = Database["public"]["Tables"]["festival_editions"]["Row"];
+export type FestivalEdition =
+  Database["public"]["Tables"]["festival_editions"]["Row"];
 export type Stage = Database["public"]["Tables"]["stages"]["Row"];
 
 export type SetNote = {
@@ -109,7 +110,7 @@ export const queryFunctions = {
           )
         ),
         votes (vote_type, user_id)
-      `
+      `,
       )
       .eq("archived", false)
       .order("created_at", { ascending: false });
@@ -126,10 +127,13 @@ export const queryFunctions = {
       .eq("archived", false);
 
     const stagesMap =
-      stagesData?.reduce((acc, stage) => {
-        acc[stage.id] = stage;
-        return acc;
-      }, {} as Record<string, Stage>) || {};
+      stagesData?.reduce(
+        (acc, stage) => {
+          acc[stage.id] = stage;
+          return acc;
+        },
+        {} as Record<string, Stage>,
+      ) || {};
 
     // Transform the data to match expected structure
     const transformedData =
@@ -157,7 +161,7 @@ export const queryFunctions = {
         *,
         artist_music_genres (music_genre_id),
         votes (vote_type, user_id)
-      `
+      `,
       )
       .eq("archived", false)
       .order("created_at", { ascending: false });
@@ -184,7 +188,7 @@ export const queryFunctions = {
           )
         ),
         votes (vote_type, user_id)
-      `
+      `,
       )
       .eq("id", id)
       .eq("archived", false)
@@ -219,7 +223,7 @@ export const queryFunctions = {
         *,
         artist_music_genres (music_genre_id),
         votes (vote_type, user_id)
-      `
+      `,
       )
       .eq("id", id)
       .eq("archived", false)
@@ -267,10 +271,13 @@ export const queryFunctions = {
       throw new Error("Failed to fetch user knowledge");
     }
 
-    return (data || []).reduce((acc, knowledge) => {
-      acc[knowledge.artist_id] = true;
-      return acc;
-    }, {} as Record<string, boolean>);
+    return (data || []).reduce(
+      (acc, knowledge) => {
+        acc[knowledge.artist_id] = true;
+        return acc;
+      },
+      {} as Record<string, boolean>,
+    );
   },
 
   async fetchArtistNotes(artistId: string): Promise<SetNote[]> {
@@ -313,7 +320,7 @@ export const queryFunctions = {
 
   async fetchSetGroupVotes(
     setId: string,
-    groupId: string
+    groupId: string,
   ): Promise<
     Array<{
       vote_type: number;
@@ -358,7 +365,7 @@ export const queryFunctions = {
       .select("id, username")
       .in(
         "id",
-        votes.map((vote) => vote.user_id)
+        votes.map((vote) => vote.user_id),
       );
 
     if (profilesError) {
@@ -437,7 +444,7 @@ export const queryFunctions = {
           )
         ),
         votes (vote_type, user_id)
-      `
+      `,
       )
       .eq("festival_edition_id", editionId)
       .eq("archived", false)
@@ -521,7 +528,7 @@ export const queryFunctions = {
           member_count: count || 0,
           is_creator: group.created_by === userId,
         };
-      })
+      }),
     );
 
     return groupsWithCounts;
@@ -555,7 +562,7 @@ export const queryFunctions = {
           ...member,
           profiles: profile || { username: null, email: null },
         };
-      })
+      }),
     );
 
     return membersWithProfiles;
@@ -563,7 +570,7 @@ export const queryFunctions = {
 
   async checkUserPermissions(
     userId: string,
-    permission: "edit_artists" | "is_admin"
+    permission: "edit_artists" | "is_admin",
   ) {
     try {
       // Use new admin roles system
@@ -610,7 +617,7 @@ export const queryFunctions = {
 
   // Management Functions for Admin Interface
   async createFestival(
-    festival: Omit<Festival, "id" | "created_at" | "updated_at" | "archived">
+    festival: Omit<Festival, "id" | "created_at" | "updated_at" | "archived">,
   ): Promise<Festival> {
     const { data, error } = await supabase
       .from("festivals")
@@ -628,7 +635,7 @@ export const queryFunctions = {
 
   async updateFestival(
     id: string,
-    updates: Partial<Festival>
+    updates: Partial<Festival>,
   ): Promise<Festival> {
     const { data, error } = await supabase
       .from("festivals")
@@ -670,7 +677,7 @@ export const queryFunctions = {
     > & {
       description?: string | null;
       location?: string | null;
-    }
+    },
   ): Promise<FestivalEdition> {
     const { data, error } = await supabase
       .from("festival_editions")
@@ -692,7 +699,7 @@ export const queryFunctions = {
 
   async updateFestivalEdition(
     id: string,
-    updates: Partial<FestivalEdition>
+    updates: Partial<FestivalEdition>,
   ): Promise<FestivalEdition> {
     const { data, error } = await supabase
       .from("festival_editions")
@@ -722,7 +729,7 @@ export const queryFunctions = {
   },
 
   async createStage(
-    stage: Omit<Stage, "id" | "created_at" | "updated_at" | "archived">
+    stage: Omit<Stage, "id" | "created_at" | "updated_at" | "archived">,
   ): Promise<Stage> {
     const { data, error } = await supabase
       .from("stages")
@@ -776,7 +783,7 @@ export const queryFunctions = {
       | "votes"
       | "stages"
       | "archived"
-    >
+    >,
   ): Promise<FestivalSet> {
     const { data, error } = await supabase
       .from("sets")
@@ -801,7 +808,7 @@ export const queryFunctions = {
 
   async updateSet(
     id: string,
-    updates: Partial<Omit<FestivalSet, "artists" | "votes" | "stages">>
+    updates: Partial<Omit<FestivalSet, "artists" | "votes" | "stages">>,
   ) {
     const { data, error } = await supabase
       .from("sets")
@@ -967,7 +974,7 @@ export const mutationFunctions = {
       | "estimated_date"
     > & {
       genre_ids: string[];
-    }
+    },
   ): Promise<Artist> {
     const { data, error } = await supabase
       .from("artists")
@@ -980,7 +987,7 @@ export const mutationFunctions = {
         `
         *,
         artist_music_genres (music_genre_id)
-      `
+      `,
       )
       .single();
 
@@ -996,7 +1003,7 @@ export const mutationFunctions = {
           artistData.genre_ids.map((genreId) => ({
             artist_id: data.id,
             music_genre_id: genreId,
-          }))
+          })),
         );
 
       if (genreError) {
@@ -1016,7 +1023,7 @@ export const mutationFunctions = {
 
   async updateArtist(
     id: string,
-    updates: UpdateArtistUpdates
+    updates: UpdateArtistUpdates,
   ): Promise<Omit<Artist, "votes">> {
     const { genre_ids, ...rest } = updates;
     const { data, error } = await supabase
@@ -1030,7 +1037,7 @@ export const mutationFunctions = {
         `
         *,
         artist_music_genres (music_genre_id)
-      `
+      `,
       )
       .single();
 
@@ -1047,10 +1054,10 @@ export const mutationFunctions = {
 
       // Calculate differences
       const genresToAdd = genre_ids.filter(
-        (id) => !currentGenreIds.includes(id)
+        (id) => !currentGenreIds.includes(id),
       );
       const genresToRemove = currentGenreIds.filter(
-        (id) => !genre_ids.includes(id)
+        (id) => !genre_ids.includes(id),
       );
 
       // Remove genres that are no longer selected
@@ -1092,7 +1099,7 @@ export const mutationFunctions = {
             `
             *,
             artist_music_genres (music_genre_id)
-          `
+          `,
           )
           .eq("id", id)
           .single();

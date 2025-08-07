@@ -95,13 +95,11 @@ export const useAuth = () => {
     await supabase.auth.signOut();
   };
 
- 
-
   const hasUsername = useMemo(() => {
     return (
       // loading ||
       // profileQuery.isLoading ||
-      (profile?.username && profile?.username.trim() !== "")
+      profile?.username && profile?.username.trim() !== ""
     );
   }, [profile]);
 

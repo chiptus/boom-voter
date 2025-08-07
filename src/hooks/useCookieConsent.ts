@@ -1,7 +1,7 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect } from "react";
 
-const CONSENT_KEY = 'gdpr-consent';
-const CONSENT_VERSION = '1.0';
+const CONSENT_KEY = "gdpr-consent";
+const CONSENT_VERSION = "1.0";
 
 export interface ConsentPreferences {
   essential: boolean;
@@ -50,7 +50,7 @@ export const useCookieConsent = () => {
       ...preferences,
       timestamp: Date.now(),
     };
-    
+
     setConsent(newConsent);
     localStorage.setItem(CONSENT_KEY, JSON.stringify(newConsent));
     setShowBanner(false);
@@ -84,10 +84,10 @@ export const useCookieConsent = () => {
     localStorage.removeItem(CONSENT_KEY);
     setConsent(null);
     setShowBanner(true);
-    
+
     // Clear non-essential cookies
     if (!consent?.preferences) {
-      localStorage.removeItem('sidebar:state');
+      localStorage.removeItem("sidebar:state");
     }
   };
 

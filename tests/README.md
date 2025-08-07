@@ -18,16 +18,19 @@ This directory contains end-to-end tests for the Boom Voter application using Pl
 ### Setup
 
 1. **Install dependencies:**
+
    ```bash
    npm install
    ```
 
 2. **Setup local Supabase test environment:**
+
    ```bash
    npm run test:setup
    ```
 
 3. **Setup test data:**
+
    ```bash
    npm run test:data
    ```
@@ -54,15 +57,15 @@ tests/
 
 ## 🧪 Available Test Commands
 
-| Command | Description |
-|---------|-------------|
-| `npm run test:e2e` | Run all tests in headless mode |
-| `npm run test:e2e:ui` | Run tests with Playwright UI |
+| Command                   | Description                                |
+| ------------------------- | ------------------------------------------ |
+| `npm run test:e2e`        | Run all tests in headless mode             |
+| `npm run test:e2e:ui`     | Run tests with Playwright UI               |
 | `npm run test:e2e:headed` | Run tests in headed mode (visible browser) |
-| `npm run test:e2e:debug` | Run tests in debug mode |
-| `npm run test:e2e:report` | Open test report |
-| `npm run test:setup` | Setup local Supabase environment |
-| `npm run test:data` | Setup test data in local Supabase |
+| `npm run test:e2e:debug`  | Run tests in debug mode                    |
+| `npm run test:e2e:report` | Open test report                           |
+| `npm run test:setup`      | Setup local Supabase environment           |
+| `npm run test:data`       | Setup test data in local Supabase          |
 
 ## 🔧 Configuration
 
@@ -90,18 +93,18 @@ The test data setup script creates:
 ### Basic Test Structure
 
 ```typescript
-import { test, expect } from '@playwright/test';
-import { TestHelpers } from '../utils/test-helpers';
+import { test, expect } from "@playwright/test";
+import { TestHelpers } from "../utils/test-helpers";
 
-test.describe('Feature Name', () => {
+test.describe("Feature Name", () => {
   let testHelpers: TestHelpers;
 
   test.beforeEach(async ({ page }) => {
     testHelpers = new TestHelpers(page);
   });
 
-  test('should do something', async ({ page }) => {
-    await testHelpers.navigateTo('/');
+  test("should do something", async ({ page }) => {
+    await testHelpers.navigateTo("/");
     // Your test logic here
   });
 });
@@ -113,10 +116,10 @@ The `TestHelpers` class provides common utilities:
 
 ```typescript
 // Sign in
-await testHelpers.signIn('user@example.com', 'password');
+await testHelpers.signIn("user@example.com", "password");
 
 // Navigate to page
-await testHelpers.navigateTo('/artists');
+await testHelpers.navigateTo("/artists");
 
 // Wait for page load
 await testHelpers.waitForPageLoad();
@@ -125,7 +128,7 @@ await testHelpers.waitForPageLoad();
 const isAuth = await testHelpers.isAuthenticated();
 
 // Take screenshot
-await testHelpers.takeScreenshot('test-name');
+await testHelpers.takeScreenshot("test-name");
 ```
 
 ### Best Practices
@@ -139,6 +142,7 @@ await testHelpers.takeScreenshot('test-name');
 ## 📋 Test Coverage
 
 ### Current Tests
+
 1. **Authentication**
    - Sign in dialog display
    - Page title verification
@@ -152,6 +156,7 @@ await testHelpers.takeScreenshot('test-name');
    - Empty state handling
 
 ### Planned Tests
+
 - User registration
 - Voting functionality
 - Group management
@@ -163,12 +168,15 @@ await testHelpers.takeScreenshot('test-name');
 ## 📊 Test Reports
 
 ### HTML Report
+
 After running tests, view the interactive report:
+
 ```bash
 npm run test:e2e:report
 ```
 
 ### Report Features
+
 - Test results and timing
 - Screenshots and videos
 - Traces for debugging
@@ -194,17 +202,20 @@ npm run test:e2e:ui
 ```
 
 ### Screenshots
+
 Tests automatically capture screenshots on failure in `tests/screenshots/`
 
 ## 🔮 Next Steps
 
 ### Immediate
+
 1. **Run initial tests** to verify setup
 2. **Add more test scenarios** based on app features
 3. **Configure test users** in local Supabase
 4. **Add data-testid attributes** to components
 
 ### Future Enhancements
+
 1. **Visual regression testing**
 2. **Performance testing**
 3. **Accessibility testing**
@@ -214,17 +225,20 @@ Tests automatically capture screenshots on failure in `tests/screenshots/`
 ## 🚨 Troubleshooting
 
 ### Common Issues
+
 1. **Supabase not starting**: Check Docker is running
 2. **Tests timing out**: Increase timeouts in config
 3. **Element not found**: Update selectors to match UI
 4. **Authentication failing**: Verify test user setup
 
 ### Getting Help
+
 1. Check Playwright docs: https://playwright.dev/
 2. Review test logs and screenshots
 3. Use debug mode for step-by-step debugging
 4. Check Supabase logs: `supabase logs`
 
 ## 🏆 Playwright & Testing Best Practices
+
 - [Playwright Documentation](https://playwright.dev/)
-- [Testing Best Practices](https://playwright.dev/docs/best-practices) 
+- [Testing Best Practices](https://playwright.dev/docs/best-practices)

@@ -9,11 +9,10 @@ export const useSetDetail = (id: string | undefined) => {
   const { data: canEdit = false, isLoading: isLoadingPermissions } =
     useUserPermissionsQuery(user?.id, "edit_artists");
 
-  const setsQuery= useOfflineSetsData();
+  const setsQuery = useOfflineSetsData();
   const { userVotes, handleVote } = useOfflineVoting(user);
 
-
-  const sets = setsQuery.sets
+  const sets = setsQuery.sets;
   const currentSet = useMemo(() => {
     if (!id || !sets.length) return null;
     return sets.find((a) => a.id === id) || null;
@@ -26,12 +25,13 @@ export const useSetDetail = (id: string | undefined) => {
 
   const getVoteCount = (voteType: number) => {
     if (!currentSet) return 0;
-    return currentSet.votes?.filter((vote) => vote.vote_type === voteType).length || 0;
+    return (
+      currentSet.votes?.filter((vote) => vote.vote_type === voteType).length ||
+      0
+    );
   };
 
   const netVoteScore = currentSet ? getVoteCount(1) - getVoteCount(-1) : 0;
-
-  
 
   const userVote = userVotes[id || ""] || null;
 

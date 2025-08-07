@@ -1,6 +1,12 @@
 import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { useGroups } from "@/hooks/useGroups";
 import { queryFunctions } from "@/services/queries";
@@ -20,28 +26,40 @@ interface GroupVote {
 
 const getVoteIcon = (voteType: number) => {
   switch (voteType) {
-    case 2: return <Heart className="h-4 w-4" />;
-    case 1: return <ThumbsUp className="h-4 w-4" />;
-    case -1: return <ThumbsDown className="h-4 w-4" />;
-    default: return null;
+    case 2:
+      return <Heart className="h-4 w-4" />;
+    case 1:
+      return <ThumbsUp className="h-4 w-4" />;
+    case -1:
+      return <ThumbsDown className="h-4 w-4" />;
+    default:
+      return null;
   }
 };
 
 const getVoteLabel = (voteType: number) => {
   switch (voteType) {
-    case 2: return "Must Go";
-    case 1: return "Interested";
-    case -1: return "Won't Go";
-    default: return "Unknown";
+    case 2:
+      return "Must Go";
+    case 1:
+      return "Interested";
+    case -1:
+      return "Won't Go";
+    default:
+      return "Unknown";
   }
 };
 
 const getVoteColor = (voteType: number) => {
   switch (voteType) {
-    case 2: return "bg-red-500/20 text-red-400 border-red-400/30";
-    case 1: return "bg-green-500/20 text-green-400 border-green-400/30";
-    case -1: return "bg-gray-500/20 text-gray-400 border-gray-400/30";
-    default: return "bg-gray-500/20 text-gray-400 border-gray-400/30";
+    case 2:
+      return "bg-red-500/20 text-red-400 border-red-400/30";
+    case 1:
+      return "bg-green-500/20 text-green-400 border-green-400/30";
+    case -1:
+      return "bg-gray-500/20 text-gray-400 border-gray-400/30";
+    default:
+      return "bg-gray-500/20 text-gray-400 border-gray-400/30";
   }
 };
 
@@ -68,14 +86,20 @@ export const ArtistGroupVoting = ({ artistId }: ArtistGroupVotingProps) => {
 
   const fetchGroupVotes = async () => {
     if (!selectedGroupId) return;
-    
+
     setLoading(true);
     try {
       let votes;
       if (isOnline) {
-        votes = await queryFunctions.fetchSetGroupVotes(artistId, selectedGroupId);
+        votes = await queryFunctions.fetchSetGroupVotes(
+          artistId,
+          selectedGroupId,
+        );
       } else {
-        votes = await offlineStorage.getSetGroupVotes(artistId, selectedGroupId);
+        votes = await offlineStorage.getSetGroupVotes(
+          artistId,
+          selectedGroupId,
+        );
       }
       setGroupVotes(votes);
     } catch (error) {
@@ -92,12 +116,12 @@ export const ArtistGroupVoting = ({ artistId }: ArtistGroupVotingProps) => {
   }
 
   const voteCounts = {
-    2: groupVotes.filter(vote => vote.vote_type === 2).length,
-    1: groupVotes.filter(vote => vote.vote_type === 1).length,
-    [-1]: groupVotes.filter(vote => vote.vote_type === -1).length,
+    2: groupVotes.filter((vote) => vote.vote_type === 2).length,
+    1: groupVotes.filter((vote) => vote.vote_type === 1).length,
+    [-1]: groupVotes.filter((vote) => vote.vote_type === -1).length,
   };
 
-  const selectedGroup = groups.find(g => g.id === selectedGroupId);
+  const selectedGroup = groups.find((g) => g.id === selectedGroupId);
 
   return (
     <Card className="bg-white/10 backdrop-blur-md border-purple-400/30">
@@ -130,7 +154,9 @@ export const ArtistGroupVoting = ({ artistId }: ArtistGroupVotingProps) => {
       </CardHeader>
       <CardContent>
         {loading ? (
-          <div className="text-center py-4 text-purple-200">Loading votes...</div>
+          <div className="text-center py-4 text-purple-200">
+            Loading votes...
+          </div>
         ) : groupVotes.length === 0 ? (
           <div className="text-center py-4 text-purple-200">
             No one in this group has voted on this artist yet.
@@ -142,21 +168,27 @@ export const ArtistGroupVoting = ({ artistId }: ArtistGroupVotingProps) => {
               <div className="text-center">
                 <div className="flex items-center justify-center gap-2 mb-1">
                   <Heart className="h-4 w-4 text-red-400" />
-                  <span className="text-white font-semibold">{voteCounts[2]}</span>
+                  <span className="text-white font-semibold">
+                    {voteCounts[2]}
+                  </span>
                 </div>
                 <p className="text-red-400 text-sm">Must Go</p>
               </div>
               <div className="text-center">
                 <div className="flex items-center justify-center gap-2 mb-1">
                   <ThumbsUp className="h-4 w-4 text-green-400" />
-                  <span className="text-white font-semibold">{voteCounts[1]}</span>
+                  <span className="text-white font-semibold">
+                    {voteCounts[1]}
+                  </span>
                 </div>
                 <p className="text-green-400 text-sm">Interested</p>
               </div>
               <div className="text-center">
                 <div className="flex items-center justify-center gap-2 mb-1">
                   <ThumbsDown className="h-4 w-4 text-gray-400" />
-                  <span className="text-white font-semibold">{voteCounts[-1]}</span>
+                  <span className="text-white font-semibold">
+                    {voteCounts[-1]}
+                  </span>
                 </div>
                 <p className="text-gray-400 text-sm">Won't Go</p>
               </div>
@@ -164,13 +196,20 @@ export const ArtistGroupVoting = ({ artistId }: ArtistGroupVotingProps) => {
 
             {/* Individual Votes */}
             <div className="space-y-2">
-              <h4 className="text-white font-medium text-sm mb-2">Individual Votes:</h4>
+              <h4 className="text-white font-medium text-sm mb-2">
+                Individual Votes:
+              </h4>
               {groupVotes.map((vote) => (
-                <div key={vote.user_id} className="flex items-center justify-between py-2 px-3 rounded-lg bg-white/5">
+                <div
+                  key={vote.user_id}
+                  className="flex items-center justify-between py-2 px-3 rounded-lg bg-white/5"
+                >
                   <span className="text-purple-200">
                     {vote.username || "Unknown User"}
                   </span>
-                  <Badge className={`${getVoteColor(vote.vote_type)} flex items-center gap-1`}>
+                  <Badge
+                    className={`${getVoteColor(vote.vote_type)} flex items-center gap-1`}
+                  >
                     {getVoteIcon(vote.vote_type)}
                     {getVoteLabel(vote.vote_type)}
                   </Badge>

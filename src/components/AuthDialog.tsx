@@ -1,12 +1,21 @@
-
 import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/ui/input-otp";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import {
+  InputOTP,
+  InputOTPGroup,
+  InputOTPSlot,
+} from "@/components/ui/input-otp";
 import { Mail, Users, ArrowLeft } from "lucide-react";
 
 interface AuthDialogProps {
@@ -17,7 +26,13 @@ interface AuthDialogProps {
   groupName?: string;
 }
 
-export const AuthDialog = ({ open, onOpenChange, onSuccess, inviteToken, groupName }: AuthDialogProps) => {
+export const AuthDialog = ({
+  open,
+  onOpenChange,
+  onSuccess,
+  inviteToken,
+  groupName,
+}: AuthDialogProps) => {
   const [email, setEmail] = useState("");
   const [otp, setOtp] = useState("");
   const [loading, setLoading] = useState(false);
@@ -31,7 +46,7 @@ export const AuthDialog = ({ open, onOpenChange, onSuccess, inviteToken, groupNa
     const { error } = await supabase.auth.signInWithOtp({
       email,
       options: {
-        emailRedirectTo: inviteToken 
+        emailRedirectTo: inviteToken
           ? `${window.location.origin}/?invite=${inviteToken}`
           : `${window.location.origin}/`,
         shouldCreateUser: true,
@@ -50,7 +65,8 @@ export const AuthDialog = ({ open, onOpenChange, onSuccess, inviteToken, groupNa
     } else {
       toast({
         title: "Check your email!",
-        description: "We've sent you a magic link and a 6-digit code. Click the link or enter the code below.",
+        description:
+          "We've sent you a magic link and a 6-digit code. Click the link or enter the code below.",
       });
       setStep("otp");
     }
@@ -60,13 +76,13 @@ export const AuthDialog = ({ open, onOpenChange, onSuccess, inviteToken, groupNa
   const handleVerifyOtp = async (e: React.FormEvent) => {
     e.preventDefault();
     if (otp.length !== 6) return;
-    
+
     setLoading(true);
 
     const { error } = await supabase.auth.verifyOtp({
       email,
       token: otp,
-      type: 'email',
+      type: "email",
     });
 
     if (error) {
@@ -122,16 +138,14 @@ export const AuthDialog = ({ open, onOpenChange, onSuccess, inviteToken, groupNa
             )}
           </DialogTitle>
           <DialogDescription>
-            {step === "email" ? (
-              inviteToken && groupName 
+            {step === "email"
+              ? inviteToken && groupName
                 ? `Enter your email to join ${groupName} - we'll send you a magic link and verification code!`
                 : "Enter your email to sign in or create an account - no password needed!"
-            ) : (
-              "Check your email! Click the magic link or enter the 6-digit code below."
-            )}
+              : "Check your email! Click the magic link or enter the 6-digit code below."}
           </DialogDescription>
         </DialogHeader>
-        
+
         {step === "email" ? (
           <form onSubmit={handleSendMagicLink} className="space-y-4">
             <div>
@@ -170,15 +184,15 @@ export const AuthDialog = ({ open, onOpenChange, onSuccess, inviteToken, groupNa
                   </InputOTPGroup>
                 </InputOTP>
               </div>
-              <Button 
-                type="submit" 
-                className="w-full" 
+              <Button
+                type="submit"
+                className="w-full"
                 disabled={loading || otp.length !== 6}
               >
                 {loading ? "Verifying..." : "Verify Code"}
               </Button>
             </form>
-            
+
             <div className="text-center">
               <Button
                 variant="link"

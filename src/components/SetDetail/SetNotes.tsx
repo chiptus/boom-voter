@@ -1,5 +1,11 @@
 import { useState } from "react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Trash2, Edit3, Save, X, StickyNote } from "lucide-react";
@@ -11,7 +17,10 @@ interface ArtistNotesProps {
 }
 
 export const ArtistNotes = ({ artistId, userId }: ArtistNotesProps) => {
-  const { notes, loading, saving, saveNote, deleteNote } = useOfflineNotes(artistId, userId);
+  const { notes, loading, saving, saveNote, deleteNote } = useOfflineNotes(
+    artistId,
+    userId,
+  );
   const [isEditing, setIsEditing] = useState(false);
   const [noteContent, setNoteContent] = useState("");
 
@@ -121,10 +130,16 @@ export const ArtistNotes = ({ artistId, userId }: ArtistNotesProps) => {
                 {notes.map((note) => {
                   const isOwnNote = note.user_id === userId;
                   return (
-                    <div key={note.id} className="bg-white/5 rounded-lg p-4 border border-purple-400/20">
+                    <div
+                      key={note.id}
+                      className="bg-white/5 rounded-lg p-4 border border-purple-400/20"
+                    >
                       <div className="flex items-start justify-between mb-2">
                         <div className="text-sm text-purple-300">
-                          By: {note.author_username || note.author_email || 'Unknown User'}
+                          By:{" "}
+                          {note.author_username ||
+                            note.author_email ||
+                            "Unknown User"}
                         </div>
                         {isOwnNote && (
                           <Button

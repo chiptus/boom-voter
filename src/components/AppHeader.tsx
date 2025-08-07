@@ -115,7 +115,7 @@ export const AppHeader = ({
                 ? onSignOut && (
                     <UserMenu
                       user={user}
-                      profile={profile}
+                      profile={profile || undefined}
                       onSignOut={onSignOut}
                       isMobile={isMobile}
                     />

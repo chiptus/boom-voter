@@ -1,6 +1,10 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
-import { artistQueries, queryFunctions, mutationFunctions } from "@/services/queries";
+import {
+  artistQueries,
+  queryFunctions,
+  mutationFunctions,
+} from "@/services/queries";
 
 export const useArtistNotesQuery = (artistId: string) => {
   return useQuery({
@@ -18,7 +22,9 @@ export const useSaveNoteMutation = () => {
     mutationFn: mutationFunctions.saveArtistNote,
     onSuccess: (_, variables) => {
       // Invalidate and refetch notes for this artist
-      queryClient.invalidateQueries({ queryKey: artistQueries.notes(variables.artistId) });
+      queryClient.invalidateQueries({
+        queryKey: artistQueries.notes(variables.artistId),
+      });
       toast({
         title: "Success",
         description: "Note saved successfully",
@@ -43,7 +49,7 @@ export const useDeleteNoteMutation = () => {
     mutationFn: mutationFunctions.deleteArtistNote,
     onSuccess: () => {
       // Invalidate all artist notes queries to refresh the list
-      queryClient.invalidateQueries({ queryKey: ['artists'] });
+      queryClient.invalidateQueries({ queryKey: ["artists"] });
       toast({
         title: "Success",
         description: "Note deleted successfully",
@@ -61,7 +67,8 @@ export const useDeleteNoteMutation = () => {
 };
 
 export const useArtistNotes = (artistId: string, userId: string | null) => {
-  const { data: notes = [], isLoading: loading } = useArtistNotesQuery(artistId);
+  const { data: notes = [], isLoading: loading } =
+    useArtistNotesQuery(artistId);
   const saveNoteMutation = useSaveNoteMutation();
   const deleteNoteMutation = useDeleteNoteMutation();
 

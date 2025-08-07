@@ -95,9 +95,8 @@ export const useGroups = () => {
 
     try {
       // Find user by username or email
-      const userResult = await groupService.findUserByUsernameOrEmail(
-        usernameOrEmail
-      );
+      const userResult =
+        await groupService.findUserByUsernameOrEmail(usernameOrEmail);
 
       if (!userResult.found) {
         const errorMessage =
@@ -125,7 +124,7 @@ export const useGroups = () => {
       // Check if user is already in the group
       const isAlreadyMember = await groupService.checkIfUserInGroup(
         groupId,
-        userResult.userId!
+        userResult.userId!,
       );
       if (isAlreadyMember) {
         toast({

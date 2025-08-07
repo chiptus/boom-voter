@@ -29,7 +29,7 @@ export default function Index() {
 
   const { filteredAndSortedSets, lockCurrentOrder } = useSetFiltering(
     sets || [],
-    urlState
+    urlState,
   );
 
   // Get profile loading state to prevent dialog flashing

@@ -8,7 +8,11 @@ interface DaySelectorProps {
   onDayChange: (day: string) => void;
 }
 
-export const DaySelector = ({ days, selectedDay, onDayChange }: DaySelectorProps) => {
+export const DaySelector = ({
+  days,
+  selectedDay,
+  onDayChange,
+}: DaySelectorProps) => {
   if (days.length <= 1) return null;
 
   return (
@@ -18,12 +22,12 @@ export const DaySelector = ({ days, selectedDay, onDayChange }: DaySelectorProps
           {days.map((day) => (
             <Button
               key={day.date}
-              variant={selectedDay === day.date ? 'default' : 'outline'}
+              variant={selectedDay === day.date ? "default" : "outline"}
               onClick={() => onDayChange(day.date)}
               className={`whitespace-nowrap ${
                 selectedDay === day.date
-                  ? 'bg-purple-600 hover:bg-purple-700 text-white'
-                  : 'border-purple-400 text-purple-400 hover:bg-purple-400 hover:text-white'
+                  ? "bg-purple-600 hover:bg-purple-700 text-white"
+                  : "border-purple-400 text-purple-400 hover:bg-purple-400 hover:text-white"
               }`}
             >
               {day.displayDate}

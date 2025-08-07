@@ -119,7 +119,7 @@ export const FestivalManagement = () => {
   const handleDelete = async (festival: Festival) => {
     if (
       !confirm(
-        `Are you sure you want to delete "${festival.name}"? This will also delete all associated editions, stages, and sets.`
+        `Are you sure you want to delete "${festival.name}"? This will also delete all associated editions, stages, and sets.`,
       )
     ) {
       return;

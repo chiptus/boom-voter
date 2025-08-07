@@ -1,4 +1,3 @@
-
 export interface GroupInvite {
   id: string;
   group_id: string;

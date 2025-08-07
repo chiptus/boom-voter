@@ -28,13 +28,16 @@ export const DeleteGroupDialog = ({
     <AlertDialog open={isOpen} onOpenChange={onClose}>
       <AlertDialogContent className="bg-background border-border">
         <AlertDialogHeader>
-          <AlertDialogTitle className="text-foreground">Delete Group</AlertDialogTitle>
+          <AlertDialogTitle className="text-foreground">
+            Delete Group
+          </AlertDialogTitle>
           <AlertDialogDescription className="text-muted-foreground">
-            Are you sure you want to delete "{groupName}"? This action cannot be undone.
+            Are you sure you want to delete "{groupName}"? This action cannot be
+            undone.
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel 
+          <AlertDialogCancel
             onClick={onClose}
             disabled={isDeleting}
             className="bg-background text-foreground border-border hover:bg-muted"

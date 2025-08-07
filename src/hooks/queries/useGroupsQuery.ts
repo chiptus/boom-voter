@@ -1,6 +1,10 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
-import { groupQueries, queryFunctions, mutationFunctions } from "@/services/queries";
+import {
+  groupQueries,
+  queryFunctions,
+  mutationFunctions,
+} from "@/services/queries";
 
 export const useUserGroupsQuery = (userId: string | undefined) => {
   return useQuery({
@@ -18,9 +22,12 @@ export const useGroupMembersQuery = (groupId: string) => {
   });
 };
 
-export const useUserPermissionsQuery = (userId: string | undefined, permission: 'edit_artists' | 'is_admin') => {
+export const useUserPermissionsQuery = (
+  userId: string | undefined,
+  permission: "edit_artists" | "is_admin",
+) => {
   return useQuery({
-    queryKey: ['permissions', {userId, permission}],
+    queryKey: ["permissions", { userId, permission }],
     queryFn: () => queryFunctions.checkUserPermissions(userId!, permission),
     enabled: !!userId,
     staleTime: 5 * 60 * 1000, // 5 minutes - permissions don't change often
@@ -34,7 +41,9 @@ export const useCreateGroupMutation = () => {
   return useMutation({
     mutationFn: mutationFunctions.createGroup,
     onSuccess: (_data, variables) => {
-      queryClient.invalidateQueries({ queryKey: groupQueries.user(variables.userId) });
+      queryClient.invalidateQueries({
+        queryKey: groupQueries.user(variables.userId),
+      });
       toast({
         title: "Success",
         description: "Group created successfully",
@@ -58,7 +67,9 @@ export const useDeleteGroupMutation = () => {
   return useMutation({
     mutationFn: mutationFunctions.deleteGroup,
     onSuccess: (_data, variables) => {
-      queryClient.invalidateQueries({ queryKey: groupQueries.user(variables.userId) });
+      queryClient.invalidateQueries({
+        queryKey: groupQueries.user(variables.userId),
+      });
       toast({
         title: "Success",
         description: "Group deleted successfully",
@@ -81,7 +92,9 @@ export const useJoinGroupMutation = () => {
   return useMutation({
     mutationFn: mutationFunctions.joinGroup,
     onSuccess: (_data, variables) => {
-      queryClient.invalidateQueries({ queryKey: groupQueries.user(variables.userId) });
+      queryClient.invalidateQueries({
+        queryKey: groupQueries.user(variables.userId),
+      });
       toast({
         title: "Success",
         description: "Joined group successfully",
@@ -104,7 +117,9 @@ export const useLeaveGroupMutation = () => {
   return useMutation({
     mutationFn: mutationFunctions.leaveGroup,
     onSuccess: (_data, variables) => {
-      queryClient.invalidateQueries({ queryKey: groupQueries.user(variables.userId) });
+      queryClient.invalidateQueries({
+        queryKey: groupQueries.user(variables.userId),
+      });
       toast({
         title: "Success",
         description: "Left group successfully",

@@ -1,8 +1,11 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { authQueries, queryFunctions, mutationFunctions } from "@/services/queries";
+import {
+  authQueries,
+  queryFunctions,
+  mutationFunctions,
+} from "@/services/queries";
 import { profileOfflineService } from "@/services/profileOfflineService";
 import { useOfflineProfileToast } from "@/hooks/useOfflineProfileToast";
-
 
 export const useProfileQuery = (userId?: string) => {
   const { showOfflineProfileToast, isOnline } = useOfflineProfileToast();
@@ -21,18 +24,20 @@ export const useProfileQuery = (userId?: string) => {
           return profile;
         } else {
           // Use cached data when offline
-          const cachedProfile = await profileOfflineService.getCachedProfile(userId);
+          const cachedProfile =
+            await profileOfflineService.getCachedProfile(userId);
           if (cachedProfile) {
             showOfflineProfileToast();
             return cachedProfile;
           }
-          throw new Error('No profile data available offline');
+          throw new Error("No profile data available offline");
         }
       } catch (error) {
         // Fallback to cache on error
         if (isOnline) {
-          console.error('Online profile fetch failed, using cache:', error);
-          const cachedProfile = await profileOfflineService.getCachedProfile(userId);
+          console.error("Online profile fetch failed, using cache:", error);
+          const cachedProfile =
+            await profileOfflineService.getCachedProfile(userId);
           if (cachedProfile) {
             showOfflineProfileToast();
             return cachedProfile;
@@ -54,16 +59,16 @@ export const useProfileQuery = (userId?: string) => {
 
 export const useUpdateProfileMutation = () => {
   const queryClient = useQueryClient();
-  
+
   return useMutation({
     mutationFn: mutationFunctions.updateProfile,
     onSuccess: async (data, variables) => {
       // Update the profile cache
       queryClient.setQueryData(authQueries.profile(variables.userId), data);
-      
+
       // Update offline cache
       await profileOfflineService.cacheProfile(variables.userId, data);
-      
+
       // Invalidate to ensure consistency
       queryClient.invalidateQueries({
         queryKey: authQueries.profile(variables.userId),

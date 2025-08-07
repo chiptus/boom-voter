@@ -48,7 +48,7 @@ export const PaletteSelector = () => {
   useEffect(() => {
     // Load saved palette from localStorage
     const saved = localStorage.getItem("app-palette") as Palette;
-    if (saved && paletteOptions.find(p => p.id === saved)) {
+    if (saved && paletteOptions.find((p) => p.id === saved)) {
       setCurrentPalette(saved);
       document.documentElement.setAttribute("data-palette", saved);
     } else {
@@ -63,14 +63,22 @@ export const PaletteSelector = () => {
     localStorage.setItem("app-palette", palette);
   };
 
-  const currentPaletteOption = paletteOptions.find(p => p.id === currentPalette);
+  const currentPaletteOption = paletteOptions.find(
+    (p) => p.id === currentPalette,
+  );
 
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="ghost" size="sm" className="text-white hover:bg-white/10">
+        <Button
+          variant="ghost"
+          size="sm"
+          className="text-white hover:bg-white/10"
+        >
           <Palette className="h-4 w-4" />
-          <span className="hidden sm:inline ml-2">{currentPaletteOption?.name}</span>
+          <span className="hidden sm:inline ml-2">
+            {currentPaletteOption?.name}
+          </span>
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-56">
@@ -89,7 +97,9 @@ export const PaletteSelector = () => {
               />
               <div>
                 <div className="font-medium">{palette.name}</div>
-                <div className="text-xs text-muted-foreground">{palette.description}</div>
+                <div className="text-xs text-muted-foreground">
+                  {palette.description}
+                </div>
               </div>
             </div>
             {currentPalette === palette.id && (

@@ -29,7 +29,7 @@ export const groupService = {
           member_count: count || 0,
           is_creator: group.created_by === currentUserId,
         };
-      })
+      }),
     );
 
     return groupsWithCounts;
@@ -38,7 +38,7 @@ export const groupService = {
   async createGroup(
     name: string,
     description: string | undefined,
-    userId: string
+    userId: string,
   ) {
     const { data: group, error } = await supabase
       .from("groups")
@@ -119,7 +119,7 @@ export const groupService = {
         // Try to find by email in auth system
         const { data: authData, error: authError } = await supabase.rpc(
           "get_user_id_by_email",
-          { user_email: usernameOrEmail }
+          { user_email: usernameOrEmail },
         );
 
         if (authError || !authData) {
@@ -190,7 +190,7 @@ export const groupService = {
             email: profile?.email || undefined,
           },
         };
-      })
+      }),
     );
 
     return membersWithProfiles;
@@ -199,7 +199,7 @@ export const groupService = {
   async removeMemberFromGroup(
     groupId: string,
     userId: string,
-    currentUserId: string
+    currentUserId: string,
   ): Promise<void> {
     // First check if current user is the group creator
     const { data: group, error: groupError } = await supabase

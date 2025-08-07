@@ -11,7 +11,14 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { GenreMultiSelect } from "@/components/ui/genre-multi-select";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/useAuth";
 import { useUserPermissionsQuery } from "@/hooks/queries/useGroupsQuery";
@@ -78,7 +85,7 @@ export function EditArtistDialog({ artist, onClose }: EditArtistDialogProps) {
     defaultValues: {
       name: artist.name,
       description: artist.description || "",
-      genre_ids: artist.artist_music_genres?.map(g => g.music_genre_id) || [],
+      genre_ids: artist.artist_music_genres?.map((g) => g.music_genre_id) || [],
       stage: artist.stage || "",
       time_start: toDatetimeLocal(artist.time_start),
       time_end: toDatetimeLocal(artist.time_end),
@@ -128,10 +135,16 @@ export function EditArtistDialog({ artist, onClose }: EditArtistDialogProps) {
   const handleSubtractOneHour = () => {
     const currentTimeStart = form.getValues("time_start");
     const currentTimeEnd = form.getValues("time_end");
-    
+
     if (currentTimeStart || currentTimeEnd) {
-      form.setValue("time_start", currentTimeStart ? subtractOneHour(currentTimeStart) : "");
-      form.setValue("time_end", currentTimeEnd ? subtractOneHour(currentTimeEnd) : "");
+      form.setValue(
+        "time_start",
+        currentTimeStart ? subtractOneHour(currentTimeStart) : "",
+      );
+      form.setValue(
+        "time_end",
+        currentTimeEnd ? subtractOneHour(currentTimeEnd) : "",
+      );
     }
   };
 
@@ -141,7 +154,7 @@ export function EditArtistDialog({ artist, onClose }: EditArtistDialogProps) {
         <DialogHeader>
           <DialogTitle>Edit Artist</DialogTitle>
         </DialogHeader>
-        
+
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
             <FormField
@@ -169,7 +182,11 @@ export function EditArtistDialog({ artist, onClose }: EditArtistDialogProps) {
                       genres={genres}
                       value={field.value || []}
                       onValueChange={field.onChange}
-                      placeholder={isLoadingGenres ? "Loading genres..." : "Select genres..."}
+                      placeholder={
+                        isLoadingGenres
+                          ? "Loading genres..."
+                          : "Select genres..."
+                      }
                       disabled={isLoadingGenres}
                     />
                   </FormControl>
@@ -185,9 +202,9 @@ export function EditArtistDialog({ artist, onClose }: EditArtistDialogProps) {
                 <FormItem>
                   <FormLabel>Stage (Optional)</FormLabel>
                   <FormControl>
-                    <StageSelector 
-                      value={field.value || ""} 
-                      onValueChange={field.onChange} 
+                    <StageSelector
+                      value={field.value || ""}
+                      onValueChange={field.onChange}
                     />
                   </FormControl>
                   <FormMessage />
@@ -202,10 +219,7 @@ export function EditArtistDialog({ artist, onClose }: EditArtistDialogProps) {
                 <FormItem>
                   <FormLabel>Performance Start Time</FormLabel>
                   <FormControl>
-                    <Input
-                      type="datetime-local"
-                      {...field}
-                    />
+                    <Input type="datetime-local" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -218,7 +232,9 @@ export function EditArtistDialog({ artist, onClose }: EditArtistDialogProps) {
                 variant="outline"
                 size="sm"
                 onClick={handleSubtractOneHour}
-                disabled={!form.getValues("time_start") && !form.getValues("time_end")}
+                disabled={
+                  !form.getValues("time_start") && !form.getValues("time_end")
+                }
               >
                 -1 Hour
               </Button>
@@ -231,10 +247,7 @@ export function EditArtistDialog({ artist, onClose }: EditArtistDialogProps) {
                 <FormItem>
                   <FormLabel>Performance End Time</FormLabel>
                   <FormControl>
-                    <Input
-                      type="datetime-local"
-                      {...field}
-                    />
+                    <Input type="datetime-local" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -312,9 +325,9 @@ export function EditArtistDialog({ artist, onClose }: EditArtistDialogProps) {
               )}
             />
 
-            <Button 
-              type="submit" 
-              className="w-full" 
+            <Button
+              type="submit"
+              className="w-full"
               disabled={updateArtistMutation.isPending || isLoadingGenres}
             >
               {updateArtistMutation.isPending ? "Updating..." : "Update Artist"}

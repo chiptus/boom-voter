@@ -7,7 +7,7 @@ export const inviteService = {
     options?: {
       expiresAt?: Date;
       maxUses?: number;
-    }
+    },
   ): Promise<string> {
     // Generate a cryptographically secure random token
     const token = crypto.randomUUID() + "-" + Date.now().toString(36);

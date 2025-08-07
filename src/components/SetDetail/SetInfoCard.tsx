@@ -7,13 +7,7 @@ import {
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import {
-  ExternalLink,
-  Music,
-  Play,
-  Clock,
-  MapPin,
-} from "lucide-react";
+import { ExternalLink, Music, Play, Clock, MapPin } from "lucide-react";
 import { ArtistVotingButtons } from "./SetVotingButtons";
 import { Artist } from "@/services/queries";
 import { formatTimeRange } from "@/lib/timeUtils";
@@ -65,7 +59,6 @@ export const ArtistInfoCard = ({
                     {netVoteScore}
                   </Badge>
                 )}
-               
               </div>
 
               {/* Performance Information */}
@@ -79,7 +72,7 @@ export const ArtistInfoCard = ({
                 {formatTimeRange(
                   artist.time_start,
                   artist.time_end,
-                  use24Hour
+                  use24Hour,
                 ) && (
                   <div className="flex items-center gap-2">
                     <Clock className="h-4 w-4" />
@@ -87,14 +80,13 @@ export const ArtistInfoCard = ({
                       {formatTimeRange(
                         artist.time_start,
                         artist.time_end,
-                        use24Hour
+                        use24Hour,
                       )}
                     </span>
                   </div>
                 )}
               </div>
             </div>
-           
           </div>
           {artist.description && (
             <CardDescription className="text-purple-200 text-lg leading-relaxed">

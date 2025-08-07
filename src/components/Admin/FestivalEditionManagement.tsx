@@ -14,9 +14,21 @@ import {
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Loader2, Plus, Edit2, Trash2, CalendarDays } from "lucide-react";
 import type { FestivalEdition } from "@/services/queries";
 
@@ -32,30 +44,35 @@ interface FestivalEditionManagementProps {
   festivalId?: string;
 }
 
-export const FestivalEditionManagement = ({ festivalId }: FestivalEditionManagementProps) => {
+export const FestivalEditionManagement = ({
+  festivalId,
+}: FestivalEditionManagementProps) => {
   const { data: festivals = [] } = useFestivalQuery.useFestivals();
-  const { data: editions = [], isLoading } = useFestivalQuery.useFestivalEditionsForFestival(festivalId);
+  const { data: editions = [], isLoading } =
+    useFestivalQuery.useFestivalEditionsForFestival(festivalId);
   const { toast } = useToast();
   const queryClient = useQueryClient();
-  
+
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [editingEdition, setEditingEdition] = useState<FestivalEdition | null>(null);
+  const [editingEdition, setEditingEdition] = useState<FestivalEdition | null>(
+    null,
+  );
   const [formData, setFormData] = useState<EditionFormData>({
-    festival_id: '',
-    name: '',
+    festival_id: "",
+    name: "",
     year: new Date().getFullYear(),
-    start_date: '',
-    end_date: '',
+    start_date: "",
+    end_date: "",
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const resetForm = () => {
     setFormData({
-      festival_id: festivalId || '',
-      name: '',
+      festival_id: festivalId || "",
+      name: "",
       year: new Date().getFullYear(),
-      start_date: '',
-      end_date: '',
+      start_date: "",
+      end_date: "",
     });
     setEditingEdition(null);
   };
@@ -70,8 +87,8 @@ export const FestivalEditionManagement = ({ festivalId }: FestivalEditionManagem
       festival_id: edition.festival_id,
       name: edition.name,
       year: edition.year,
-      start_date: edition.start_date || '',
-      end_date: edition.end_date || '',
+      start_date: edition.start_date || "",
+      end_date: edition.end_date || "",
     });
     setEditingEdition(edition);
     setIsDialogOpen(true);
@@ -97,7 +114,10 @@ export const FestivalEditionManagement = ({ festivalId }: FestivalEditionManagem
       };
 
       if (editingEdition) {
-        await queryFunctions.updateFestivalEdition(editingEdition.id, submitData);
+        await queryFunctions.updateFestivalEdition(
+          editingEdition.id,
+          submitData,
+        );
         toast({
           title: "Success",
           description: "Festival edition updated successfully",
@@ -110,13 +130,16 @@ export const FestivalEditionManagement = ({ festivalId }: FestivalEditionManagem
         });
       }
 
-      queryClient.invalidateQueries({ queryKey: ['festival-editions'] });
+      queryClient.invalidateQueries({ queryKey: ["festival-editions"] });
       setIsDialogOpen(false);
       resetForm();
     } catch (error) {
       toast({
         title: "Error",
-        description: error instanceof Error ? error.message : "Failed to save festival edition",
+        description:
+          error instanceof Error
+            ? error.message
+            : "Failed to save festival edition",
         variant: "destructive",
       });
     } finally {
@@ -125,7 +148,11 @@ export const FestivalEditionManagement = ({ festivalId }: FestivalEditionManagem
   };
 
   const handleDelete = async (edition: FestivalEdition) => {
-    if (!confirm(`Are you sure you want to delete "${edition.name}"? This will also delete all associated stages and sets.`)) {
+    if (
+      !confirm(
+        `Are you sure you want to delete "${edition.name}"? This will also delete all associated stages and sets.`,
+      )
+    ) {
       return;
     }
 
@@ -135,18 +162,23 @@ export const FestivalEditionManagement = ({ festivalId }: FestivalEditionManagem
         title: "Success",
         description: "Festival edition deleted successfully",
       });
-      queryClient.invalidateQueries({ queryKey: ['festival-editions'] });
+      queryClient.invalidateQueries({ queryKey: ["festival-editions"] });
     } catch (error) {
       toast({
         title: "Error",
-        description: error instanceof Error ? error.message : "Failed to delete festival edition",
+        description:
+          error instanceof Error
+            ? error.message
+            : "Failed to delete festival edition",
         variant: "destructive",
       });
     }
   };
 
   const getFestivalName = (festivalId: string) => {
-    return festivals.find(f => f.id === festivalId)?.name || 'Unknown Festival';
+    return (
+      festivals.find((f) => f.id === festivalId)?.name || "Unknown Festival"
+    );
   };
 
   if (isLoading) {
@@ -170,7 +202,10 @@ export const FestivalEditionManagement = ({ festivalId }: FestivalEditionManagem
           </span>
           <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
             <DialogTrigger asChild>
-              <Button onClick={handleCreate} className="bg-purple-600 hover:bg-purple-700">
+              <Button
+                onClick={handleCreate}
+                className="bg-purple-600 hover:bg-purple-700"
+              >
                 <Plus className="h-4 w-4 mr-2" />
                 Add Edition
               </Button>
@@ -178,7 +213,9 @@ export const FestivalEditionManagement = ({ festivalId }: FestivalEditionManagem
             <DialogContent>
               <DialogHeader>
                 <DialogTitle>
-                  {editingEdition ? 'Edit Festival Edition' : 'Create New Festival Edition'}
+                  {editingEdition
+                    ? "Edit Festival Edition"
+                    : "Create New Festival Edition"}
                 </DialogTitle>
               </DialogHeader>
               <form onSubmit={handleSubmit} className="space-y-4">
@@ -186,7 +223,9 @@ export const FestivalEditionManagement = ({ festivalId }: FestivalEditionManagem
                   <Label htmlFor="festival">Festival</Label>
                   <Select
                     value={formData.festival_id}
-                    onValueChange={(value) => setFormData({ ...formData, festival_id: value })}
+                    onValueChange={(value) =>
+                      setFormData({ ...formData, festival_id: value })
+                    }
                     required
                   >
                     <SelectTrigger>
@@ -206,7 +245,9 @@ export const FestivalEditionManagement = ({ festivalId }: FestivalEditionManagem
                   <Input
                     id="name"
                     value={formData.name}
-                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                    onChange={(e) =>
+                      setFormData({ ...formData, name: e.target.value })
+                    }
                     placeholder="e.g., Boom Festival 2025"
                     required
                   />
@@ -217,7 +258,12 @@ export const FestivalEditionManagement = ({ festivalId }: FestivalEditionManagem
                     id="year"
                     type="number"
                     value={formData.year}
-                    onChange={(e) => setFormData({ ...formData, year: parseInt(e.target.value) })}
+                    onChange={(e) =>
+                      setFormData({
+                        ...formData,
+                        year: parseInt(e.target.value),
+                      })
+                    }
                     min="2000"
                     max="2100"
                     required
@@ -229,7 +275,9 @@ export const FestivalEditionManagement = ({ festivalId }: FestivalEditionManagem
                     id="start_date"
                     type="date"
                     value={formData.start_date}
-                    onChange={(e) => setFormData({ ...formData, start_date: e.target.value })}
+                    onChange={(e) =>
+                      setFormData({ ...formData, start_date: e.target.value })
+                    }
                   />
                 </div>
                 <div>
@@ -238,21 +286,25 @@ export const FestivalEditionManagement = ({ festivalId }: FestivalEditionManagem
                     id="end_date"
                     type="date"
                     value={formData.end_date}
-                    onChange={(e) => setFormData({ ...formData, end_date: e.target.value })}
+                    onChange={(e) =>
+                      setFormData({ ...formData, end_date: e.target.value })
+                    }
                   />
                 </div>
                 <div className="flex justify-end gap-2">
-                  <Button 
-                    type="button" 
-                    variant="outline" 
+                  <Button
+                    type="button"
+                    variant="outline"
                     onClick={() => setIsDialogOpen(false)}
                     disabled={isSubmitting}
                   >
                     Cancel
                   </Button>
                   <Button type="submit" disabled={isSubmitting}>
-                    {isSubmitting && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
-                    {editingEdition ? 'Update' : 'Create'}
+                    {isSubmitting && (
+                      <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                    )}
+                    {editingEdition ? "Update" : "Create"}
                   </Button>
                 </div>
               </form>
@@ -276,11 +328,13 @@ export const FestivalEditionManagement = ({ festivalId }: FestivalEditionManagem
             <TableBody>
               {editions.map((edition) => (
                 <TableRow key={edition.id}>
-                  <TableCell className="font-medium">{getFestivalName(edition.festival_id)}</TableCell>
+                  <TableCell className="font-medium">
+                    {getFestivalName(edition.festival_id)}
+                  </TableCell>
                   <TableCell>{edition.name}</TableCell>
                   <TableCell>{edition.year}</TableCell>
-                  <TableCell>{edition.start_date || '—'}</TableCell>
-                  <TableCell>{edition.end_date || '—'}</TableCell>
+                  <TableCell>{edition.start_date || "—"}</TableCell>
+                  <TableCell>{edition.end_date || "—"}</TableCell>
                   <TableCell>
                     <div className="flex gap-2">
                       <Button
@@ -307,7 +361,8 @@ export const FestivalEditionManagement = ({ festivalId }: FestivalEditionManagem
 
           {editions.length === 0 && (
             <div className="text-center py-8 text-muted-foreground">
-              No festival editions found. Create your first edition to get started.
+              No festival editions found. Create your first edition to get
+              started.
             </div>
           )}
         </div>

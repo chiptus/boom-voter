@@ -1,6 +1,11 @@
-
 import { useState, useEffect } from "react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -15,9 +20,12 @@ interface InviteManagementProps {
   groupName: string;
 }
 
-export const InviteManagement = ({ groupId, groupName }: InviteManagementProps) => {
+export const InviteManagement = ({
+  groupId,
+  groupName,
+}: InviteManagementProps) => {
   const [invites, setInvites] = useState<GroupInvite[]>([]);
- 
+
   const [generating, setGenerating] = useState(false);
   const [expirationDays, setExpirationDays] = useState<string>("");
   const [maxUses, setMaxUses] = useState<string>("");
@@ -32,7 +40,7 @@ export const InviteManagement = ({ groupId, groupName }: InviteManagementProps) 
       const data = await inviteService.getGroupInvites(groupId);
       setInvites(data);
     } catch (error) {
-      console.error('Error fetching invites:', error);
+      console.error("Error fetching invites:", error);
       toast({
         title: "Error",
         description: "Failed to load invites",
@@ -47,36 +55,39 @@ export const InviteManagement = ({ groupId, groupName }: InviteManagementProps) 
       const options: {
         expiresAt?: Date;
         maxUses?: number;
-    } = {};
-      
+      } = {};
+
       if (expirationDays) {
         const expireDate = new Date();
         expireDate.setDate(expireDate.getDate() + parseInt(expirationDays));
         options.expiresAt = expireDate;
       }
-      
+
       if (maxUses) {
         options.maxUses = parseInt(maxUses);
       }
 
-      const inviteUrl = await inviteService.generateInviteLink(groupId, options);
-      
+      const inviteUrl = await inviteService.generateInviteLink(
+        groupId,
+        options,
+      );
+
       // Copy to clipboard
       await navigator.clipboard.writeText(inviteUrl);
-      
+
       toast({
         title: "Invite Created",
         description: "Invite link has been copied to your clipboard!",
       });
-      
+
       // Reset form
       setExpirationDays("");
       setMaxUses("");
-      
+
       // Refresh invites list
       fetchInvites();
     } catch (error) {
-      console.error('Error generating invite:', error);
+      console.error("Error generating invite:", error);
       toast({
         title: "Error",
         description: "Failed to generate invite link",
@@ -106,7 +117,7 @@ export const InviteManagement = ({ groupId, groupName }: InviteManagementProps) 
 
   const deleteInvite = async (inviteId: string) => {
     if (!window.confirm("Are you sure you want to delete this invite?")) return;
-    
+
     try {
       await inviteService.deleteInvite(inviteId);
       toast({
@@ -133,7 +144,9 @@ export const InviteManagement = ({ groupId, groupName }: InviteManagementProps) 
   };
 
   const isOverused = (invite: GroupInvite) => {
-    return invite.max_uses !== undefined && invite.used_count >= invite.max_uses;
+    return (
+      invite.max_uses !== undefined && invite.used_count >= invite.max_uses
+    );
   };
 
   return (
@@ -174,8 +187,8 @@ export const InviteManagement = ({ groupId, groupName }: InviteManagementProps) 
               />
             </div>
           </div>
-          <Button 
-            onClick={generateInvite} 
+          <Button
+            onClick={generateInvite}
             disabled={generating}
             className="w-full"
           >
@@ -188,9 +201,7 @@ export const InviteManagement = ({ groupId, groupName }: InviteManagementProps) 
       <Card>
         <CardHeader>
           <CardTitle>Active Invites</CardTitle>
-          <CardDescription>
-            Manage your group's invite links
-          </CardDescription>
+          <CardDescription>Manage your group's invite links</CardDescription>
         </CardHeader>
         <CardContent>
           {invites.length === 0 ? (
@@ -203,16 +214,24 @@ export const InviteManagement = ({ groupId, groupName }: InviteManagementProps) 
                 <div key={invite.id} className="border rounded-lg p-4">
                   <div className="flex items-center justify-between mb-2">
                     <div className="flex items-center space-x-2">
-                      <Badge variant={
-                        !invite.is_active ? "destructive" :
-                        isExpired(invite.expires_at) ? "destructive" :
-                        isOverused(invite) ? "destructive" :
-                        "default"
-                      }>
-                        {!invite.is_active ? "Inactive" :
-                         isExpired(invite.expires_at) ? "Expired" :
-                         isOverused(invite) ? "Overused" :
-                         "Active"}
+                      <Badge
+                        variant={
+                          !invite.is_active
+                            ? "destructive"
+                            : isExpired(invite.expires_at)
+                              ? "destructive"
+                              : isOverused(invite)
+                                ? "destructive"
+                                : "default"
+                        }
+                      >
+                        {!invite.is_active
+                          ? "Inactive"
+                          : isExpired(invite.expires_at)
+                            ? "Expired"
+                            : isOverused(invite)
+                              ? "Overused"
+                              : "Active"}
                       </Badge>
                       <span className="text-sm text-muted-foreground">
                         Created {formatDate(invite.created_at)}
@@ -235,14 +254,12 @@ export const InviteManagement = ({ groupId, groupName }: InviteManagementProps) 
                       </Button>
                     </div>
                   </div>
-                  
+
                   <div className="flex items-center space-x-4 text-sm text-muted-foreground">
                     <div className="flex items-center space-x-1">
                       <Users className="h-4 w-4" />
                       <span>{invite.used_count} uses</span>
-                      {invite.max_uses && (
-                        <span>/ {invite.max_uses}</span>
-                      )}
+                      {invite.max_uses && <span>/ {invite.max_uses}</span>}
                     </div>
                     {invite.expires_at && (
                       <div className="flex items-center space-x-1">

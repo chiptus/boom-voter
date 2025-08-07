@@ -49,11 +49,9 @@ test.describe("Artists", () => {
     await testHelpers.navigateTo("/");
 
     // Look for artist cards/items
-    const artistCard = page
-      .getByTestId("artist-item").first();
+    const artistCard = page.getByTestId("artist-item").first();
 
     if (await artistCard.isVisible()) {
-
       const artistName = await artistCard.getByRole("heading").textContent();
       const link = artistCard.getByRole("link");
       await link.click();

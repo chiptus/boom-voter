@@ -11,14 +11,15 @@ interface ArtistScheduleBlockProps {
   compact?: boolean;
 }
 
-export const ArtistScheduleBlock = ({ 
-  artist, 
-  userVote, 
-  onVote, 
-  compact = false 
+export const ArtistScheduleBlock = ({
+  artist,
+  userVote,
+  onVote,
+  compact = false,
 }: ArtistScheduleBlockProps) => {
   const getVoteCount = (voteType: number) => {
-    return (artist.votes || []).filter(vote => vote.vote_type === voteType).length;
+    return (artist.votes || []).filter((vote) => vote.vote_type === voteType)
+      .length;
   };
 
   const handleVote = (voteType: number) => {
@@ -31,17 +32,17 @@ export const ArtistScheduleBlock = ({
     <Card className="bg-white/10 backdrop-blur-md border-purple-400/30 hover:border-purple-400/50 transition-colors">
       <CardContent className={compact ? "p-3" : "p-4"}>
         <div className="mb-2">
-          <Link 
+          <Link
             to={`/artist/${artist.id}`}
             className="text-white font-semibold hover:text-purple-300 transition-colors block"
           >
             {artist.name}
           </Link>
-          
+
           {/* Show artists in this set */}
           {artist.artists && artist.artists.length > 0 && (
             <div className="text-purple-300 text-sm mt-1">
-              {artist.artists.map(a => a.name).join(", ")}
+              {artist.artists.map((a) => a.name).join(", ")}
             </div>
           )}
         </div>
@@ -51,11 +52,17 @@ export const ArtistScheduleBlock = ({
             <div className="flex items-center gap-2">
               <Clock className="h-3 w-3" />
               <span className="text-xs">
-                {artist.startTime && artist.endTime && formatTimeOnly(artist.startTime.toISOString(), artist.endTime.toISOString(), true)}
+                {artist.startTime &&
+                  artist.endTime &&
+                  formatTimeOnly(
+                    artist.startTime.toISOString(),
+                    artist.endTime.toISOString(),
+                    true,
+                  )}
               </span>
             </div>
           )}
-          
+
           {!compact && artist.stage && (
             <div className="flex items-center gap-2">
               <MapPin className="h-3 w-3" />
@@ -66,27 +73,33 @@ export const ArtistScheduleBlock = ({
 
         {onVote && (
           <div className="flex gap-3 mt-2">
-            <div 
+            <div
               className={`flex items-center gap-1 cursor-pointer ${
-                userVote === 2 ? 'text-green-400' : 'text-purple-300 hover:text-green-400'
+                userVote === 2
+                  ? "text-green-400"
+                  : "text-purple-300 hover:text-green-400"
               }`}
               onClick={() => handleVote(2)}
             >
               <Heart className="h-3 w-3" />
               <span className="text-xs">{getVoteCount(2)}</span>
             </div>
-            <div 
+            <div
               className={`flex items-center gap-1 cursor-pointer ${
-                userVote === 1 ? 'text-blue-400' : 'text-purple-300 hover:text-blue-400'
+                userVote === 1
+                  ? "text-blue-400"
+                  : "text-purple-300 hover:text-blue-400"
               }`}
               onClick={() => handleVote(1)}
             >
               <ThumbsUp className="h-3 w-3" />
               <span className="text-xs">{getVoteCount(1)}</span>
             </div>
-            <div 
+            <div
               className={`flex items-center gap-1 cursor-pointer ${
-                userVote === -1 ? 'text-red-400' : 'text-purple-300 hover:text-red-400'
+                userVote === -1
+                  ? "text-red-400"
+                  : "text-purple-300 hover:text-red-400"
               }`}
               onClick={() => handleVote(-1)}
             >

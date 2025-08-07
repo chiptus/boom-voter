@@ -53,7 +53,7 @@ const fetchGroupAnalytics = async (): Promise<GroupAnalytics[]> => {
         ...group,
         member_count: count || 0,
       };
-    })
+    }),
   );
 
   return groupsWithCounts;
@@ -79,7 +79,7 @@ const fetchUserAnalytics = async (): Promise<UserAnalytics[]> => {
         ...profile,
         vote_count: count || 0,
       };
-    })
+    }),
   );
 
   return usersWithCounts;
@@ -106,9 +106,7 @@ export function AnalyticsTable() {
 
   if (groupsError || usersError) {
     return (
-      <div className="text-destructive">
-        Failed to load analytics data
-      </div>
+      <div className="text-destructive">Failed to load analytics data</div>
     );
   }
 

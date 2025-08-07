@@ -26,7 +26,7 @@ export const MobileFilters = ({
   onClear,
 }: MobileFiltersProps) => {
   const { data: stages = [], isLoading: stagesLoading } = useStagesQuery();
-  
+
   const handleStageSelect = (value: string) => {
     if (value === "all") {
       onStateChange({ stages: [] });
@@ -44,9 +44,7 @@ export const MobileFilters = ({
   };
 
   const hasActiveFilters =
-    state.stages.length > 0 ||
-    state.genres.length > 0 ||
-    state.minRating > 0;
+    state.stages.length > 0 || state.genres.length > 0 || state.minRating > 0;
 
   return (
     <div className="space-y-4">
@@ -70,7 +68,11 @@ export const MobileFilters = ({
               </SelectItem>
             ) : (
               stages.map((stage) => (
-                <SelectItem key={stage.id} value={stage.id} className="text-purple-100">
+                <SelectItem
+                  key={stage.id}
+                  value={stage.id}
+                  className="text-purple-100"
+                >
                   {stage.name}
                 </SelectItem>
               ))

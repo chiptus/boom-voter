@@ -27,7 +27,10 @@ export default function Admin() {
   const [addGenreOpen, setAddGenreOpen] = useState(false);
 
   const navigate = useNavigate();
-  const { tab, festivalId } = useParams<{ tab?: string; festivalId?: string }>();
+  const { tab, festivalId } = useParams<{
+    tab?: string;
+    festivalId?: string;
+  }>();
   const { toast } = useToast();
 
   const { data: canEdit = false, isLoading: isLoadingPermissions } =
@@ -35,8 +38,6 @@ export default function Admin() {
 
   const { data: isSuperAdmin = false, isLoading: isLoadingSuperAdmin } =
     useUserPermissionsQuery(user?.id, "is_admin");
-
- 
 
   useEffect(() => {
     // Wait for auth loading to complete
@@ -78,7 +79,7 @@ export default function Admin() {
   };
 
   // If we're in a festival management route, always show festivals tab
-  const currentTab = festivalId ? "festivals" : (tab || "artists");
+  const currentTab = festivalId ? "festivals" : tab || "artists";
 
   const handleTabChange = (value: string) => {
     if (value === "artists") {
@@ -101,8 +102,14 @@ export default function Admin() {
         />
 
         <div className="mt-8">
-          <Tabs value={currentTab} onValueChange={handleTabChange} className="w-full">
-            <TabsList className={`grid w-full ${isSuperAdmin ? 'grid-cols-5' : 'grid-cols-4'} bg-white/10 backdrop-blur-md`}>
+          <Tabs
+            value={currentTab}
+            onValueChange={handleTabChange}
+            className="w-full"
+          >
+            <TabsList
+              className={`grid w-full ${isSuperAdmin ? "grid-cols-5" : "grid-cols-4"} bg-white/10 backdrop-blur-md`}
+            >
               <TabsTrigger
                 value="artists"
                 className="data-[state=active]:bg-purple-600 data-[state=active]:text-white"

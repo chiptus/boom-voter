@@ -32,7 +32,7 @@ export function SetsPanel({
 
   const { userVotes, votingLoading, handleVote } = useOfflineVoting(
     user,
-    undefined // Remove the refresh callback to prevent auto re-sorting
+    undefined, // Remove the refresh callback to prevent auto re-sorting
   );
 
   if (sets.length === 0) {

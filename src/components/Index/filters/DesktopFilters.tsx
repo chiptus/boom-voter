@@ -19,7 +19,7 @@ export const DesktopFilters = ({
   onClear,
 }: DesktopFiltersProps) => {
   const { data: stages = [], isLoading: stagesLoading } = useStagesQuery();
-  
+
   const handleStageToggle = (stageId: string) => {
     const newStages = state.stages.includes(stageId)
       ? state.stages.filter((s) => s !== stageId)
@@ -35,9 +35,7 @@ export const DesktopFilters = ({
   };
 
   const hasActiveFilters =
-    state.stages.length > 0 ||
-    state.genres.length > 0 ||
-    state.minRating > 0;
+    state.stages.length > 0 || state.genres.length > 0 || state.minRating > 0;
 
   return (
     <div className="space-y-4">
@@ -51,7 +49,9 @@ export const DesktopFilters = ({
             stages.map((stage) => (
               <Button
                 key={stage.id}
-                variant={state.stages.includes(stage.id) ? "default" : "outline"}
+                variant={
+                  state.stages.includes(stage.id) ? "default" : "outline"
+                }
                 size="sm"
                 onClick={() => handleStageToggle(stage.id)}
                 className={

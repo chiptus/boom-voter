@@ -10,7 +10,7 @@ export const useFestivalsQuery = () => {
 
 export const useFestivalEditionsQuery = (festivalId: string | undefined) => {
   return useQuery({
-    queryKey: festivalQueries.editions(festivalId || ''),
+    queryKey: festivalQueries.editions(festivalId || ""),
     queryFn: () => queryFunctions.fetchFestivalEditions(festivalId!),
     enabled: !!festivalId,
   });
@@ -19,7 +19,7 @@ export const useFestivalEditionsQuery = (festivalId: string | undefined) => {
 // Hook to get ALL festival editions (for admin management)
 export const useAllFestivalEditionsQuery = () => {
   return useQuery({
-    queryKey: ['festival-editions'],
+    queryKey: ["festival-editions"],
     queryFn: () => queryFunctions.fetchFestivalEditions(), // Without festivalId gets all
   });
 };
@@ -27,11 +27,11 @@ export const useAllFestivalEditionsQuery = () => {
 // Hook to get the default Boom Festival 2025 edition ID
 export const useBoomFestival2025 = () => {
   const { data: festivals } = useFestivalsQuery();
-  const boomFestival = festivals?.find(f => f.name === 'Boom Festival');
-  
+  const boomFestival = festivals?.find((f) => f.name === "Boom Festival");
+
   const { data: editions } = useFestivalEditionsQuery(boomFestival?.id);
-  const boom2025 = editions?.find(e => e.name === 'Boom 2025');
-  
+  const boom2025 = editions?.find((e) => e.name === "Boom 2025");
+
   return {
     festivalId: boomFestival?.id,
     editionId: boom2025?.id,

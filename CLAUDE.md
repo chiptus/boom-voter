@@ -5,6 +5,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ## Essential Commands
 
 ### Development
+
 - `npm run dev` - Start development server on port 8080
 - `npm run build` - Production build
 - `npm run build:dev` - Development build
@@ -12,6 +13,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - `npm run preview` - Preview production build
 
 ### Testing
+
 - `npm run test:e2e` - Run Playwright end-to-end tests
 - `npm run test:e2e:ui` - Run tests with Playwright UI
 - `npm run test:e2e:headed` - Run tests in headed mode
@@ -23,6 +25,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ## Architecture Overview
 
 ### Tech Stack
+
 - **Frontend**: React 18 + TypeScript + Vite
 - **UI**: shadcn/ui components with Radix UI primitives
 - **Styling**: Tailwind CSS with custom design system
@@ -32,6 +35,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - **Testing**: Playwright for E2E tests
 
 ### Project Structure
+
 ```
 src/
 ├── components/          # Reusable UI components
@@ -62,6 +66,7 @@ src/
 5. **Authentication**: Passwordless login with magic links and OTP backup
 
 ### Database Schema
+
 - `artists` - Artist information with genres, stages, performance times
 - `votes` - User votes linked to artists and groups
 - `artist_notes` - Collaborative notes visible to group members
@@ -84,9 +89,10 @@ src/
 3. **Components**: Follow shadcn/ui patterns for new UI components
 4. **Data Fetching**: Use TanStack Query hooks in `hooks/queries/`
 5. **Authentication**: Use `useAuth` hook for auth state and actions
-6. **Routing**: Add new routes to `App.tsx` above the catch-all "*" route
+6. **Routing**: Add new routes to `App.tsx` above the catch-all "\*" route
 
 ### Testing Setup
+
 - E2E tests use Playwright with local Supabase instance
 - Tests run against port 8080 (development server)
 - Test data setup via `scripts/setup-test-env.sh`
@@ -94,6 +100,7 @@ src/
 - Detailed testing documentation in `tests/README.md`
 
 ### Code Conventions
+
 - ESLint configuration disables unused variable warnings
 - React hooks follow standard patterns
 - Component files use PascalCase
@@ -101,6 +108,7 @@ src/
 - Services and utilities use camelCase
 
 ### Important Notes
+
 - Server runs on port 8080 (not standard 3000)
 - Authentication uses magic links primarily, OTP as backup
 - All database operations go through Supabase RLS policies

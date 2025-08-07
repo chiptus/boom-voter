@@ -3,7 +3,13 @@ import { useNavigate, useParams } from "react-router-dom";
 import { useFestivalQuery } from "@/hooks/queries/useFestivalQuery";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { Calendar, CalendarDays, MapPin, Music, Loader2 } from "lucide-react";
 
@@ -15,17 +21,20 @@ import { SetManagement } from "./SetManagement";
 export const FestivalHierarchyManagement = () => {
   const { data: festivals = [], isLoading } = useFestivalQuery.useFestivals();
   const navigate = useNavigate();
-  const { festivalId, subtab } = useParams<{ festivalId?: string; subtab?: string }>();
+  const { festivalId, subtab } = useParams<{
+    festivalId?: string;
+    subtab?: string;
+  }>();
   const [selectedFestival, setSelectedFestival] = useState<string>("");
 
   // Initialize festival and tab from URL params
   useEffect(() => {
-    if (festivalId && festivals.some(f => f.id === festivalId)) {
+    if (festivalId && festivals.some((f) => f.id === festivalId)) {
       setSelectedFestival(festivalId);
     }
   }, [festivalId, festivals]);
 
-  const selectedFestivalData = festivals.find(f => f.id === selectedFestival);
+  const selectedFestivalData = festivals.find((f) => f.id === selectedFestival);
 
   const handleFestivalChange = (festivalId: string) => {
     if (festivalId === "none") {
@@ -67,7 +76,10 @@ export const FestivalHierarchyManagement = () => {
               Festival Management
             </span>
             <div className="flex items-center gap-4">
-              <Select value={selectedFestival || "none"} onValueChange={handleFestivalChange}>
+              <Select
+                value={selectedFestival || "none"}
+                onValueChange={handleFestivalChange}
+              >
                 <SelectTrigger className="w-64">
                   <SelectValue placeholder="Select a festival to manage" />
                 </SelectTrigger>
@@ -93,13 +105,21 @@ export const FestivalHierarchyManagement = () => {
             <div className="text-center py-8 text-muted-foreground">
               <Calendar className="h-12 w-12 mx-auto mb-4 opacity-50" />
               <p className="text-lg font-medium mb-2">Festival Management</p>
-              <p>Select a festival above to manage its editions, stages, and sets.</p>
-              <p className="text-sm mt-2">Or use the "Festivals" tab to create and manage festivals.</p>
+              <p>
+                Select a festival above to manage its editions, stages, and
+                sets.
+              </p>
+              <p className="text-sm mt-2">
+                Or use the "Festivals" tab to create and manage festivals.
+              </p>
             </div>
           ) : (
             <div className="text-center py-4">
               <p className="text-sm text-muted-foreground">
-                Managing <span className="font-medium">{selectedFestivalData?.name}</span>
+                Managing{" "}
+                <span className="font-medium">
+                  {selectedFestivalData?.name}
+                </span>
               </p>
             </div>
           )}
@@ -107,7 +127,11 @@ export const FestivalHierarchyManagement = () => {
       </Card>
 
       {/* Management Tabs */}
-      <Tabs value={currentSubTab} onValueChange={handleSubTabChange} className="w-full">
+      <Tabs
+        value={currentSubTab}
+        onValueChange={handleSubTabChange}
+        className="w-full"
+      >
         <TabsList className="grid w-full grid-cols-4 bg-white/10 backdrop-blur-md">
           <TabsTrigger
             value="festivals"
@@ -190,7 +214,11 @@ export const FestivalHierarchyManagement = () => {
 };
 
 // Filtered components that only show data for the selected festival
-const FestivalEditionManagementFiltered = ({ festivalId }: { festivalId: string }) => {
+const FestivalEditionManagementFiltered = ({
+  festivalId,
+}: {
+  festivalId: string;
+}) => {
   return <FestivalEditionManagement festivalId={festivalId} />;
 };
 

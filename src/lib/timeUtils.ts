@@ -1,8 +1,11 @@
 import { format, isValid, parseISO, isSameDay } from "date-fns";
 import { fromZonedTime, toZonedTime } from "date-fns-tz";
 
-export function formatTimeRange(startTime: string | null,
-  endTime: string | null, use24Hour: boolean = false): string | null {
+export function formatTimeRange(
+  startTime: string | null,
+  endTime: string | null,
+  use24Hour: boolean = false,
+): string | null {
   if (!startTime && !endTime) return null;
 
   const start = startTime ? parseISO(startTime) : null;
@@ -33,13 +36,13 @@ export function formatTimeRange(startTime: string | null,
       // Same day: "Dec 15, 2:00 PM - 4:00 PM" or "Dec 15, 14:00 - 16:00"
       return `${format(validStart, dateTimeFormat)} - ${format(
         validEnd,
-        timeFormat
+        timeFormat,
       )}`;
     } else {
       // Different days: "Dec 15, 2:00 PM - Dec 16, 1:00 AM" or "Dec 15, 14:00 - Dec 16, 01:00"
       return `${format(validStart, dateTimeFormat)} - ${format(
         validEnd,
-        dateTimeFormat
+        dateTimeFormat,
       )}`;
     }
   }
@@ -47,7 +50,10 @@ export function formatTimeRange(startTime: string | null,
   return null;
 }
 
-export function formatDateTime(dateTime: string | null, use24Hour: boolean = false): string | null {
+export function formatDateTime(
+  dateTime: string | null,
+  use24Hour: boolean = false,
+): string | null {
   if (!dateTime) return null;
 
   const date = parseISO(dateTime);
@@ -55,9 +61,13 @@ export function formatDateTime(dateTime: string | null, use24Hour: boolean = fal
 
   const dateTimeFormat = use24Hour ? "MMM d, HH:mm" : "MMM d, h:mm a";
   return format(date, dateTimeFormat);
-};
+}
 
-export const formatTimeOnly = (startTime: string | null, endTime: string | null, use24Hour: boolean = false): string | null => {
+export const formatTimeOnly = (
+  startTime: string | null,
+  endTime: string | null,
+  use24Hour: boolean = false,
+): string | null => {
   if (!startTime) return null;
 
   const start = parseISO(startTime);
@@ -73,7 +83,6 @@ export const formatTimeOnly = (startTime: string | null, endTime: string | null,
 
   return format(start, timeFormat);
 };
-
 
 // Get user's timezone
 function getUserTimeZone(): string {
@@ -95,7 +104,7 @@ export function toDatetimeLocal(isoString: string | null): string {
   const minutes = String(localDate.getMinutes()).padStart(2, "0");
 
   return `${year}-${month}-${day}T${hours}:${minutes}`;
-};
+}
 
 // Helper function to convert local datetime-local to UTC ISO string
 export function toISOString(datetimeLocal: string): string {

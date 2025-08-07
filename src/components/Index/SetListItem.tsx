@@ -15,7 +15,7 @@ interface SetListItemProps {
   votingLoading?: boolean;
   onVote: (
     setId: string,
-    voteType: number
+    voteType: number,
   ) => Promise<{ requiresAuth: boolean }>;
   onKnowledgeToggle: (setId: string) => Promise<{ requiresAuth: boolean }>;
   onAuthRequired: () => void;
@@ -195,8 +195,8 @@ export function SetListItem({
                 .filter(
                   (genre, index, self) =>
                     self.findIndex(
-                      (g) => g.music_genre_id === genre.music_genre_id
-                    ) === index
+                      (g) => g.music_genre_id === genre.music_genre_id,
+                    ) === index,
                 )
                 .map((genre) => (
                   <GenreBadge
@@ -379,12 +379,12 @@ export function SetListItem({
                         <img
                           src={
                             getSocialPlatformLogo(
-                              set.artists[0]?.soundcloud_url
+                              set.artists[0]?.soundcloud_url,
                             )?.logo
                           }
                           alt={`${
                             getSocialPlatformLogo(
-                              set.artists[0]?.soundcloud_url
+                              set.artists[0]?.soundcloud_url,
                             )?.platform
                           } logo`}
                           className="h-3 w-3 object-contain"
@@ -400,8 +400,8 @@ export function SetListItem({
                   .filter(
                     (genre, index, self) =>
                       self.findIndex(
-                        (g) => g.music_genre_id === genre.music_genre_id
-                      ) === index
+                        (g) => g.music_genre_id === genre.music_genre_id,
+                      ) === index,
                   )
                   .map((genre) => (
                     <GenreBadge
