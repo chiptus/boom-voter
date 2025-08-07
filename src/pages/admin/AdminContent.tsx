@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { AddArtistDialog } from "@/components/Index/AddArtistDialog";
+import { AddArtistDialog } from "@/components/Admin/AddArtistDialog";
 import { AddGenreDialog } from "@/components/Index/AddGenreDialog";
 import { Button } from "@/components/ui/button";
 import {

@@ -16,28 +16,32 @@ import {
 import { Checkbox } from "@/components/ui/checkbox";
 import { ChevronsUpDown, X } from "lucide-react";
 
-interface Genre {
+interface Option {
   id: string;
   name: string;
 }
 
-interface GenreMultiSelectProps {
-  genres: Genre[];
+interface MultiSelectProps {
+  options: Option[];
   value: string[];
   onValueChange: (value: string[]) => void;
   placeholder?: string;
+  searchPlaceholder?: string;
+  emptyMessage?: string;
   disabled?: boolean;
   className?: string;
 }
 
-export function GenreMultiSelect({
-  genres,
+export function MultiSelect({
+  options,
   value,
   onValueChange,
-  placeholder = "Select genres...",
+  placeholder = "Select options...",
+  searchPlaceholder = "Search options...",
+  emptyMessage = "No options found.",
   disabled = false,
   className,
-}: GenreMultiSelectProps) {
+}: MultiSelectProps) {
   return (
     <Popover>
       <PopoverTrigger asChild>
@@ -49,17 +53,17 @@ export function GenreMultiSelect({
         >
           {value.length > 0 ? (
             <div className="flex flex-wrap gap-1">
-              {value.map((genreId) => {
-                const genre = genres.find((g) => g.id === genreId);
-                return genre ? (
-                  <Badge key={genreId} variant="secondary" className="text-xs">
-                    {genre.name}
+              {value.map((optionId) => {
+                const option = options.find((o) => o.id === optionId);
+                return option ? (
+                  <Badge key={optionId} variant="secondary" className="text-xs">
+                    {option.name}
                     <span
                       className="ml-1 hover:text-red-600 cursor-pointer"
                       onClick={(e) => {
                         e.stopPropagation();
                         e.preventDefault();
-                        const newValue = value.filter((id) => id !== genreId);
+                        const newValue = value.filter((id) => id !== optionId);
                         onValueChange(newValue);
                       }}
                     >
@@ -77,25 +81,25 @@ export function GenreMultiSelect({
       </PopoverTrigger>
       <PopoverContent className="w-full p-0">
         <Command>
-          <CommandInput placeholder="Search genres..." />
-          <CommandEmpty>No genres found.</CommandEmpty>
+          <CommandInput placeholder={searchPlaceholder} />
+          <CommandEmpty>{emptyMessage}</CommandEmpty>
           <CommandGroup>
             <CommandList>
-              {genres.map((genre) => (
+              {options.map((option) => (
                 <CommandItem
-                  key={genre.id}
+                  key={option.id}
                   onSelect={() => {
-                    const newValue = value.includes(genre.id)
-                      ? value.filter((id) => id !== genre.id)
-                      : [...value, genre.id];
+                    const newValue = value.includes(option.id)
+                      ? value.filter((id) => id !== option.id)
+                      : [...value, option.id];
                     onValueChange(newValue);
                   }}
                 >
                   <Checkbox
-                    checked={value.includes(genre.id)}
+                    checked={value.includes(option.id)}
                     className="mr-2"
                   />
-                  {genre.name}
+                  {option.name}
                 </CommandItem>
               ))}
             </CommandList>

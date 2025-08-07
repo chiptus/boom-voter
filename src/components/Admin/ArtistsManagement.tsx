@@ -17,8 +17,8 @@ import {
   useArchiveArtistMutation,
   useArtistsQuery,
 } from "@/hooks/queries/useArtistsQuery";
-import { AddArtistDialog } from "../Index/AddArtistDialog";
-import { EditArtistDialog } from "../EditArtistDialog";
+import { AddArtistDialog } from "./AddArtistDialog";
+import { EditArtistDialog } from "./EditArtistDialog";
 import { GenreBadge } from "../Index/GenreBadge";
 
 export const ArtistsManagement = () => {

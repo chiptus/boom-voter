@@ -10,7 +10,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { GenreMultiSelect } from "@/components/ui/genre-multi-select";
+import { GenreMultiSelect } from "@/components/GenreMultiSelect";
 import {
   Form,
   FormControl,
@@ -24,7 +24,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { useUserPermissionsQuery } from "@/hooks/queries/useGroupsQuery";
 import { useGenresQuery } from "@/hooks/queries/useGenresQuery";
 import { useUpdateArtistMutation } from "@/hooks/queries/useArtistsQuery";
-import { StageSelector } from "./StageSelector";
+import { StageSelector } from "../StageSelector";
 import { toDatetimeLocal, toISOString } from "@/lib/timeUtils";
 import type { Database } from "@/integrations/supabase/types";
 

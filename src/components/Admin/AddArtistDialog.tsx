@@ -26,7 +26,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { useUserPermissionsQuery } from "@/hooks/queries/useGroupsQuery";
 import { useGenresQuery } from "@/hooks/queries/useGenresQuery";
 import { useCreateArtistMutation } from "@/hooks/queries/useArtistsQuery";
-import { GenreMultiSelect } from "../ui/genre-multi-select";
+import { GenreMultiSelect } from "../GenreMultiSelect";
 
 // Form validation schema
 const artistFormSchema = z.object({
