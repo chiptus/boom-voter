@@ -14,6 +14,14 @@ export const useUserGroupsQuery = (userId: string | undefined) => {
   });
 };
 
+export const useGroupDetailQuery = (groupId: string) => {
+  return useQuery({
+    queryKey: groupQueries.detail(groupId),
+    queryFn: () => queryFunctions.fetchGroupById(groupId),
+    enabled: !!groupId,
+  });
+};
+
 export const useGroupMembersQuery = (groupId: string) => {
   return useQuery({
     queryKey: groupQueries.members(groupId),

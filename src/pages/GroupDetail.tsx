@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { AppHeader } from "@/components/AppHeader";
 import {
@@ -14,23 +14,31 @@ import { useGroups } from "@/hooks/useGroups";
 import { useToast } from "@/components/ui/use-toast";
 import { InviteManagement } from "@/components/Groups/InviteManagement";
 import { Button } from "@/components/ui/button";
-import type { Group, GroupMember } from "@/types/groups";
+import {
+  useGroupDetailQuery,
+  useGroupMembersQuery,
+} from "@/hooks/queries/useGroupsQuery";
+import { useQueryClient } from "@tanstack/react-query";
+import { groupQueries } from "@/services/queries";
 
 const GroupDetail = () => {
   const { groupId } = useParams<{ groupId: string }>();
   const navigate = useNavigate();
-  const {
-    user,
-    getGroupById,
-    getGroupMembers,
-    removeMemberFromGroup,
-    loading: authLoading,
-  } = useGroups();
+  const { user, removeMemberFromGroup, loading: authLoading } = useGroups();
   const { toast } = useToast();
-  const [group, setGroup] = useState<Group | null>(null);
-  const [members, setMembers] = useState<GroupMember[]>([]);
-  const [loading, setLoading] = useState(true);
+  const queryClient = useQueryClient();
   const [removingMember, setRemovingMember] = useState<string | null>(null);
+
+  // React Query hooks
+  const {
+    data: group,
+    isLoading: groupLoading,
+    error: groupError,
+  } = useGroupDetailQuery(groupId || "");
+  const { data: members = [], isLoading: membersLoading } =
+    useGroupMembersQuery(groupId || "");
+
+  const loading = groupLoading || membersLoading;
 
   useEffect(() => {
     if (authLoading) return; // Wait for auth to load
@@ -45,32 +53,16 @@ const GroupDetail = () => {
       return;
     }
 
-    fetchGroupDetails();
-  }, [groupId, user, authLoading]);
-
-  const fetchGroupDetails = async () => {
-    if (!groupId) return;
-
-    try {
-      setLoading(true);
-      const [groupData, membersData] = await Promise.all([
-        getGroupById(groupId),
-        getGroupMembers(groupId),
-      ]);
-
-      setGroup(groupData);
-      setMembers(membersData);
-    } catch (error) {
+    // Handle group fetch errors
+    if (groupError) {
       toast({
         title: "Error",
         description: "Failed to fetch group details",
         variant: "destructive",
       });
       navigate("/groups");
-    } finally {
-      setLoading(false);
     }
-  };
+  }, [groupId, user, authLoading, groupError, navigate, toast]);
 
   const handleRemoveMember = async (memberId: string, memberUserId: string) => {
     if (!groupId || !user) return;
@@ -83,7 +75,10 @@ const GroupDetail = () => {
       setRemovingMember(memberId);
       const success = await removeMemberFromGroup(groupId, memberUserId);
       if (success) {
-        await fetchGroupDetails(); // Refresh the member list
+        // Refresh the member list using React Query
+        queryClient.invalidateQueries({
+          queryKey: groupQueries.members(groupId),
+        });
       }
       setRemovingMember(null);
     }

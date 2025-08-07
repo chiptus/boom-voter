@@ -99,6 +99,8 @@ export const inviteQueries = {
   all: () => ["invites"] as const,
   group: (groupId: string) =>
     [...inviteQueries.all(), "group", groupId] as const,
+  validation: (token: string) =>
+    [...inviteQueries.all(), "validation", token] as const,
 };
 
 // Query Functions
@@ -541,6 +543,21 @@ export const queryFunctions = {
     );
 
     return groupsWithCounts;
+  },
+
+  async fetchGroupById(groupId: string) {
+    const { data, error } = await supabase
+      .from("groups")
+      .select("*")
+      .eq("id", groupId)
+      .single();
+
+    if (error) {
+      console.error("Error fetching group:", error);
+      throw new Error("Failed to fetch group");
+    }
+
+    return data;
   },
 
   async fetchGroupMembers(groupId: string) {

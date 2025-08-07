@@ -1,0 +1,86 @@
+import { useQuery, useMutation } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
+import { inviteQueries } from "@/services/queries";
+import { useToast } from "@/components/ui/use-toast";
+import type { InviteValidation } from "@/types/invites";
+
+const validateInviteToken = async (
+  token: string,
+): Promise<InviteValidation | null> => {
+  const { data, error } = await supabase.rpc("validate_invite_token", {
+    token,
+  });
+
+  if (error) {
+    console.error("Error validating invite:", error);
+    throw new Error(error.message);
+  }
+
+  if (data && data.length > 0) {
+    return data[0] as InviteValidation;
+  }
+
+  return null;
+};
+
+export const useInviteValidationQuery = (token: string | null) => {
+  return useQuery({
+    queryKey: inviteQueries.validation(token || ""),
+    queryFn: () => validateInviteToken(token!),
+    enabled: !!token,
+    staleTime: 0, // Always fresh check for invites
+    gcTime: 0, // Don't cache invite validations
+    retry: false, // Don't retry failed validations
+  });
+};
+
+export const useInviteMutation = () => {
+  const { toast } = useToast();
+
+  return useMutation({
+    mutationFn: async ({
+      token,
+      userId,
+    }: {
+      token: string;
+      userId: string;
+    }) => {
+      const { data, error } = await supabase.rpc("use_invite_token", {
+        token,
+        user_id: userId,
+      });
+
+      if (error) {
+        console.error("Error using invite:", error);
+        throw new Error("Failed to join group");
+      }
+
+      if (data && data.length > 0) {
+        const result = data[0];
+        if (result.success) {
+          return result;
+        } else {
+          throw new Error(result.message);
+        }
+      }
+
+      throw new Error("Failed to join group");
+    },
+    onSuccess: () => {
+      // We'll need to get the group name from somewhere - let's make this flexible
+      toast({
+        title: "Success",
+        description: "Successfully joined the group!",
+      });
+      return true;
+    },
+    onError: (error) => {
+      toast({
+        title: "Error",
+        description: error.message,
+        variant: "destructive",
+      });
+      return false;
+    },
+  });
+};
