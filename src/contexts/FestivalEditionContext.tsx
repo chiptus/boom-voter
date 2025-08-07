@@ -1,5 +1,5 @@
 import { createContext, PropsWithChildren, useContext } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useNavigate, matchPath } from "react-router-dom";
 import { type Festival, type FestivalEdition } from "@/services/queries";
 import {
   useFestivalEditionBySlugQuery,
@@ -32,14 +32,53 @@ export const useFestivalEdition = () => {
   return context;
 };
 
+function getSlugs({
+  propFestivalSlug,
+  isSubDomain,
+}: {
+  propFestivalSlug?: string;
+  isSubDomain?: boolean;
+}) {
+  if (!location.pathname.includes("/editions")) {
+    return {
+      festivalSlug: propFestivalSlug,
+    };
+  }
+
+  if (!isSubDomain) {
+    const match = matchPath(
+      { path: "/festivals/:festivalSlug/editions/:editionSlug" },
+      location.pathname,
+    );
+
+    return {
+      festivalSlug: match?.params.festivalSlug,
+      editionSlug: match?.params.editionSlug,
+    };
+  }
+
+  const match = matchPath(
+    { path: "/editions/:editionSlug" },
+    location.pathname,
+  );
+
+  return {
+    festivalSlug: propFestivalSlug,
+    editionSlug: match?.params.editionSlug,
+  };
+}
+
 export function FestivalEditionProvider({
   children,
-}: PropsWithChildren<unknown>) {
+  festivalSlug: propFestivalSlug,
+  isSubDomain,
+}: PropsWithChildren<{ festivalSlug?: string; isSubDomain?: boolean }>) {
   const navigate = useNavigate();
-  const { festivalSlug, editionSlug } = useParams<{
-    festivalSlug?: string;
-    editionSlug?: string;
-  }>();
+
+  const { festivalSlug, editionSlug } = getSlugs({
+    propFestivalSlug,
+    isSubDomain,
+  });
 
   const festivalQuery = useFestivalBySlugQuery(festivalSlug);
 

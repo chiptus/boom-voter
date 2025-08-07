@@ -7,22 +7,38 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Link, useNavigate } from "react-router-dom";
 import { useFestivalsQuery } from "@/hooks/queries/useFestivalQuery";
 import { AppHeader } from "@/components/AppHeader";
 import { Festival } from "@/services/queries";
 import { useEffect } from "react";
+import { createFestivalSubdomainUrl } from "@/lib/subdomain";
 
 export default function FestivalSelection() {
   const { data: availableFestivals = [], isLoading: festivalsLoading } =
     useFestivalsQuery();
-  const navigate = useNavigate();
+
+  const handleFestivalClick = (festival: Festival) => {
+    const subdomainUrl = createFestivalSubdomainUrl(festival.slug);
+
+    // For localhost development, use regular navigation
+    const isLocalhost =
+      window.location.hostname.includes("localhost") ||
+      window.location.hostname.includes("127.0.0.1");
+
+    if (isLocalhost) {
+      // In development, navigate to regular route
+      window.location.href = `/festivals/${festival.slug}`;
+    } else {
+      // In production, redirect to subdomain
+      window.location.href = subdomainUrl;
+    }
+  };
 
   useEffect(() => {
     if (!festivalsLoading && availableFestivals.length === 1) {
-      navigate(`/festivals/${availableFestivals[0].slug}`);
+      handleFestivalClick(availableFestivals[0]);
     }
-  }, [availableFestivals, festivalsLoading, navigate]);
+  }, [availableFestivals, festivalsLoading]);
 
   if (festivalsLoading) {
     return (
@@ -72,10 +88,10 @@ export default function FestivalSelection() {
 
         <div className="mt-12 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
           {availableFestivals.map((festival: Festival) => (
-            <Link
+            <div
               key={festival.id}
-              to={`/festivals/${festival.slug}`}
-              className="block"
+              className="block cursor-pointer"
+              onClick={() => handleFestivalClick(festival)}
             >
               <Card className="bg-white/10 border-purple-400/30 hover:bg-white/15 transition-all duration-300 cursor-pointer group">
                 <CardHeader>
@@ -123,7 +139,7 @@ export default function FestivalSelection() {
                   </div>
                 </CardContent>
               </Card>
-            </Link>
+            </div>
           ))}
         </div>
 

@@ -2,8 +2,6 @@
 import { createClient } from "@supabase/supabase-js";
 import type { Database } from "./types";
 
-// console.log({env: import.meta.env})
-
 const SUPABASE_URL =
   import.meta.env.VITE_SUPABASE_URL ||
   "https://qssmazlqrmxiudxckxvi.supabase.co";

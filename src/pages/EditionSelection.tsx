@@ -14,11 +14,13 @@ import { Link, useNavigate } from "react-router-dom";
 import type { FestivalEdition } from "@/services/queries";
 import { useFestivalEditionsForFestival } from "@/hooks/queries/useFestivalQuery";
 import { useEffect } from "react";
+import { getSubdomainInfo } from "@/lib/subdomain";
 
 export default function EditionSelection() {
-  const { festival, setContext } = useFestivalEdition();
+  const { festival } = useFestivalEdition();
   const editionListQuery = useFestivalEditionsForFestival(festival?.id);
   const navigate = useNavigate();
+  const subdomainInfo = getSubdomainInfo();
 
   useEffect(() => {
     if (
@@ -26,15 +28,20 @@ export default function EditionSelection() {
       !editionListQuery.isLoading &&
       editionListQuery.data?.length === 1
     ) {
-      navigate(
-        `/festivals/${festival?.slug}/editions/${editionListQuery.data[0].slug}`,
-      );
+      // If we're on a subdomain, navigate to /editions/slug
+      // If we're on main domain, navigate to /festivals/festival-slug/editions/slug
+      const targetPath = subdomainInfo.isSubdomain
+        ? `/editions/${editionListQuery.data[0].slug}`
+        : `/festivals/${festival?.slug}/editions/${editionListQuery.data[0].slug}`;
+
+      navigate(targetPath);
     }
   }, [
     editionListQuery.data,
     editionListQuery.isLoading,
     festival?.slug,
     navigate,
+    subdomainInfo.isSubdomain,
   ]);
 
   if (!festival) {
@@ -149,12 +156,12 @@ export default function EditionSelection() {
           {availableEditions.map((edition) => {
             const editionStatus = getEditionStatus(edition);
 
+            const linkPath = subdomainInfo.isSubdomain
+              ? `/editions/${edition.slug}`
+              : `/festivals/${festival.slug}/editions/${edition.slug}`;
+
             return (
-              <Link
-                key={festival.id}
-                to={`./editions/${edition.slug}`}
-                className="block"
-              >
+              <Link key={festival.id} to={linkPath} className="block">
                 <Card
                   key={edition.id}
                   className="bg-white/10 border-purple-400/30 hover:bg-white/15 transition-all duration-300 cursor-pointer group"
@@ -225,15 +232,11 @@ export default function EditionSelection() {
                       )}
                     </div>
 
-                    <Button
-                      className="w-full mt-4 bg-purple-600 hover:bg-purple-700 text-white border-purple-600"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setContext(festival.slug, edition.slug);
-                      }}
-                    >
-                      Select Edition
-                    </Button>
+                    <Link to={linkPath}>
+                      <Button className="w-full mt-4 bg-purple-600 hover:bg-purple-700 text-white border-purple-600">
+                        Select Edition
+                      </Button>
+                    </Link>
                   </CardContent>
                 </Card>
               </Link>
