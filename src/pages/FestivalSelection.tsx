@@ -20,7 +20,7 @@ export default function FestivalSelection() {
 
   useEffect(() => {
     if (!festivalsLoading && availableFestivals.length === 1) {
-      navigate(`/festivals/${availableFestivals[0].id}`);
+      navigate(`/festivals/${availableFestivals[0].slug}`);
     }
   }, [availableFestivals, festivalsLoading, navigate]);
 
@@ -74,7 +74,7 @@ export default function FestivalSelection() {
           {availableFestivals.map((festival: Festival) => (
             <Link
               key={festival.id}
-              to={`/festivals/${festival.id}`}
+              to={`/festivals/${festival.slug}`}
               className="block"
             >
               <Card className="bg-white/10 border-purple-400/30 hover:bg-white/15 transition-all duration-300 cursor-pointer group">

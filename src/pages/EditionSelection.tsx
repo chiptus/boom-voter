@@ -10,7 +10,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { useFestivalEdition } from "@/contexts/FestivalEditionContext";
 import { AppHeader } from "@/components/AppHeader";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import type { FestivalEdition } from "@/services/queries";
 import { useFestivalEditionsForFestival } from "@/hooks/queries/useFestivalQuery";
 import { useEffect } from "react";
@@ -22,18 +22,18 @@ export default function EditionSelection() {
 
   useEffect(() => {
     if (
-      festival?.id &&
+      festival?.slug &&
       !editionListQuery.isLoading &&
       editionListQuery.data?.length === 1
     ) {
       navigate(
-        `/festivals/${festival?.id}/editions/${editionListQuery.data[0].id}`,
+        `/festivals/${festival?.slug}/editions/${editionListQuery.data[0].slug}`,
       );
     }
   }, [
     editionListQuery.data,
     editionListQuery.isLoading,
-    festival?.id,
+    festival?.slug,
     navigate,
   ]);
 
@@ -54,7 +54,7 @@ export default function EditionSelection() {
   }
 
   if (
-    festival?.id &&
+    festival?.slug &&
     !editionListQuery.isLoading &&
     editionListQuery.data?.length === 1
   ) {
@@ -150,88 +150,93 @@ export default function EditionSelection() {
             const editionStatus = getEditionStatus(edition);
 
             return (
-              <Card
-                key={edition.id}
-                className="bg-white/10 border-purple-400/30 hover:bg-white/15 transition-all duration-300 cursor-pointer group"
-                onClick={() => setContext(festival.id, edition.id)}
+              <Link
+                key={festival.id}
+                to={`./editions/${edition.slug}`}
+                className="block"
               >
-                <CardHeader>
-                  <div className="flex items-start justify-between">
-                    <div className="flex-1">
-                      <CardTitle className="text-white text-xl mb-2 group-hover:text-purple-200 transition-colors">
-                        {edition.name}
-                      </CardTitle>
-                      <CardDescription className="text-purple-200 text-sm">
-                        {edition.year}
-                      </CardDescription>
-                      {edition.description && (
-                        <CardDescription className="text-purple-200 text-sm mt-2">
-                          {edition.description}
+                <Card
+                  key={edition.id}
+                  className="bg-white/10 border-purple-400/30 hover:bg-white/15 transition-all duration-300 cursor-pointer group"
+                >
+                  <CardHeader>
+                    <div className="flex items-start justify-between">
+                      <div className="flex-1">
+                        <CardTitle className="text-white text-xl mb-2 group-hover:text-purple-200 transition-colors">
+                          {edition.name}
+                        </CardTitle>
+                        <CardDescription className="text-purple-200 text-sm">
+                          {edition.year}
                         </CardDescription>
-                      )}
-                    </div>
-                    <Badge
-                      variant="secondary"
-                      className={`
+                        {edition.description && (
+                          <CardDescription className="text-purple-200 text-sm mt-2">
+                            {edition.description}
+                          </CardDescription>
+                        )}
+                      </div>
+                      <Badge
+                        variant="secondary"
+                        className={`
                         ${editionStatus.color === "green" ? "bg-green-600/50 text-green-100 border-green-500/50" : ""}
                         ${editionStatus.color === "blue" ? "bg-blue-600/50 text-blue-100 border-blue-500/50" : ""}
                         ${editionStatus.color === "gray" ? "bg-gray-600/50 text-gray-100 border-gray-500/50" : ""}
                       `}
-                    >
-                      {editionStatus.label}
-                    </Badge>
-                  </div>
-                </CardHeader>
+                      >
+                        {editionStatus.label}
+                      </Badge>
+                    </div>
+                  </CardHeader>
 
-                <CardContent className="space-y-4">
-                  <div className="space-y-2 text-sm text-purple-200">
-                    <div className="flex items-center gap-2">
-                      <Calendar className="h-4 w-4" />
-                      <span>
-                        {formatDate(edition.start_date || "")} -{" "}
-                        {formatDate(edition.end_date || "")}
-                      </span>
+                  <CardContent className="space-y-4">
+                    <div className="space-y-2 text-sm text-purple-200">
+                      <div className="flex items-center gap-2">
+                        <Calendar className="h-4 w-4" />
+                        <span>
+                          {formatDate(edition.start_date || "")} -{" "}
+                          {formatDate(edition.end_date || "")}
+                        </span>
+                      </div>
+
+                      {edition.location && (
+                        <div className="flex items-center gap-2">
+                          <MapPin className="h-4 w-4" />
+                          <span>{edition.location}</span>
+                        </div>
+                      )}
                     </div>
 
-                    {edition.location && (
-                      <div className="flex items-center gap-2">
-                        <MapPin className="h-4 w-4" />
-                        <span>{edition.location}</span>
-                      </div>
-                    )}
-                  </div>
-
-                  <div className="flex flex-wrap gap-2">
-                    <Badge
-                      variant="secondary"
-                      className="bg-purple-600/50 text-purple-100 border-purple-500/50"
-                    >
-                      <Users className="h-3 w-3 mr-1" />
-                      Community Voting
-                    </Badge>
-
-                    {edition.is_active && (
+                    <div className="flex flex-wrap gap-2">
                       <Badge
                         variant="secondary"
-                        className="bg-orange-600/50 text-orange-100 border-orange-500/50"
+                        className="bg-purple-600/50 text-purple-100 border-purple-500/50"
                       >
-                        <Clock className="h-3 w-3 mr-1" />
-                        Active
+                        <Users className="h-3 w-3 mr-1" />
+                        Community Voting
                       </Badge>
-                    )}
-                  </div>
 
-                  <Button
-                    className="w-full mt-4 bg-purple-600 hover:bg-purple-700 text-white border-purple-600"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setContext(festival.id, edition.id);
-                    }}
-                  >
-                    Select Edition
-                  </Button>
-                </CardContent>
-              </Card>
+                      {edition.is_active && (
+                        <Badge
+                          variant="secondary"
+                          className="bg-orange-600/50 text-orange-100 border-orange-500/50"
+                        >
+                          <Clock className="h-3 w-3 mr-1" />
+                          Active
+                        </Badge>
+                      )}
+                    </div>
+
+                    <Button
+                      className="w-full mt-4 bg-purple-600 hover:bg-purple-700 text-white border-purple-600"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setContext(festival.slug, edition.slug);
+                      }}
+                    >
+                      Select Edition
+                    </Button>
+                  </CardContent>
+                </Card>
+              </Link>
             );
           })}
         </div>

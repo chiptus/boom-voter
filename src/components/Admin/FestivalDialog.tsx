@@ -12,13 +12,17 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
+import { Switch } from "@/components/ui/switch";
 import { Loader2 } from "lucide-react";
 import type { Festival } from "@/services/queries";
+import { generateSlug, isValidSlug, sanitizeSlug } from "@/lib/slug";
 
 interface FestivalFormData {
   name: string;
+  slug: string;
   description?: string;
   website_url?: string;
+  published: boolean;
 }
 
 interface FestivalDialogProps {
@@ -37,10 +41,13 @@ export const FestivalDialog = ({
 
   const [formData, setFormData] = useState<FestivalFormData>({
     name: "",
+    slug: "",
     description: "",
     website_url: "",
+    published: false,
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [slugError, setSlugError] = useState("");
 
   // Reset form when dialog opens/closes or editing festival changes
   useEffect(() => {
@@ -48,18 +55,50 @@ export const FestivalDialog = ({
       if (editingFestival) {
         setFormData({
           name: editingFestival.name,
+          slug: editingFestival.slug || generateSlug(editingFestival.name),
           description: editingFestival.description || "",
           website_url: editingFestival.website_url || "",
+          published: editingFestival.published || false,
         });
       } else {
         setFormData({
           name: "",
+          slug: "",
           description: "",
           website_url: "",
+          published: false,
         });
       }
+      setSlugError("");
     }
   }, [open, editingFestival]);
+
+  // Auto-generate slug when name changes
+  const handleNameChange = (name: string) => {
+    setFormData((prev) => ({
+      ...prev,
+      name,
+      // Only auto-generate slug if it's empty or matches the generated slug from previous name
+      slug:
+        prev.slug === "" || prev.slug === generateSlug(prev.name)
+          ? generateSlug(name)
+          : prev.slug,
+    }));
+  };
+
+  // Validate slug when it changes
+  const handleSlugChange = (slug: string) => {
+    const cleanSlug = sanitizeSlug(slug);
+    setFormData((prev) => ({ ...prev, slug: cleanSlug }));
+
+    if (cleanSlug && !isValidSlug(cleanSlug)) {
+      setSlugError(
+        "Slug must contain only lowercase letters, numbers, and hyphens",
+      );
+    } else {
+      setSlugError("");
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -67,6 +106,24 @@ export const FestivalDialog = ({
       toast({
         title: "Error",
         description: "Festival name is required",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (!formData.slug.trim()) {
+      toast({
+        title: "Error",
+        description: "Festival slug is required",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (!isValidSlug(formData.slug)) {
+      toast({
+        title: "Error",
+        description: "Please enter a valid slug",
         variant: "destructive",
       });
       return;
@@ -120,12 +177,27 @@ export const FestivalDialog = ({
             <Input
               id="name"
               value={formData.name}
-              onChange={(e) =>
-                setFormData({ ...formData, name: e.target.value })
-              }
+              onChange={(e) => handleNameChange(e.target.value)}
               placeholder="e.g., Boom Festival"
               required
             />
+          </div>
+          <div>
+            <Label htmlFor="slug">URL Slug</Label>
+            <Input
+              id="slug"
+              value={formData.slug}
+              onChange={(e) => handleSlugChange(e.target.value)}
+              placeholder="e.g., boom-festival"
+              required
+            />
+            {slugError && (
+              <p className="text-sm text-destructive mt-1">{slugError}</p>
+            )}
+            <p className="text-sm text-muted-foreground mt-1">
+              This will be used in the URL: /festivals/
+              {formData.slug || "your-slug"}
+            </p>
           </div>
           <div>
             <Label htmlFor="description">Description</Label>
@@ -150,6 +222,21 @@ export const FestivalDialog = ({
               }
               placeholder="https://example.com"
             />
+          </div>
+          <div className="flex items-center space-x-2">
+            <Switch
+              id="published"
+              checked={formData.published}
+              onCheckedChange={(checked) =>
+                setFormData({ ...formData, published: checked })
+              }
+            />
+            <Label htmlFor="published">Published</Label>
+            <p className="text-sm text-muted-foreground">
+              {formData.published
+                ? "Visible to public users"
+                : "Only visible to admins"}
+            </p>
           </div>
           <div className="flex justify-end gap-2">
             <Button

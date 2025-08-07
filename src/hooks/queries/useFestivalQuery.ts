@@ -5,10 +5,10 @@ import {
   queryFunctions,
 } from "@/services/queries";
 
-export function useFestivalsQuery() {
+export function useFestivalsQuery({ all }: { all?: boolean } = {}) {
   return useQuery({
     queryKey: festivalQueries.all(),
-    queryFn: queryFunctions.fetchFestivals,
+    queryFn: () => queryFunctions.fetchFestivals({ all }),
   });
 }
 
@@ -20,10 +20,21 @@ export function useFestivalQuery(festivalId: string | undefined) {
   });
 }
 
-export function useFestivalEditionsForFestival(festivalId: string | undefined) {
+export function useFestivalBySlugQuery(festivalSlug: string | undefined) {
+  return useQuery({
+    queryKey: [...festivalQueries.all(), "slug", festivalSlug!] as const,
+    queryFn: () => queryFunctions.fetchFestivalBySlug(festivalSlug!),
+    enabled: !!festivalSlug,
+  });
+}
+
+export function useFestivalEditionsForFestival(
+  festivalId: string | undefined,
+  { all }: { all?: boolean } = {},
+) {
   return useQuery({
     queryKey: editionQueries.all(festivalId || ""),
-    queryFn: () => queryFunctions.fetchFestivalEditions(festivalId!),
+    queryFn: () => queryFunctions.fetchFestivalEditions(festivalId!, { all }),
     enabled: !!festivalId,
   });
 }
@@ -46,5 +57,28 @@ export function useFestivalEditionQuery({
         editionId: editionId!,
       }),
     enabled: !!festivalId && !!editionId,
+  });
+}
+
+export function useFestivalEditionBySlugQuery({
+  editionSlug,
+  festivalSlug,
+}: {
+  festivalSlug?: string;
+  editionSlug?: string;
+}) {
+  return useQuery({
+    queryKey: [
+      ...editionQueries.all(""),
+      "slug",
+      festivalSlug!,
+      editionSlug!,
+    ] as const,
+    queryFn: () =>
+      queryFunctions.fetchFestivalEditionBySlug({
+        festivalSlug: festivalSlug!,
+        editionSlug: editionSlug!,
+      }),
+    enabled: !!festivalSlug && !!editionSlug,
   });
 }

@@ -22,15 +22,19 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
+import { Switch } from "@/components/ui/switch";
 import { Loader2, Plus, Edit2, Trash2, CalendarDays } from "lucide-react";
 import type { FestivalEdition } from "@/services/queries";
 import { cn } from "@/lib/utils";
+import { generateSlug, isValidSlug, sanitizeSlug } from "@/lib/slug";
 
 interface EditionFormData {
   name: string;
+  slug: string;
   year: number;
   start_date?: string;
   end_date?: string;
+  published: boolean;
 }
 
 export const FestivalEditionManagement = ({
@@ -42,8 +46,10 @@ export const FestivalEditionManagement = ({
   onSelect: (editionId: string) => void;
   selected: string;
 }) => {
-  const { data: editions = [], isLoading } =
-    useFestivalEditionsForFestival(festivalId);
+  const { data: editions = [], isLoading } = useFestivalEditionsForFestival(
+    festivalId,
+    { all: true },
+  );
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
@@ -53,20 +59,26 @@ export const FestivalEditionManagement = ({
   );
   const [formData, setFormData] = useState<EditionFormData>({
     name: "",
+    slug: "",
     year: new Date().getFullYear(),
     start_date: "",
     end_date: "",
+    published: false,
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [slugError, setSlugError] = useState("");
 
   const resetForm = () => {
     setFormData({
       name: "",
+      slug: "",
       year: new Date().getFullYear(),
       start_date: "",
       end_date: "",
+      published: false,
     });
     setEditingEdition(null);
+    setSlugError("");
   };
 
   const handleCreate = () => {
@@ -77,12 +89,42 @@ export const FestivalEditionManagement = ({
   const handleEdit = (edition: FestivalEdition) => {
     setFormData({
       name: edition.name,
+      slug: edition.slug || generateSlug(edition.name),
       year: edition.year,
       start_date: edition.start_date || "",
       end_date: edition.end_date || "",
+      published: edition.published || false,
     });
     setEditingEdition(edition);
+    setSlugError("");
     setIsDialogOpen(true);
+  };
+
+  // Auto-generate slug when name changes
+  const handleNameChange = (name: string) => {
+    setFormData((prev) => ({
+      ...prev,
+      name,
+      // Only auto-generate slug if it's empty or matches the generated slug from previous name
+      slug:
+        prev.slug === "" || prev.slug === generateSlug(prev.name)
+          ? generateSlug(name)
+          : prev.slug,
+    }));
+  };
+
+  // Validate slug when it changes
+  const handleSlugChange = (slug: string) => {
+    const cleanSlug = sanitizeSlug(slug);
+    setFormData((prev) => ({ ...prev, slug: cleanSlug }));
+
+    if (cleanSlug && !isValidSlug(cleanSlug)) {
+      setSlugError(
+        "Slug must contain only lowercase letters, numbers, and hyphens",
+      );
+    } else {
+      setSlugError("");
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -91,6 +133,24 @@ export const FestivalEditionManagement = ({
       toast({
         title: "Error",
         description: "Edition name is required",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (!formData.slug.trim()) {
+      toast({
+        title: "Error",
+        description: "Edition slug is required",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (!isValidSlug(formData.slug)) {
+      toast({
+        title: "Error",
+        description: "Please enter a valid slug",
         variant: "destructive",
       });
       return;
@@ -210,12 +270,28 @@ export const FestivalEditionManagement = ({
                   <Input
                     id="name"
                     value={formData.name}
-                    onChange={(e) =>
-                      setFormData({ ...formData, name: e.target.value })
-                    }
+                    onChange={(e) => handleNameChange(e.target.value)}
                     placeholder="e.g., Boom Festival 2025"
                     required
                   />
+                </div>
+                <div>
+                  <Label htmlFor="slug">URL Slug</Label>
+                  <Input
+                    id="slug"
+                    value={formData.slug}
+                    onChange={(e) => handleSlugChange(e.target.value)}
+                    placeholder="e.g., boom-2025"
+                    required
+                  />
+                  {slugError && (
+                    <p className="text-sm text-destructive mt-1">{slugError}</p>
+                  )}
+                  <p className="text-sm text-muted-foreground mt-1">
+                    This will be used in the URL:
+                    /festivals/festival-name/editions/
+                    {formData.slug || "your-slug"}
+                  </p>
                 </div>
                 <div>
                   <Label htmlFor="year">Year</Label>
@@ -255,6 +331,21 @@ export const FestivalEditionManagement = ({
                       setFormData({ ...formData, end_date: e.target.value })
                     }
                   />
+                </div>
+                <div className="flex items-center space-x-2">
+                  <Switch
+                    id="published"
+                    checked={formData.published}
+                    onCheckedChange={(checked) =>
+                      setFormData({ ...formData, published: checked })
+                    }
+                  />
+                  <Label htmlFor="published">Published</Label>
+                  <p className="text-sm text-muted-foreground">
+                    {formData.published
+                      ? "Visible to public users"
+                      : "Only visible to admins"}
+                  </p>
                 </div>
                 <div className="flex justify-end gap-2">
                   <Button

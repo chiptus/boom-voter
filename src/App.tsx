@@ -44,7 +44,7 @@ const App = () => (
             {/* Festival/Edition Selection Routes */}
             <Route path="/" element={<FestivalSelection />} />
             <Route
-              path="/festivals/:festivalId"
+              path="/festivals/:festivalSlug"
               element={
                 <FestivalEditionProvider>
                   <EditionSelection />
@@ -52,7 +52,7 @@ const App = () => (
               }
             />
             <Route
-              path="/festivals/:festivalId/editions/:editionId"
+              path="/festivals/:festivalSlug/editions/:editionSlug"
               element={
                 <FestivalEditionProvider>
                   <EditionView />
@@ -60,7 +60,7 @@ const App = () => (
               }
             />
             <Route
-              path="/festivals/:festivalId/editions/:editionId/sets/:setId"
+              path="/festivals/:festivalSlug/editions/:editionSlug/sets/:setId"
               element={
                 <FestivalEditionProvider>
                   <SetDetails />
@@ -68,7 +68,7 @@ const App = () => (
               }
             />
             <Route
-              path="/festivals/:festivalId/editions/:editionId/schedule"
+              path="/festivals/:festivalSlug/editions/:editionSlug/schedule"
               element={
                 <FestivalEditionProvider>
                   <Schedule />

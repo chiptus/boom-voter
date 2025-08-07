@@ -25,7 +25,7 @@ export function FestivalManagementTable({
   onSelect: (festival: Festival) => void;
   selected: string;
 }) {
-  const { data: festivals = [], isLoading } = useFestivalsQuery();
+  const { data: festivals = [], isLoading } = useFestivalsQuery({ all: true });
   const { toast } = useToast();
   const queryClient = useQueryClient();
 

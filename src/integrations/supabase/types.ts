@@ -198,6 +198,8 @@ export type Database = {
           is_active: boolean;
           location: string | null;
           name: string;
+          published: boolean | null;
+          slug: string;
           start_date: string | null;
           updated_at: string;
           year: number;
@@ -212,6 +214,8 @@ export type Database = {
           is_active?: boolean;
           location?: string | null;
           name: string;
+          published?: boolean | null;
+          slug: string;
           start_date?: string | null;
           updated_at?: string;
           year: number;
@@ -226,6 +230,8 @@ export type Database = {
           is_active?: boolean;
           location?: string | null;
           name?: string;
+          published?: boolean | null;
+          slug?: string;
           start_date?: string | null;
           updated_at?: string;
           year?: number;
@@ -247,6 +253,8 @@ export type Database = {
           description: string | null;
           id: string;
           name: string;
+          published: boolean | null;
+          slug: string;
           updated_at: string;
           website_url: string | null;
         };
@@ -256,6 +264,8 @@ export type Database = {
           description?: string | null;
           id?: string;
           name: string;
+          published?: boolean | null;
+          slug: string;
           updated_at?: string;
           website_url?: string | null;
         };
@@ -265,6 +275,8 @@ export type Database = {
           description?: string | null;
           id?: string;
           name?: string;
+          published?: boolean | null;
+          slug?: string;
           updated_at?: string;
           website_url?: string | null;
         };

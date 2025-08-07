@@ -418,12 +418,14 @@ export const queryFunctions = {
   },
 
   // Festival functions
-  async fetchFestivals(): Promise<Festival[]> {
-    const { data, error } = await supabase
-      .from("festivals")
-      .select("*")
-      .eq("archived", false)
-      .order("name");
+  async fetchFestivals({ all }: { all?: boolean }): Promise<Festival[]> {
+    let query = supabase.from("festivals").select("*").eq("archived", false);
+
+    if (!all) {
+      query = query.eq("published", true);
+    }
+
+    const { data, error } = await query.order("name");
 
     if (error) {
       throw new Error("Failed to load festivals");
@@ -448,7 +450,25 @@ export const queryFunctions = {
     return data;
   },
 
-  async fetchFestivalEditions(festivalId?: string): Promise<FestivalEdition[]> {
+  async fetchFestivalBySlug(festivalSlug: string): Promise<Festival> {
+    const { data, error } = await supabase
+      .from("festivals")
+      .select("*")
+      .eq("archived", false)
+      .eq("slug", festivalSlug)
+      .single();
+
+    if (error) {
+      throw new Error("Failed to load festival");
+    }
+
+    return data;
+  },
+
+  async fetchFestivalEditions(
+    festivalId: string,
+    { all }: { all?: boolean } = {},
+  ): Promise<FestivalEdition[]> {
     let query = supabase
       .from("festival_editions")
       .select("*")
@@ -457,6 +477,10 @@ export const queryFunctions = {
 
     if (festivalId) {
       query = query.eq("festival_id", festivalId);
+    }
+
+    if (!all) {
+      query = query.eq("published", true);
     }
 
     const { data, error } = await query;
@@ -487,6 +511,33 @@ export const queryFunctions = {
 
     if (error) {
       throw new Error("Failed to load festival editions");
+    }
+
+    return data;
+  },
+
+  async fetchFestivalEditionBySlug({
+    editionSlug,
+    festivalSlug,
+  }: {
+    festivalSlug: string;
+    editionSlug: string;
+  }): Promise<FestivalEdition> {
+    // First get the festival ID from the slug
+    const festival = await queryFunctions.fetchFestivalBySlug(festivalSlug);
+
+    const query = supabase
+      .from("festival_editions")
+      .select("*")
+      .eq("archived", false)
+      .eq("festival_id", festival.id)
+      .eq("slug", editionSlug)
+      .single();
+
+    const { data, error } = await query;
+
+    if (error) {
+      throw new Error("Failed to load festival edition");
     }
 
     return data;

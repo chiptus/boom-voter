@@ -2,8 +2,8 @@ import { createContext, PropsWithChildren, useContext } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { type Festival, type FestivalEdition } from "@/services/queries";
 import {
-  useFestivalEditionQuery,
-  useFestivalQuery,
+  useFestivalEditionBySlugQuery,
+  useFestivalBySlugQuery,
 } from "@/hooks/queries/useFestivalQuery";
 
 interface FestivalEditionContextType {
@@ -12,7 +12,7 @@ interface FestivalEditionContextType {
   edition: FestivalEdition | null;
 
   // Actions
-  setContext: (festivalId: string, editionId?: string) => void;
+  setContext: (festivalSlug: string, editionSlug?: string) => void;
 
   // Utils
   isContextReady: boolean;
@@ -36,37 +36,37 @@ export function FestivalEditionProvider({
   children,
 }: PropsWithChildren<unknown>) {
   const navigate = useNavigate();
-  const { festivalId, editionId } = useParams<{
-    festivalId?: string;
-    editionId?: string;
+  const { festivalSlug, editionSlug } = useParams<{
+    festivalSlug?: string;
+    editionSlug?: string;
   }>();
 
-  const festivalQuery = useFestivalQuery(festivalId);
+  const festivalQuery = useFestivalBySlugQuery(festivalSlug);
 
-  const editionQuery = useFestivalEditionQuery({
-    festivalId,
-    editionId,
+  const editionQuery = useFestivalEditionBySlugQuery({
+    festivalSlug,
+    editionSlug,
   });
 
   const festival = festivalQuery.data;
   const edition = editionQuery.data;
 
-  const setContext = (festivalId: string, editionId?: string) => {
-    if (editionId) {
-      navigate(`/festivals/${festivalId}/editions/${editionId}`);
+  const setContext = (festivalSlug: string, editionSlug?: string) => {
+    if (editionSlug) {
+      navigate(`/festivals/${festivalSlug}/editions/${editionSlug}`);
     } else {
-      navigate(`/festivals/${festivalId}`);
+      navigate(`/festivals/${festivalSlug}`);
     }
   };
 
   const isContextReady = !!(
     // Either we're on root (no context needed)
     (
-      (!festivalId && !editionId) ||
+      (!festivalSlug && !editionSlug) ||
       // Or we have valid festival context
-      (festivalId && festival) ||
+      (festivalSlug && festival) ||
       // Or we have valid edition context
-      (editionId && edition && festival)
+      (editionSlug && edition && festival)
     )
   );
 
