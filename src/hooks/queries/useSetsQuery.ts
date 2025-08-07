@@ -50,3 +50,126 @@ export const useVoteMutation = () => {
     },
   });
 };
+
+export const useCreateSetMutation = () => {
+  const queryClient = useQueryClient();
+  const { toast } = useToast();
+
+  return useMutation({
+    mutationFn: queryFunctions.createSet,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: setQueries.lists() });
+      queryClient.invalidateQueries({ queryKey: ["artists"] });
+      toast({
+        title: "Success",
+        description: "Set created successfully",
+      });
+    },
+    onError: (error) => {
+      console.error("Error creating set:", error);
+      toast({
+        title: "Error",
+        description:
+          error instanceof Error ? error.message : "Failed to create set",
+        variant: "destructive",
+      });
+    },
+  });
+};
+
+export const useUpdateSetMutation = () => {
+  const queryClient = useQueryClient();
+  const { toast } = useToast();
+
+  return useMutation({
+    mutationFn: ({ id, data }: { id: string; data: Record<string, unknown> }) =>
+      queryFunctions.updateSet(id, data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: setQueries.lists() });
+      queryClient.invalidateQueries({ queryKey: ["artists"] });
+      toast({
+        title: "Success",
+        description: "Set updated successfully",
+      });
+    },
+    onError: (error) => {
+      console.error("Error updating set:", error);
+      toast({
+        title: "Error",
+        description:
+          error instanceof Error ? error.message : "Failed to update set",
+        variant: "destructive",
+      });
+    },
+  });
+};
+
+export const useDeleteSetMutation = () => {
+  const queryClient = useQueryClient();
+  const { toast } = useToast();
+
+  return useMutation({
+    mutationFn: queryFunctions.deleteSet,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: setQueries.lists() });
+      queryClient.invalidateQueries({ queryKey: ["artists"] });
+      toast({
+        title: "Success",
+        description: "Set deleted successfully",
+      });
+    },
+    onError: (error) => {
+      console.error("Error deleting set:", error);
+      toast({
+        title: "Error",
+        description:
+          error instanceof Error ? error.message : "Failed to delete set",
+        variant: "destructive",
+      });
+    },
+  });
+};
+
+export const useAddArtistToSetMutation = () => {
+  const queryClient = useQueryClient();
+  const { toast } = useToast();
+
+  return useMutation({
+    mutationFn: ({ setId, artistId }: { setId: string; artistId: string }) =>
+      queryFunctions.addArtistToSet(setId, artistId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: setQueries.lists() });
+      queryClient.invalidateQueries({ queryKey: ["artists"] });
+    },
+    onError: (error) => {
+      console.error("Error adding artist to set:", error);
+      toast({
+        title: "Error",
+        description: "Failed to add artist to set",
+        variant: "destructive",
+      });
+    },
+  });
+};
+
+export const useRemoveArtistFromSetMutation = () => {
+  const queryClient = useQueryClient();
+  const { toast } = useToast();
+
+  return useMutation({
+    mutationFn: ({ setId, artistId }: { setId: string; artistId: string }) =>
+      queryFunctions.removeArtistFromSet(setId, artistId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: setQueries.lists() });
+      queryClient.invalidateQueries({ queryKey: ["artists"] });
+    },
+    onError: (error) => {
+      console.error("Error removing artist from set:", error);
+      toast({
+        title: "Error",
+        description: "Failed to remove artist from set",
+        variant: "destructive",
+      });
+    },
+  });
+};

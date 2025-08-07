@@ -11,7 +11,8 @@
       "Bash(npm run typecheck:*)",
       "Bash(npm install:*)",
       "Bash(git add:*)",
-      "Bash(npm run lint:*)"
+      "Bash(npm run lint:*)",
+      "Bash(mv:*)"
     ],
     "deny": []
   }

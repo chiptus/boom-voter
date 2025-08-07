@@ -1,12 +1,12 @@
 import { useState } from "react";
-import { useQueryClient } from "@tanstack/react-query";
-import { queryFunctions } from "@/services/queries";
-import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Loader2, Plus, Music } from "lucide-react";
 import type { FestivalSet } from "@/services/queries";
-import { useSetsQuery } from "@/hooks/queries/useSetsQuery";
+import {
+  useDeleteSetMutation,
+  useSetsQuery,
+} from "@/hooks/queries/useSetsQuery";
 import { SetFormDialog } from "./SetFormDialog";
 import { SetsTable } from "./SetsTable";
 
@@ -16,11 +16,11 @@ interface SetManagementProps {
 
 export const SetManagement = ({ editionId }: SetManagementProps) => {
   const { data: sets = [], isLoading } = useSetsQuery();
-  const { toast } = useToast();
-  const queryClient = useQueryClient();
 
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingSet, setEditingSet] = useState<FestivalSet | null>(null);
+
+  const deleteSetMutation = useDeleteSetMutation();
 
   const handleCreate = () => {
     setEditingSet(null);
@@ -41,22 +41,7 @@ export const SetManagement = ({ editionId }: SetManagementProps) => {
       return;
     }
 
-    try {
-      await queryFunctions.deleteSet(set.id);
-      toast({
-        title: "Success",
-        description: "Set deleted successfully",
-      });
-      queryClient.invalidateQueries({ queryKey: ["sets"] });
-      queryClient.invalidateQueries({ queryKey: ["artists"] });
-    } catch (error) {
-      toast({
-        title: "Error",
-        description:
-          error instanceof Error ? error.message : "Failed to delete set",
-        variant: "destructive",
-      });
-    }
+    deleteSetMutation.mutate(set.id);
   };
 
   const handleCloseDialog = () => {
