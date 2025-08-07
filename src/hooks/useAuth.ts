@@ -25,6 +25,7 @@ export const useAuth = () => {
 
       // Clear cached profile on sign out for security
       if (event === "SIGNED_OUT") {
+        // For sign out, use the current user state from closure
         if (user?.id) {
           await profileOfflineService.clearCachedProfile(user.id);
         }
@@ -85,7 +86,7 @@ export const useAuth = () => {
     return () => {
       subscription.unsubscribe();
     };
-  }, [toast]);
+  }, [toast, user?.id]);
 
   const signOut = async () => {
     // Clear cached profile before signing out
