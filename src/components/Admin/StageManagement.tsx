@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { queryFunctions } from "@/services/queries";
-import { useFestivalQuery } from "@/hooks/queries/useFestivalQuery";
 import { useStagesQuery } from "@/hooks/queries/useStagesQuery";
 import { useToast } from "@/hooks/use-toast";
 import {
@@ -23,29 +22,18 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { Loader2, Plus, Edit2, Trash2, MapPin } from "lucide-react";
 import type { Stage } from "@/services/queries";
 
 interface StageFormData {
   name: string;
-  festival_edition_id: string;
 }
 
 interface StageManagementProps {
-  festivalId?: string;
+  editionId: string;
 }
 
-export const StageManagement = ({ festivalId }: StageManagementProps) => {
-  const { data: festivals = [] } = useFestivalQuery.useFestivals();
-  const { data: editions = [] } =
-    useFestivalQuery.useFestivalEditionsForFestival(festivalId);
+export const StageManagement = ({ editionId }: StageManagementProps) => {
   const { data: stages = [], isLoading } = useStagesQuery();
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -54,16 +42,12 @@ export const StageManagement = ({ festivalId }: StageManagementProps) => {
   const [editingStage, setEditingStage] = useState<Stage | null>(null);
   const [formData, setFormData] = useState<StageFormData>({
     name: "",
-    festival_edition_id: "",
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [selectedEditionFilter, setSelectedEditionFilter] =
-    useState<string>("all");
 
   const resetForm = () => {
     setFormData({
       name: "",
-      festival_edition_id: "",
     });
     setEditingStage(null);
   };
@@ -76,7 +60,6 @@ export const StageManagement = ({ festivalId }: StageManagementProps) => {
   const handleEdit = (stage: Stage) => {
     setFormData({
       name: stage.name,
-      festival_edition_id: stage.festival_edition_id,
     });
     setEditingStage(stage);
     setIsDialogOpen(true);
@@ -84,10 +67,10 @@ export const StageManagement = ({ festivalId }: StageManagementProps) => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!formData.name.trim() || !formData.festival_edition_id) {
+    if (!formData.name.trim()) {
       toast({
         title: "Error",
-        description: "Stage name and festival edition are required",
+        description: "Stage name is required",
         variant: "destructive",
       });
       return;
@@ -102,7 +85,10 @@ export const StageManagement = ({ festivalId }: StageManagementProps) => {
           description: "Stage updated successfully",
         });
       } else {
-        await queryFunctions.createStage(formData);
+        await queryFunctions.createStage({
+          ...formData,
+          festival_edition_id: editionId,
+        });
         toast({
           title: "Success",
           description: "Stage created successfully",
@@ -150,21 +136,10 @@ export const StageManagement = ({ festivalId }: StageManagementProps) => {
     }
   };
 
-  const getEditionName = (editionId: string) => {
-    const edition = editions.find((e) => e.id === editionId);
-    const festival = festivals.find((f) => f.id === edition?.festival_id);
-    return edition
-      ? `${festival?.name || "Unknown"} - ${edition.name}`
-      : "Unknown Edition";
-  };
-
   // Filter stages by selected edition
-  const filteredStages =
-    selectedEditionFilter && selectedEditionFilter !== "all"
-      ? stages.filter(
-          (stage) => stage.festival_edition_id === selectedEditionFilter,
-        )
-      : stages;
+  const filteredStages = stages.filter(
+    (stage) => stage.festival_edition_id === editionId,
+  );
 
   if (isLoading) {
     return (
@@ -186,22 +161,6 @@ export const StageManagement = ({ festivalId }: StageManagementProps) => {
             Stage Management
           </span>
           <div className="flex gap-2">
-            <Select
-              value={selectedEditionFilter}
-              onValueChange={setSelectedEditionFilter}
-            >
-              <SelectTrigger className="w-64">
-                <SelectValue placeholder="Filter by edition" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Editions</SelectItem>
-                {editions.map((edition) => (
-                  <SelectItem key={edition.id} value={edition.id}>
-                    {getEditionName(edition.id)}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
             <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
               <DialogTrigger asChild>
                 <Button
@@ -219,27 +178,6 @@ export const StageManagement = ({ festivalId }: StageManagementProps) => {
                   </DialogTitle>
                 </DialogHeader>
                 <form onSubmit={handleSubmit} className="space-y-4">
-                  <div>
-                    <Label htmlFor="edition">Festival Edition</Label>
-                    <Select
-                      value={formData.festival_edition_id}
-                      onValueChange={(value) =>
-                        setFormData({ ...formData, festival_edition_id: value })
-                      }
-                      required
-                    >
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select a festival edition" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {editions.map((edition) => (
-                          <SelectItem key={edition.id} value={edition.id}>
-                            {getEditionName(edition.id)}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
                   <div>
                     <Label htmlFor="name">Stage Name</Label>
                     <Input
@@ -280,7 +218,7 @@ export const StageManagement = ({ festivalId }: StageManagementProps) => {
             <TableHeader>
               <TableRow>
                 <TableHead>Stage Name</TableHead>
-                <TableHead>Festival Edition</TableHead>
+
                 <TableHead>Created</TableHead>
                 <TableHead className="w-20">Actions</TableHead>
               </TableRow>
@@ -289,9 +227,7 @@ export const StageManagement = ({ festivalId }: StageManagementProps) => {
               {filteredStages.map((stage) => (
                 <TableRow key={stage.id}>
                   <TableCell className="font-medium">{stage.name}</TableCell>
-                  <TableCell>
-                    {getEditionName(stage.festival_edition_id)}
-                  </TableCell>
+
                   <TableCell>
                     {new Date(stage.created_at).toLocaleDateString()}
                   </TableCell>
@@ -321,9 +257,7 @@ export const StageManagement = ({ festivalId }: StageManagementProps) => {
 
           {filteredStages.length === 0 && (
             <div className="text-center py-8 text-muted-foreground">
-              {selectedEditionFilter && selectedEditionFilter !== "all"
-                ? "No stages found for the selected edition."
-                : "No stages found. Create your first stage to get started."}
+              No stages found for the selected edition.
             </div>
           )}
         </div>

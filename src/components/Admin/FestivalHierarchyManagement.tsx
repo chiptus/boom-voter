@@ -1,31 +1,35 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { useFestivalQuery } from "@/hooks/queries/useFestivalQuery";
+import {
+  useFestivalEditionsQuery,
+  useFestivalQuery,
+} from "@/hooks/queries/useFestivalQuery";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { Badge } from "@/components/ui/badge";
-import { Calendar, CalendarDays, MapPin, Music, Loader2 } from "lucide-react";
+import { Calendar, MapPin, Music, Loader2, Plus } from "lucide-react";
 
-import { FestivalManagement } from "./FestivalManagement";
+import { FestivalManagementTable } from "./FestivalManagementTable";
 import { FestivalEditionManagement } from "./FestivalEditionManagement";
 import { StageManagement } from "./StageManagement";
 import { SetManagement } from "./SetManagement";
+import { Button } from "../ui/button";
+import { Festival } from "@/services/queries";
+import { FestivalDialog } from "./FestivalDialog";
 
 export const FestivalHierarchyManagement = () => {
+  const [editingFestival, setEditingFestival] = useState<Festival | null>(null);
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+
   const { data: festivals = [], isLoading } = useFestivalQuery.useFestivals();
   const navigate = useNavigate();
   const { festivalId, subtab } = useParams<{
     festivalId?: string;
+    editionId?: string;
     subtab?: string;
   }>();
+  const editionsQuery = useFestivalEditionsQuery(festivalId);
   const [selectedFestival, setSelectedFestival] = useState<string>("");
+  const [selectedEdition, setSelectedEdition] = useState<string>("");
 
   // Initialize festival and tab from URL params
   useEffect(() => {
@@ -35,6 +39,9 @@ export const FestivalHierarchyManagement = () => {
   }, [festivalId, festivals]);
 
   const selectedFestivalData = festivals.find((f) => f.id === selectedFestival);
+  const selectedEditionData = editionsQuery.data?.find(
+    (f) => f.id === selectedEdition,
+  );
 
   const handleFestivalChange = (festivalId: string) => {
     if (festivalId === "none") {
@@ -42,17 +49,29 @@ export const FestivalHierarchyManagement = () => {
       navigate("/admin/festivals");
     } else {
       setSelectedFestival(festivalId);
-      navigate(`/admin/festivals/${festivalId}/festivals`);
+      navigate(`/admin/festivals/${festivalId}`);
+    }
+  };
+
+  const handleEditionChange = (editionId: string) => {
+    if (editionId === "none") {
+      setSelectedEdition("");
+      navigate("/admin/festivals");
+    } else {
+      setSelectedEdition(editionId);
+      navigate(`/admin/festivals/${festivalId}/${editionId}/stages`);
     }
   };
 
   const handleSubTabChange = (value: string) => {
-    if (selectedFestival && selectedFestival !== "none") {
-      navigate(`/admin/festivals/${selectedFestival}/${value}`);
+    if (selectedFestival && selectedFestival !== "none" && selectedEdition) {
+      navigate(
+        `/admin/festivals/${selectedFestival}/${selectedEdition}/${value}`,
+      );
     }
   };
 
-  const currentSubTab = subtab || "festivals";
+  const currentSubTab = subtab || "stages";
 
   if (isLoading) {
     return (
@@ -67,7 +86,6 @@ export const FestivalHierarchyManagement = () => {
 
   return (
     <div className="space-y-6">
-      {/* Festival Selection Header */}
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center justify-between">
@@ -75,157 +93,116 @@ export const FestivalHierarchyManagement = () => {
               <Calendar className="h-5 w-5" />
               Festival Management
             </span>
-            <div className="flex items-center gap-4">
-              <Select
-                value={selectedFestival || "none"}
-                onValueChange={handleFestivalChange}
-              >
-                <SelectTrigger className="w-64">
-                  <SelectValue placeholder="Select a festival to manage" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="none">Select a festival</SelectItem>
-                  {festivals.map((festival) => (
-                    <SelectItem key={festival.id} value={festival.id}>
-                      {festival.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              {selectedFestivalData && (
-                <Badge variant="outline" className="text-sm">
-                  {selectedFestivalData.name}
-                </Badge>
-              )}
-            </div>
+
+            <Button
+              onClick={handleCreate}
+              className="bg-purple-600 hover:bg-purple-700"
+            >
+              <Plus className="h-4 w-4 mr-2" />
+              Add Festival
+            </Button>
           </CardTitle>
         </CardHeader>
         <CardContent>
-          {!selectedFestival ? (
-            <div className="text-center py-8 text-muted-foreground">
-              <Calendar className="h-12 w-12 mx-auto mb-4 opacity-50" />
-              <p className="text-lg font-medium mb-2">Festival Management</p>
-              <p>
-                Select a festival above to manage its editions, stages, and
-                sets.
-              </p>
-              <p className="text-sm mt-2">
-                Or use the "Festivals" tab to create and manage festivals.
-              </p>
-            </div>
-          ) : (
-            <div className="text-center py-4">
-              <p className="text-sm text-muted-foreground">
-                Managing{" "}
-                <span className="font-medium">
-                  {selectedFestivalData?.name}
-                </span>
-              </p>
-            </div>
-          )}
+          <FestivalManagementTable
+            onEdit={(festival) => {
+              setEditingFestival(festival);
+              setIsEditDialogOpen(true);
+            }}
+            onSelect={(festival) => {
+              handleFestivalChange(festival.id);
+            }}
+            selected={selectedFestival}
+          />
         </CardContent>
       </Card>
 
-      {/* Management Tabs */}
-      <Tabs
-        value={currentSubTab}
-        onValueChange={handleSubTabChange}
-        className="w-full"
-      >
-        <TabsList className="grid w-full grid-cols-4 bg-white/10 backdrop-blur-md">
-          <TabsTrigger
-            value="festivals"
-            className="data-[state=active]:bg-purple-600 data-[state=active]:text-white"
-          >
-            <Calendar className="h-4 w-4 mr-2" />
-            Festivals
-          </TabsTrigger>
-          <TabsTrigger
-            value="editions"
-            className="data-[state=active]:bg-purple-600 data-[state=active]:text-white"
-            disabled={!selectedFestival}
-          >
-            <CalendarDays className="h-4 w-4 mr-2" />
-            Editions
-          </TabsTrigger>
-          <TabsTrigger
-            value="stages"
-            className="data-[state=active]:bg-purple-600 data-[state=active]:text-white"
-            disabled={!selectedFestival}
-          >
-            <MapPin className="h-4 w-4 mr-2" />
-            Stages
-          </TabsTrigger>
-          <TabsTrigger
-            value="sets"
-            className="data-[state=active]:bg-purple-600 data-[state=active]:text-white"
-            disabled={!selectedFestival}
-          >
-            <Music className="h-4 w-4 mr-2" />
-            Sets
-          </TabsTrigger>
-        </TabsList>
+      {selectedFestival && (
+        <>
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center justify-between">
+                <span className="flex items-center gap-2">
+                  {selectedFestivalData?.name}
+                </span>
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <FestivalEditionManagement
+                festivalId={selectedFestival}
+                onSelect={(editionId) => {
+                  handleEditionChange(editionId);
+                }}
+                selected={selectedEdition}
+              />
+              ;
+            </CardContent>
+          </Card>
+        </>
+      )}
 
-        <TabsContent value="festivals" className="mt-6">
-          <FestivalManagement />
-        </TabsContent>
+      {selectedFestival && selectedEditionData && (
+        <>
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center justify-between">
+                <span className="flex items-center gap-2">
+                  Edition: {selectedEditionData.name}
+                </span>
+              </CardTitle>
+            </CardHeader>
+          </Card>
+          <Tabs
+            value={currentSubTab}
+            onValueChange={handleSubTabChange}
+            className="w-full"
+          >
+            <>
+              <Card className="mt-6">
+                <TabsList className="grid w-full grid-cols-4 bg-white/10 backdrop-blur-md">
+                  <TabsTrigger
+                    value="stages"
+                    className="data-[state=active]:bg-purple-600 data-[state=active]:text-white"
+                    disabled={!selectedFestival}
+                  >
+                    <MapPin className="h-4 w-4 mr-2" />
+                    Stages
+                  </TabsTrigger>
+                  <TabsTrigger
+                    value="sets"
+                    className="data-[state=active]:bg-purple-600 data-[state=active]:text-white"
+                    disabled={!selectedFestival}
+                  >
+                    <Music className="h-4 w-4 mr-2" />
+                    Sets
+                  </TabsTrigger>
+                </TabsList>
+              </Card>
+            </>
 
-        <TabsContent value="editions" className="mt-6">
-          {selectedFestival ? (
-            <FestivalEditionManagementFiltered festivalId={selectedFestival} />
-          ) : (
-            <Card>
-              <CardContent className="text-center py-8 text-muted-foreground">
-                <CalendarDays className="h-12 w-12 mx-auto mb-4 opacity-50" />
-                <p>Select a festival first to manage its editions</p>
-              </CardContent>
-            </Card>
-          )}
-        </TabsContent>
+            <TabsContent value="stages" className="mt-6">
+              <StageManagement editionId={selectedEdition} />
+            </TabsContent>
 
-        <TabsContent value="stages" className="mt-6">
-          {selectedFestival ? (
-            <StageManagementFiltered festivalId={selectedFestival} />
-          ) : (
-            <Card>
-              <CardContent className="text-center py-8 text-muted-foreground">
-                <MapPin className="h-12 w-12 mx-auto mb-4 opacity-50" />
-                <p>Select a festival first to manage its stages</p>
-              </CardContent>
-            </Card>
-          )}
-        </TabsContent>
-
-        <TabsContent value="sets" className="mt-6">
-          {selectedFestival ? (
-            <SetManagementFiltered festivalId={selectedFestival} />
-          ) : (
-            <Card>
-              <CardContent className="text-center py-8 text-muted-foreground">
-                <Music className="h-12 w-12 mx-auto mb-4 opacity-50" />
-                <p>Select a festival first to manage its sets</p>
-              </CardContent>
-            </Card>
-          )}
-        </TabsContent>
-      </Tabs>
+            <TabsContent value="sets" className="mt-6">
+              <SetManagement editionId={selectedEdition} />;
+            </TabsContent>
+          </Tabs>
+        </>
+      )}
+      <FestivalDialog
+        open={isEditDialogOpen}
+        onOpenChange={() => {
+          setEditingFestival(null);
+          setIsEditDialogOpen(false);
+        }}
+        editingFestival={editingFestival}
+      />
     </div>
   );
-};
 
-// Filtered components that only show data for the selected festival
-const FestivalEditionManagementFiltered = ({
-  festivalId,
-}: {
-  festivalId: string;
-}) => {
-  return <FestivalEditionManagement festivalId={festivalId} />;
-};
-
-const StageManagementFiltered = ({ festivalId }: { festivalId: string }) => {
-  return <StageManagement festivalId={festivalId} />;
-};
-
-const SetManagementFiltered = ({ festivalId }: { festivalId: string }) => {
-  return <SetManagement festivalId={festivalId} />;
+  function handleCreate() {
+    setEditingFestival(null);
+    setIsEditDialogOpen(true);
+  }
 };

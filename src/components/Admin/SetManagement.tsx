@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { queryFunctions } from "@/services/queries";
-import { useFestivalQuery } from "@/hooks/queries/useFestivalQuery";
 import { useStagesQuery } from "@/hooks/queries/useStagesQuery";
 import { useArtistsQuery } from "@/hooks/queries/useArtistsQuery";
 import { useToast } from "@/hooks/use-toast";
@@ -51,7 +50,6 @@ import { useSetsQuery } from "@/hooks/queries/useSetsQuery";
 interface SetFormData {
   name: string;
   description?: string;
-  festival_edition_id: string;
   stage_id?: string;
   time_start?: string;
   time_end?: string;
@@ -59,13 +57,10 @@ interface SetFormData {
 }
 
 interface SetManagementProps {
-  festivalId?: string;
+  editionId: string;
 }
 
-export const SetManagement = ({ festivalId }: SetManagementProps) => {
-  const { data: festivals = [] } = useFestivalQuery.useFestivals();
-  const { data: editions = [] } =
-    useFestivalQuery.useFestivalEditionsForFestival(festivalId);
+export const SetManagement = ({ editionId }: SetManagementProps) => {
   const { data: stages = [] } = useStagesQuery();
   const { data: sets = [], isLoading } = useSetsQuery(); // This gets sets
   const { data: artists = [], isLoading: isLoadingArtists } = useArtistsQuery();
@@ -77,14 +72,12 @@ export const SetManagement = ({ festivalId }: SetManagementProps) => {
   const [formData, setFormData] = useState<SetFormData>({
     name: "",
     description: "",
-    festival_edition_id: "",
     stage_id: "",
     time_start: "",
     time_end: "",
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [selectedEditionFilter, setSelectedEditionFilter] =
-    useState<string>("all");
+
   const [selectedArtists, setSelectedArtists] = useState<string[]>([]);
   const [artistSearchDialog, setArtistSearchDialog] = useState(false);
   const [artistSearchQuery, setArtistSearchQuery] = useState("");
@@ -93,7 +86,7 @@ export const SetManagement = ({ festivalId }: SetManagementProps) => {
     setFormData({
       name: "",
       description: "",
-      festival_edition_id: "",
+
       stage_id: "none",
       time_start: "",
       time_end: "",
@@ -113,7 +106,6 @@ export const SetManagement = ({ festivalId }: SetManagementProps) => {
     setFormData({
       name: set.name,
       description: set.description || "",
-      festival_edition_id: set.festival_edition_id,
       stage_id: set.stage_id || "none",
       time_start: set.time_start || "",
       time_end: set.time_end || "",
@@ -126,10 +118,10 @@ export const SetManagement = ({ festivalId }: SetManagementProps) => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!formData.name.trim() || !formData.festival_edition_id) {
+    if (!formData.name.trim()) {
       toast({
         title: "Error",
-        description: "Set name and festival edition are required",
+        description: "Set name is required",
         variant: "destructive",
       });
       return;
@@ -139,6 +131,7 @@ export const SetManagement = ({ festivalId }: SetManagementProps) => {
     try {
       const submitData = {
         ...formData,
+        festival_edition_id: editionId,
         stage_id:
           formData.stage_id && formData.stage_id !== "none"
             ? formData.stage_id
@@ -227,39 +220,19 @@ export const SetManagement = ({ festivalId }: SetManagementProps) => {
     }
   };
 
-  const getEditionName = (editionId: string) => {
-    const edition = editions.find((e) => e.id === editionId);
-    const festival = festivals.find((f) => f.id === edition?.festival_id);
-    return edition
-      ? `${festival?.name || "Unknown"} - ${edition.name}`
-      : "Unknown Edition";
-  };
-
   const getStageName = (stageId: string | null) => {
     if (!stageId) return "—";
     return stages.find((s) => s.id === stageId)?.name || "Unknown Stage";
   };
 
-  // Filter stages by selected edition in form
-  const availableStages = formData.festival_edition_id
-    ? stages.filter(
-        (stage) => stage.festival_edition_id === formData.festival_edition_id,
-      )
-    : [];
-
-  // Filter sets by festival editions
-  const editionIds = editions.map((e) => e.id);
-  const festivalSets = sets.filter((set) =>
-    editionIds.includes(set.festival_edition_id),
+  const availableStages = stages.filter(
+    (stage) => stage.festival_edition_id === editionId,
   );
 
   // Filter sets by selected edition
-  const filteredSets =
-    selectedEditionFilter && selectedEditionFilter !== "all"
-      ? festivalSets.filter(
-          (set) => set.festival_edition_id === selectedEditionFilter,
-        )
-      : festivalSets;
+  const filteredSets = sets.filter(
+    (set) => set.festival_edition_id === editionId,
+  );
 
   // Filter artists for search dialog
   const filteredArtists = artists.filter((artist) =>
@@ -300,22 +273,6 @@ export const SetManagement = ({ festivalId }: SetManagementProps) => {
             Set Management
           </span>
           <div className="flex gap-2">
-            <Select
-              value={selectedEditionFilter}
-              onValueChange={setSelectedEditionFilter}
-            >
-              <SelectTrigger className="w-64">
-                <SelectValue placeholder="Filter by edition" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Editions</SelectItem>
-                {editions.map((edition) => (
-                  <SelectItem key={edition.id} value={edition.id}>
-                    {getEditionName(edition.id)}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
             <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
               <DialogTrigger asChild>
                 <Button
@@ -334,30 +291,6 @@ export const SetManagement = ({ festivalId }: SetManagementProps) => {
                 </DialogHeader>
                 <form onSubmit={handleSubmit} className="space-y-4">
                   <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <Label htmlFor="edition">Festival Edition</Label>
-                      <Select
-                        value={formData.festival_edition_id}
-                        onValueChange={(value) =>
-                          setFormData({
-                            ...formData,
-                            festival_edition_id: value,
-                          })
-                        }
-                        required
-                      >
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select edition" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {editions.map((edition) => (
-                            <SelectItem key={edition.id} value={edition.id}>
-                              {getEditionName(edition.id)}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </div>
                     <div>
                       <Label htmlFor="stage">Stage</Label>
                       <Select
@@ -523,7 +456,7 @@ export const SetManagement = ({ festivalId }: SetManagementProps) => {
             <TableHeader>
               <TableRow>
                 <TableHead>Set Name</TableHead>
-                <TableHead>Edition</TableHead>
+
                 <TableHead>Stage</TableHead>
                 <TableHead>Time</TableHead>
                 <TableHead>Artists</TableHead>
@@ -534,9 +467,7 @@ export const SetManagement = ({ festivalId }: SetManagementProps) => {
               {filteredSets.map((set) => (
                 <TableRow key={set.id}>
                   <TableCell className="font-medium">{set.name}</TableCell>
-                  <TableCell>
-                    {getEditionName(set.festival_edition_id)}
-                  </TableCell>
+
                   <TableCell>{getStageName(set.stage_id)}</TableCell>
                   <TableCell>
                     {set.time_start && set.time_end
@@ -587,9 +518,7 @@ export const SetManagement = ({ festivalId }: SetManagementProps) => {
 
           {filteredSets.length === 0 && (
             <div className="text-center py-8 text-muted-foreground">
-              {selectedEditionFilter && selectedEditionFilter !== "all"
-                ? "No sets found for the selected edition."
-                : "No sets found. Create your first set to get started."}
+              No sets found for the selected edition.
             </div>
           )}
         </div>

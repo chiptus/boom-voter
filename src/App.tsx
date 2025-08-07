@@ -33,8 +33,9 @@ const App = () => (
             <Route path="/schedule" element={<Schedule />} />
             <Route path="/admin" element={<Admin />} />
             <Route path="/admin/:tab" element={<Admin />} />
+            <Route path="/admin/festivals/:festivalId" element={<Admin />} />
             <Route
-              path="/admin/festivals/:festivalId/:subtab"
+              path="/admin/festivals/:festivalId/:editionId/:subtab"
               element={<Admin />}
             />
             <Route path="/privacy" element={<PrivacyPolicy />} />

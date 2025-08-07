@@ -22,32 +22,26 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { Loader2, Plus, Edit2, Trash2, CalendarDays } from "lucide-react";
 import type { FestivalEdition } from "@/services/queries";
+import { cn } from "@/lib/utils";
 
 interface EditionFormData {
-  festival_id: string;
   name: string;
   year: number;
   start_date?: string;
   end_date?: string;
 }
 
-interface FestivalEditionManagementProps {
-  festivalId?: string;
-}
-
 export const FestivalEditionManagement = ({
   festivalId,
-}: FestivalEditionManagementProps) => {
-  const { data: festivals = [] } = useFestivalQuery.useFestivals();
+  onSelect,
+  selected,
+}: {
+  festivalId: string;
+  onSelect: (editionId: string) => void;
+  selected: string;
+}) => {
   const { data: editions = [], isLoading } =
     useFestivalQuery.useFestivalEditionsForFestival(festivalId);
   const { toast } = useToast();
@@ -58,7 +52,6 @@ export const FestivalEditionManagement = ({
     null,
   );
   const [formData, setFormData] = useState<EditionFormData>({
-    festival_id: "",
     name: "",
     year: new Date().getFullYear(),
     start_date: "",
@@ -68,7 +61,6 @@ export const FestivalEditionManagement = ({
 
   const resetForm = () => {
     setFormData({
-      festival_id: festivalId || "",
       name: "",
       year: new Date().getFullYear(),
       start_date: "",
@@ -84,7 +76,6 @@ export const FestivalEditionManagement = ({
 
   const handleEdit = (edition: FestivalEdition) => {
     setFormData({
-      festival_id: edition.festival_id,
       name: edition.name,
       year: edition.year,
       start_date: edition.start_date || "",
@@ -96,10 +87,10 @@ export const FestivalEditionManagement = ({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!formData.name.trim() || !formData.festival_id) {
+    if (!formData.name.trim()) {
       toast({
         title: "Error",
-        description: "Edition name and festival are required",
+        description: "Edition name is required",
         variant: "destructive",
       });
       return;
@@ -111,6 +102,7 @@ export const FestivalEditionManagement = ({
         ...formData,
         start_date: formData.start_date || null,
         end_date: formData.end_date || null,
+        festival_id: festivalId,
       };
 
       if (editingEdition) {
@@ -175,12 +167,6 @@ export const FestivalEditionManagement = ({
     }
   };
 
-  const getFestivalName = (festivalId: string) => {
-    return (
-      festivals.find((f) => f.id === festivalId)?.name || "Unknown Festival"
-    );
-  };
-
   if (isLoading) {
     return (
       <Card>
@@ -193,12 +179,12 @@ export const FestivalEditionManagement = ({
   }
 
   return (
-    <Card>
+    <div>
       <CardHeader>
         <CardTitle className="flex items-center justify-between">
           <span className="flex items-center gap-2">
             <CalendarDays className="h-5 w-5" />
-            Festival Edition Management
+            Editions
           </span>
           <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
             <DialogTrigger asChild>
@@ -219,27 +205,6 @@ export const FestivalEditionManagement = ({
                 </DialogTitle>
               </DialogHeader>
               <form onSubmit={handleSubmit} className="space-y-4">
-                <div>
-                  <Label htmlFor="festival">Festival</Label>
-                  <Select
-                    value={formData.festival_id}
-                    onValueChange={(value) =>
-                      setFormData({ ...formData, festival_id: value })
-                    }
-                    required
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select a festival" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {festivals.map((festival) => (
-                        <SelectItem key={festival.id} value={festival.id}>
-                          {festival.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
                 <div>
                   <Label htmlFor="name">Edition Name</Label>
                   <Input
@@ -317,7 +282,6 @@ export const FestivalEditionManagement = ({
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Festival</TableHead>
                 <TableHead>Edition Name</TableHead>
                 <TableHead>Year</TableHead>
                 <TableHead>Start Date</TableHead>
@@ -327,10 +291,13 @@ export const FestivalEditionManagement = ({
             </TableHeader>
             <TableBody>
               {editions.map((edition) => (
-                <TableRow key={edition.id}>
-                  <TableCell className="font-medium">
-                    {getFestivalName(edition.festival_id)}
-                  </TableCell>
+                <TableRow
+                  key={edition.id}
+                  onClick={() => onSelect(edition.id)}
+                  className={cn(
+                    selected === edition.id ? "bg-slate-200 selected" : "",
+                  )}
+                >
                   <TableCell>{edition.name}</TableCell>
                   <TableCell>{edition.year}</TableCell>
                   <TableCell>{edition.start_date || "—"}</TableCell>
@@ -340,14 +307,22 @@ export const FestivalEditionManagement = ({
                       <Button
                         size="sm"
                         variant="ghost"
-                        onClick={() => handleEdit(edition)}
+                        onClick={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          handleEdit(edition);
+                        }}
                       >
                         <Edit2 className="h-4 w-4" />
                       </Button>
                       <Button
                         size="sm"
                         variant="ghost"
-                        onClick={() => handleDelete(edition)}
+                        onClick={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          handleDelete(edition);
+                        }}
                         className="text-destructive hover:text-destructive"
                       >
                         <Trash2 className="h-4 w-4" />
@@ -367,6 +342,6 @@ export const FestivalEditionManagement = ({
           )}
         </div>
       </CardContent>
-    </Card>
+    </div>
   );
 };
