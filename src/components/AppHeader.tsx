@@ -4,11 +4,10 @@ import { Button } from "@/components/ui/button";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { Music, Heart, LogIn } from "lucide-react";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { useProfileQuery } from "@/hooks/queries/useProfileQuery";
 import { Navigation } from "./AppHeader/Navigation";
 import { UserMenu } from "./AppHeader/UserMenu";
 import { AdminActions } from "./AppHeader/AdminActions";
-import { User } from "@supabase/supabase-js";
+import { useAuth } from "@/contexts/AuthContext";
 
 interface AppHeaderProps {
   // Navigation
@@ -24,10 +23,7 @@ interface AppHeaderProps {
   // Actions
   actions?: ReactNode;
 
-  // Authentication & Admin Actions
-  user?: User;
-  onSignIn?: () => void;
-  onSignOut?: () => void;
+  // Navigation options
   showGroupsButton?: boolean;
 
   // Custom content section
@@ -42,17 +38,12 @@ export const AppHeader = ({
   subtitle,
   description,
   actions,
-  user,
-  onSignIn,
-  onSignOut,
-
   showGroupsButton = false,
   children,
 }: AppHeaderProps) => {
   const navigate = useNavigate();
-
+  const { user, profile, signOut, showAuthDialog } = useAuth();
   const isMobile = useIsMobile();
-  const { data: profile } = useProfileQuery(user?.id);
 
   const handleBackClick = () => {
     navigate(backTo);
@@ -99,7 +90,6 @@ export const AppHeader = ({
               showBackButton={showBackButton}
               backLabel={backLabel}
               showGroupsButton={showGroupsButton}
-              user={user}
               isMobile={isMobile}
               onBackClick={handleBackClick}
             />
@@ -113,27 +103,25 @@ export const AppHeader = ({
 
             {/* Authentication - User Menu or Sign In */}
             <div className="flex items-center">
-              {user
-                ? onSignOut && (
-                    <UserMenu
-                      user={user}
-                      profile={profile || undefined}
-                      onSignOut={onSignOut}
-                      isMobile={isMobile}
-                    />
-                  )
-                : onSignIn && (
-                    <Button
-                      onClick={onSignIn}
-                      size={isMobile ? "sm" : "default"}
-                      className="bg-purple-600 hover:bg-purple-700 text-white font-medium rounded-full px-6"
-                    >
-                      <LogIn className="h-4 w-4" />
-                      <span className={isMobile ? "ml-1" : "ml-2"}>
-                        {isMobile ? "Sign In" : "Sign In / Sign Up"}
-                      </span>
-                    </Button>
-                  )}
+              {user ? (
+                <UserMenu
+                  user={user}
+                  profile={profile || undefined}
+                  onSignOut={signOut}
+                  isMobile={isMobile}
+                />
+              ) : (
+                <Button
+                  onClick={() => showAuthDialog()}
+                  size={isMobile ? "sm" : "default"}
+                  className="bg-purple-600 hover:bg-purple-700 text-white font-medium rounded-full px-6"
+                >
+                  <LogIn className="h-4 w-4" />
+                  <span className={isMobile ? "ml-1" : "ml-2"}>
+                    {isMobile ? "Sign In" : "Sign In / Sign Up"}
+                  </span>
+                </Button>
+              )}
             </div>
           </div>
         </div>

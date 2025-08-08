@@ -19,7 +19,7 @@ import { useEditionSetsQuery } from "@/hooks/queries/useEditionSetsQuery";
 import { useFestivalEdition } from "@/contexts/FestivalEditionContext";
 
 export default function EditionView() {
-  const { user, loading: authLoading, signOut, hasUsername } = useAuth();
+  const { user, loading: authLoading, hasUsername } = useAuth();
   const { inviteValidation, isValidating, hasValidInvite } =
     useInviteValidation();
   const [showAuthDialog, setShowAuthDialog] = useState(false);
@@ -120,12 +120,9 @@ export default function EditionView() {
     <div className="min-h-screen bg-app-gradient">
       <div className="container mx-auto px-4 py-8">
         <AppHeader
-          user={user || undefined}
           title={festival.name}
           subtitle={edition.name}
           description={`${filteredAndSortedSets.length} artists available for voting`}
-          onSignIn={() => setShowAuthDialog(true)}
-          onSignOut={signOut}
           showGroupsButton={true}
         />
 

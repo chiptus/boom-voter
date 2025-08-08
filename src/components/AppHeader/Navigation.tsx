@@ -6,14 +6,12 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-// import { PaletteSelector } from "@/components/PaletteSelector";
-import { User } from "@supabase/supabase-js";
+import { useAuth } from "@/contexts/AuthContext";
 
 interface NavigationProps {
   showBackButton?: boolean;
   backLabel?: string;
   showGroupsButton?: boolean;
-  user?: User;
   isMobile: boolean;
   onBackClick?: () => void;
 }
@@ -49,15 +47,13 @@ export const Navigation = ({
   showBackButton,
   backLabel = "Back",
   showGroupsButton,
-  user,
   isMobile,
   onBackClick,
 }: NavigationProps) => {
+  const { user } = useAuth();
+
   return (
     <div className="flex items-center gap-3">
-      {/* Palette Selector */}
-      {/* <PaletteSelector /> */}
-
       {/* Back Navigation */}
       {showBackButton && (
         <TooltipButton
