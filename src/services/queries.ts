@@ -1,5 +1,6 @@
 import { supabase } from "@/integrations/supabase/client";
 import type { Database } from "@/integrations/supabase/types";
+import { generateSlug } from "@/lib/slug";
 
 export type Artist = Database["public"]["Tables"]["artists"]["Row"] & {
   artist_music_genres: { music_genre_id: string }[] | null;
@@ -36,6 +37,7 @@ export const artistQueries = {
   list: (filters?: unknown) => [...artistQueries.lists(), filters] as const,
   details: () => [...artistQueries.all(), "detail"] as const,
   detail: (id: string) => [...artistQueries.details(), id] as const,
+  bySlug: (slug: string) => [...artistQueries.details(), "slug", slug] as const,
   notes: (artistId: string) =>
     [...artistQueries.detail(artistId), "notes"] as const,
 };
@@ -47,6 +49,7 @@ export const setQueries = {
   list: (filters?: unknown) => [...setQueries.lists(), filters] as const,
   details: () => [...setQueries.all(), "detail"] as const,
   detail: (id: string) => [...setQueries.details(), id] as const,
+  bySlug: (slug: string) => [...setQueries.details(), "slug", slug] as const,
   notes: (setId: string) => [...setQueries.detail(setId), "notes"] as const,
   byEdition: (editionId: string) =>
     [...setQueries.all(), "edition", editionId] as const,
@@ -197,6 +200,52 @@ export const queryFunctions = {
     return data || [];
   },
 
+  async fetchSetBySlug(slug: string): Promise<FestivalSet> {
+    const { data, error } = await supabase
+      .from("sets")
+      .select(
+        `
+        *,
+        stages (name),
+        set_artists!inner (
+          artists (
+            *,
+            artist_music_genres (music_genre_id)
+          )
+        ),
+        votes (vote_type, user_id)
+      `,
+      )
+      .eq("slug", slug)
+      .eq("archived", false)
+      .single();
+
+    if (error) {
+      console.error("Error fetching set by slug:", error);
+      throw new Error("Set not found");
+    }
+
+    // Transform to expected format  
+    const transformedData: FestivalSet = {
+      ...data,
+      artists:
+        data.set_artists
+          ?.map((sa: any) => ({
+            ...sa.artists,
+            artist_music_genres: sa.artists?.artist_music_genres || [],
+            votes: [],
+          }))
+          .filter(Boolean) || [],
+      stages: data.stage_id && data.stages ? data.stages : null,
+      votes: data.votes || [],
+    };
+
+    // Remove junction data from response
+    delete (transformedData as any).set_artists;
+    
+    return transformedData;
+  },
+
   async fetchSet(id: string): Promise<FestivalSet> {
     const { data, error } = await supabase
       .from("sets")
@@ -236,6 +285,28 @@ export const queryFunctions = {
     };
 
     return transformedData;
+  },
+
+  async fetchArtistBySlug(slug: string): Promise<Artist> {
+    const { data, error } = await supabase
+      .from("artists")
+      .select(
+        `
+        *,
+        artist_music_genres (music_genre_id),
+        votes (vote_type, user_id)
+      `,
+      )
+      .eq("slug", slug)
+      .eq("archived", false)
+      .single();
+
+    if (error) {
+      console.error("Error fetching artist by slug:", error);
+      throw new Error("Artist not found");
+    }
+
+    return data;
   },
 
   async fetchArtist(id: string): Promise<Artist> {
@@ -912,8 +983,10 @@ export const queryFunctions = {
       | "votes"
       | "stages"
       | "archived"
+      | "slug"
     >,
   ): Promise<FestivalSet> {
+    // First, create the set without slug
     const { data, error } = await supabase
       .from("sets")
       .insert({
@@ -928,8 +1001,21 @@ export const queryFunctions = {
       throw new Error("Failed to create set");
     }
 
+    // Generate and update the slug using the created ID
+    const slug = generateSlug(data.name);
+    const { error: slugError } = await supabase
+      .from("sets")
+      .update({ slug })
+      .eq("id", data.id);
+
+    if (slugError) {
+      console.error("Error updating set slug:", slugError);
+      throw new Error("Failed to generate set slug");
+    }
+
     return {
       ...data,
+      slug,
       artists: [],
       votes: [],
     };
@@ -939,9 +1025,15 @@ export const queryFunctions = {
     id: string,
     updates: Partial<Omit<FestivalSet, "artists" | "votes" | "stages">>,
   ) {
+    // If name is being updated, regenerate slug
+    const updateData = { ...updates };
+    if (updates.name) {
+      updateData.slug = generateSlug(updates.name);
+    }
+
     const { data, error } = await supabase
       .from("sets")
-      .update({ ...updates, updated_at: new Date().toISOString() })
+      .update({ ...updateData, updated_at: new Date().toISOString() })
       .eq("id", id)
       .select()
       .single();
@@ -1101,10 +1193,12 @@ export const mutationFunctions = {
       | "soundcloud_followers"
       | "votes"
       | "estimated_date"
+      | "slug"
     > & {
       genre_ids: string[];
     },
   ): Promise<Artist> {
+    // First, create the artist without slug
     const { data, error } = await supabase
       .from("artists")
       .insert({
@@ -1112,17 +1206,24 @@ export const mutationFunctions = {
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString(),
       })
-      .select(
-        `
-        *,
-        artist_music_genres (music_genre_id)
-      `,
-      )
+      .select("*")
       .single();
 
     if (error) {
       console.error("Error creating artist:", error);
       throw new Error("Failed to create artist");
+    }
+
+    // Generate and update the slug using the created ID
+    const slug = generateSlug(data.name);
+    const { error: slugError } = await supabase
+      .from("artists")
+      .update({ slug })
+      .eq("id", data.id);
+
+    if (slugError) {
+      console.error("Error updating artist slug:", slugError);
+      throw new Error("Failed to generate artist slug");
     }
 
     if (artistData.genre_ids.length > 0) {
@@ -1143,6 +1244,7 @@ export const mutationFunctions = {
 
     return {
       ...data,
+      slug,
       artist_music_genres: artistData.genre_ids.map((genreId) => ({
         music_genre_id: genreId,
       })),
@@ -1155,10 +1257,17 @@ export const mutationFunctions = {
     updates: UpdateArtistUpdates,
   ): Promise<Omit<Artist, "votes">> {
     const { genre_ids, ...rest } = updates;
+    
+    // If name is being updated, regenerate slug
+    const updateData = { ...rest };
+    if (updates.name) {
+      updateData.slug = generateSlug(updates.name);
+    }
+    
     const { data, error } = await supabase
       .from("artists")
       .update({
-        ...rest,
+        ...updateData,
         updated_at: new Date().toISOString(),
       })
       .eq("id", id)

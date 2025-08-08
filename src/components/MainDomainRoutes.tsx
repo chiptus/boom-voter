@@ -47,7 +47,7 @@ export function MainDomainRoutes() {
         element={<SubdomainRedirect component={EditionView} />}
       />
       <Route
-        path="/festivals/:festivalSlug/editions/:editionSlug/sets/:setId"
+        path="/festivals/:festivalSlug/editions/:editionSlug/sets/:setSlug"
         element={<SubdomainRedirect component={SetDetails} />}
       />
       <Route

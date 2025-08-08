@@ -21,6 +21,14 @@ export const useSetQuery = (id: string | undefined) => {
   });
 };
 
+export const useSetBySlugQuery = (slug: string | undefined) => {
+  return useQuery({
+    queryKey: setQueries.bySlug(slug || ""),
+    queryFn: () => queryFunctions.fetchSetBySlug(slug!),
+    enabled: !!slug,
+  });
+};
+
 export const useSetsByEditionQuery = (editionId: string | undefined) => {
   return useQuery({
     queryKey: setQueries.byEdition(editionId || ""),

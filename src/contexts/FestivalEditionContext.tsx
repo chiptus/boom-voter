@@ -19,15 +19,15 @@ const FestivalEditionContext = createContext<
   FestivalEditionContextType | undefined
 >(undefined);
 
-export const useFestivalEdition = () => {
+export function useFestivalEdition() {
   const context = useContext(FestivalEditionContext);
   if (context === undefined) {
     throw new Error(
-      "useFestivalEdition must be used within a FestivalEditionProvider",
+      "useFestivalEdition must be used within a FestivalEditionProvider"
     );
   }
   return context;
-};
+}
 
 function getSlugs(pathname: string) {
   let festivalSlug = "";
@@ -66,6 +66,8 @@ export function FestivalEditionProvider({
   children,
 }: PropsWithChildren<unknown>) {
   const { festivalSlug, editionSlug } = useParseSlugs();
+
+  console.log("[DEBUG]", {festivalSlug,editionSlug})
 
   const festivalQuery = useFestivalBySlugQuery(festivalSlug);
 

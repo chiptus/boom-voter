@@ -17,6 +17,7 @@ export interface ScheduleStage {
 export interface ScheduleArtist {
   id: string;
   name: string;
+  slug?: string;
   stage?: string;
   startTime?: Date;
   endTime?: Date;
@@ -60,6 +61,7 @@ export const useScheduleData = (use24Hour: boolean = false) => {
       return {
         id: set.id,
         name: set.name,
+        slug: set.slug,
         stage: set.stages?.name || "",
         startTime,
         endTime,
