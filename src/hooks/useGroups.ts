@@ -1,4 +1,3 @@
-import { useAuth } from "./useAuth";
 import {
   useUserGroupsQuery,
   useCreateGroupMutation,
@@ -9,6 +8,7 @@ import {
 import { groupService } from "@/services/groupService";
 import { useToast } from "@/components/ui/use-toast";
 import type { GroupMember } from "@/types/groups";
+import { useAuth } from "@/contexts/AuthContext";
 
 export const useGroups = () => {
   const { user, loading } = useAuth();

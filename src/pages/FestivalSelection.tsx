@@ -12,10 +12,12 @@ import { AppHeader } from "@/components/AppHeader";
 import { Festival } from "@/services/queries";
 import { useEffect } from "react";
 import { createFestivalSubdomainUrl } from "@/lib/subdomain";
+import { useAuth } from "@/contexts/AuthContext";
 
 export default function FestivalSelection() {
   const { data: availableFestivals = [], isLoading: festivalsLoading } =
     useFestivalsQuery();
+  const { user, showAuthDialog, signOut } = useAuth();
 
   const handleFestivalClick = (festival: Festival) => {
     const subdomainUrl = createFestivalSubdomainUrl(festival.slug);
@@ -56,6 +58,9 @@ export default function FestivalSelection() {
             title="UpLine"
             subtitle="Collaborative Festival Voting"
             description="No festivals are currently available for voting."
+            user={user || undefined}
+            onSignIn={() => showAuthDialog()}
+            onSignOut={signOut}
           />
 
           <div className="flex items-center justify-center mt-16">
@@ -84,6 +89,9 @@ export default function FestivalSelection() {
           title="UpLine"
           subtitle="Collaborative Festival Voting"
           description="Choose a festival to start voting and collaborating with your community."
+          user={user || undefined}
+          onSignIn={() => showAuthDialog()}
+          onSignOut={signOut}
         />
 
         <div className="mt-12 grid gap-6 md:grid-cols-2 lg:grid-cols-3">

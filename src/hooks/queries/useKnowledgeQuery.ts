@@ -1,7 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
 import { queryFunctions, mutationFunctions } from "@/services/queries";
-import { useAuth } from "@/hooks/useAuth";
+import { useAuth } from "@/contexts/AuthContext";
 
 export const useUserKnowledgeQuery = (userId: string | undefined) => {
   return useQuery({

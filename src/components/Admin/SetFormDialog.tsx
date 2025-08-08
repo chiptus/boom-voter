@@ -10,7 +10,7 @@ import {
   useAddArtistToSetMutation,
   useRemoveArtistFromSetMutation,
 } from "@/hooks/queries/useSetsQuery";
-import { useAuth } from "@/hooks/useAuth";
+import { useAuth } from "@/contexts/AuthContext";
 import {
   Dialog,
   DialogContent,

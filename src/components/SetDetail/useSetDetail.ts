@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import { useAuth } from "@/hooks/useAuth";
+import { useAuth } from "@/contexts/AuthContext";
 import { useOfflineVoting } from "@/hooks/useOfflineVoting";
 import { useUserPermissionsQuery } from "@/hooks/queries/useGroupsQuery";
 import { useOfflineSetsData } from "@/hooks/useOfflineSetsData";

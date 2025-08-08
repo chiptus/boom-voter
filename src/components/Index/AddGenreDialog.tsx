@@ -14,7 +14,7 @@ import {
 import { Plus } from "lucide-react";
 
 import { useUserPermissionsQuery } from "@/hooks/queries/useGroupsQuery";
-import { useAuth } from "@/hooks/useAuth";
+import { useAuth } from "@/contexts/AuthContext";
 
 interface AddGenreDialogProps {
   open: boolean;

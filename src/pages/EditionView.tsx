@@ -1,6 +1,6 @@
 import { useState, useMemo } from "react";
 
-import { useAuth } from "@/hooks/useAuth";
+import { useAuth } from "@/contexts/AuthContext";
 import { useProfileQuery } from "@/hooks/queries/useProfileQuery";
 import { useInviteValidation } from "@/components/Index/useInviteValidation";
 import { AuthDialog } from "@/components/AuthDialog";

@@ -20,7 +20,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { useToast } from "@/hooks/use-toast";
-import { useAuth } from "@/hooks/useAuth";
+import { useAuth } from "@/contexts/AuthContext";
 import { useUserPermissionsQuery } from "@/hooks/queries/useGroupsQuery";
 import { useGenresQuery } from "@/hooks/queries/useGenresQuery";
 import { useUpdateArtistMutation } from "@/hooks/queries/useArtistsQuery";

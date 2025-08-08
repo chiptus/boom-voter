@@ -1,17 +1,50 @@
-import { useEffect, useMemo, useState } from "react";
+import {
+  createContext,
+  useContext,
+  useEffect,
+  useState,
+  useMemo,
+  ReactNode,
+} from "react";
+import { User } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
 import { useProfileQuery } from "@/hooks/queries/useProfileQuery";
 import { profileOfflineService } from "@/services/profileOfflineService";
 import { useToast } from "@/hooks/use-toast";
-import { User, Session } from "@supabase/supabase-js";
+import { AuthDialog } from "@/components/AuthDialog";
+import { Profile } from "@/services/queries";
 
-export const useAuth = () => {
+interface AuthContextType {
+  // Auth state
+  user: User | null;
+  profile: Profile | null;
+  loading: boolean;
+  hasUsername: boolean;
+
+  // Auth actions
+  signOut: () => Promise<void>;
+
+  // Dialog management
+  showAuthDialog: (inviteToken?: string, groupName?: string) => void;
+  hideAuthDialog: () => void;
+}
+
+const AuthContext = createContext<AuthContextType | undefined>(undefined);
+
+interface AuthProviderProps {
+  children: ReactNode;
+}
+
+export function AuthProvider({ children }: AuthProviderProps) {
   const [user, setUser] = useState<User | null>(null);
-  const [session, setSession] = useState<Session | null>(null);
+  // const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
+  const [authDialogOpen, setAuthDialogOpen] = useState(false);
+  const [inviteToken, setInviteToken] = useState<string | undefined>();
+  const [groupName, setGroupName] = useState<string | undefined>();
+
   const { toast } = useToast();
   const profileQuery = useProfileQuery(user?.id);
-
   const profile = profileQuery.data;
 
   useEffect(() => {
@@ -19,7 +52,7 @@ export const useAuth = () => {
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange(async (event, session) => {
-      setSession(session);
+      // setSession(session);
       setUser(session?.user || null);
       setLoading(false);
 
@@ -73,12 +106,15 @@ export const useAuth = () => {
             console.error("Error processing invite:", error);
           }
         }
+
+        // Close auth dialog on successful sign in
+        setAuthDialogOpen(false);
       }
     });
 
     // Then check for existing session
     supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
+      // setSession(session);
       setUser(session?.user || null);
       setLoading(false);
     });
@@ -96,20 +132,50 @@ export const useAuth = () => {
     await supabase.auth.signOut();
   };
 
+  const showAuthDialog = (token?: string, name?: string) => {
+    setInviteToken(token);
+    setGroupName(name);
+    setAuthDialogOpen(true);
+  };
+
+  const hideAuthDialog = () => {
+    setAuthDialogOpen(false);
+    setInviteToken(undefined);
+    setGroupName(undefined);
+  };
+
   const hasUsername = useMemo(() => {
-    return (
-      // loading ||
-      // profileQuery.isLoading ||
-      profile?.username && profile?.username.trim() !== ""
-    );
+    return Boolean(profile?.username && profile?.username.trim() !== "");
   }, [profile]);
 
-  return {
+  const contextValue: AuthContextType = {
     user,
-    session,
-    profile,
+    profile: profile || null,
     loading,
     hasUsername,
     signOut,
+    showAuthDialog,
+    hideAuthDialog,
   };
-};
+
+  return (
+    <AuthContext.Provider value={contextValue}>
+      {children}
+      <AuthDialog
+        open={authDialogOpen}
+        onOpenChange={setAuthDialogOpen}
+        onSuccess={hideAuthDialog}
+        inviteToken={inviteToken}
+        groupName={groupName}
+      />
+    </AuthContext.Provider>
+  );
+}
+
+export function useAuth() {
+  const context = useContext(AuthContext);
+  if (context === undefined) {
+    throw new Error("useAuth must be used within an AuthProvider");
+  }
+  return context;
+}

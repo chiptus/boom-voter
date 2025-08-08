@@ -16,6 +16,7 @@ export type Festival = Database["public"]["Tables"]["festivals"]["Row"];
 export type FestivalEdition =
   Database["public"]["Tables"]["festival_editions"]["Row"];
 export type Stage = Database["public"]["Tables"]["stages"]["Row"];
+export type Profile = Database["public"]["Tables"]["profiles"]["Row"];
 
 export type SetNote = {
   id: string;

@@ -22,7 +22,7 @@ import {
 } from "@/components/ui/form";
 import { Music } from "lucide-react";
 import { StageSelector } from "../StageSelector";
-import { useAuth } from "@/hooks/useAuth";
+import { useAuth } from "@/contexts/AuthContext";
 import { useUserPermissionsQuery } from "@/hooks/queries/useGroupsQuery";
 import { useGenresQuery } from "@/hooks/queries/useGenresQuery";
 import { useCreateArtistMutation } from "@/hooks/queries/useArtistsQuery";
