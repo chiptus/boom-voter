@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState, useRef, useCallback } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -69,6 +69,10 @@ export function SetFormDialog({
   const { data: artists = [] } = useArtistsQuery();
   const { user } = useAuth();
 
+  // Track if user has manually edited the name
+  const [hasManuallyEditedName, setHasManuallyEditedName] = useState(false);
+  const nameFieldRef = useRef<HTMLInputElement>(null);
+
   // React Query mutations
   const createSetMutation = useCreateSetMutation();
   const updateSetMutation = useUpdateSetMutation();
@@ -92,6 +96,9 @@ export function SetFormDialog({
   // Reset form when dialog opens/closes or editingSet changes
   useEffect(() => {
     if (isOpen) {
+      // Reset manual edit flag when dialog opens
+      setHasManuallyEditedName(false);
+
       if (editingSet) {
         form.reset({
           name: editingSet.name,
@@ -102,6 +109,8 @@ export function SetFormDialog({
           estimated_date: "",
           artist_ids: editingSet.artists?.map((a) => a.id) || [],
         });
+        // When editing, consider the name as manually set
+        setHasManuallyEditedName(true);
       } else {
         form.reset({
           name: "",
@@ -115,6 +124,29 @@ export function SetFormDialog({
       }
     }
   }, [isOpen, editingSet, form]);
+
+  // Generate set name from selected artists
+  const generateSetName = useCallback(
+    (artistIds: string[]): string => {
+      if (artistIds.length === 0) return "";
+
+      const selectedArtists = artists.filter((artist) =>
+        artistIds.includes(artist.id),
+      );
+      const artistNames = selectedArtists.map((artist) => artist.name);
+
+      if (artistNames.length === 1) {
+        return artistNames[0];
+      } else if (artistNames.length === 2) {
+        return `${artistNames[0]} vs ${artistNames[1]}`;
+      } else if (artistNames.length > 2) {
+        return `${artistNames[0]} + ${artistNames.length - 1} more`;
+      }
+
+      return "";
+    },
+    [artists],
+  );
 
   const availableStages = stages.filter(
     (stage) => stage.festival_edition_id === editionId,
@@ -196,6 +228,63 @@ export function SetFormDialog({
         </DialogHeader>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+            {/* Artist Selection - First Step */}
+            <FormField
+              control={form.control}
+              name="artist_ids"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Artists in Set</FormLabel>
+                  <FormControl>
+                    <ArtistMultiSelect
+                      artists={artists.map((a) => ({ id: a.id, name: a.name }))}
+                      value={field.value || []}
+                      onValueChange={(artistIds) => {
+                        field.onChange(artistIds);
+                        // Auto-generate name if user hasn't manually edited it
+                        if (!hasManuallyEditedName) {
+                          const generatedName = generateSetName(artistIds);
+                          form.setValue("name", generatedName, {
+                            shouldValidate: true,
+                          });
+                        }
+                      }}
+                      placeholder="Select artists for this set..."
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            {/* Set Name - Auto-generated but editable */}
+            <FormField
+              control={form.control}
+              name="name"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Set Name</FormLabel>
+                  <FormControl>
+                    <Input
+                      placeholder="e.g., Shpongle Live Set"
+                      {...field}
+                      ref={nameFieldRef}
+                      onChange={(e) => {
+                        field.onChange(e);
+                        setHasManuallyEditedName(true);
+                      }}
+                    />
+                  </FormControl>
+                  {!hasManuallyEditedName && (
+                    <p className="text-xs text-muted-foreground">
+                      Name will be auto-generated from selected artists
+                    </p>
+                  )}
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
             <FormField
               control={form.control}
               name="stage_id"
@@ -216,20 +305,6 @@ export function SetFormDialog({
                         ))}
                       </SelectContent>
                     </Select>
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="name"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Set Name</FormLabel>
-                  <FormControl>
-                    <Input placeholder="e.g., Shpongle Live Set" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -302,25 +377,6 @@ export function SetFormDialog({
                 )}
               />
             </div>
-
-            <FormField
-              control={form.control}
-              name="artist_ids"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Artists in Set</FormLabel>
-                  <FormControl>
-                    <ArtistMultiSelect
-                      artists={artists.map((a) => ({ id: a.id, name: a.name }))}
-                      value={field.value || []}
-                      onValueChange={field.onChange}
-                      placeholder="Select artists for this set..."
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
 
             <div className="flex justify-end gap-2">
               <Button
