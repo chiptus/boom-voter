@@ -24,6 +24,8 @@ export default tseslint.config(
         { allowConstantExport: true },
       ],
       "@typescript-eslint/no-unused-vars": "off",
+      "prefer-function-declarations-for-components": "off",
+      "func-style": ["warn", "declaration", { allowArrowFunctions: false }],
     },
   },
 );
