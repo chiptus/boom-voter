@@ -11,22 +11,22 @@ interface ArtistScheduleBlockProps {
   compact?: boolean;
 }
 
-export const ArtistScheduleBlock = ({
+export function ArtistScheduleBlock({
   artist,
   userVote,
   onVote,
   compact = false,
-}: ArtistScheduleBlockProps) => {
-  const getVoteCount = (voteType: number) => {
+}: ArtistScheduleBlockProps) {
+  function getVoteCount(voteType: number) {
     return (artist.votes || []).filter((vote) => vote.vote_type === voteType)
       .length;
-  };
+  }
 
-  const handleVote = (voteType: number) => {
+  function handleVote(voteType: number) {
     if (onVote) {
       onVote(artist.id, voteType);
     }
-  };
+  }
 
   return (
     <Card className="bg-white/10 backdrop-blur-md border-purple-400/30 hover:border-purple-400/50 transition-colors">
@@ -34,17 +34,17 @@ export const ArtistScheduleBlock = ({
         <div className="mb-2">
           <Link
             to={`/artist/${artist.id}`}
-            className="text-white font-semibold hover:text-purple-300 transition-colors block"
+            className="text-white font-semibold hover:text-purple-300 transition-colors block text-sm"
           >
             {artist.name}
           </Link>
 
           {/* Show artists in this set */}
-          {artist.artists && artist.artists.length > 0 && (
+          {/* {artist.artists && artist.artists.length > 0 && (
             <div className="text-purple-300 text-sm mt-1">
               {artist.artists.map((a) => a.name).join(", ")}
             </div>
-          )}
+          )} */}
         </div>
 
         <div className="space-y-1 text-sm text-purple-200">
@@ -111,4 +111,4 @@ export const ArtistScheduleBlock = ({
       </CardContent>
     </Card>
   );
-};
+}

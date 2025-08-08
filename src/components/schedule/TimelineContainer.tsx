@@ -20,7 +20,6 @@ export function TimelineContainer({
     <div
       ref={scrollContainerRef}
       className="overflow-x-auto overflow-y-hidden pb-20"
-      style={{ paddingLeft: "144px" }}
     >
       {/* Time Scale */}
       <TimeScale
@@ -30,7 +29,7 @@ export function TimelineContainer({
       />
 
       {/* Stage Rows */}
-      <div className="space-y-6">
+      <div className="space-y-20 mt-28">
         {timelineData.stages.map((stage) => (
           <StageRow
             key={stage.name}
