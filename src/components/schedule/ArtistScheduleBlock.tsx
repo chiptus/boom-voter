@@ -4,6 +4,7 @@ import { Link } from "react-router-dom";
 import { formatTimeOnly } from "@/lib/timeUtils";
 import { format } from "date-fns";
 import type { ScheduleSet } from "@/hooks/useScheduleData";
+import { useMemo } from "react";
 
 interface ArtistScheduleBlockProps {
   artist: ScheduleSet;
@@ -42,13 +43,16 @@ export function ArtistScheduleBlock({
     return `${startStr}-${endStr}`;
   }
 
-  let duration = 60;
-  if (set.endTime && set.startTime) {
-    // Calculate duration in minutes
-    duration = (set.endTime.getTime() - set.startTime.getTime()) / (1000 * 60);
-  }
-  // Use compact format for sets shorter than 1 hour (60 minutes)
-  const useCompact = duration <= 60;
+  const useCompact = useMemo(() => {
+    let duration = 60;
+    if (set.endTime && set.startTime) {
+      // Calculate duration in minutes
+      duration =
+        (set.endTime.getTime() - set.startTime.getTime()) / (1000 * 60);
+    }
+    // Use compact format for sets shorter than 1 hour (60 minutes)
+    return duration <= 60;
+  }, [set.startTime, set.endTime]);
 
   return (
     <Card className="bg-white/10 backdrop-blur-md border-purple-400/30 hover:border-purple-400/50 transition-colors">
