@@ -21,7 +21,7 @@ export function StageRow({
     <div key={stage.name} className="flex items-start">
       {/* Timeline Track */}
       <div
-        className="relative h-20 bg-white/5 rounded-lg border border-purple-400/20"
+        className="relative h-24 bg-white/5 rounded-lg border border-purple-400/20"
         style={{ minWidth: totalWidth }}
       >
         {stage.artists.map((set) => {
@@ -32,16 +32,17 @@ export function StageRow({
               key={set.id}
               className="absolute h-16"
               style={{
-                left: `${set.horizontalPosition.left}px`,
-                width: `${set.horizontalPosition.width}px`,
+                left: `${set.horizontalPosition.left + 20}px`,
+                width: `${set.horizontalPosition.width - 4}px`, // Reduce width by 4px for spacing
               }}
             >
-              <div className="h-full">
+              <div className="h-full pr-1">
+                {" "}
+                {/* Add right padding for spacing */}
                 <ArtistScheduleBlock
                   artist={set}
                   userVote={userVotes[set.id]}
                   onVote={onVote}
-                  compact={true}
                 />
               </div>
             </div>

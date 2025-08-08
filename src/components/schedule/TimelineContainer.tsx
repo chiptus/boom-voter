@@ -29,7 +29,7 @@ export function TimelineContainer({
       />
 
       {/* Stage Rows */}
-      <div className="space-y-20 mt-28">
+      <div className="space-y-12 mt-28">
         {timelineData.stages.map((stage) => (
           <StageRow
             key={stage.name}

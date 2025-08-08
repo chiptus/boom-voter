@@ -1,42 +1,64 @@
 import { Card, CardContent } from "@/components/ui/card";
-import { Clock, MapPin, Heart, ThumbsUp, ThumbsDown } from "lucide-react";
+import { Clock, Heart, ThumbsUp, ThumbsDown } from "lucide-react";
 import { Link } from "react-router-dom";
 import { formatTimeOnly } from "@/lib/timeUtils";
+import { format } from "date-fns";
 import type { ScheduleSet } from "@/hooks/useScheduleData";
 
 interface ArtistScheduleBlockProps {
   artist: ScheduleSet;
   userVote?: number;
   onVote?: (setId: string, voteType: number) => void;
-  compact?: boolean;
 }
 
 export function ArtistScheduleBlock({
-  artist,
+  artist: set,
   userVote,
   onVote,
-  compact = false,
 }: ArtistScheduleBlockProps) {
   function getVoteCount(voteType: number) {
-    return (artist.votes || []).filter((vote) => vote.vote_type === voteType)
+    return (set.votes || []).filter((vote) => vote.vote_type === voteType)
       .length;
   }
 
   function handleVote(voteType: number) {
     if (onVote) {
-      onVote(artist.id, voteType);
+      onVote(set.id, voteType);
     }
   }
 
+  // Format time in compact format (e.g., "22-23" instead of "22:00 - 23:00")
+  function formatCompactTime(startTime: Date, endTime: Date): string {
+    const start = format(startTime, "H");
+    const end = format(endTime, "H");
+
+    // If minutes are not :00, include them
+    const startMinutes = startTime.getMinutes();
+    const endMinutes = endTime.getMinutes();
+
+    const startStr = startMinutes === 0 ? start : format(startTime, "H:mm");
+    const endStr = endMinutes === 0 ? end : format(endTime, "H:mm");
+
+    return `${startStr}-${endStr}`;
+  }
+
+  let duration = 60;
+  if (set.endTime && set.startTime) {
+    // Calculate duration in minutes
+    duration = (set.endTime.getTime() - set.startTime.getTime()) / (1000 * 60);
+  }
+  // Use compact format for sets shorter than 1 hour (60 minutes)
+  const useCompact = duration <= 60;
+
   return (
     <Card className="bg-white/10 backdrop-blur-md border-purple-400/30 hover:border-purple-400/50 transition-colors">
-      <CardContent className={compact ? "p-3" : "p-4"}>
+      <CardContent className="p-3">
         <div className="mb-2">
           <Link
-            to={`/artist/${artist.id}`}
-            className="text-white font-semibold hover:text-purple-300 transition-colors block text-sm"
+            to={`/artist/${set.id}`}
+            className="text-white font-semibold hover:text-purple-300 transition-colors block text-sm whitespace-nowrap overflow-hidden text-ellipsis"
           >
-            {artist.name}
+            {set.name}
           </Link>
 
           {/* Show artists in this set */}
@@ -48,25 +70,18 @@ export function ArtistScheduleBlock({
         </div>
 
         <div className="space-y-1 text-sm text-purple-200">
-          {(artist.startTime || artist.endTime) && (
-            <div className="flex items-center gap-2">
-              <Clock className="h-3 w-3" />
-              <span className="text-xs">
-                {artist.startTime &&
-                  artist.endTime &&
-                  formatTimeOnly(
-                    artist.startTime.toISOString(),
-                    artist.endTime.toISOString(),
-                    true,
-                  )}
+          {set.startTime && set.endTime && (
+            <div className="flex items-center gap-1">
+              <Clock className="h-3 w-3 flex-shrink-0" />
+              <span className="text-xs whitespace-nowrap overflow-hidden text-ellipsis">
+                {useCompact
+                  ? formatCompactTime(set.startTime, set.endTime)
+                  : formatTimeOnly(
+                      set.startTime.toISOString(),
+                      set.endTime.toISOString(),
+                      true,
+                    )}
               </span>
-            </div>
-          )}
-
-          {!compact && artist.stage && (
-            <div className="flex items-center gap-2">
-              <MapPin className="h-3 w-3" />
-              <span className="text-xs">{artist.stage}</span>
             </div>
           )}
         </div>
