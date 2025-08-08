@@ -11,27 +11,26 @@ import { useFestivalsQuery } from "@/hooks/queries/useFestivalQuery";
 import { AppHeader } from "@/components/AppHeader";
 import { Festival } from "@/services/queries";
 import { useEffect } from "react";
-import { createFestivalSubdomainUrl } from "@/lib/subdomain";
+import {
+  createFestivalSubdomainUrl,
+  shouldRedirectToSubdomain,
+} from "@/lib/subdomain";
 export default function FestivalSelection() {
   const { data: availableFestivals = [], isLoading: festivalsLoading } =
     useFestivalsQuery();
 
-  const handleFestivalClick = (festival: Festival) => {
+  function handleFestivalClick(festival: Festival) {
     const subdomainUrl = createFestivalSubdomainUrl(festival.slug);
+    const shouldNotRedirect = !shouldRedirectToSubdomain();
 
-    // For localhost development, use regular navigation
-    const isLocalhost =
-      window.location.hostname.includes("localhost") ||
-      window.location.hostname.includes("127.0.0.1");
-
-    if (isLocalhost) {
+    if (shouldNotRedirect) {
       // In development, navigate to regular route
       window.location.href = `/festivals/${festival.slug}`;
     } else {
       // In production, redirect to subdomain
       window.location.href = subdomainUrl;
     }
-  };
+  }
 
   useEffect(() => {
     if (!festivalsLoading && availableFestivals.length === 1) {

@@ -10,8 +10,9 @@ import { AuthProvider } from "@/contexts/AuthContext";
 import { MainDomainRoutes } from "./components/MainDomainRoutes";
 import { SubdomainRoutes } from "./components/SubdomainRoutes";
 import { useState } from "react";
+import { FestivalEditionProvider } from "./contexts/FestivalEditionContext";
 
-const App = () => {
+function App() {
   const [subdomainInfo] = useState(() => getSubdomainInfo());
 
   return (
@@ -26,22 +27,24 @@ const App = () => {
         }}
       >
         <AuthProvider>
-          <div className="min-h-screen flex flex-col">
-            <div className="flex-1">
-              {subdomainInfo.isSubdomain && subdomainInfo.festivalSlug ? (
-                // Subdomain routing: boom-festival.getupline.com
-                <SubdomainRoutes festivalSlug={subdomainInfo.festivalSlug} />
-              ) : (
-                // Main domain routing: getupline.com
-                <MainDomainRoutes />
-              )}
+          <FestivalEditionProvider>
+            <div className="min-h-screen flex flex-col">
+              <div className="flex-1">
+                {subdomainInfo.isSubdomain && subdomainInfo.festivalSlug ? (
+                  // Subdomain routing: boom-festival.getupline.com
+                  <SubdomainRoutes />
+                ) : (
+                  // Main domain routing: getupline.com
+                  <MainDomainRoutes />
+                )}
+              </div>
+              <AppFooter />
             </div>
-            <AppFooter />
-          </div>
+          </FestivalEditionProvider>
         </AuthProvider>
       </BrowserRouter>
     </TooltipProvider>
   );
-};
+}
 
 export default App;

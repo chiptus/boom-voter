@@ -8,6 +8,14 @@ export interface SubdomainInfo {
   isMainDomain: boolean;
 }
 
+const isIpRegex =
+  /^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/;
+
+export function shouldRedirectToSubdomain() {
+  const hostname = location.hostname;
+  return !hostname.includes("localhost") && !isIpRegex.test(hostname);
+}
+
 /**
  * Extract festival slug from subdomain
  * Examples:
@@ -27,9 +35,10 @@ export function getSubdomainInfo(): SubdomainInfo {
 
   const hostname = window.location.hostname;
   const parts = hostname.split(".");
+  const shouldRedirect = shouldRedirectToSubdomain();
 
   // Handle localhost development
-  if (hostname === "localhost" || hostname.includes("127.0.0.1")) {
+  if (!shouldRedirect) {
     return {
       festivalSlug: null,
       isSubdomain: false,

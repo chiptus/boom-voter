@@ -22,6 +22,10 @@ import PrivacyPolicy from "@/pages/PrivacyPolicy";
 import TermsOfService from "@/pages/TermsOfService";
 import CookiePolicy from "@/pages/CookiePolicy";
 import NotFound from "@/pages/NotFound";
+import EditionSelection from "@/pages/EditionSelection";
+import { SetDetails } from "@/pages/SetDetails";
+import EditionView from "@/pages/EditionView";
+import Schedule from "@/pages/Schedule";
 
 /**
  * Routes for main domain access (getupline.com)
@@ -34,18 +38,21 @@ export function MainDomainRoutes() {
       <Route path="/" element={<FestivalSelection />} />
 
       {/* Festival routes redirect to subdomains */}
-      <Route path="/festivals/:festivalSlug" element={<SubdomainRedirect />} />
+      <Route
+        path="/festivals/:festivalSlug"
+        element={<SubdomainRedirect component={EditionSelection} />}
+      />
       <Route
         path="/festivals/:festivalSlug/editions/:editionSlug"
-        element={<SubdomainRedirect />}
+        element={<SubdomainRedirect component={EditionView} />}
       />
       <Route
         path="/festivals/:festivalSlug/editions/:editionSlug/sets/:setId"
-        element={<SubdomainRedirect />}
+        element={<SubdomainRedirect component={SetDetails} />}
       />
       <Route
         path="/festivals/:festivalSlug/editions/:editionSlug/schedule"
-        element={<SubdomainRedirect />}
+        element={<SubdomainRedirect component={Schedule} />}
       />
 
       {/* Global routes (not scoped to festival/edition) */}
