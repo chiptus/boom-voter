@@ -14,6 +14,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
@@ -225,6 +226,11 @@ export function SetFormDialog({
           <DialogTitle>
             {editingSet ? "Edit Set" : "Create New Set"}
           </DialogTitle>
+          <DialogDescription>
+            {editingSet
+              ? "Update the set details, artists, and scheduling information."
+              : "Create a new set by first selecting artists, then configuring details and scheduling."}
+          </DialogDescription>
         </DialogHeader>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">

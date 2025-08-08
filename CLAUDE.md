@@ -6,7 +6,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ### Development
 
-- `npm run dev` - Start development server on port 8080
+- `npm run dev` - Start development server on port 8080 (DO NOT RUN - user always has dev server running)
 - `npm run build` - Production build
 - `npm run build:dev` - Development build
 - `npm run lint` - Run ESLint
@@ -106,6 +106,8 @@ src/
 - Component files use PascalCase
 - Custom hooks use camelCase with "use" prefix
 - Services and utilities use camelCase
+- **Dialog Components**: Always include both `DialogTitle` AND `DialogDescription` in `DialogHeader` to prevent accessibility warnings
+- **React Router**: Use future flags `v7_startTransition` and `v7_relativeSplatPath` in BrowserRouter to prepare for v7 upgrade
 
 ### Important Notes
 

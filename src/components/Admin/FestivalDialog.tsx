@@ -5,6 +5,7 @@ import { useToast } from "@/hooks/use-toast";
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
@@ -170,6 +171,11 @@ export const FestivalDialog = ({
           <DialogTitle>
             {editingFestival ? "Edit Festival" : "Create New Festival"}
           </DialogTitle>
+          <DialogDescription>
+            {editingFestival
+              ? "Update festival information including name, description, and settings."
+              : "Create a new festival with basic information and publish settings."}
+          </DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>

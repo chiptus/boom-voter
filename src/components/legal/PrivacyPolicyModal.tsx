@@ -1,6 +1,7 @@
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
@@ -20,6 +21,10 @@ export const PrivacyPolicyModal = ({
       <DialogContent className="max-w-4xl max-h-[80vh]">
         <DialogHeader>
           <DialogTitle>Privacy Policy</DialogTitle>
+          <DialogDescription>
+            Read our complete privacy policy to understand how we collect, use,
+            and protect your personal data.
+          </DialogDescription>
         </DialogHeader>
 
         <ScrollArea className="h-full">

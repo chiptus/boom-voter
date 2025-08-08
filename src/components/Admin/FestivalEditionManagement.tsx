@@ -17,6 +17,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
@@ -263,6 +264,11 @@ export const FestivalEditionManagement = ({
                     ? "Edit Festival Edition"
                     : "Create New Festival Edition"}
                 </DialogTitle>
+                <DialogDescription>
+                  {editingEdition
+                    ? "Update edition information including name, dates, and visibility settings."
+                    : "Create a new festival edition with dates and publish settings."}
+                </DialogDescription>
               </DialogHeader>
               <form onSubmit={handleSubmit} className="space-y-4">
                 <div>

@@ -19,7 +19,12 @@ const App = () => {
       <Toaster />
       <Sonner />
       <CookieConsentBanner />
-      <BrowserRouter>
+      <BrowserRouter
+        future={{
+          v7_startTransition: true,
+          v7_relativeSplatPath: true,
+        }}
+      >
         <AuthProvider>
           <div className="min-h-screen flex flex-col">
             <div className="flex-1">

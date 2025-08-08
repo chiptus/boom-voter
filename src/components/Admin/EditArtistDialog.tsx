@@ -4,6 +4,7 @@ import { z } from "zod";
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
@@ -153,6 +154,10 @@ export function EditArtistDialog({ artist, onClose }: EditArtistDialogProps) {
       <DialogContent className="sm:max-w-[425px] max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Edit Artist</DialogTitle>
+          <DialogDescription>
+            Update artist information, genres, streaming links, and performance
+            details.
+          </DialogDescription>
         </DialogHeader>
 
         <Form {...form}>

@@ -17,6 +17,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
@@ -176,6 +177,11 @@ export const StageManagement = ({ editionId }: StageManagementProps) => {
                   <DialogTitle>
                     {editingStage ? "Edit Stage" : "Create New Stage"}
                   </DialogTitle>
+                  <DialogDescription>
+                    {editingStage
+                      ? "Update the stage name and details."
+                      : "Create a new stage where artists will perform."}
+                  </DialogDescription>
                 </DialogHeader>
                 <form onSubmit={handleSubmit} className="space-y-4">
                   <div>

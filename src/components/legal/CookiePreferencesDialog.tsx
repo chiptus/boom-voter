@@ -1,6 +1,7 @@
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
@@ -75,6 +76,10 @@ export const CookiePreferencesDialog = ({
       <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Cookie Preferences</DialogTitle>
+          <DialogDescription>
+            Manage your cookie settings and privacy preferences. You can control
+            which types of cookies are stored on your device.
+          </DialogDescription>
         </DialogHeader>
 
         <div className="space-y-6">
