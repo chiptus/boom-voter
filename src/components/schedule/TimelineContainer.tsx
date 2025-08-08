@@ -1,3 +1,4 @@
+import { useRef } from "react";
 import { TimeScale } from "./TimeScale";
 import { StageRow } from "./StageRow";
 import type { TimelineData } from "@/lib/timelineCalculator";
@@ -13,8 +14,11 @@ export function TimelineContainer({
   userVotes,
   onVote,
 }: TimelineContainerProps) {
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
+
   return (
     <div
+      ref={scrollContainerRef}
       className="overflow-x-auto overflow-y-hidden pb-20"
       style={{ paddingLeft: "144px" }}
     >
@@ -22,6 +26,7 @@ export function TimelineContainer({
       <TimeScale
         timeSlots={timelineData.timeSlots}
         totalWidth={timelineData.totalWidth}
+        scrollContainerRef={scrollContainerRef}
       />
 
       {/* Stage Rows */}
