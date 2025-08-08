@@ -87,7 +87,7 @@ export const SetCard = ({
     <Card className="bg-white/10 backdrop-blur-md border-purple-400/30 hover:bg-white/15 transition-all duration-300 overflow-hidden">
       <CardHeader className="pb-4">
         {/* Artist Image - clickable for details */}
-        <Link to={`/set/${set.id}`} className="block">
+        <Link to={`./sets/${set.id}`} className="block">
           <ArtistImageLoader
             src={set.artists[0]?.image_url}
             alt={set.name}

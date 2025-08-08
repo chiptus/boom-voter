@@ -10,7 +10,7 @@ import { useUrlState } from "@/hooks/useUrlState";
 import { useSetDetail } from "@/components/SetDetail/useSetDetail";
 
 export function SetDetails() {
-  const { id } = useParams<{ id: string }>();
+  const { setId } = useParams<{ setId: string }>();
 
   const { state: urlState } = useUrlState();
   const {
@@ -21,7 +21,7 @@ export function SetDetails() {
     handleVote,
     getVoteCount,
     netVoteScore,
-  } = useSetDetail(id);
+  } = useSetDetail(setId);
 
   if (loading) {
     return <ArtistLoadingState />;
@@ -57,12 +57,12 @@ export function SetDetails() {
 
         {/* Artist Group Voting Section */}
         <div className="mb-8">
-          <SetGroupVoting setId={id!} />
+          <SetGroupVoting setId={currentSet.id} />
         </div>
 
         {/* Artist Notes Section */}
         <div className="mb-8">
-          <ArtistNotes artistId={id!} userId={user?.id || null} />
+          <ArtistNotes artistId={currentSet.id} userId={user?.id || null} />
         </div>
       </div>
     </div>

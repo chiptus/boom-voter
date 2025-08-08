@@ -14,7 +14,10 @@ export const useSetDetail = (id: string | undefined) => {
 
   const sets = setsQuery.sets;
   const currentSet = useMemo(() => {
-    if (!id || !sets.length) return null;
+    if (!id || !sets.length) {
+      return null;
+    }
+
     return sets.find((a) => a.id === id) || null;
   }, [id, sets]);
 

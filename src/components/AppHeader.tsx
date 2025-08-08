@@ -32,7 +32,6 @@ interface AppHeaderProps {
 
 export const AppHeader = ({
   showBackButton = false,
-  backTo = "/",
   backLabel = "Back",
   title,
   subtitle,
@@ -46,7 +45,7 @@ export const AppHeader = ({
   const isMobile = useIsMobile();
 
   const handleBackClick = () => {
-    navigate(backTo);
+    navigate(-1);
   };
 
   const getGreeting = () => {

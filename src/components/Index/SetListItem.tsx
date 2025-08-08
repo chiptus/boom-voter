@@ -87,7 +87,7 @@ export function SetListItem({
       <div className="block md:hidden space-y-3">
         {/* Top Row: Image + Basic Info */}
         <div className="flex items-start gap-3 relative">
-          <Link to={`/set/${set.id}`} className="flex-shrink-0">
+          <Link to={`./sets/${set.id}`} className="flex-shrink-0">
             <ArtistImageLoader
               src={set.artists[0]?.image_url}
               alt={set.name}
@@ -285,7 +285,7 @@ export function SetListItem({
       {/* Desktop Layout (md and above) */}
       <div className="hidden md:flex items-center gap-4 relative">
         {/* Artist Image - clickable for details */}
-        <Link to={`/set/${set.id}`} className="flex-shrink-0">
+        <Link to={`./sets/${set.id}`} className="flex-shrink-0">
           <ArtistImageLoader
             src={set.artists[0]?.image_url}
             alt={set.name}
