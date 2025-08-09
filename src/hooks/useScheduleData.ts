@@ -1,7 +1,7 @@
 import { useMemo } from "react";
 import { formatDateTime } from "@/lib/timeUtils";
 import { format, startOfDay } from "date-fns";
-import { useOfflineSetsData } from "./useOfflineSetsData";
+import type { FestivalSet } from "@/services/queries";
 
 export interface ScheduleDay {
   date: string;
@@ -35,8 +35,12 @@ export interface ScheduleSet extends ScheduleArtist {
   artists: ScheduleArtist[];
 }
 
-export const useScheduleData = (use24Hour: boolean = false) => {
-  const { sets, loading, error } = useOfflineSetsData();
+export function useScheduleData(
+  sets?: FestivalSet[],
+  use24Hour: boolean = false,
+) {
+  const loading = false;
+  const error = null;
 
   const scheduleDays = useMemo(() => {
     // Enhanced defensive checks
@@ -146,4 +150,4 @@ export const useScheduleData = (use24Hour: boolean = false) => {
     loading,
     error,
   };
-};
+}

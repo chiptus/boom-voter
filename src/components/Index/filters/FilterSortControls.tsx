@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import type { SortOption, FilterSortState } from "@/hooks/useUrlState";
 import { useGenres } from "@/hooks/queries/useGenresQuery";
 import { useGroups } from "@/hooks/useGroups";
+import { useFestivalEdition } from "@/contexts/FestivalEditionContext";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -37,6 +38,14 @@ export const FilterSortControls = ({
   const [isMobile, setIsMobile] = useState(false);
   const { genres } = useGenres();
   const { groups } = useGroups();
+  const { edition } = useFestivalEdition();
+
+  // Redirect to list view if timeline is selected but schedule is not published
+  useEffect(() => {
+    if (state.mainView === "timeline" && !edition?.published) {
+      onStateChange({ mainView: "list" });
+    }
+  }, [state.mainView, edition?.published, onStateChange]);
 
   useEffect(() => {
     const checkMobile = () => {
@@ -89,10 +98,16 @@ export const FilterSortControls = ({
               variant={state.mainView === "timeline" ? "default" : "ghost"}
               size="sm"
               onClick={() => onStateChange({ mainView: "timeline" })}
+              disabled={!edition?.published}
               className={
                 state.mainView === "timeline"
                   ? "bg-purple-600 hover:bg-purple-700 text-white"
-                  : "text-purple-200 hover:text-white hover:bg-white/10"
+                  : edition?.published
+                    ? "text-purple-200 hover:text-white hover:bg-white/10"
+                    : "text-purple-400/50 cursor-not-allowed"
+              }
+              title={
+                !edition?.published ? "Schedule not yet published" : undefined
               }
             >
               <Calendar className="h-4 w-4" />
