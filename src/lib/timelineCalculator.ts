@@ -19,27 +19,20 @@ export interface TimelineData {
   festivalEnd: Date;
 }
 
-export const calculateTimelineData = (
+export function calculateTimelineData(
+  festivalStartDate: Date,
+  festivalEndDate: Date,
   scheduleDays: ScheduleDay[],
-): TimelineData | null => {
+): TimelineData | null {
   if (!scheduleDays || scheduleDays.length === 0) return null;
 
-  // Find the earliest and latest times across all days
-  let earliestTime = new Date("2099-01-01");
-  let latestTime = new Date("1900-01-01");
+  // Require festival dates to be provided
+  if (!festivalStartDate || !festivalEndDate) {
+    return null;
+  }
 
-  scheduleDays.forEach((day) => {
-    day.stages.forEach((stage) => {
-      stage.artists.forEach((artist) => {
-        if (artist.startTime && artist.startTime < earliestTime) {
-          earliestTime = artist.startTime;
-        }
-        if (artist.endTime && artist.endTime > latestTime) {
-          latestTime = artist.endTime;
-        }
-      });
-    });
-  });
+  const earliestTime = new Date(festivalStartDate);
+  const latestTime = new Date(festivalEndDate);
 
   // Create unified time grid from festival start to end
   const timeSlots = [];
@@ -102,4 +95,4 @@ export const calculateTimelineData = (
     festivalStart: earliestTime,
     festivalEnd: latestTime,
   };
-};
+}

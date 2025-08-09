@@ -20,10 +20,16 @@ export function ScheduleHorizontalTimelineView({
     useEditionSetsQuery(edition?.id);
   const { scheduleDays, loading, error } = useScheduleData(editionSets);
 
-  const timelineData = useMemo(
-    () => calculateTimelineData(scheduleDays),
-    [scheduleDays],
-  );
+  const timelineData = useMemo(() => {
+    if (!edition || !edition.start_date || !edition.end_date) {
+      return null;
+    }
+    return calculateTimelineData(
+      new Date(edition.start_date),
+      new Date(edition.end_date),
+      scheduleDays,
+    );
+  }, [edition, scheduleDays]);
 
   if (loading || setsLoading) {
     return (
@@ -44,7 +50,7 @@ export function ScheduleHorizontalTimelineView({
   if (!timelineData) {
     return (
       <div className="text-center text-purple-300 py-12">
-        <p>Schedule is not published yet.</p>
+        <p>Festival dates not available yet.</p>
       </div>
     );
   }
