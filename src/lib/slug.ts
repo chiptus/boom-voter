@@ -30,18 +30,3 @@ export function isValidSlug(slug: string): boolean {
 export function sanitizeSlug(input: string): string {
   return generateSlug(input);
 }
-
-/**
- * Generate a unique slug for artists/sets by appending ID
- */
-export function generateUniqueSlug(name: string, id: string): string {
-  const baseSlug = generateSlug(name);
-  const shortId = id.substring(0, 8);
-  
-  // If base slug is empty, use just the ID
-  if (!baseSlug) {
-    return shortId;
-  }
-  
-  return `${baseSlug}-${shortId}`;
-}
