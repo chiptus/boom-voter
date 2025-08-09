@@ -31,7 +31,11 @@ export function calculateTimelineData(
     return null;
   }
 
-  const earliestTime = new Date(festivalStartDate);
+  // Find the earliest set time from all scheduled sets
+  const earliestSetTime = calculateEarliestSetTime(scheduleDays);
+
+  // Use the earliest set time if available, otherwise fall back to festival start date
+  const earliestTime = earliestSetTime || new Date(festivalStartDate);
   const latestTime = new Date(festivalEndDate);
 
   // Create unified time grid from festival start to end
@@ -95,4 +99,20 @@ export function calculateTimelineData(
     festivalStart: earliestTime,
     festivalEnd: latestTime,
   };
+}
+function calculateEarliestSetTime(scheduleDays: ScheduleDay[]) {
+  let earliestSetTime: Date | null = null;
+
+  scheduleDays.forEach((day) => {
+    day.stages.forEach((stage) => {
+      stage.artists.forEach((artist) => {
+        if (artist.startTime) {
+          if (!earliestSetTime || artist.startTime < earliestSetTime) {
+            earliestSetTime = artist.startTime;
+          }
+        }
+      });
+    });
+  });
+  return earliestSetTime;
 }
