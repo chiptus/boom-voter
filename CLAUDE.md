@@ -106,6 +106,7 @@ src/
 - Component files use PascalCase
 - Custom hooks use camelCase with "use" prefix
 - Services and utilities use camelCase
+- **Function Style**: Always use function declarations (`function name() {}`) instead of arrow function expressions (`const name = () => {}`) for components and named functions
 - **Dialog Components**: Always include both `DialogTitle` AND `DialogDescription` in `DialogHeader` to prevent accessibility warnings
 - **React Router**: Use future flags `v7_startTransition` and `v7_relativeSplatPath` in BrowserRouter to prepare for v7 upgrade
 
