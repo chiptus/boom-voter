@@ -1,5 +1,5 @@
-import { createContext, PropsWithChildren, useContext } from "react";
-import { useNavigate, matchPath } from "react-router-dom";
+import { createContext, PropsWithChildren, useContext, useMemo } from "react";
+import { matchPath, useLocation } from "react-router-dom";
 import { type Festival, type FestivalEdition } from "@/services/queries";
 import {
   useFestivalEditionBySlugQuery,
@@ -10,9 +10,6 @@ interface FestivalEditionContextType {
   // Current state
   festival: Festival | null;
   edition: FestivalEdition | null;
-
-  // Actions
-  setContext: (festivalSlug: string, editionSlug?: string) => void;
 
   // Utils
   isContextReady: boolean;
@@ -32,53 +29,43 @@ export const useFestivalEdition = () => {
   return context;
 };
 
-function getSlugs({
-  propFestivalSlug,
-  isSubDomain,
-}: {
-  propFestivalSlug?: string;
-  isSubDomain?: boolean;
-}) {
+function getSlugs(pathname: string) {
+  let festivalSlug = "";
+  if (pathname.includes("/festivals/")) {
+    const match = matchPath({ path: "/festivals/:festivalSlug/*" }, pathname);
+
+    festivalSlug = match?.params.festivalSlug || "";
+
+    pathname = pathname.replace(`/festivals/${festivalSlug}`, "");
+  }
+
   if (!location.pathname.includes("/editions")) {
     return {
-      festivalSlug: propFestivalSlug,
+      festivalSlug,
     };
   }
 
-  if (!isSubDomain) {
-    const match = matchPath(
-      { path: "/festivals/:festivalSlug/editions/:editionSlug" },
-      location.pathname,
-    );
+  const match = matchPath({ path: "/editions/:editionSlug/*" }, pathname);
 
-    return {
-      festivalSlug: match?.params.festivalSlug,
-      editionSlug: match?.params.editionSlug,
-    };
-  }
-
-  const match = matchPath(
-    { path: "/editions/:editionSlug" },
-    location.pathname,
-  );
+  const editionSlug = match?.params.editionSlug || "";
 
   return {
-    festivalSlug: propFestivalSlug,
-    editionSlug: match?.params.editionSlug,
+    festivalSlug,
+    editionSlug,
   };
+}
+
+function useParseSlugs() {
+  const location = useLocation();
+  const pathname = location.pathname;
+
+  return useMemo(() => getSlugs(pathname), [pathname]);
 }
 
 export function FestivalEditionProvider({
   children,
-  festivalSlug: propFestivalSlug,
-  isSubDomain,
-}: PropsWithChildren<{ festivalSlug?: string; isSubDomain?: boolean }>) {
-  const navigate = useNavigate();
-
-  const { festivalSlug, editionSlug } = getSlugs({
-    propFestivalSlug,
-    isSubDomain,
-  });
+}: PropsWithChildren<unknown>) {
+  const { festivalSlug, editionSlug } = useParseSlugs();
 
   const festivalQuery = useFestivalBySlugQuery(festivalSlug);
 
@@ -89,14 +76,6 @@ export function FestivalEditionProvider({
 
   const festival = festivalQuery.data;
   const edition = editionQuery.data;
-
-  const setContext = (festivalSlug: string, editionSlug?: string) => {
-    if (editionSlug) {
-      navigate(`/festivals/${festivalSlug}/editions/${editionSlug}`);
-    } else {
-      navigate(`/festivals/${festivalSlug}`);
-    }
-  };
 
   const isContextReady = !!(
     // Either we're on root (no context needed)
@@ -112,7 +91,6 @@ export function FestivalEditionProvider({
   const contextValue: FestivalEditionContextType = {
     festival: festival || null,
     edition: edition || null,
-    setContext,
     isContextReady,
   };
 
