@@ -28,20 +28,20 @@ interface FilterSortControlsProps {
   onClear: () => void;
 }
 
-export const FilterSortControls = ({
+export function FilterSortControls({
   state,
   onStateChange,
   onClear,
-}: FilterSortControlsProps) => {
+}: FilterSortControlsProps) {
   const [isFiltersExpanded, setIsFiltersExpanded] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
   const { genres } = useGenres();
   const { groups } = useGroups();
 
   useEffect(() => {
-    const checkMobile = () => {
+    function checkMobile() {
       setIsMobile(window.innerWidth < 768);
-    };
+    }
 
     checkMobile();
     window.addEventListener("resize", checkMobile);
@@ -49,13 +49,13 @@ export const FilterSortControls = ({
     return () => window.removeEventListener("resize", checkMobile);
   }, []);
 
-  const handleSortChange = (sort: SortOption) => {
+  function handleSortChange(sort: SortOption) {
     onStateChange({ sort, sortLocked: false });
-  };
+  }
 
-  const handleRefreshRankings = () => {
+  function handleRefreshRankings() {
     onStateChange({ sortLocked: false });
-  };
+  }
 
   const hasActiveFilters =
     state.stages.length > 0 || state.genres.length > 0 || state.minRating > 0;
@@ -140,9 +140,7 @@ export const FilterSortControls = ({
               <DropdownMenuContent className="bg-gray-800 border-purple-400/30">
                 <DropdownMenuItem
                   onClick={() => onStateChange({ groupId: undefined })}
-                  className={`text-purple-100 hover:bg-purple-600/30 ${
-                    !state.groupId ? "bg-purple-600/20" : ""
-                  }`}
+                  className={`text-purple-100 hover:bg-purple-600/30 ${!state.groupId ? "bg-purple-600/20" : ""}`}
                 >
                   All Votes
                 </DropdownMenuItem>
@@ -150,9 +148,7 @@ export const FilterSortControls = ({
                   <DropdownMenuItem
                     key={group.id}
                     onClick={() => onStateChange({ groupId: group.id })}
-                    className={`text-purple-100 hover:bg-purple-600/30 ${
-                      state.groupId === group.id ? "bg-purple-600/20" : ""
-                    }`}
+                    className={`text-purple-100 hover:bg-purple-600/30 ${state.groupId === group.id ? "bg-purple-600/20" : ""}`}
                   >
                     {group.name}
                     {group.member_count && (
@@ -217,4 +213,4 @@ export const FilterSortControls = ({
       )}
     </div>
   );
-};
+}

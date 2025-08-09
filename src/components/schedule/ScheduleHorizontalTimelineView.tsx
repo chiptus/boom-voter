@@ -3,6 +3,8 @@ import { useScheduleData } from "@/hooks/useScheduleData";
 import { calculateTimelineData } from "@/lib/timelineCalculator";
 import { StageLabels } from "./StageLabels";
 import { TimelineContainer } from "./TimelineContainer";
+import { useFestivalEdition } from "@/contexts/FestivalEditionContext";
+import { useEditionSetsQuery } from "@/hooks/queries/useEditionSetsQuery";
 
 interface ScheduleHorizontalTimelineViewProps {
   userVotes: Record<string, number>;
@@ -13,14 +15,23 @@ export function ScheduleHorizontalTimelineView({
   userVotes,
   onVote,
 }: ScheduleHorizontalTimelineViewProps) {
-  const { scheduleDays, loading, error } = useScheduleData();
+  const { edition } = useFestivalEdition();
+  const { data: editionSets = [], isLoading: setsLoading } =
+    useEditionSetsQuery(edition?.id);
+  const { scheduleDays, loading, error } = useScheduleData(editionSets);
 
-  const timelineData = useMemo(
-    () => calculateTimelineData(scheduleDays),
-    [scheduleDays],
-  );
+  const timelineData = useMemo(() => {
+    if (!edition || !edition.start_date || !edition.end_date) {
+      return null;
+    }
+    return calculateTimelineData(
+      new Date(edition.start_date),
+      new Date(edition.end_date),
+      scheduleDays,
+    );
+  }, [edition, scheduleDays]);
 
-  if (loading) {
+  if (loading || setsLoading) {
     return (
       <div className="text-center text-purple-300 py-12">
         <p>Loading horizontal timeline...</p>
@@ -39,7 +50,16 @@ export function ScheduleHorizontalTimelineView({
   if (!timelineData) {
     return (
       <div className="text-center text-purple-300 py-12">
-        <p>No performances scheduled.</p>
+        <p>Festival dates not available yet.</p>
+      </div>
+    );
+  }
+
+  // Check if schedule is published
+  if (!edition?.published) {
+    return (
+      <div className="text-center text-purple-300 py-12">
+        <p>Schedule not yet published.</p>
       </div>
     );
   }
