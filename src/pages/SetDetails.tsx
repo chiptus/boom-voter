@@ -10,7 +10,7 @@ import { useUrlState } from "@/hooks/useUrlState";
 import { useSetDetail } from "@/components/SetDetail/useSetDetail";
 
 export function SetDetails() {
-  const { setId } = useParams<{ setId: string }>();
+  const { setSlug } = useParams<{ setSlug: string }>();
 
   const { state: urlState } = useUrlState();
   const {
@@ -21,7 +21,7 @@ export function SetDetails() {
     handleVote,
     getVoteCount,
     netVoteScore,
-  } = useSetDetail(setId);
+  } = useSetDetail(setSlug);
 
   if (loading) {
     return <ArtistLoadingState />;

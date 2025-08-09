@@ -19,7 +19,7 @@ const FestivalEditionContext = createContext<
   FestivalEditionContextType | undefined
 >(undefined);
 
-export const useFestivalEdition = () => {
+export function useFestivalEdition() {
   const context = useContext(FestivalEditionContext);
   if (context === undefined) {
     throw new Error(
@@ -27,7 +27,7 @@ export const useFestivalEdition = () => {
     );
   }
   return context;
-};
+}
 
 function getSlugs(pathname: string) {
   let festivalSlug = "";

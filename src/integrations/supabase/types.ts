@@ -141,6 +141,7 @@ export type Database = {
           image_url: string | null;
           last_soundcloud_sync: string | null;
           name: string;
+          slug: string;
           soundcloud_followers: number | null;
           soundcloud_url: string | null;
           spotify_url: string | null;
@@ -159,6 +160,7 @@ export type Database = {
           image_url?: string | null;
           last_soundcloud_sync?: string | null;
           name: string;
+          slug: string;
           soundcloud_followers?: number | null;
           soundcloud_url?: string | null;
           spotify_url?: string | null;
@@ -177,6 +179,7 @@ export type Database = {
           image_url?: string | null;
           last_soundcloud_sync?: string | null;
           name?: string;
+          slug?: string;
           soundcloud_followers?: number | null;
           soundcloud_url?: string | null;
           spotify_url?: string | null;
@@ -478,6 +481,7 @@ export type Database = {
           festival_edition_id: string;
           id: string;
           name: string;
+          slug: string;
           stage_id: string | null;
           time_end: string | null;
           time_start: string | null;
@@ -491,6 +495,7 @@ export type Database = {
           festival_edition_id: string;
           id?: string;
           name: string;
+          slug: string;
           stage_id?: string | null;
           time_end?: string | null;
           time_start?: string | null;
@@ -504,6 +509,7 @@ export type Database = {
           festival_edition_id?: string;
           id?: string;
           name?: string;
+          slug?: string;
           stage_id?: string | null;
           time_end?: string | null;
           time_start?: string | null;

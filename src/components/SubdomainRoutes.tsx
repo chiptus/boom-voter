@@ -23,7 +23,7 @@ export function SubdomainRoutes() {
       {/* Edition-specific routes */}
       <Route path="/editions/:editionSlug" element={<EditionView />} />
       <Route
-        path="/editions/:editionSlug/sets/:setId"
+        path="/editions/:editionSlug/sets/:setSlug"
         element={<SetDetails />}
       />
       <Route path="/editions/:editionSlug/schedule" element={<Schedule />} />

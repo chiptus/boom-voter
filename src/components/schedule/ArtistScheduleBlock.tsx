@@ -59,7 +59,7 @@ export function ArtistScheduleBlock({
       <CardContent className="p-3">
         <div className="mb-2">
           <Link
-            to={`/artist/${set.id}`}
+            to={`./sets/${set.slug}`}
             className="text-white font-semibold hover:text-purple-300 transition-colors block text-sm whitespace-nowrap overflow-hidden text-ellipsis"
           >
             {set.name}

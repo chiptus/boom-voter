@@ -22,6 +22,14 @@ export const useArtistQuery = (id: string) => {
   });
 };
 
+export const useArtistBySlugQuery = (slug: string) => {
+  return useQuery({
+    queryKey: artistQueries.bySlug(slug),
+    queryFn: () => queryFunctions.fetchArtistBySlug(slug),
+    enabled: !!slug,
+  });
+};
+
 export const useCreateArtistMutation = () => {
   const queryClient = useQueryClient();
   const { toast } = useToast();
