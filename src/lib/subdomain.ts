@@ -8,20 +8,47 @@ export interface SubdomainInfo {
   isMainDomain: boolean;
 }
 
-const isIpRegex =
-  /^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/;
-
-export function shouldRedirectToSubdomain() {
-  const hostname = location.hostname;
-  return !hostname.includes("localhost") && !isIpRegex.test(hostname);
+/**
+ * Check if the current hostname is the main getupline.com domain
+ */
+function isMainGetuplineDomain(): boolean {
+  if (typeof window === "undefined") return false;
+  return window.location.hostname === "getupline.com";
 }
 
 /**
- * Extract festival slug from subdomain
+ * Check if we should redirect www.getupline.com to getupline.com
+ */
+export function shouldRedirectFromWww(): boolean {
+  if (typeof window === "undefined") return false;
+  return window.location.hostname === "www.getupline.com";
+}
+
+/**
+ * Get the non-www redirect URL
+ */
+export function getNonWwwRedirectUrl(): string {
+  if (typeof window === "undefined") return "";
+  const protocol = window.location.protocol;
+  const pathname = window.location.pathname;
+  const search = window.location.search;
+  const hash = window.location.hash;
+  return `${protocol}//getupline.com${pathname}${search}${hash}`;
+}
+
+export function shouldRedirectToSubdomain() {
+  // Only use subdomain redirects for main getupline.com domain
+  return isMainGetuplineDomain();
+}
+
+/**
+ * Extract festival slug from subdomain or URL path
  * Examples:
  * - boom-festival.getupline.com -> "boom-festival"
  * - getupline.com -> null
  * - www.getupline.com -> null
+ * - localhost:8080/festivals/boom-festival -> "boom-festival" (path-based routing)
+ * - 192.168.1.1:8080/festivals/boom-festival -> "boom-festival" (path-based routing)
  */
 export function getSubdomainInfo(): SubdomainInfo {
   // Default for SSR/build time
@@ -37,8 +64,20 @@ export function getSubdomainInfo(): SubdomainInfo {
   const parts = hostname.split(".");
   const shouldRedirect = shouldRedirectToSubdomain();
 
-  // Handle localhost development
+  // Handle non-main domains (localhost, IP, development domains) - use path-based routing
   if (!shouldRedirect) {
+    const pathname = window.location.pathname;
+    const pathMatch = pathname.match(/^\/festivals\/([^/]+)/);
+
+    if (pathMatch) {
+      // Path-based festival routing (localhost/IP addresses/development domains)
+      return {
+        festivalSlug: pathMatch[1],
+        isSubdomain: false, // It's not a real subdomain, but path-based
+        isMainDomain: true, // It's festival-specific content
+      };
+    }
+
     return {
       festivalSlug: null,
       isSubdomain: false,
@@ -52,6 +91,15 @@ export function getSubdomainInfo(): SubdomainInfo {
 
     // Ignore www subdomain
     if (subdomain === "www") {
+      return {
+        festivalSlug: null,
+        isSubdomain: false,
+        isMainDomain: true,
+      };
+    }
+
+    // Only getupline.com is a main domain that supports subdomains
+    if (isMainGetuplineDomain()) {
       return {
         festivalSlug: null,
         isSubdomain: false,
@@ -79,32 +127,11 @@ export function getSubdomainInfo(): SubdomainInfo {
 }
 
 /**
- * Get the main domain without subdomain
+ * Get the main domain (always returns current hostname)
  */
 export function getMainDomain(): string {
   if (typeof window === "undefined") return "";
-
-  const hostname = window.location.hostname;
-
-  // Handle localhost
-  if (hostname === "localhost" || hostname.includes("127.0.0.1")) {
-    return hostname;
-  }
-
-  const parts = hostname.split(".");
-
-  // If already main domain (2 parts: domain.tld)
-  if (parts.length <= 2) {
-    return hostname;
-  }
-
-  // If www subdomain, remove it and return domain.tld
-  if (parts[0] === "www") {
-    return parts.slice(1).join(".");
-  }
-
-  // For other subdomains, return domain.tld (remove subdomain)
-  return parts.slice(1).join(".");
+  return window.location.hostname;
 }
 
 /**
@@ -118,12 +145,13 @@ export function createFestivalSubdomainUrl(
     typeof window !== "undefined" ? window.location.protocol : "https:";
   const mainDomain = getMainDomain();
 
-  // Handle localhost development
-  if (mainDomain.includes("localhost") || mainDomain.includes("127.0.0.1")) {
-    return `${protocol}//${mainDomain}/festivals/${festivalSlug}${path === "/" ? "" : path}`;
+  // Only use subdomain routing for main getupline.com domain
+  if (isMainGetuplineDomain()) {
+    return `${protocol}//${festivalSlug}.${mainDomain}${path}`;
   }
 
-  return `${protocol}//${festivalSlug}.${mainDomain}${path}`;
+  // For all other domains (localhost, IP, development), use path-based routing
+  return `${protocol}//${mainDomain}/festivals/${festivalSlug}${path === "/" ? "" : path}`;
 }
 
 /**
