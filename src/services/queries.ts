@@ -225,12 +225,12 @@ export const queryFunctions = {
       throw new Error("Set not found");
     }
 
-    // Transform to expected format  
+    // Transform to expected format
     const transformedData: FestivalSet = {
       ...data,
       artists:
         data.set_artists
-          ?.map((sa: any) => ({
+          ?.map((sa) => ({
             ...sa.artists,
             artist_music_genres: sa.artists?.artist_music_genres || [],
             votes: [],
@@ -240,9 +240,6 @@ export const queryFunctions = {
       votes: data.votes || [],
     };
 
-    // Remove junction data from response
-    delete (transformedData as any).set_artists;
-    
     return transformedData;
   },
 
@@ -991,6 +988,7 @@ export const queryFunctions = {
       .from("sets")
       .insert({
         ...set,
+        slug: generateSlug(set.name),
         archived: false, // Explicit default
       })
       .select()
@@ -1203,6 +1201,7 @@ export const mutationFunctions = {
       .from("artists")
       .insert({
         ...artistData,
+        slug: generateSlug(artistData.name),
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString(),
       })
@@ -1257,13 +1256,13 @@ export const mutationFunctions = {
     updates: UpdateArtistUpdates,
   ): Promise<Omit<Artist, "votes">> {
     const { genre_ids, ...rest } = updates;
-    
+
     // If name is being updated, regenerate slug
     const updateData = { ...rest };
     if (updates.name) {
       updateData.slug = generateSlug(updates.name);
     }
-    
+
     const { data, error } = await supabase
       .from("artists")
       .update({
