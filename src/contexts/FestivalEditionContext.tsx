@@ -1,5 +1,5 @@
 import { createContext, PropsWithChildren, useContext, useMemo } from "react";
-import { matchPath } from "react-router-dom";
+import { matchPath, useLocation } from "react-router-dom";
 import { type Festival, type FestivalEdition } from "@/services/queries";
 import {
   useFestivalEditionBySlugQuery,
@@ -55,14 +55,17 @@ function getSlugs(pathname: string) {
   };
 }
 
+function useParseSlugs() {
+  const location = useLocation();
+  const pathname = location.pathname;
+
+  return useMemo(() => getSlugs(pathname), [pathname]);
+}
+
 export function FestivalEditionProvider({
   children,
 }: PropsWithChildren<unknown>) {
-  const pathname = location.pathname;
-  const { festivalSlug, editionSlug } = useMemo(
-    () => getSlugs(pathname),
-    [pathname],
-  );
+  const { festivalSlug, editionSlug } = useParseSlugs();
 
   const festivalQuery = useFestivalBySlugQuery(festivalSlug);
 
