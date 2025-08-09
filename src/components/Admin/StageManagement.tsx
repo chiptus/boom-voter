@@ -23,7 +23,8 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
-import { Loader2, Plus, Edit2, Trash2, MapPin } from "lucide-react";
+import { Loader2, Plus, Edit2, Trash2, MapPin, Upload } from "lucide-react";
+import { CSVImportDialog } from "./CSVImportDialog";
 import type { Stage } from "@/services/queries";
 
 interface StageFormData {
@@ -162,6 +163,12 @@ export const StageManagement = ({ editionId }: StageManagementProps) => {
             Stage Management
           </span>
           <div className="flex gap-2">
+            <CSVImportDialog editionId={editionId}>
+              <Button variant="outline">
+                <Upload className="h-4 w-4 mr-2" />
+                Import CSV
+              </Button>
+            </CSVImportDialog>
             <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
               <DialogTrigger asChild>
                 <Button

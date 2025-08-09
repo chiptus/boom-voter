@@ -1,7 +1,8 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Loader2, Plus, Music } from "lucide-react";
+import { Loader2, Plus, Music, Upload } from "lucide-react";
+import { CSVImportDialog } from "./CSVImportDialog";
 import type { FestivalSet } from "@/services/queries";
 import {
   useDeleteSetMutation,
@@ -73,13 +74,21 @@ export const SetManagement = ({ editionId }: SetManagementProps) => {
             <Music className="h-5 w-5" />
             Set Management
           </span>
-          <Button
-            onClick={handleCreate}
-            className="bg-purple-600 hover:bg-purple-700"
-          >
-            <Plus className="h-4 w-4 mr-2" />
-            Add Set
-          </Button>
+          <div className="flex gap-2">
+            <CSVImportDialog editionId={editionId} defaultTab="sets">
+              <Button variant="outline">
+                <Upload className="h-4 w-4 mr-2" />
+                Import CSV
+              </Button>
+            </CSVImportDialog>
+            <Button
+              onClick={handleCreate}
+              className="bg-purple-600 hover:bg-purple-700"
+            >
+              <Plus className="h-4 w-4 mr-2" />
+              Add Set
+            </Button>
+          </div>
         </CardTitle>
       </CardHeader>
       <CardContent>
