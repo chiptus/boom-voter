@@ -2,7 +2,6 @@ import { useState, useEffect } from "react";
 import type { SortOption, FilterSortState } from "@/hooks/useUrlState";
 import { useGenres } from "@/hooks/queries/useGenresQuery";
 import { useGroups } from "@/hooks/useGroups";
-import { useFestivalEdition } from "@/contexts/FestivalEditionContext";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -29,28 +28,20 @@ interface FilterSortControlsProps {
   onClear: () => void;
 }
 
-export const FilterSortControls = ({
+export function FilterSortControls({
   state,
   onStateChange,
   onClear,
-}: FilterSortControlsProps) => {
+}: FilterSortControlsProps) {
   const [isFiltersExpanded, setIsFiltersExpanded] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
   const { genres } = useGenres();
   const { groups } = useGroups();
-  const { edition } = useFestivalEdition();
-
-  // Redirect to list view if timeline is selected but schedule is not published
-  useEffect(() => {
-    if (state.mainView === "timeline" && !edition?.published) {
-      onStateChange({ mainView: "list" });
-    }
-  }, [state.mainView, edition?.published, onStateChange]);
 
   useEffect(() => {
-    const checkMobile = () => {
+    function checkMobile() {
       setIsMobile(window.innerWidth < 768);
-    };
+    }
 
     checkMobile();
     window.addEventListener("resize", checkMobile);
@@ -58,13 +49,13 @@ export const FilterSortControls = ({
     return () => window.removeEventListener("resize", checkMobile);
   }, []);
 
-  const handleSortChange = (sort: SortOption) => {
+  function handleSortChange(sort: SortOption) {
     onStateChange({ sort, sortLocked: false });
-  };
+  }
 
-  const handleRefreshRankings = () => {
+  function handleRefreshRankings() {
     onStateChange({ sortLocked: false });
-  };
+  }
 
   const hasActiveFilters =
     state.stages.length > 0 || state.genres.length > 0 || state.minRating > 0;
@@ -98,16 +89,10 @@ export const FilterSortControls = ({
               variant={state.mainView === "timeline" ? "default" : "ghost"}
               size="sm"
               onClick={() => onStateChange({ mainView: "timeline" })}
-              disabled={!edition?.published}
               className={
                 state.mainView === "timeline"
                   ? "bg-purple-600 hover:bg-purple-700 text-white"
-                  : edition?.published
-                    ? "text-purple-200 hover:text-white hover:bg-white/10"
-                    : "text-purple-400/50 cursor-not-allowed"
-              }
-              title={
-                !edition?.published ? "Schedule not yet published" : undefined
+                  : "text-purple-200 hover:text-white hover:bg-white/10"
               }
             >
               <Calendar className="h-4 w-4" />
@@ -155,9 +140,7 @@ export const FilterSortControls = ({
               <DropdownMenuContent className="bg-gray-800 border-purple-400/30">
                 <DropdownMenuItem
                   onClick={() => onStateChange({ groupId: undefined })}
-                  className={`text-purple-100 hover:bg-purple-600/30 ${
-                    !state.groupId ? "bg-purple-600/20" : ""
-                  }`}
+                  className={`text-purple-100 hover:bg-purple-600/30 ${!state.groupId ? "bg-purple-600/20" : ""}`}
                 >
                   All Votes
                 </DropdownMenuItem>
@@ -165,9 +148,7 @@ export const FilterSortControls = ({
                   <DropdownMenuItem
                     key={group.id}
                     onClick={() => onStateChange({ groupId: group.id })}
-                    className={`text-purple-100 hover:bg-purple-600/30 ${
-                      state.groupId === group.id ? "bg-purple-600/20" : ""
-                    }`}
+                    className={`text-purple-100 hover:bg-purple-600/30 ${state.groupId === group.id ? "bg-purple-600/20" : ""}`}
                   >
                     {group.name}
                     {group.member_count && (
@@ -232,4 +213,4 @@ export const FilterSortControls = ({
       )}
     </div>
   );
-};
+}
