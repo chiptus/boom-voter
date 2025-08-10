@@ -57,12 +57,6 @@ export function SingleArtistSetCard({
     return set.votes.filter((vote) => vote.vote_type === voteType).length;
   }
 
-  // Get social platform counts
-  const socialPlatforms = {
-    spotify: set.artists.filter((a) => a.spotify_url).length,
-    soundcloud: set.artists.filter((a) => a.soundcloud_url).length,
-  };
-
   return (
     <Card className="bg-white/10 backdrop-blur-md border-purple-400/30 hover:bg-white/15 transition-all duration-300 overflow-hidden">
       <CardHeader className="pb-4">
@@ -73,9 +67,9 @@ export function SingleArtistSetCard({
           <div className="flex-1">
             <SetHeader
               setName={set.name}
+              artists={set.artists}
               userKnowledge={userKnowledge}
               onKnowledgeToggle={handleKnowledgeToggle}
-              socialPlatforms={socialPlatforms}
             />
 
             <SetMetadata set={set} use24Hour={use24Hour} />

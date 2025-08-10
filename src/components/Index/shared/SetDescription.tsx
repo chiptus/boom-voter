@@ -1,5 +1,6 @@
 import { CardDescription } from "@/components/ui/card";
 import { Artist } from "@/services/queries";
+import { MultiArtistSocialPlatformLinks } from "./MultiArtistSocialPlatformLinks";
 
 interface SetDescriptionProps {
   artists: Artist[];
@@ -18,7 +19,7 @@ export function SetDescription({
     return (
       <CardDescription className={className}>
         <span className="font-medium">Artists:</span>{" "}
-        {artists.map((a) => a.name).join(", ")}
+        <MultiArtistSocialPlatformLinks artists={artists} />
         {setDescription && (
           <>
             <br />

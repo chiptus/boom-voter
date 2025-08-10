@@ -56,12 +56,6 @@ export function MultiArtistSetListItem({
     return set.votes.filter((vote) => vote.vote_type === voteType).length;
   }
 
-  // Get social platform counts
-  const socialPlatforms = {
-    spotify: set.artists.filter((a) => a.spotify_url).length,
-    soundcloud: set.artists.filter((a) => a.soundcloud_url).length,
-  };
-
   return (
     <div
       className="bg-white/10 backdrop-blur-md border-purple-400/30 hover:bg-white/15 transition-all duration-300 rounded-lg p-4"
@@ -79,10 +73,10 @@ export function MultiArtistSetListItem({
           <div className="flex-1 min-w-0">
             <SetHeader
               setName={set.name}
+              artists={set.artists}
               artistCount={set.artists.length}
               userKnowledge={userKnowledge}
               onKnowledgeToggle={handleKnowledgeToggle}
-              socialPlatforms={socialPlatforms}
               size="sm"
             />
 
@@ -120,10 +114,10 @@ export function MultiArtistSetListItem({
             <div className="flex-1 min-w-0">
               <SetHeader
                 setName={set.name}
+                artists={set.artists}
                 artistCount={set.artists.length}
                 userKnowledge={userKnowledge}
                 onKnowledgeToggle={handleKnowledgeToggle}
-                socialPlatforms={socialPlatforms}
                 size="sm"
               />
 

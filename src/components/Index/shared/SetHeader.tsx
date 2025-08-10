@@ -2,25 +2,30 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { CardTitle } from "@/components/ui/card";
 import { Eye, EyeOff, Users } from "lucide-react";
+import { SocialPlatformLinkList } from "./SocialPlatformLinkList";
+
+interface Artist {
+  id: string;
+  name: string;
+  spotify_url?: string | null;
+  soundcloud_url?: string | null;
+}
 
 interface SetHeaderProps {
   setName: string;
+  artists?: Artist[];
   artistCount?: number;
   userKnowledge?: boolean;
   onKnowledgeToggle: () => void;
-  socialPlatforms?: {
-    spotify: number;
-    soundcloud: number;
-  };
   size?: "sm" | "lg";
 }
 
 export function SetHeader({
   setName,
+  artists,
   artistCount,
   userKnowledge,
   onKnowledgeToggle,
-  socialPlatforms,
   size = "lg",
 }: SetHeaderProps) {
   const titleClass =
@@ -61,24 +66,12 @@ export function SetHeader({
         )}
       </Button>
 
-      {/* Social Platform Badges */}
-      {!!(socialPlatforms?.spotify && socialPlatforms.spotify > 0) && (
-        <Badge
-          variant="secondary"
-          className="bg-green-600/20 text-green-400 text-xs border-green-400/30"
-        >
-          Spotify{" "}
-          {socialPlatforms.spotify > 1 && `(${socialPlatforms.spotify})`}
-        </Badge>
-      )}
-      {!!(socialPlatforms?.soundcloud && socialPlatforms.soundcloud > 0) && (
-        <Badge
-          variant="secondary"
-          className="bg-orange-600/20 text-orange-400 text-xs border-orange-400/30"
-        >
-          SoundCloud{" "}
-          {socialPlatforms.soundcloud > 1 && `(${socialPlatforms.soundcloud})`}
-        </Badge>
+      {/* Social Platform Links */}
+      {artists && artists.length === 1 && (
+        <SocialPlatformLinkList
+          artist={artists[0]}
+          size={size == "sm" ? "sm" : "md"}
+        />
       )}
     </div>
   );
