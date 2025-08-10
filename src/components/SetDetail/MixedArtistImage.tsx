@@ -60,13 +60,13 @@ export function MixedArtistImage({
           </div>
         </div>
         {/* Overlay with set name */}
-        <div className="absolute inset-0 bg-black/20 flex items-end">
+        {/* <div className="absolute inset-0 bg-black/20 flex items-end">
           <div className="w-full bg-gradient-to-t from-black/60 to-transparent p-3">
             <div className="text-white text-sm font-medium text-center">
               {setName}
             </div>
           </div>
-        </div>
+        </div> */}
       </div>
     );
   }
@@ -103,13 +103,13 @@ export function MixedArtistImage({
           </div>
         </div>
         {/* Overlay with set name */}
-        <div className="absolute inset-0 bg-black/20 flex items-end">
+        {/* <div className="absolute inset-0 bg-black/20 flex items-end">
           <div className="w-full bg-gradient-to-t from-black/60 to-transparent p-3">
             <div className="text-white text-sm font-medium text-center">
               {setName}
             </div>
           </div>
-        </div>
+        </div> */}
       </div>
     );
   }
@@ -137,13 +137,13 @@ export function MixedArtistImage({
         ))}
       </div>
       {/* Overlay with set name */}
-      <div className="absolute inset-0 bg-black/20 flex items-end">
+      {/* <div className="absolute inset-0 bg-black/20 flex items-end">
         <div className="w-full bg-gradient-to-t from-black/60 to-transparent p-3">
           <div className="text-white text-sm font-medium text-center">
             {setName}
           </div>
         </div>
-      </div>
+      </div> */}
     </div>
   );
 }

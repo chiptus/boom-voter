@@ -20,15 +20,17 @@ export function SetMetadata({ set, use24Hour = false }: SetMetadataProps) {
   return (
     <div className="flex items-center flex-wrap gap-2">
       {/* Genres */}
-      <div className="flex flex-wrap gap-1 items-center">
-        {uniqueGenres?.map((genre) => (
-          <GenreBadge
-            key={genre.music_genre_id}
-            genreId={genre.music_genre_id}
-            size="sm"
-          />
-        ))}
-      </div>
+      {uniqueGenres.length > 0 && (
+        <div className="flex flex-wrap gap-1 items-center">
+          {uniqueGenres?.map((genre) => (
+            <GenreBadge
+              key={genre.music_genre_id}
+              genreId={genre.music_genre_id}
+              size="sm"
+            />
+          ))}
+        </div>
+      )}
 
       {/* Stage and Time Information */}
       <div className="flex flex-wrap gap-2 items-center">
