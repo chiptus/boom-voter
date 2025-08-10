@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { CrossDomainStorage } from "@/lib/crossDomainStorage";
 
 const CONSENT_KEY = "gdpr-consent";
 const CONSENT_VERSION = "1.0";
@@ -21,12 +22,12 @@ const defaultConsent: ConsentPreferences = {
   timestamp: Date.now(),
 };
 
-export const useCookieConsent = () => {
+export function useCookieConsent() {
   const [consent, setConsent] = useState<ConsentPreferences | null>(null);
   const [showBanner, setShowBanner] = useState(false);
 
   useEffect(() => {
-    const savedConsent = localStorage.getItem(CONSENT_KEY);
+    const savedConsent = CrossDomainStorage.getItem(CONSENT_KEY);
     if (savedConsent) {
       try {
         const parsed = JSON.parse(savedConsent);
@@ -44,7 +45,7 @@ export const useCookieConsent = () => {
     }
   }, []);
 
-  const saveConsent = (preferences: Partial<ConsentPreferences>) => {
+  function saveConsent(preferences: Partial<ConsentPreferences>) {
     const newConsent = {
       ...defaultConsent,
       ...preferences,
@@ -52,36 +53,36 @@ export const useCookieConsent = () => {
     };
 
     setConsent(newConsent);
-    localStorage.setItem(CONSENT_KEY, JSON.stringify(newConsent));
+    CrossDomainStorage.setItem(CONSENT_KEY, JSON.stringify(newConsent));
     setShowBanner(false);
-  };
+  }
 
-  const acceptAll = () => {
+  function acceptAll() {
     saveConsent({
       essential: true,
       analytics: true,
       preferences: true,
       marketing: true,
     });
-  };
+  }
 
-  const acceptEssential = () => {
+  function acceptEssential() {
     saveConsent({
       essential: true,
       analytics: false,
       preferences: false,
       marketing: false,
     });
-  };
+  }
 
-  const updateConsent = (preferences: Partial<ConsentPreferences>) => {
+  function updateConsent(preferences: Partial<ConsentPreferences>) {
     if (consent) {
       saveConsent({ ...consent, ...preferences });
     }
-  };
+  }
 
-  const revokeConsent = () => {
-    localStorage.removeItem(CONSENT_KEY);
+  function revokeConsent() {
+    CrossDomainStorage.removeItem(CONSENT_KEY);
     setConsent(null);
     setShowBanner(true);
 
@@ -89,11 +90,11 @@ export const useCookieConsent = () => {
     if (!consent?.preferences) {
       localStorage.removeItem("sidebar:state");
     }
-  };
+  }
 
-  const canUseCookie = (type: keyof ConsentPreferences) => {
+  function canUseCookie(type: keyof ConsentPreferences) {
     return consent?.[type] === true;
-  };
+  }
 
   return {
     consent,
@@ -106,4 +107,4 @@ export const useCookieConsent = () => {
     canUseCookie,
     setShowBanner,
   };
-};
+}
