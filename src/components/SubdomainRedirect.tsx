@@ -2,7 +2,7 @@ import { useEffect } from "react";
 import { useParams } from "react-router-dom";
 import {
   createFestivalSubdomainUrl,
-  shouldRedirectToSubdomain,
+  isMainGetuplineDomain,
 } from "@/lib/subdomain";
 
 interface SubdomainRedirectProps {
@@ -22,7 +22,7 @@ export function SubdomainRedirect({
     setId?: string;
   }>();
 
-  const shouldNotRedirect = !shouldRedirectToSubdomain();
+  const shouldNotRedirect = !isMainGetuplineDomain();
 
   useEffect(() => {
     if (!festivalSlug || shouldNotRedirect) {

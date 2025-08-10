@@ -5,6 +5,7 @@ import {
   useFestivalEditionBySlugQuery,
   useFestivalBySlugQuery,
 } from "@/hooks/queries/useFestivalQuery";
+import { getSubdomainInfo } from "@/lib/subdomain";
 
 interface FestivalEditionContextType {
   // Current state
@@ -30,25 +31,39 @@ export function useFestivalEdition() {
 }
 
 function getSlugs(pathname: string) {
-  let festivalSlug = "";
-  if (pathname.includes("/festivals/")) {
+  // Get festival slug from subdomain or URL path
+  const subdomainInfo = getSubdomainInfo();
+  let festivalSlug = subdomainInfo.festivalSlug || "";
+
+  console.log("🔍 FestivalEditionContext getSlugs debug:", {
+    pathname,
+    subdomainInfo,
+    festivalSlug: subdomainInfo.festivalSlug,
+    isSubdomain: subdomainInfo.isSubdomain,
+    isMainDomain: subdomainInfo.isMainDomain,
+  });
+
+  // For main domain, extract festival slug from URL path
+  if (!festivalSlug && pathname.includes("/festivals/")) {
     const match = matchPath({ path: "/festivals/:festivalSlug/*" }, pathname);
-
     festivalSlug = match?.params.festivalSlug || "";
-
     pathname = pathname.replace(`/festivals/${festivalSlug}`, "");
   }
 
-  if (!location.pathname.includes("/editions")) {
+  if (!pathname.includes("/editions")) {
+    console.log("🔍 No editions in pathname, returning:", { festivalSlug });
     return {
       festivalSlug,
     };
   }
 
   const match = matchPath({ path: "/editions/:editionSlug/*" }, pathname);
-
   const editionSlug = match?.params.editionSlug || "";
 
+  console.log("🔍 Found editions in pathname, returning:", {
+    festivalSlug,
+    editionSlug,
+  });
   return {
     festivalSlug,
     editionSlug,

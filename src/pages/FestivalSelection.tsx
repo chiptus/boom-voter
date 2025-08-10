@@ -13,7 +13,7 @@ import { Festival } from "@/services/queries";
 import { useEffect } from "react";
 import {
   createFestivalSubdomainUrl,
-  shouldRedirectToSubdomain,
+  isMainGetuplineDomain,
 } from "@/lib/subdomain";
 export default function FestivalSelection() {
   const { data: availableFestivals = [], isLoading: festivalsLoading } =
@@ -21,14 +21,12 @@ export default function FestivalSelection() {
 
   function handleFestivalClick(festival: Festival) {
     const subdomainUrl = createFestivalSubdomainUrl(festival.slug);
-    const shouldNotRedirect = !shouldRedirectToSubdomain();
+    const isMain = !isMainGetuplineDomain();
 
-    if (shouldNotRedirect) {
-      // In development, navigate to regular route
-      window.location.href = `/festivals/${festival.slug}`;
-    } else {
-      // In production, redirect to subdomain
+    if (isMain) {
       window.location.href = subdomainUrl;
+    } else {
+      window.location.href = `/festivals/${festival.slug}`;
     }
   }
 
