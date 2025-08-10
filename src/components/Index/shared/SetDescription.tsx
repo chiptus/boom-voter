@@ -1,6 +1,6 @@
 import { CardDescription } from "@/components/ui/card";
 import { Artist } from "@/services/queries";
-import { MultiArtistSocialPlatformLinks } from "./MultiArtistSocialPlatformLinks";
+import { MultiArtistInfo } from "./MultiArtistInfo";
 
 interface SetDescriptionProps {
   artists: Artist[];
@@ -18,15 +18,13 @@ export function SetDescription({
   if (isMultiArtist) {
     return (
       <CardDescription className={className}>
-        <span className="font-medium">Artists:</span>{" "}
-        <MultiArtistSocialPlatformLinks artists={artists} />
-        {setDescription && (
-          <>
-            <br />
-            <br />
-            {setDescription}
-          </>
-        )}
+        <div className="space-y-3">
+          <p>{setDescription}</p>
+          <div className="flex gap-4 items-center">
+            <span className="font-medium">Artists:</span>{" "}
+            <MultiArtistInfo artists={artists} />
+          </div>
+        </div>
       </CardDescription>
     );
   }

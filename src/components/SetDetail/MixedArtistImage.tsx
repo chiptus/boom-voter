@@ -22,7 +22,7 @@ export function MixedArtistImage({
       >
         <div className="text-white text-center p-4">
           <div className="text-2xl font-bold mb-2">🎵</div>
-          <div className="text-sm font-medium">{setName}</div>
+          {/* <div className="text-sm font-medium">{setName}</div> */}
         </div>
       </div>
     );
