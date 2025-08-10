@@ -70,7 +70,7 @@ export function SetHeader({
       {artists && artists.length === 1 && (
         <SocialPlatformLinkList
           artist={artists[0]}
-          size={size == "sm" ? "sm" : "md"}
+          size={size === "sm" ? "sm" : "md"}
         />
       )}
     </div>
