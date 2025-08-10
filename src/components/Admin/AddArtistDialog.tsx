@@ -49,11 +49,11 @@ interface AddArtistDialogProps {
   onSuccess: () => void;
 }
 
-export const AddArtistDialog = ({
+export function AddArtistDialog({
   open,
   onOpenChange,
   onSuccess,
-}: AddArtistDialogProps) => {
+}: AddArtistDialogProps) {
   const { user, loading: authLoading } = useAuth();
   const { data: canEdit = false, isLoading: isLoadingPermissions } =
     useUserPermissionsQuery(user?.id, "edit_artists");
@@ -84,7 +84,7 @@ export const AddArtistDialog = ({
     return null;
   }
 
-  const onSubmit = async (data: ArtistFormData) => {
+  async function onSubmit(data: ArtistFormData) {
     if (!user) {
       toast({
         title: "Error",
@@ -124,7 +124,7 @@ export const AddArtistDialog = ({
     } catch (error) {
       // Error handling is done in the mutation hook
     }
-  };
+  }
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -310,4 +310,4 @@ export const AddArtistDialog = ({
       </DialogContent>
     </Dialog>
   );
-};
+}

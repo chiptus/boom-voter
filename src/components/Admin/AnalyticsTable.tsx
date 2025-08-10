@@ -32,7 +32,7 @@ interface UserAnalytics {
   created_at: string;
 }
 
-const fetchGroupAnalytics = async (): Promise<GroupAnalytics[]> => {
+async function fetchGroupAnalytics(): Promise<GroupAnalytics[]> {
   const { data: groups, error: groupsError } = await supabase
     .from("groups")
     .select("id, name, created_at")
@@ -57,9 +57,9 @@ const fetchGroupAnalytics = async (): Promise<GroupAnalytics[]> => {
   );
 
   return groupsWithCounts;
-};
+}
 
-const fetchUserAnalytics = async (): Promise<UserAnalytics[]> => {
+async function fetchUserAnalytics(): Promise<UserAnalytics[]> {
   const { data: profiles, error: profilesError } = await supabase
     .from("profiles")
     .select("id, username, email, created_at")
@@ -83,7 +83,7 @@ const fetchUserAnalytics = async (): Promise<UserAnalytics[]> => {
   );
 
   return usersWithCounts;
-};
+}
 
 export function AnalyticsTable() {
   const {

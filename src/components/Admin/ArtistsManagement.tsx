@@ -21,7 +21,7 @@ import { AddArtistDialog } from "./AddArtistDialog";
 import { EditArtistDialog } from "./EditArtistDialog";
 import { GenreBadge } from "../Index/GenreBadge";
 
-export const ArtistsManagement = () => {
+export function ArtistsManagement() {
   const [addArtistOpen, setAddArtistOpen] = useState(false);
   const [edittedArtist, setEdittedArtist] = useState<Artist>();
 
@@ -43,7 +43,7 @@ export const ArtistsManagement = () => {
     [artists, searchTerm],
   );
 
-  const handleArchive = async (artist: Artist) => {
+  async function handleArchive(artist: Artist) {
     if (
       !confirm(
         `Are you sure you want to archive "${artist.name}"? This will hide the artist from the main interface but preserve all data.`,
@@ -53,7 +53,7 @@ export const ArtistsManagement = () => {
     }
 
     archiveMutation.mutate(artist.id, {});
-  };
+  }
 
   return (
     <>
@@ -193,4 +193,4 @@ export const ArtistsManagement = () => {
       )}
     </>
   );
-};
+}

@@ -53,7 +53,7 @@ import {
 import { UserPlus, Trash2, Crown } from "lucide-react";
 import type { Database } from "@/integrations/supabase/types";
 
-export const AdminRolesTable = () => {
+export function AdminRolesTable() {
   const [addDialogOpen, setAddDialogOpen] = useState(false);
   const [newUserEmail, setNewUserEmail] = useState("");
   const [newUserRole, setNewUserRole] =
@@ -65,7 +65,7 @@ export const AdminRolesTable = () => {
   const removeAdminMutation = useRemoveAdminMutation();
   const updateRoleMutation = useUpdateAdminRoleMutation();
 
-  const handleAddAdmin = async (e: React.FormEvent) => {
+  async function handleAddAdmin(e: React.FormEvent) {
     e.preventDefault();
 
     addAdminMutation.mutate(
@@ -81,20 +81,20 @@ export const AdminRolesTable = () => {
         },
       },
     );
-  };
+  }
 
-  const handleRemoveAdmin = (roleId: string) => {
+  function handleRemoveAdmin(roleId: string) {
     removeAdminMutation.mutate(roleId);
-  };
+  }
 
-  const handleRoleChange = (
+  function handleRoleChange(
     roleId: string,
     newRole: Database["public"]["Enums"]["admin_role"],
-  ) => {
+  ) {
     updateRoleMutation.mutate({ roleId, newRole });
-  };
+  }
 
-  const getRoleBadgeVariant = (role: string) => {
+  function getRoleBadgeVariant(role: string) {
     switch (role) {
       case "super_admin":
         return "default";
@@ -105,7 +105,7 @@ export const AdminRolesTable = () => {
       default:
         return "outline";
     }
-  };
+  }
 
   if (isLoading) {
     return (
@@ -271,4 +271,4 @@ export const AdminRolesTable = () => {
       </CardContent>
     </Card>
   );
-};
+}

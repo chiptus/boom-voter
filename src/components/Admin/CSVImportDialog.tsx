@@ -42,10 +42,10 @@ export function CSVImportDialog({
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
-  const handleFileChange = (
+  function handleFileChange(
     event: React.ChangeEvent<HTMLInputElement>,
     type: "stages" | "sets",
-  ) => {
+  ) {
     const file = event.target.files?.[0];
     if (file && file.type === "text/csv") {
       if (type === "stages") {
@@ -60,18 +60,18 @@ export function CSVImportDialog({
         variant: "destructive",
       });
     }
-  };
+  }
 
-  const readFileAsText = (file: File): Promise<string> => {
+  function readFileAsText(file: File): Promise<string> {
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
       reader.onload = (e) => resolve(e.target?.result as string);
       reader.onerror = reject;
       reader.readAsText(file);
     });
-  };
+  }
 
-  const handleImport = async () => {
+  async function handleImport() {
     if (!stagesFile && !setsFile) {
       toast({
         title: "No files selected",
@@ -161,7 +161,7 @@ export function CSVImportDialog({
       setIsImporting(false);
       setProgress({ current: 0, total: 0, label: "" });
     }
-  };
+  }
 
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
