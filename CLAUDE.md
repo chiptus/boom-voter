@@ -9,7 +9,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - `npm run dev` - Start development server on port 8080 (DO NOT RUN - user always has dev server running)
 - `npm run build` - Production build
 - `npm run build:dev` - Development build
-- `npm run lint` - Run ESLint
+- `npm run lint` - Run oxlint
 - `npm run preview` - Preview production build
 
 ### Testing
@@ -101,7 +101,7 @@ src/
 
 ### Code Conventions
 
-- ESLint configuration disables unused variable warnings
+- oxlint configuration with TypeScript and React rules
 - React hooks follow standard patterns
 - Component files use PascalCase
 - Custom hooks use camelCase with "use" prefix

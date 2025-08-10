@@ -1,0 +1,24 @@
+{
+  "$schema": "./node_modules/oxlint/configuration_schema.json",
+  "ignorePatterns": ["dist"],
+  "overrides": [
+    {
+      "files": ["**/*.{ts,tsx}"],
+      "rules": {
+        "react-hooks/rules-of-hooks": "error",
+        "react-hooks/exhaustive-deps": "warn",
+        "func-style": [
+          "warn",
+          "declaration",
+          {
+            "allowArrowFunctions": false
+          }
+        ]
+      },
+      "env": {
+        "es2024": true
+      },
+      "plugins": ["react", "typescript"]
+    }
+  ]
+}
