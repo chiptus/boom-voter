@@ -41,7 +41,7 @@ function App() {
           <FestivalEditionProvider>
             <div className="min-h-screen flex flex-col">
               <div className="flex-1">
-                {subdomainInfo.festivalSlug && !subdomainInfo.isMainDomain ? (
+                {subdomainInfo.festivalSlug && subdomainInfo.isSubdomain ? (
                   // Festival-specific routing: subdomain or path-based
                   <SubdomainRoutes />
                 ) : (

@@ -37,16 +37,15 @@ function getSlugs(pathname: string) {
 
   console.log("🔍 FestivalEditionContext getSlugs debug:", {
     pathname,
-    subdomainInfo,
     festivalSlug: subdomainInfo.festivalSlug,
     isSubdomain: subdomainInfo.isSubdomain,
     isMainDomain: subdomainInfo.isMainDomain,
   });
 
   // For main domain, extract festival slug from URL path
-  if (!festivalSlug && pathname.includes("/festivals/")) {
+  if (pathname.includes("/festivals/")) {
     const match = matchPath({ path: "/festivals/:festivalSlug/*" }, pathname);
-    festivalSlug = match?.params.festivalSlug || "";
+    festivalSlug = match?.params.festivalSlug || festivalSlug || "";
     pathname = pathname.replace(`/festivals/${festivalSlug}`, "");
   }
 
@@ -57,12 +56,35 @@ function getSlugs(pathname: string) {
     };
   }
 
-  const match = matchPath({ path: "/editions/:editionSlug/*" }, pathname);
-  const editionSlug = match?.params.editionSlug || "";
+  const matchWithSlash = matchPath(
+    { path: "/editions/:editionSlug/*" },
+    pathname,
+  );
 
-  console.log("🔍 Found editions in pathname, returning:", {
+  if (matchWithSlash) {
+    const editionSlug = matchWithSlash?.params.editionSlug || "";
+
+    console.log("🔍 Found editions in pathname with slash, returning:", {
+      festivalSlug,
+      editionSlug,
+    });
+    return {
+      festivalSlug,
+      editionSlug,
+    };
+  }
+  const matchWithoutSlash = matchPath(
+    { path: "/editions/:editionSlug" },
+    pathname,
+  );
+
+  const editionSlug = matchWithoutSlash?.params.editionSlug || "";
+
+  console.log("🔍 Found editions in pathname without slash, returning:", {
     festivalSlug,
     editionSlug,
+    matchWithoutSlash,
+    pathname,
   });
   return {
     festivalSlug,

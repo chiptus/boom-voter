@@ -21,7 +21,7 @@ export default function FestivalSelection() {
 
   function handleFestivalClick(festival: Festival) {
     const subdomainUrl = createFestivalSubdomainUrl(festival.slug);
-    const isMain = !isMainGetuplineDomain();
+    const isMain = isMainGetuplineDomain();
 
     if (isMain) {
       window.location.href = subdomainUrl;
