@@ -32,8 +32,8 @@ export function MixedArtistImage({
   if (artistsWithImages.length === 1) {
     return (
       <ArtistImageLoader
-        imageUrl={artistsWithImages[0].image_url}
-        artistName={setName}
+        src={artistsWithImages[0].image_url}
+        alt={setName}
         className={className}
       />
     );
@@ -46,15 +46,15 @@ export function MixedArtistImage({
         <div className="absolute inset-0 flex">
           <div className="w-1/2">
             <ArtistImageLoader
-              imageUrl={artistsWithImages[0].image_url}
-              artistName={artistsWithImages[0].name}
+              src={artistsWithImages[0].image_url}
+              alt={artistsWithImages[0].name}
               className="w-full h-full object-cover"
             />
           </div>
           <div className="w-1/2">
             <ArtistImageLoader
-              imageUrl={artistsWithImages[1].image_url}
-              artistName={artistsWithImages[1].name}
+              src={artistsWithImages[1].image_url}
+              alt={artistsWithImages[1].name}
               className="w-full h-full object-cover"
             />
           </div>
@@ -79,8 +79,8 @@ export function MixedArtistImage({
           {/* Main image takes left 2/3 */}
           <div className="w-2/3">
             <ArtistImageLoader
-              imageUrl={artistsWithImages[0].image_url}
-              artistName={artistsWithImages[0].name}
+              src={artistsWithImages[0].image_url}
+              alt={artistsWithImages[0].name}
               className="w-full h-full object-cover"
             />
           </div>
@@ -88,15 +88,15 @@ export function MixedArtistImage({
           <div className="w-1/3 flex flex-col">
             <div className="h-1/2">
               <ArtistImageLoader
-                imageUrl={artistsWithImages[1].image_url}
-                artistName={artistsWithImages[1].name}
+                src={artistsWithImages[1].image_url}
+                alt={artistsWithImages[1].name}
                 className="w-full h-full object-cover"
               />
             </div>
             <div className="h-1/2">
               <ArtistImageLoader
-                imageUrl={artistsWithImages[2].image_url}
-                artistName={artistsWithImages[2].name}
+                src={artistsWithImages[2].image_url}
+                alt={artistsWithImages[2].name}
                 className="w-full h-full object-cover"
               />
             </div>
@@ -121,8 +121,8 @@ export function MixedArtistImage({
         {artistsWithImages.slice(0, 4).map((artist, index) => (
           <div key={artist.id} className="relative">
             <ArtistImageLoader
-              imageUrl={artist.image_url}
-              artistName={artist.name}
+              src={artist.image_url}
+              alt={artist.name}
               className="w-full h-full object-cover"
             />
             {/* Show count overlay on last image if more than 4 */}

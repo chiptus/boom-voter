@@ -7,9 +7,9 @@ import {
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { ExternalLink, Music, Play, Clock, MapPin } from "lucide-react";
+import { Clock, MapPin, ExternalLink, Music, Play } from "lucide-react";
 import { ArtistVotingButtons } from "./SetVotingButtons";
-import { Artist, FestivalSet } from "@/services/queries";
+import { FestivalSet } from "@/services/queries";
 import { formatTimeRange } from "@/lib/timeUtils";
 import { GenreBadge } from "../Index/GenreBadge";
 
@@ -22,14 +22,14 @@ interface SetInfoCardProps {
   use24Hour?: boolean;
 }
 
-export const SetInfoCard = ({
+export function SetInfoCard({
   set,
   userVote,
   netVoteScore,
   onVote,
   getVoteCount,
   use24Hour = false,
-}: SetInfoCardProps) => {
+}: SetInfoCardProps) {
   const artist = set.artists[0];
   return (
     <div className="lg:col-span-2">
@@ -64,10 +64,10 @@ export const SetInfoCard = ({
 
               {/* Performance Information */}
               <div className="flex flex-wrap gap-4 mb-4 text-purple-200">
-                {set.stage && (
+                {set.stages?.name && (
                   <div className="flex items-center gap-2">
                     <MapPin className="h-4 w-4" />
-                    <span className="text-sm">{set.stage}</span>
+                    <span className="text-sm">{set.stages.name}</span>
                   </div>
                 )}
                 {formatTimeRange(set.time_start, set.time_end, use24Hour) && (
@@ -130,4 +130,4 @@ export const SetInfoCard = ({
       </Card>
     </div>
   );
-};
+}

@@ -20,8 +20,8 @@ export function IndividualArtistCard({
       {/* Artist Image */}
       <div className="aspect-square overflow-hidden rounded-t-lg">
         <ArtistImageLoader
-          imageUrl={artist.image_url}
-          artistName={artist.name}
+          src={artist.image_url}
+          alt={artist.name}
           className="w-full h-full object-cover transition-transform hover:scale-105"
         />
       </div>

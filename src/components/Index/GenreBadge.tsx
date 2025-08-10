@@ -17,7 +17,7 @@ export function GenreBadge({ genreId, size = "default" }: GenreBadgeProps) {
   return (
     <Badge
       variant="secondary"
-      className={`bg-purple-600/50 text-purple-100 mb-2 ${
+      className={`bg-purple-600/50 text-purple-100 ${
         size === "sm" ? "text-xs px-2 py-1" : ""
       }`}
     >

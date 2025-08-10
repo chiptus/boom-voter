@@ -5,11 +5,10 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { ExternalLink, Music, Play, Clock, MapPin, Users } from "lucide-react";
+import { Clock, MapPin, Users } from "lucide-react";
 import { ArtistVotingButtons } from "./SetVotingButtons";
-import { Artist, FestivalSet } from "@/services/queries";
+import { FestivalSet } from "@/services/queries";
 import { formatTimeRange } from "@/lib/timeUtils";
 import { GenreBadge } from "../Index/GenreBadge";
 import { IndividualArtistCard } from "./IndividualArtistCard";
@@ -23,14 +22,14 @@ interface MultiArtistSetInfoCardProps {
   use24Hour?: boolean;
 }
 
-export const MultiArtistSetInfoCard = ({
+export function MultiArtistSetInfoCard({
   set,
   userVote,
   netVoteScore,
   onVote,
   getVoteCount,
   use24Hour = false,
-}: MultiArtistSetInfoCardProps) => {
+}: MultiArtistSetInfoCardProps) {
   const allGenres = set.artists.flatMap(
     (artist) => artist.artist_music_genres || [],
   );
@@ -38,15 +37,6 @@ export const MultiArtistSetInfoCard = ({
     (genre, index, self) =>
       index ===
       self.findIndex((g) => g.music_genre_id === genre.music_genre_id),
-  );
-
-  const allLinks = set.artists.reduce(
-    (acc, artist) => {
-      if (artist.spotify_url) acc.spotify.push(artist.spotify_url);
-      if (artist.soundcloud_url) acc.soundcloud.push(artist.soundcloud_url);
-      return acc;
-    },
-    { spotify: [] as string[], soundcloud: [] as string[] },
   );
 
   return (
@@ -95,10 +85,10 @@ export const MultiArtistSetInfoCard = ({
 
               {/* Performance Information */}
               <div className="flex flex-wrap gap-4 mb-4 text-purple-200">
-                {set.stage && (
+                {set.stages?.name && (
                   <div className="flex items-center gap-2">
                     <MapPin className="h-4 w-4" />
-                    <span className="text-sm">{set.stage}</span>
+                    <span className="text-sm">{set.stages.name}</span>
                   </div>
                 )}
                 {formatTimeRange(set.time_start, set.time_end, use24Hour) && (
@@ -146,4 +136,4 @@ export const MultiArtistSetInfoCard = ({
       </div>
     </div>
   );
-};
+}
