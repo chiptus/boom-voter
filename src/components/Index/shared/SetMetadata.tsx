@@ -1,14 +1,10 @@
 import { MapPin, Clock } from "lucide-react";
 import { formatTimeRange } from "@/lib/timeUtils";
 import { GenreBadge } from "../GenreBadge";
-import { FestivalSet } from "@/services/queries";
+import { useFestivalSet } from "../FestivalSetContext";
 
-interface SetMetadataProps {
-  set: FestivalSet;
-  use24Hour?: boolean;
-}
-
-export function SetMetadata({ set, use24Hour = false }: SetMetadataProps) {
+export function SetMetadata() {
+  const { set, use24Hour } = useFestivalSet();
   const uniqueGenres = set.artists
     ?.flatMap((a) => a.artist_music_genres || [])
     .filter(

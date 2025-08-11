@@ -1,24 +1,15 @@
 import { Link } from "react-router-dom";
 import { ArtistImageLoader } from "@/components/ArtistImageLoader";
 import { MixedArtistImage } from "@/components/SetDetail/MixedArtistImage";
-import { Artist } from "@/services/queries";
+import { useFestivalSet } from "../FestivalSetContext";
 
 interface SetImageProps {
-  artists: Artist[];
-  setName: string;
-  setSlug: string;
   className?: string;
   size?: "sm" | "md" | "lg";
 }
 
-export function SetImage({
-  artists,
-  setName,
-  setSlug,
-  className = "",
-  size = "lg",
-}: SetImageProps) {
-  const isMultiArtist = artists.length > 1;
+export function SetImage({ className = "", size = "lg" }: SetImageProps) {
+  const { set, isMultiArtist } = useFestivalSet();
 
   const sizeClasses = {
     sm: "w-12 h-12",
@@ -29,17 +20,17 @@ export function SetImage({
   const containerClass = `${sizeClasses[size]} ${className} overflow-hidden rounded-lg hover:opacity-90 transition-opacity cursor-pointer`;
 
   return (
-    <Link to={`./sets/${setSlug}`} className="block flex-shrink-0">
+    <Link to={`./sets/${set.slug}`} className="block flex-shrink-0">
       {isMultiArtist ? (
         <MixedArtistImage
-          artists={artists}
-          setName={setName}
+          artists={set.artists}
+          setName={set.name}
           className={containerClass}
         />
       ) : (
         <ArtistImageLoader
-          src={artists[0]?.image_url}
-          alt={setName}
+          src={set.artists[0]?.image_url}
+          alt={set.name}
           className={containerClass}
         />
       )}

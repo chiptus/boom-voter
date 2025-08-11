@@ -1,23 +1,25 @@
 import { Button } from "@/components/ui/button";
 import { Star, Heart, X } from "lucide-react";
+import { useFestivalSet } from "../FestivalSetContext";
 
 interface SetVotingButtonsProps {
-  userVote?: number;
-  votingLoading?: boolean;
-  onVote: (voteType: number) => void;
-  getVoteCount: (voteType: number) => number;
   size?: "sm" | "default";
   layout?: "horizontal" | "vertical";
 }
 
 export function SetVotingButtons({
-  userVote,
-  votingLoading,
-  onVote,
-  getVoteCount,
   size = "default",
   layout = "vertical",
 }: SetVotingButtonsProps) {
+  const { set, userVote, votingLoading, onVote, onAuthRequired, getVoteCount } =
+    useFestivalSet();
+
+  const handleVote = async (voteType: number) => {
+    const result = await onVote(set.id, voteType);
+    if (result.requiresAuth) {
+      onAuthRequired();
+    }
+  };
   const containerClass =
     layout === "horizontal" ? "flex items-center gap-2" : "space-y-3";
 
@@ -29,7 +31,7 @@ export function SetVotingButtons({
         <Button
           variant={userVote === 2 ? "default" : "outline"}
           size={size}
-          onClick={() => onVote(2)}
+          onClick={() => handleVote(2)}
           disabled={votingLoading}
           className={`${buttonClass} ${
             userVote === 2
@@ -52,7 +54,7 @@ export function SetVotingButtons({
         <Button
           variant={userVote === 1 ? "default" : "outline"}
           size={size}
-          onClick={() => onVote(1)}
+          onClick={() => handleVote(1)}
           disabled={votingLoading}
           className={`${buttonClass} ${
             userVote === 1
@@ -75,7 +77,7 @@ export function SetVotingButtons({
         <Button
           variant={userVote === -1 ? "default" : "outline"}
           size={size}
-          onClick={() => onVote(-1)}
+          onClick={() => handleVote(-1)}
           disabled={votingLoading}
           className={`${buttonClass} ${
             userVote === -1

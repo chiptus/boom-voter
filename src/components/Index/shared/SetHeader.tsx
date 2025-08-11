@@ -3,31 +3,27 @@ import { Badge } from "@/components/ui/badge";
 import { CardTitle } from "@/components/ui/card";
 import { Eye, EyeOff, Users } from "lucide-react";
 import { SocialPlatformLinkList } from "./SocialPlatformLinkList";
-
-interface Artist {
-  id: string;
-  name: string;
-  spotify_url?: string | null;
-  soundcloud_url?: string | null;
-}
+import { useFestivalSet } from "../FestivalSetContext";
 
 interface SetHeaderProps {
-  setName: string;
-  artists?: Artist[];
-  artistCount?: number;
-  userKnowledge?: boolean;
-  onKnowledgeToggle: () => void;
   size?: "sm" | "lg";
 }
 
-export function SetHeader({
-  setName,
-  artists,
-  artistCount,
-  userKnowledge,
-  onKnowledgeToggle,
-  size = "lg",
-}: SetHeaderProps) {
+export function SetHeader({ size = "lg" }: SetHeaderProps) {
+  const {
+    set,
+    userKnowledge,
+    onKnowledgeToggle,
+    onAuthRequired,
+    isMultiArtist,
+  } = useFestivalSet();
+
+  async function handleKnowledgeToggle() {
+    const result = await onKnowledgeToggle(set.id);
+    if (result.requiresAuth) {
+      onAuthRequired();
+    }
+  }
   const titleClass =
     size === "sm"
       ? "text-white text-lg font-semibold truncate"
@@ -35,15 +31,15 @@ export function SetHeader({
 
   return (
     <div className="flex items-center gap-2 mb-2">
-      <CardTitle className={titleClass}>{setName}</CardTitle>
+      <CardTitle className={titleClass}>{set.name}</CardTitle>
 
-      {!!(artistCount && artistCount > 1) && (
+      {isMultiArtist && (
         <Badge
           variant="secondary"
           className="bg-purple-600/50 text-purple-100 text-xs"
         >
           <Users className="h-3 w-3 mr-1" />
-          {artistCount}
+          {set.artists.length}
         </Badge>
       )}
 
@@ -51,7 +47,7 @@ export function SetHeader({
       <Button
         variant="ghost"
         size="sm"
-        onClick={onKnowledgeToggle}
+        onClick={handleKnowledgeToggle}
         className={`p-1 h-6 w-6 ${
           userKnowledge
             ? "text-purple-400 hover:text-purple-300"
@@ -67,9 +63,9 @@ export function SetHeader({
       </Button>
 
       {/* Social Platform Links */}
-      {artists && artists.length === 1 && (
+      {!isMultiArtist && set.artists.length > 0 && (
         <SocialPlatformLinkList
-          artist={artists[0]}
+          artist={set.artists[0]}
           size={size === "sm" ? "sm" : "md"}
         />
       )}

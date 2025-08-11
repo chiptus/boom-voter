@@ -1,37 +1,33 @@
 import { CardDescription } from "@/components/ui/card";
-import { Artist } from "@/services/queries";
 import { MultiArtistInfo } from "./MultiArtistInfo";
+import { useFestivalSet } from "../FestivalSetContext";
 
 interface SetDescriptionProps {
-  artists: Artist[];
-  setDescription?: string | null;
   className?: string;
 }
 
 export function SetDescription({
-  artists,
-  setDescription,
   className = "text-purple-200 text-sm leading-relaxed",
 }: SetDescriptionProps) {
-  const isMultiArtist = artists.length > 1;
+  const { set, isMultiArtist } = useFestivalSet();
 
   if (isMultiArtist) {
     return (
       <CardDescription className={className}>
         <div className="space-y-3">
-          <p>{setDescription}</p>
+          <div>{set.description}</div>
           <div className="flex gap-4 items-center">
             <span className="font-medium">Artists:</span>{" "}
-            <MultiArtistInfo artists={artists} />
+            <MultiArtistInfo artists={set.artists} />
           </div>
         </div>
       </CardDescription>
     );
   }
 
-  if (setDescription) {
+  if (set.description) {
     return (
-      <CardDescription className={className}>{setDescription}</CardDescription>
+      <CardDescription className={className}>{set.description}</CardDescription>
     );
   }
 
