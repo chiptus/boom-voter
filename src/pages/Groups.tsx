@@ -13,7 +13,7 @@ import {
 } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Label } from "@/components/ui/label";
-import { Users, Trash2, UserPlus, Crown, Link } from "lucide-react";
+import { Users, Trash2, Crown, Link } from "lucide-react";
 import { useGroups } from "@/hooks/useGroups";
 import { useToast } from "@/components/ui/use-toast";
 import { Badge } from "@/components/ui/badge";
@@ -22,24 +22,14 @@ import { DeleteGroupDialog } from "@/components/DeleteGroupDialog";
 
 function Groups() {
   const navigate = useNavigate();
-  const {
-    user,
-    groups,
-    loading,
-    createGroup,
-    leaveGroup,
-    deleteGroup,
-    inviteToGroup,
-  } = useGroups();
+  const { user, groups, loading, createGroup, leaveGroup, deleteGroup } =
+    useGroups();
   const { toast } = useToast();
   const [newGroupName, setNewGroupName] = useState("");
   const [newGroupDescription, setNewGroupDescription] = useState("");
-  const [inviteUsername, setInviteUsername] = useState("");
-  const [invitingToGroup, setInvitingToGroup] = useState<string | null>(null);
   const [selectedGroupForInvites, setSelectedGroupForInvites] =
     useState<string>("");
   const [creating, setCreating] = useState(false);
-  const [inviting, setInviting] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [groupToDelete, setGroupToDelete] = useState<{
     id: string;
@@ -69,25 +59,6 @@ function Groups() {
       navigate(`/groups/${result.id}`);
     }
     setCreating(false);
-  }
-
-  async function handleInviteUser(groupId: string) {
-    if (!inviteUsername.trim()) {
-      toast({
-        title: "Error",
-        description: "Username or email is required",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    setInviting(true);
-    const success = await inviteToGroup(groupId, inviteUsername.trim());
-    if (success) {
-      setInviteUsername("");
-      setInvitingToGroup(null);
-    }
-    setInviting(false);
   }
 
   function handleDeleteGroup(groupId: string, groupName: string) {
@@ -255,35 +226,6 @@ function Groups() {
                           <Users className="h-4 w-4" />
                           <span>{group.member_count} members</span>
                         </div>
-                        {group.is_creator && (
-                          <div className="flex items-center space-x-2">
-                            <Input
-                              placeholder="Username or email"
-                              value={
-                                invitingToGroup === group.id
-                                  ? inviteUsername
-                                  : ""
-                              }
-                              onChange={(e) => {
-                                setInvitingToGroup(group.id);
-                                setInviteUsername(e.target.value);
-                              }}
-                              className="w-40 h-8 bg-white/10 border-purple-400/30 text-white"
-                            />
-                            <Button
-                              size="sm"
-                              onClick={() => handleInviteUser(group.id)}
-                              disabled={
-                                !inviteUsername.trim() ||
-                                inviting ||
-                                invitingToGroup !== group.id
-                              }
-                              className="bg-purple-600 hover:bg-purple-700"
-                            >
-                              <UserPlus className="h-4 w-4" />
-                            </Button>
-                          </div>
-                        )}
                       </div>
                     </CardContent>
                   </Card>

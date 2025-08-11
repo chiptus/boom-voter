@@ -141,9 +141,9 @@ export const groupService = {
       .select("id")
       .eq("group_id", groupId)
       .eq("user_id", userId)
-      .single();
+      .limit(1);
 
-    return !!existingMember;
+    return !!(existingMember && existingMember.length);
   },
 
   async addUserToGroup(groupId: string, userId: string): Promise<void> {

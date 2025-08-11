@@ -5,6 +5,7 @@ import {
   queryFunctions,
   mutationFunctions,
 } from "@/services/queries";
+import { groupService } from "@/services/groupService";
 
 export function useUserGroupsQuery(userId: string | undefined) {
   return useQuery({
@@ -144,6 +145,66 @@ export function useLeaveGroupMutation() {
       toast({
         title: "Error",
         description: error?.message || "Failed to leave group",
+        variant: "destructive",
+      });
+    },
+  });
+}
+
+export function useInviteToGroupMutation(groupId: string) {
+  const queryClient = useQueryClient();
+  const { toast } = useToast();
+
+  return useMutation({
+    mutationFn: async (usernameOrEmail: string) => {
+      // Find user by username or email
+      const userResult =
+        await groupService.findUserByUsernameOrEmail(usernameOrEmail);
+
+      if (!userResult.found) {
+        const errorMessage =
+          userResult.foundBy === "email"
+            ? `No user found with email: ${usernameOrEmail}`
+            : "User not found";
+        throw new Error(errorMessage);
+      }
+
+      // Check if user is already in the group
+      const isAlreadyMember = await groupService.checkIfUserInGroup(
+        groupId,
+        userResult.userId!,
+      );
+      if (isAlreadyMember) {
+        throw new Error("User is already in this group");
+      }
+
+      // Add user to group
+      await groupService.addUserToGroup(groupId, userResult.userId!);
+
+      return {
+        usernameOrEmail,
+        foundBy: userResult.foundBy,
+        userId: userResult.userId!,
+      };
+    },
+    onSuccess: (data) => {
+      // Invalidate group members query to refresh the list
+      queryClient.invalidateQueries({
+        queryKey: groupQueries.members(groupId),
+      });
+
+      toast({
+        title: "Member Added",
+        description: `${data.usernameOrEmail} has been added to the group`,
+      });
+    },
+    onError: (error) => {
+      toast({
+        title: "Error",
+        description:
+          error instanceof Error
+            ? error.message
+            : "Failed to invite user to group",
         variant: "destructive",
       });
     },
