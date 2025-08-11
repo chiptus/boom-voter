@@ -35,39 +35,6 @@ export const groupService = {
     return groupsWithCounts;
   },
 
-  async createGroup(
-    name: string,
-    description: string | undefined,
-    userId: string,
-  ) {
-    const { data: group, error } = await supabase
-      .from("groups")
-      .insert({
-        name,
-        description,
-        created_by: userId,
-      })
-      .select()
-      .single();
-
-    if (error) {
-      throw new Error(error.message || "Failed to create group");
-    }
-
-    // Add creator as first member
-    const { error: memberError } = await supabase.from("group_members").insert({
-      group_id: group.id,
-      user_id: userId,
-      role: "creator",
-    });
-
-    if (memberError) {
-      throw new Error("Group created but failed to add you as member");
-    }
-
-    return group;
-  },
-
   async joinGroup(groupId: string, userId: string): Promise<void> {
     const { error } = await supabase.from("group_members").insert({
       group_id: groupId,
@@ -76,18 +43,6 @@ export const groupService = {
 
     if (error) {
       throw new Error("Failed to join group");
-    }
-  },
-
-  async leaveGroup(groupId: string, userId: string): Promise<void> {
-    const { error } = await supabase
-      .from("group_members")
-      .delete()
-      .eq("group_id", groupId)
-      .eq("user_id", userId);
-
-    if (error) {
-      throw new Error("Failed to leave group");
     }
   },
 
@@ -108,7 +63,7 @@ export const groupService = {
     const { data: profile, error: profileError } = await supabase
       .from("profiles")
       .select("id")
-      .or(`username.eq.${usernameOrEmail},email.eq.${usernameOrEmail}`)
+      .or(`username.ilike.${usernameOrEmail},email.ilike.${usernameOrEmail}`)
       .single();
 
     // If not found in profiles, check auth.users by email
@@ -141,9 +96,9 @@ export const groupService = {
       .select("id")
       .eq("group_id", groupId)
       .eq("user_id", userId)
-      .single();
+      .limit(1);
 
-    return !!existingMember;
+    return !!(existingMember && existingMember.length);
   },
 
   async addUserToGroup(groupId: string, userId: string): Promise<void> {

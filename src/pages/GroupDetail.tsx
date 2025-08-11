@@ -13,6 +13,7 @@ import { Users, UserMinus, Crown } from "lucide-react";
 import { useGroups } from "@/hooks/useGroups";
 import { useToast } from "@/components/ui/use-toast";
 import { InviteManagement } from "@/components/Groups/InviteManagement";
+import { AddMemberForm } from "@/components/Groups/AddMemberForm";
 import { Button } from "@/components/ui/button";
 import {
   useGroupDetailQuery,
@@ -21,7 +22,7 @@ import {
 import { useQueryClient } from "@tanstack/react-query";
 import { groupQueries } from "@/services/queries";
 
-const GroupDetail = () => {
+function GroupDetail() {
   const { groupId } = useParams<{ groupId: string }>();
   const navigate = useNavigate();
   const { user, removeMemberFromGroup, loading: authLoading } = useGroups();
@@ -63,26 +64,6 @@ const GroupDetail = () => {
       navigate("/groups");
     }
   }, [groupId, user, authLoading, groupError, navigate, toast]);
-
-  const handleRemoveMember = async (memberId: string, memberUserId: string) => {
-    if (!groupId || !user) return;
-
-    if (
-      window.confirm(
-        "Are you sure you want to remove this member from the group?",
-      )
-    ) {
-      setRemovingMember(memberId);
-      const success = await removeMemberFromGroup(groupId, memberUserId);
-      if (success) {
-        // Refresh the member list using React Query
-        queryClient.invalidateQueries({
-          queryKey: groupQueries.members(groupId),
-        });
-      }
-      setRemovingMember(null);
-    }
-  };
 
   // Show loading while checking authentication
   if (authLoading) {
@@ -182,6 +163,9 @@ const GroupDetail = () => {
           </TabsList>
 
           <TabsContent value="members" className="space-y-4">
+            {/* Member Invitation Form - Only show for creators */}
+            {isCreator && <AddMemberForm groupId={groupId!} />}
+
             <Card className="bg-white/10 border-purple-400/30">
               <CardHeader>
                 <div className="flex items-center justify-between">
@@ -273,6 +257,26 @@ const GroupDetail = () => {
       </div>
     </div>
   );
-};
+
+  async function handleRemoveMember(memberId: string, memberUserId: string) {
+    if (!groupId || !user) return;
+
+    if (
+      window.confirm(
+        "Are you sure you want to remove this member from the group?",
+      )
+    ) {
+      setRemovingMember(memberId);
+      const success = await removeMemberFromGroup(groupId, memberUserId);
+      if (success) {
+        // Refresh the member list using React Query
+        queryClient.invalidateQueries({
+          queryKey: groupQueries.members(groupId),
+        });
+      }
+      setRemovingMember(null);
+    }
+  }
+}
 
 export default GroupDetail;

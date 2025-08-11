@@ -5,44 +5,45 @@ import {
   queryFunctions,
   mutationFunctions,
 } from "@/services/queries";
+import { groupService } from "@/services/groupService";
 
-export const useUserGroupsQuery = (userId: string | undefined) => {
+export function useUserGroupsQuery(userId: string | undefined) {
   return useQuery({
     queryKey: groupQueries.user(userId!),
     queryFn: () => queryFunctions.fetchUserGroups(userId!),
     enabled: !!userId,
   });
-};
+}
 
-export const useGroupDetailQuery = (groupId: string) => {
+export function useGroupDetailQuery(groupId: string) {
   return useQuery({
     queryKey: groupQueries.detail(groupId),
     queryFn: () => queryFunctions.fetchGroupById(groupId),
     enabled: !!groupId,
   });
-};
+}
 
-export const useGroupMembersQuery = (groupId: string) => {
+export function useGroupMembersQuery(groupId: string) {
   return useQuery({
     queryKey: groupQueries.members(groupId),
     queryFn: () => queryFunctions.fetchGroupMembers(groupId),
     enabled: !!groupId,
   });
-};
+}
 
-export const useUserPermissionsQuery = (
+export function useUserPermissionsQuery(
   userId: string | undefined,
   permission: "edit_artists" | "is_admin",
-) => {
+) {
   return useQuery({
     queryKey: ["permissions", { userId, permission }],
     queryFn: () => queryFunctions.checkUserPermissions(userId!, permission),
     enabled: !!userId,
     staleTime: 5 * 60 * 1000, // 5 minutes - permissions don't change often
   });
-};
+}
 
-export const useCreateGroupMutation = () => {
+export function useCreateGroupMutation() {
   const queryClient = useQueryClient();
   const { toast } = useToast();
 
@@ -51,6 +52,9 @@ export const useCreateGroupMutation = () => {
     onSuccess: (_data, variables) => {
       queryClient.invalidateQueries({
         queryKey: groupQueries.user(variables.userId),
+      });
+      queryClient.invalidateQueries({
+        queryKey: groupQueries.all(),
       });
       toast({
         title: "Success",
@@ -66,17 +70,21 @@ export const useCreateGroupMutation = () => {
       });
     },
   });
-};
+}
 
-export const useDeleteGroupMutation = () => {
+export function useDeleteGroupMutation() {
   const queryClient = useQueryClient();
   const { toast } = useToast();
 
   return useMutation({
     mutationFn: mutationFunctions.deleteGroup,
     onSuccess: (_data, variables) => {
+      // Invalidate all group-related queries
       queryClient.invalidateQueries({
         queryKey: groupQueries.user(variables.userId),
+      });
+      queryClient.invalidateQueries({
+        queryKey: groupQueries.all(),
       });
       toast({
         title: "Success",
@@ -91,9 +99,9 @@ export const useDeleteGroupMutation = () => {
       });
     },
   });
-};
+}
 
-export const useJoinGroupMutation = () => {
+export function useJoinGroupMutation() {
   const queryClient = useQueryClient();
   const { toast } = useToast();
 
@@ -116,9 +124,9 @@ export const useJoinGroupMutation = () => {
       });
     },
   });
-};
+}
 
-export const useLeaveGroupMutation = () => {
+export function useLeaveGroupMutation() {
   const queryClient = useQueryClient();
   const { toast } = useToast();
 
@@ -141,4 +149,64 @@ export const useLeaveGroupMutation = () => {
       });
     },
   });
-};
+}
+
+export function useInviteToGroupMutation(groupId: string) {
+  const queryClient = useQueryClient();
+  const { toast } = useToast();
+
+  return useMutation({
+    mutationFn: async (usernameOrEmail: string) => {
+      // Find user by username or email
+      const userResult =
+        await groupService.findUserByUsernameOrEmail(usernameOrEmail);
+
+      if (!userResult.found) {
+        const errorMessage =
+          userResult.foundBy === "email"
+            ? `No user found with email: ${usernameOrEmail}`
+            : "User not found";
+        throw new Error(errorMessage);
+      }
+
+      // Check if user is already in the group
+      const isAlreadyMember = await groupService.checkIfUserInGroup(
+        groupId,
+        userResult.userId!,
+      );
+      if (isAlreadyMember) {
+        throw new Error("User is already in this group");
+      }
+
+      // Add user to group
+      await groupService.addUserToGroup(groupId, userResult.userId!);
+
+      return {
+        usernameOrEmail,
+        foundBy: userResult.foundBy,
+        userId: userResult.userId!,
+      };
+    },
+    onSuccess: (data) => {
+      // Invalidate group members query to refresh the list
+      queryClient.invalidateQueries({
+        queryKey: groupQueries.members(groupId),
+      });
+
+      toast({
+        title: "Member Added",
+        description: `${data.usernameOrEmail} has been added to the group`,
+      });
+    },
+    onError: (error) => {
+      toast({
+        title: "Error",
+        description:
+          error instanceof Error
+            ? error.message
+            : "Failed to invite user to group",
+        variant: "destructive",
+      });
+    },
+  });
+}
