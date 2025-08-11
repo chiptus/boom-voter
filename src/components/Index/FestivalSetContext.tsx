@@ -1,4 +1,4 @@
-import { createContext, useContext, ReactNode } from "react";
+import { createContext, useContext, ReactNode, useMemo } from "react";
 import { FestivalSet } from "@/services/queries";
 
 interface FestivalSetContextValue {
@@ -49,8 +49,16 @@ export function FestivalSetProvider({
 }: FestivalSetProviderProps) {
   const isMultiArtist = set.artists.length > 1;
 
+  const voteCounts = useMemo(() => {
+    const counts: Record<number, number> = {};
+    for (const vc of set.votes) {
+      counts[vc.vote_type] = (counts[vc.vote_type] || 0) + 1;
+    }
+    return counts;
+  }, [set.votes]);
+
   function getVoteCount(voteType: number) {
-    return set.votes.filter((vc) => vc.vote_type === voteType).length || 0;
+    return voteCounts[voteType] || 0;
   }
 
   const contextValue: FestivalSetContextValue = {
