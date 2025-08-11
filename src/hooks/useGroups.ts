@@ -10,7 +10,7 @@ import { useToast } from "@/components/ui/use-toast";
 import type { GroupMember } from "@/types/groups";
 import { useAuth } from "@/contexts/AuthContext";
 
-export const useGroups = () => {
+export function useGroups() {
   const { user, loading } = useAuth();
   const { toast } = useToast();
 
@@ -25,7 +25,7 @@ export const useGroups = () => {
   const joinGroupMutation = useJoinGroupMutation();
   const leaveGroupMutation = useLeaveGroupMutation();
 
-  const createGroup = async (name: string, description?: string) => {
+  async function createGroup(name: string, description?: string) {
     if (!user) {
       toast({
         title: "Error",
@@ -45,9 +45,9 @@ export const useGroups = () => {
     } catch (error) {
       return null;
     }
-  };
+  }
 
-  const joinGroup = async (groupId: string) => {
+  async function joinGroup(groupId: string) {
     if (!user) return false;
 
     try {
@@ -59,9 +59,9 @@ export const useGroups = () => {
     } catch (error) {
       return false;
     }
-  };
+  }
 
-  const leaveGroup = async (groupId: string) => {
+  async function leaveGroup(groupId: string) {
     if (!user) return false;
 
     try {
@@ -73,9 +73,9 @@ export const useGroups = () => {
     } catch (error) {
       return false;
     }
-  };
+  }
 
-  const deleteGroup = async (groupId: string) => {
+  async function deleteGroup(groupId: string) {
     if (!user) return false;
 
     try {
@@ -87,10 +87,10 @@ export const useGroups = () => {
     } catch (error) {
       return false;
     }
-  };
+  }
 
   // Keep some legacy functions that use groupService directly
-  const inviteToGroup = async (groupId: string, usernameOrEmail: string) => {
+  async function inviteToGroup(groupId: string, usernameOrEmail: string) {
     if (!user) return false;
 
     try {
@@ -155,13 +155,13 @@ export const useGroups = () => {
       });
       return false;
     }
-  };
+  }
 
-  const getGroupMembers = async (groupId: string): Promise<GroupMember[]> => {
+  async function getGroupMembers(groupId: string): Promise<GroupMember[]> {
     return groupService.getGroupMembers(groupId);
-  };
+  }
 
-  const removeMemberFromGroup = async (groupId: string, userId: string) => {
+  async function removeMemberFromGroup(groupId: string, userId: string) {
     if (!user) return false;
 
     try {
@@ -180,11 +180,7 @@ export const useGroups = () => {
       });
       return false;
     }
-  };
-
-  const getGroupById = async (groupId: string) => {
-    return groupService.getGroupById(groupId);
-  };
+  }
 
   return {
     user,
@@ -197,7 +193,7 @@ export const useGroups = () => {
     deleteGroup,
     getGroupMembers,
     removeMemberFromGroup,
-    getGroupById,
+
     fetchUserGroups,
   };
-};
+}

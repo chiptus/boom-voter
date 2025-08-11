@@ -6,43 +6,43 @@ import {
   mutationFunctions,
 } from "@/services/queries";
 
-export const useUserGroupsQuery = (userId: string | undefined) => {
+export function useUserGroupsQuery(userId: string | undefined) {
   return useQuery({
     queryKey: groupQueries.user(userId!),
     queryFn: () => queryFunctions.fetchUserGroups(userId!),
     enabled: !!userId,
   });
-};
+}
 
-export const useGroupDetailQuery = (groupId: string) => {
+export function useGroupDetailQuery(groupId: string) {
   return useQuery({
     queryKey: groupQueries.detail(groupId),
     queryFn: () => queryFunctions.fetchGroupById(groupId),
     enabled: !!groupId,
   });
-};
+}
 
-export const useGroupMembersQuery = (groupId: string) => {
+export function useGroupMembersQuery(groupId: string) {
   return useQuery({
     queryKey: groupQueries.members(groupId),
     queryFn: () => queryFunctions.fetchGroupMembers(groupId),
     enabled: !!groupId,
   });
-};
+}
 
-export const useUserPermissionsQuery = (
+export function useUserPermissionsQuery(
   userId: string | undefined,
   permission: "edit_artists" | "is_admin",
-) => {
+) {
   return useQuery({
     queryKey: ["permissions", { userId, permission }],
     queryFn: () => queryFunctions.checkUserPermissions(userId!, permission),
     enabled: !!userId,
     staleTime: 5 * 60 * 1000, // 5 minutes - permissions don't change often
   });
-};
+}
 
-export const useCreateGroupMutation = () => {
+export function useCreateGroupMutation() {
   const queryClient = useQueryClient();
   const { toast } = useToast();
 
@@ -66,17 +66,21 @@ export const useCreateGroupMutation = () => {
       });
     },
   });
-};
+}
 
-export const useDeleteGroupMutation = () => {
+export function useDeleteGroupMutation() {
   const queryClient = useQueryClient();
   const { toast } = useToast();
 
   return useMutation({
     mutationFn: mutationFunctions.deleteGroup,
     onSuccess: (_data, variables) => {
+      // Invalidate all group-related queries
       queryClient.invalidateQueries({
         queryKey: groupQueries.user(variables.userId),
+      });
+      queryClient.invalidateQueries({
+        queryKey: groupQueries.all(),
       });
       toast({
         title: "Success",
@@ -91,9 +95,9 @@ export const useDeleteGroupMutation = () => {
       });
     },
   });
-};
+}
 
-export const useJoinGroupMutation = () => {
+export function useJoinGroupMutation() {
   const queryClient = useQueryClient();
   const { toast } = useToast();
 
@@ -116,9 +120,9 @@ export const useJoinGroupMutation = () => {
       });
     },
   });
-};
+}
 
-export const useLeaveGroupMutation = () => {
+export function useLeaveGroupMutation() {
   const queryClient = useQueryClient();
   const { toast } = useToast();
 
@@ -141,4 +145,4 @@ export const useLeaveGroupMutation = () => {
       });
     },
   });
-};
+}

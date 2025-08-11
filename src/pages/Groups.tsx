@@ -20,7 +20,7 @@ import { Badge } from "@/components/ui/badge";
 import { InviteManagement } from "@/components/Groups/InviteManagement";
 import { DeleteGroupDialog } from "@/components/DeleteGroupDialog";
 
-const Groups = () => {
+function Groups() {
   const navigate = useNavigate();
   const {
     user,
@@ -47,7 +47,7 @@ const Groups = () => {
   } | null>(null);
   const [deleting, setDeleting] = useState(false);
 
-  const handleCreateGroup = async () => {
+  async function handleCreateGroup() {
     if (!newGroupName.trim()) {
       toast({
         title: "Error",
@@ -67,9 +67,9 @@ const Groups = () => {
       setNewGroupDescription("");
     }
     setCreating(false);
-  };
+  }
 
-  const handleInviteUser = async (groupId: string) => {
+  async function handleInviteUser(groupId: string) {
     if (!inviteUsername.trim()) {
       toast({
         title: "Error",
@@ -86,14 +86,14 @@ const Groups = () => {
       setInvitingToGroup(null);
     }
     setInviting(false);
-  };
+  }
 
-  const handleDeleteGroup = (groupId: string, groupName: string) => {
+  function handleDeleteGroup(groupId: string, groupName: string) {
     setGroupToDelete({ id: groupId, name: groupName });
     setDeleteDialogOpen(true);
-  };
+  }
 
-  const confirmDeleteGroup = async () => {
+  async function confirmDeleteGroup() {
     if (!groupToDelete) return;
 
     setDeleting(true);
@@ -101,13 +101,13 @@ const Groups = () => {
     setDeleting(false);
     setDeleteDialogOpen(false);
     setGroupToDelete(null);
-  };
+  }
 
-  const handleLeaveGroup = async (groupId: string) => {
+  async function handleLeaveGroup(groupId: string) {
     if (window.confirm("Are you sure you want to leave this group?")) {
       await leaveGroup(groupId);
     }
-  };
+  }
 
   if (!user) {
     return (
@@ -408,6 +408,6 @@ const Groups = () => {
       </div>
     </div>
   );
-};
+}
 
 export default Groups;
