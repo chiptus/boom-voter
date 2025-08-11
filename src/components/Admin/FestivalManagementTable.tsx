@@ -12,9 +12,11 @@ import {
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Loader2, Edit2, Trash2 } from "lucide-react";
+import { Loader2, Edit2, Trash2, Image as ImageIcon } from "lucide-react";
 import type { Festival } from "@/services/queries";
 import { cn } from "@/lib/utils";
+import { FestivalLogoDialog } from "./FestivalLogoDialog";
+import { useState } from "react";
 
 export function FestivalManagementTable({
   onEdit,
@@ -29,7 +31,11 @@ export function FestivalManagementTable({
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
-  const handleDelete = async (festival: Festival) => {
+  const [logoDialogOpen, setLogoDialogOpen] = useState(false);
+  const [selectedFestivalForLogo, setSelectedFestivalForLogo] =
+    useState<Festival | null>(null);
+
+  async function handleDelete(festival: Festival) {
     if (
       !confirm(
         `Are you sure you want to delete "${festival.name}"? This will also delete all associated editions, stages, and sets.`,
@@ -53,7 +59,12 @@ export function FestivalManagementTable({
         variant: "destructive",
       });
     }
-  };
+  }
+
+  function handleLogoManagement(festival: Festival) {
+    setSelectedFestivalForLogo(festival);
+    setLogoDialogOpen(true);
+  }
 
   if (isLoading) {
     return (
@@ -71,10 +82,11 @@ export function FestivalManagementTable({
       <Table>
         <TableHeader>
           <TableRow>
+            <TableHead>Logo</TableHead>
             <TableHead>Name</TableHead>
             <TableHead>Description</TableHead>
             <TableHead>Website</TableHead>
-            <TableHead className="w-20">Actions</TableHead>
+            <TableHead className="w-32">Actions</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -86,6 +98,19 @@ export function FestivalManagementTable({
                 selected === festival.id ? "bg-slate-200 selected" : "",
               )}
             >
+              <TableCell>
+                {festival.logo_url ? (
+                  <img
+                    src={festival.logo_url}
+                    alt={`${festival.name} logo`}
+                    className="h-8 w-8 object-contain rounded"
+                  />
+                ) : (
+                  <div className="h-8 w-8 bg-gray-200 rounded flex items-center justify-center">
+                    <ImageIcon className="h-4 w-4 text-gray-400" />
+                  </div>
+                )}
+              </TableCell>
               <TableCell className="font-medium">{festival.name}</TableCell>
               <TableCell>{festival.description || "—"}</TableCell>
               <TableCell>
@@ -103,7 +128,19 @@ export function FestivalManagementTable({
                 )}
               </TableCell>
               <TableCell>
-                <div className="flex gap-2">
+                <div className="flex gap-1">
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      handleLogoManagement(festival);
+                    }}
+                    title="Manage logo"
+                  >
+                    <ImageIcon className="h-4 w-4" />
+                  </Button>
                   <Button
                     size="sm"
                     variant="ghost"
@@ -112,6 +149,7 @@ export function FestivalManagementTable({
                       e.stopPropagation();
                       onEdit(festival);
                     }}
+                    title="Edit festival"
                   >
                     <Edit2 className="h-4 w-4" />
                   </Button>
@@ -124,6 +162,7 @@ export function FestivalManagementTable({
                       handleDelete(festival);
                     }}
                     className="text-destructive hover:text-destructive"
+                    title="Delete festival"
                   >
                     <Trash2 className="h-4 w-4" />
                   </Button>
@@ -138,6 +177,12 @@ export function FestivalManagementTable({
           No festivals found. Create your first festival to get started.
         </div>
       )}
+
+      <FestivalLogoDialog
+        open={logoDialogOpen}
+        onOpenChange={setLogoDialogOpen}
+        festival={selectedFestivalForLogo}
+      />
     </>
   );
 }

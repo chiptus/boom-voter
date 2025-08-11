@@ -120,6 +120,7 @@ export default function EditionView() {
           title={festival.name}
           subtitle={edition.name}
           description={`${filteredAndSortedSets.length} artists available for voting`}
+          logoUrl={festival.logo_url}
           showGroupsButton={true}
         />
 

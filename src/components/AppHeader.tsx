@@ -19,6 +19,7 @@ interface AppHeaderProps {
   title?: string;
   subtitle?: string;
   description?: string;
+  logoUrl?: string | null;
 
   // Actions
   actions?: ReactNode;
@@ -30,30 +31,31 @@ interface AppHeaderProps {
   children?: ReactNode;
 }
 
-export const AppHeader = ({
+export function AppHeader({
   showBackButton = false,
   backLabel = "Back",
   title,
   subtitle,
   description,
+  logoUrl,
   actions,
   showGroupsButton = false,
   children,
-}: AppHeaderProps) => {
+}: AppHeaderProps) {
   const navigate = useNavigate();
   const { user, profile, signOut, showAuthDialog } = useAuth();
   const isMobile = useIsMobile();
 
-  const handleBackClick = () => {
+  function handleBackClick() {
     navigate(-1);
-  };
+  }
 
-  const getGreeting = () => {
+  function getGreeting() {
     const hour = new Date().getHours();
     if (hour < 12) return "Good morning";
     if (hour < 18) return "Good afternoon";
     return "Good evening";
-  };
+  }
 
   const displayName =
     profile?.username || user?.email?.split("@")[0] || "there";
@@ -130,11 +132,21 @@ export const AppHeader = ({
           <div className="text-center space-y-4">
             {title && (
               <div className="flex items-center justify-center gap-3 mb-6">
-                <Music className="h-8 w-8 text-purple-400 animate-pulse" />
-                <h2 className="text-4xl font-bold text-white tracking-tight">
-                  {title}
-                </h2>
-                <Heart className="h-8 w-8 text-pink-400 animate-pulse" />
+                {logoUrl ? (
+                  <img
+                    src={logoUrl}
+                    alt={`${title} logo`}
+                    className="h-40 w-auto max-w-sm object-contain rounded"
+                  />
+                ) : (
+                  <>
+                    <Music className="h-8 w-8 text-purple-400 animate-pulse" />
+                    <h2 className="text-4xl font-bold text-white tracking-tight">
+                      {title}
+                    </h2>
+                    <Heart className="h-8 w-8 text-pink-400 animate-pulse" />
+                  </>
+                )}
               </div>
             )}
 
@@ -160,4 +172,4 @@ export const AppHeader = ({
       </div>
     </TooltipProvider>
   );
-};
+}

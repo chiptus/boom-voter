@@ -32,11 +32,11 @@ interface FestivalDialogProps {
   editingFestival: Festival | null;
 }
 
-export const FestivalDialog = ({
+export function FestivalDialog({
   open,
   onOpenChange,
   editingFestival,
-}: FestivalDialogProps) => {
+}: FestivalDialogProps) {
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
@@ -75,7 +75,7 @@ export const FestivalDialog = ({
   }, [open, editingFestival]);
 
   // Auto-generate slug when name changes
-  const handleNameChange = (name: string) => {
+  function handleNameChange(name: string) {
     setFormData((prev) => ({
       ...prev,
       name,
@@ -85,10 +85,10 @@ export const FestivalDialog = ({
           ? generateSlug(name)
           : prev.slug,
     }));
-  };
+  }
 
   // Validate slug when it changes
-  const handleSlugChange = (slug: string) => {
+  function handleSlugChange(slug: string) {
     const cleanSlug = sanitizeSlug(slug);
     setFormData((prev) => ({ ...prev, slug: cleanSlug }));
 
@@ -99,9 +99,9 @@ export const FestivalDialog = ({
     } else {
       setSlugError("");
     }
-  };
+  }
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (!formData.name.trim()) {
       toast({
@@ -132,17 +132,22 @@ export const FestivalDialog = ({
 
     setIsSubmitting(true);
     try {
+      const festivalData = {
+        ...formData,
+        description: formData.description || null,
+        website_url: formData.website_url || null,
+      };
+
       if (editingFestival) {
-        await queryFunctions.updateFestival(editingFestival.id, formData);
+        await queryFunctions.updateFestival(editingFestival.id, festivalData);
         toast({
           title: "Success",
           description: "Festival updated successfully",
         });
       } else {
         await queryFunctions.createFestival({
-          ...formData,
-          description: formData.description || null,
-          website_url: formData.website_url || null,
+          ...festivalData,
+          logo_url: null,
         });
         toast({
           title: "Success",
@@ -162,7 +167,7 @@ export const FestivalDialog = ({
     } finally {
       setIsSubmitting(false);
     }
-  };
+  }
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -264,4 +269,4 @@ export const FestivalDialog = ({
       </DialogContent>
     </Dialog>
   );
-};
+}

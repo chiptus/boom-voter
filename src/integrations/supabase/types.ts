@@ -7,10 +7,30 @@ export type Json =
   | Json[];
 
 export type Database = {
-  // Allows to automatically instanciate createClient with right options
-  // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
-  __InternalSupabase: {
-    PostgrestVersion: "12.2.3 (519615d)";
+  graphql_public: {
+    Tables: {
+      [_ in never]: never;
+    };
+    Views: {
+      [_ in never]: never;
+    };
+    Functions: {
+      graphql: {
+        Args: {
+          extensions?: Json;
+          operationName?: string;
+          query?: string;
+          variables?: Json;
+        };
+        Returns: Json;
+      };
+    };
+    Enums: {
+      [_ in never]: never;
+    };
+    CompositeTypes: {
+      [_ in never]: never;
+    };
   };
   public: {
     Tables: {
@@ -255,6 +275,7 @@ export type Database = {
           created_at: string;
           description: string | null;
           id: string;
+          logo_url: string | null;
           name: string;
           published: boolean | null;
           slug: string;
@@ -266,6 +287,7 @@ export type Database = {
           created_at?: string;
           description?: string | null;
           id?: string;
+          logo_url?: string | null;
           name: string;
           published?: boolean | null;
           slug: string;
@@ -277,6 +299,7 @@ export type Database = {
           created_at?: string;
           description?: string | null;
           id?: string;
+          logo_url?: string | null;
           name?: string;
           published?: boolean | null;
           slug?: string;
@@ -609,8 +632,8 @@ export type Database = {
       };
       has_admin_role: {
         Args: {
-          check_user_id: string;
           check_role: Database["public"]["Enums"]["admin_role"];
+          check_user_id: string;
         };
         Returns: boolean;
       };
@@ -779,6 +802,9 @@ export type CompositeTypes<
     : never;
 
 export const Constants = {
+  graphql_public: {
+    Enums: {},
+  },
   public: {
     Enums: {
       admin_role: ["super_admin", "admin", "moderator"],
