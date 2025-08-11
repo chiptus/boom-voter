@@ -3,7 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
 import { offlineStorage } from "@/lib/offlineStorage";
 import { useOnlineStatus, useOfflineQueue } from "@/hooks/useOffline";
-import { voteQueries } from "@/services/queries";
+import { voteQueries, setQueries, FestivalSet } from "@/services/queries";
 import type { User } from "@supabase/supabase-js";
 
 interface OfflineVote {
@@ -176,6 +176,60 @@ export function useOfflineVoteMutation(
         },
       );
 
+      // Also update the sets cache to reflect vote count changes
+      queryClient.setQueriesData(
+        { queryKey: setQueries.all() },
+        (oldData: any) => {
+          if (!oldData) return oldData;
+
+          // Handle different data structures (could be array of sets or object with sets property)
+          function updateSetsArray(sets: Array<FestivalSet>) {
+            return sets.map((set: FestivalSet) => {
+              if (set.id === setId) {
+                const updatedVotes = [...(set.votes || [])];
+
+                // Remove existing vote from this user for this set
+                const existingVoteIndex = updatedVotes.findIndex(
+                  (vote: any) => vote.user_id === userId,
+                );
+                if (existingVoteIndex !== -1) {
+                  updatedVotes.splice(existingVoteIndex, 1);
+                }
+
+                // Add new vote if not a toggle
+                if (!isToggle) {
+                  updatedVotes.push({
+                    vote_type: voteType,
+                    user_id: userId,
+                  });
+                }
+
+                return {
+                  ...set,
+                  votes: updatedVotes,
+                };
+              }
+              return set;
+            });
+          }
+
+          // Handle array of sets
+          if (Array.isArray(oldData)) {
+            return updateSetsArray(oldData);
+          }
+
+          // Handle object with sets property
+          if (oldData.sets && Array.isArray(oldData.sets)) {
+            return {
+              ...oldData,
+              sets: updateSetsArray(oldData.sets),
+            };
+          }
+
+          return oldData;
+        },
+      );
+
       // If online, sync immediately
       if (isOnline) {
         try {
@@ -233,14 +287,15 @@ export function useOfflineVoteMutation(
 
       return isToggle ? null : voteType;
     },
-    onError: (error: Error) => {
+    onSettled: () => {
       // Revert optimistic update on error
       if (user?.id) {
         queryClient.invalidateQueries({
           queryKey: voteQueries.user(user.id),
         });
       }
-
+    },
+    onError: (error: any) => {
       toast({
         title: "Error",
         description: error.message || "Failed to save vote",

@@ -10,14 +10,12 @@ export function useOfflineVoting(user: User | null, onVoteUpdate?: () => void) {
     {},
   );
 
-  // Use React Query for data fetching
   const {
     data: userVotes = {},
     isLoading,
     error,
   } = useOfflineVotingQuery(user);
 
-  // Use React Query for mutations
   const voteMutation = useOfflineVoteMutation(user, onVoteUpdate);
 
   const handleVote = useCallback(
