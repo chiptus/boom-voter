@@ -1,4 +1,5 @@
 import { useForm } from "react-hook-form";
+// Removed unused useState import
 import {
   Dialog,
   DialogContent,
@@ -6,6 +7,8 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { useCreateGroupMutation } from "@/hooks/queries/useGroupsQuery";
+import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -15,21 +18,21 @@ import { Users } from "lucide-react";
 interface CreateGroupDialogProps {
   isOpen: boolean;
   onOpenChange: (open: boolean) => void;
-  onCreateGroup: (name: string, description?: string) => Promise<boolean>;
-  isCreating?: boolean;
+  onGroupCreated: (groupId: string) => void;
 }
 
 interface FormData {
   name: string;
   description: string;
 }
-
 export function CreateGroupDialog({
   isOpen,
   onOpenChange,
-  onCreateGroup,
-  isCreating = false,
+  onGroupCreated,
 }: CreateGroupDialogProps) {
+  const { user } = useAuth();
+  const createGroupMutation = useCreateGroupMutation();
+  // No local creating state needed; use createGroupMutation.isLoading
   const {
     register,
     handleSubmit,
@@ -37,16 +40,24 @@ export function CreateGroupDialog({
     formState: { errors, isSubmitting },
   } = useForm<FormData>();
 
-  async function onSubmit(data: FormData) {
-    const success = await onCreateGroup(
-      data.name.trim(),
-      data.description.trim() || undefined,
+  function onSubmit(data: FormData) {
+    if (!user?.id) return;
+    createGroupMutation.mutate(
+      {
+        name: data.name.trim(),
+        description: data.description.trim() || undefined,
+        userId: user.id,
+      },
+      {
+        onSuccess: (group) => {
+          if (group && group.id) {
+            reset();
+            onOpenChange(false);
+            onGroupCreated(group.id);
+          }
+        },
+      },
     );
-
-    if (success) {
-      reset(); // Clear the form
-      onOpenChange(false); // Close the dialog
-    }
   }
 
   function handleOpenChange(open: boolean) {
@@ -103,12 +114,17 @@ export function CreateGroupDialog({
               type="button"
               variant="outline"
               onClick={() => handleOpenChange(false)}
-              disabled={isSubmitting || isCreating}
+              disabled={isSubmitting || createGroupMutation.isPending}
             >
               Cancel
             </Button>
-            <Button type="submit" disabled={isSubmitting || isCreating}>
-              {isSubmitting || isCreating ? "Creating..." : "Create Group"}
+            <Button
+              type="submit"
+              disabled={isSubmitting || createGroupMutation.isPending}
+            >
+              {isSubmitting || createGroupMutation.isPending
+                ? "Creating..."
+                : "Create Group"}
             </Button>
           </div>
         </form>

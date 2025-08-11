@@ -1,6 +1,5 @@
 import {
   useUserGroupsQuery,
-  useCreateGroupMutation,
   useDeleteGroupMutation,
   useJoinGroupMutation,
   useLeaveGroupMutation,
@@ -20,32 +19,9 @@ export function useGroups() {
     refetch: fetchUserGroups,
   } = useUserGroupsQuery(user?.id);
 
-  const createGroupMutation = useCreateGroupMutation();
   const deleteGroupMutation = useDeleteGroupMutation();
   const joinGroupMutation = useJoinGroupMutation();
   const leaveGroupMutation = useLeaveGroupMutation();
-
-  async function createGroup(name: string, description?: string) {
-    if (!user) {
-      toast({
-        title: "Error",
-        description: "You must be logged in to create a group",
-        variant: "destructive",
-      });
-      return null;
-    }
-
-    try {
-      const group = await createGroupMutation.mutateAsync({
-        name,
-        description,
-        userId: user.id,
-      });
-      return group;
-    } catch (error) {
-      return null;
-    }
-  }
 
   async function joinGroup(groupId: string) {
     if (!user) return false;
@@ -186,7 +162,6 @@ export function useGroups() {
     user,
     groups,
     loading: loading || groupsLoading,
-    createGroup,
     joinGroup,
     leaveGroup,
     inviteToGroup,
