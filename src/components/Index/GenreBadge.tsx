@@ -3,9 +3,10 @@ import { useGenres } from "@/hooks/queries/useGenresQuery";
 
 interface GenreBadgeProps {
   genreId: string;
+  size?: "default" | "sm";
 }
 
-export function GenreBadge({ genreId }: GenreBadgeProps) {
+export function GenreBadge({ genreId, size = "default" }: GenreBadgeProps) {
   const { genres, loading, error } = useGenres();
 
   if (loading || error) return null;
@@ -16,7 +17,9 @@ export function GenreBadge({ genreId }: GenreBadgeProps) {
   return (
     <Badge
       variant="secondary"
-      className="bg-purple-600/50 text-purple-100 mb-2"
+      className={`bg-purple-600/50 text-purple-100 ${
+        size === "sm" ? "text-xs px-2 py-1" : ""
+      }`}
     >
       {genre.name}
     </Badge>

@@ -5,15 +5,15 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Clock, MapPin, ExternalLink, Music, Play } from "lucide-react";
+import { Clock, MapPin, Users } from "lucide-react";
 import { ArtistVotingButtons } from "./SetVotingButtons";
 import { FestivalSet } from "@/services/queries";
 import { formatTimeRange } from "@/lib/timeUtils";
 import { GenreBadge } from "../Index/GenreBadge";
+import { IndividualArtistCard } from "./IndividualArtistCard";
 
-interface SetInfoCardProps {
+interface MultiArtistSetInfoCardProps {
   set: FestivalSet;
   userVote: number | null;
   netVoteScore: number;
@@ -22,26 +22,47 @@ interface SetInfoCardProps {
   use24Hour?: boolean;
 }
 
-export function SetInfoCard({
+export function MultiArtistSetInfoCard({
   set,
   userVote,
   netVoteScore,
   onVote,
   getVoteCount,
   use24Hour = false,
-}: SetInfoCardProps) {
-  const artist = set.artists[0];
+}: MultiArtistSetInfoCardProps) {
+  const allGenres = set.artists.flatMap(
+    (artist) => artist.artist_music_genres || [],
+  );
+  const uniqueGenres = allGenres.filter(
+    (genre, index, self) =>
+      index ===
+      self.findIndex((g) => g.music_genre_id === genre.music_genre_id),
+  );
+
   return (
-    <div className="lg:col-span-2">
-      <Card className="bg-white/10 backdrop-blur-md border-purple-400/30 h-full">
+    <div className="lg:col-span-2 space-y-6">
+      {/* Main Set Info Card */}
+      <Card className="bg-white/10 backdrop-blur-md border-purple-400/30">
         <CardHeader>
           <div className="flex items-start justify-between">
             <div className="flex-1">
               <CardTitle className="text-3xl font-bold text-white mb-2">
                 {set.name}
               </CardTitle>
+
+              {/* Set Summary */}
+              <div className="mb-4">
+                <div className="flex items-center gap-2 mb-2">
+                  <Users className="h-4 w-4 text-purple-200" />
+                  <span className="text-sm text-purple-200 font-medium">
+                    {set.artists.length} Artists
+                  </span>
+                </div>
+              </div>
+
+              {/* Genres */}
               <div className="flex flex-wrap gap-2 mb-4">
-                {artist.artist_music_genres?.map((genre) => (
+                {uniqueGenres.map((genre) => (
                   <GenreBadge
                     key={genre.music_genre_id}
                     genreId={genre.music_genre_id}
@@ -81,9 +102,9 @@ export function SetInfoCard({
               </div>
             </div>
           </div>
-          {(set.description || artist.description) && (
+          {set.description && (
             <CardDescription className="text-purple-200 text-lg leading-relaxed">
-              {set.description || artist.description}
+              {set.description}
             </CardDescription>
           )}
         </CardHeader>
@@ -94,40 +115,25 @@ export function SetInfoCard({
             onVote={onVote}
             getVoteCount={getVoteCount}
           />
-
-          {/* External Links */}
-          {(artist.spotify_url || artist.soundcloud_url) && (
-            <div className="flex flex-wrap gap-4">
-              {artist.spotify_url && (
-                <Button asChild className="bg-green-600 hover:bg-green-700">
-                  <a
-                    href={artist.spotify_url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    <Play className="h-4 w-4 mr-2" />
-                    Open in Spotify
-                    <ExternalLink className="h-4 w-4 ml-2" />
-                  </a>
-                </Button>
-              )}
-              {artist.soundcloud_url && (
-                <Button asChild className="bg-orange-600 hover:bg-orange-700">
-                  <a
-                    href={artist.soundcloud_url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    <Music className="h-4 w-4 mr-2" />
-                    Open in SoundCloud
-                    <ExternalLink className="h-4 w-4 ml-2" />
-                  </a>
-                </Button>
-              )}
-            </div>
-          )}
         </CardContent>
       </Card>
+
+      {/* Individual Artist Cards */}
+      <div>
+        <h3 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
+          <Users className="h-5 w-5" />
+          Artists in this Set
+        </h3>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {set.artists.map((artist) => (
+            <IndividualArtistCard
+              key={artist.id}
+              artist={artist}
+              showFullDetails={false}
+            />
+          ))}
+        </div>
+      </div>
     </div>
   );
 }

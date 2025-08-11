@@ -7,11 +7,11 @@ interface ArtistVotingButtonsProps {
   getVoteCount: (voteType: number) => number;
 }
 
-export const ArtistVotingButtons = ({
+export function ArtistVotingButtons({
   userVote,
   onVote,
   getVoteCount,
-}: ArtistVotingButtonsProps) => {
+}: ArtistVotingButtonsProps) {
   return (
     <div className="flex items-center gap-4 mb-6">
       <Button
@@ -52,4 +52,4 @@ export const ArtistVotingButtons = ({
       </Button>
     </div>
   );
-};
+}

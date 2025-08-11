@@ -106,15 +106,12 @@ export default function EditionView() {
     );
   }
 
-  // This loading check is no longer needed since we handle it earlier
-  // with the new context loading state
-
-  const handleVoteAction = async (artistId: string, voteType: number) => {
+  async function handleVoteAction(artistId: string, voteType: number) {
     const result = await handleVote(artistId, voteType);
     if (result.requiresAuth) {
       setShowAuthDialog(true);
     }
-  };
+  }
 
   return (
     <div className="min-h-screen bg-app-gradient">
@@ -137,7 +134,6 @@ export default function EditionView() {
             {urlState.mainView === "list" && (
               <SetsPanel
                 sets={filteredAndSortedSets}
-                isGrid={false}
                 user={user}
                 use24Hour={urlState.use24Hour}
                 openAuthDialog={() => setShowAuthDialog(true)}

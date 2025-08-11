@@ -1,7 +1,9 @@
 import { useParams } from "react-router-dom";
 import { AppHeader } from "@/components/AppHeader";
 import { ArtistImageCard } from "@/components/SetDetail/SetImageCard";
-import { ArtistInfoCard } from "@/components/SetDetail/SetInfoCard";
+import { MixedArtistImage } from "@/components/SetDetail/MixedArtistImage";
+import { SetInfoCard } from "@/components/SetDetail/SetInfoCard";
+import { MultiArtistSetInfoCard } from "@/components/SetDetail/MultiArtistSetInfoCard";
 import { ArtistNotFoundState } from "@/components/SetDetail/SetNotFoundState";
 import { ArtistLoadingState } from "@/components/SetDetail/SetLoadingState";
 import { SetGroupVoting } from "@/components/SetDetail/SetGroupVoting";
@@ -31,36 +33,58 @@ export function SetDetails() {
     return <ArtistNotFoundState />;
   }
 
-  const artist = currentSet.artists[0];
+  const isMultiArtistSet = currentSet.artists.length > 1;
+  const primaryArtist = currentSet.artists[0];
 
   return (
     <div className="min-h-screen bg-app-gradient">
       <div className="container mx-auto px-4 py-8">
         <AppHeader showBackButton backTo="/" backLabel="Back to Artists" />
 
-        {/* Artist Header */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
-          <ArtistImageCard
-            imageUrl={artist.image_url}
-            artistName={currentSet.name}
-          />
+        {/* Set Header */}
+        {isMultiArtistSet ? (
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
+            {/* Mixed Image for Multi-Artist Sets */}
+            <MixedArtistImage
+              artists={currentSet.artists}
+              setName={currentSet.name}
+              className="aspect-square rounded-lg"
+            />
 
-          <ArtistInfoCard
-            artist={artist}
-            userVote={userVote}
-            netVoteScore={netVoteScore}
-            onVote={handleVote}
-            getVoteCount={getVoteCount}
-            use24Hour={urlState.use24Hour}
-          />
-        </div>
+            <MultiArtistSetInfoCard
+              set={currentSet}
+              userVote={userVote}
+              netVoteScore={netVoteScore}
+              onVote={handleVote}
+              getVoteCount={getVoteCount}
+              use24Hour={urlState.use24Hour}
+            />
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
+            {/* Single Artist Image */}
+            <ArtistImageCard
+              imageUrl={primaryArtist.image_url}
+              artistName={currentSet.name}
+            />
 
-        {/* Artist Group Voting Section */}
+            <SetInfoCard
+              set={currentSet}
+              userVote={userVote}
+              netVoteScore={netVoteScore}
+              onVote={handleVote}
+              getVoteCount={getVoteCount}
+              use24Hour={urlState.use24Hour}
+            />
+          </div>
+        )}
+
+        {/* Set Group Voting Section */}
         <div className="mb-8">
           <SetGroupVoting setId={currentSet.id} />
         </div>
 
-        {/* Artist Notes Section */}
+        {/* Set Notes Section */}
         <div className="mb-8">
           <ArtistNotes artistId={currentSet.id} userId={user?.id || null} />
         </div>
