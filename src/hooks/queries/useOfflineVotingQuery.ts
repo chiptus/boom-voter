@@ -192,7 +192,6 @@ export function useOfflineVoteMutation(
             // Add/update vote on server
             const { error } = await supabase.from("votes").upsert(
               {
-                artist_id: "",
                 user_id: userId,
                 vote_type: voteType,
                 set_id: setId,

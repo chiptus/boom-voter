@@ -7,15 +7,15 @@ import {
   setQueries,
 } from "@/services/queries";
 
-export const useUserVotesQuery = (userId: string | undefined) => {
+export function useUserVotesQuery(userId: string | undefined) {
   return useQuery({
     queryKey: voteQueries.user(userId || ""),
     queryFn: () => queryFunctions.fetchUserVotes(userId!),
     enabled: !!userId,
   });
-};
+}
 
-export const useVoteMutation = () => {
+export function useVoteMutation() {
   const queryClient = useQueryClient();
   const { toast } = useToast();
 
@@ -79,4 +79,4 @@ export const useVoteMutation = () => {
       });
     },
   });
-};
+}

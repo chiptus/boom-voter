@@ -14,12 +14,12 @@ export function SetVotingButtons({
   const { set, userVote, votingLoading, onVote, onAuthRequired, getVoteCount } =
     useFestivalSet();
 
-  const handleVote = async (voteType: number) => {
+  async function handleVote(voteType: number) {
     const result = await onVote(set.id, voteType);
     if (result.requiresAuth) {
       onAuthRequired();
     }
-  };
+  }
   const containerClass =
     layout === "horizontal" ? "flex items-center gap-2" : "space-y-3";
 

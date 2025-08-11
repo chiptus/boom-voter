@@ -5,10 +5,7 @@ import {
 } from "./queries/useOfflineVotingQuery";
 import type { User } from "@supabase/supabase-js";
 
-export const useOfflineVoting = (
-  user: User | null,
-  onVoteUpdate?: () => void,
-) => {
+export function useOfflineVoting(user: User | null, onVoteUpdate?: () => void) {
   const [votingLoading, setVotingLoading] = useState<Record<string, boolean>>(
     {},
   );
@@ -64,4 +61,4 @@ export const useOfflineVoting = (
     handleVote,
     getUserVote,
   };
-};
+}

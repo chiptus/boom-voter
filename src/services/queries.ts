@@ -4,7 +4,6 @@ import { generateSlug } from "@/lib/slug";
 
 export type Artist = Database["public"]["Tables"]["artists"]["Row"] & {
   artist_music_genres: { music_genre_id: string }[] | null;
-  votes: { vote_type: number; user_id: string }[];
 };
 
 export type FestivalSet = Database["public"]["Tables"]["sets"]["Row"] & {
@@ -185,8 +184,7 @@ export const queryFunctions = {
       .select(
         `
         *,
-        artist_music_genres (music_genre_id),
-        votes (vote_type, user_id)
+        artist_music_genres (music_genre_id)
       `,
       )
       .eq("archived", false)
@@ -331,7 +329,7 @@ export const queryFunctions = {
   async fetchUserVotes(userId: string): Promise<Record<string, number>> {
     const { data, error } = await supabase
       .from("votes")
-      .select("set_id, artist_id, vote_type")
+      .select("set_id, vote_type")
       .eq("user_id", userId);
 
     if (error) {
@@ -341,11 +339,8 @@ export const queryFunctions = {
     const votes: Record<string, number> = {};
 
     (data || []).forEach((vote) => {
-      // Prioritize set-based votes over legacy artist votes
       if (vote.set_id) {
         votes[vote.set_id] = vote.vote_type;
-      } else if (vote.artist_id && !votes[vote.artist_id]) {
-        votes[vote.artist_id] = vote.vote_type;
       }
     });
 
@@ -1114,14 +1109,11 @@ export const mutationFunctions = {
     } else {
       // Add or update vote
       const voteData: {
-        artist_id: "";
-
         set_id: string;
         updated_at?: string;
         user_id: string;
         vote_type: number;
       } = {
-        artist_id: "",
         user_id: userId,
         vote_type: voteType,
         set_id: setId,
@@ -1247,7 +1239,6 @@ export const mutationFunctions = {
       artist_music_genres: artistData.genre_ids.map((genreId) => ({
         music_genre_id: genreId,
       })),
-      votes: [],
     };
   },
 

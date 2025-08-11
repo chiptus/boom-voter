@@ -74,7 +74,6 @@ export function useScheduleData(
         artists: (set.artists || []).map((artist) => ({
           id: artist.id,
           name: artist.name,
-          votes: artist.votes || [],
         })),
       };
     });

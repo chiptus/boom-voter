@@ -561,40 +561,30 @@ export type Database = {
       };
       votes: {
         Row: {
-          artist_id: string;
           created_at: string;
           id: string;
-          set_id: string | null;
+          set_id: string;
           updated_at: string;
           user_id: string;
           vote_type: number;
         };
         Insert: {
-          artist_id: string;
           created_at?: string;
           id?: string;
-          set_id?: string | null;
+          set_id: string;
           updated_at?: string;
           user_id: string;
           vote_type: number;
         };
         Update: {
-          artist_id?: string;
           created_at?: string;
           id?: string;
-          set_id?: string | null;
+          set_id?: string;
           updated_at?: string;
           user_id?: string;
           vote_type?: number;
         };
         Relationships: [
-          {
-            foreignKeyName: "votes_artist_id_fkey";
-            columns: ["artist_id"];
-            isOneToOne: false;
-            referencedRelation: "artists";
-            referencedColumns: ["id"];
-          },
           {
             foreignKeyName: "votes_set_id_fkey";
             columns: ["set_id"];

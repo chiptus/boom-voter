@@ -6,30 +6,20 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { ExternalLink, Music, Play, Clock, MapPin } from "lucide-react";
-import { ArtistVotingButtons } from "./ArtistVotingButtons";
 import { Artist } from "@/services/queries";
 import { formatTimeRange } from "@/lib/timeUtils";
 import { GenreBadge } from "../Index/GenreBadge";
 
 interface ArtistInfoCardProps {
   artist: Artist;
-  userVote: number | null;
-  netVoteScore: number;
-  onVote: (voteType: number) => void;
-  getVoteCount: (voteType: number) => number;
   use24Hour?: boolean;
 }
 
-export const ArtistInfoCard = ({
+export function ArtistInfoCard({
   artist,
-  userVote,
-  netVoteScore,
-  onVote,
-  getVoteCount,
   use24Hour = false,
-}: ArtistInfoCardProps) => {
+}: ArtistInfoCardProps) {
   return (
     <div className="lg:col-span-2">
       <Card className="bg-white/10 backdrop-blur-md border-purple-400/30 h-full">
@@ -46,19 +36,6 @@ export const ArtistInfoCard = ({
                     genreId={genre.music_genre_id}
                   />
                 ))}
-                {netVoteScore !== 0 && (
-                  <Badge
-                    variant="outline"
-                    className={`${
-                      netVoteScore > 0
-                        ? "border-green-400 text-green-400"
-                        : "border-red-400 text-red-400"
-                    }`}
-                  >
-                    Score: {netVoteScore > 0 ? "+" : ""}
-                    {netVoteScore}
-                  </Badge>
-                )}
               </div>
 
               {/* Performance Information */}
@@ -95,13 +72,6 @@ export const ArtistInfoCard = ({
           )}
         </CardHeader>
         <CardContent>
-          {/* Voting System */}
-          <ArtistVotingButtons
-            userVote={userVote}
-            onVote={onVote}
-            getVoteCount={getVoteCount}
-          />
-
           {/* External Links */}
           {(artist.spotify_url || artist.soundcloud_url) && (
             <div className="flex flex-wrap gap-4">
@@ -137,4 +107,4 @@ export const ArtistInfoCard = ({
       </Card>
     </div>
   );
-};
+}

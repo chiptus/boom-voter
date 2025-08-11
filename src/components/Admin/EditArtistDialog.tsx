@@ -27,12 +27,7 @@ import { useGenresQuery } from "@/hooks/queries/useGenresQuery";
 import { useUpdateArtistMutation } from "@/hooks/queries/useArtistsQuery";
 import { StageSelector } from "../StageSelector";
 import { toDatetimeLocal, toISOString } from "@/lib/timeUtils";
-import type { Database } from "@/integrations/supabase/types";
-
-type Artist = Database["public"]["Tables"]["artists"]["Row"] & {
-  artist_music_genres: { music_genre_id: string }[] | null;
-  votes: { vote_type: number; user_id: string }[];
-};
+import { Artist } from "@/services/queries";
 
 // Form validation schema
 const editArtistFormSchema = z.object({
@@ -50,7 +45,7 @@ const editArtistFormSchema = z.object({
 type EditArtistFormData = z.infer<typeof editArtistFormSchema>;
 
 // Helper function to subtract one hour from datetime-local string
-const subtractOneHour = (datetimeLocal: string): string => {
+function subtractOneHour(datetimeLocal: string): string {
   if (!datetimeLocal) return "";
   const date = new Date(datetimeLocal);
   date.setHours(date.getHours() - 1);
@@ -62,7 +57,7 @@ const subtractOneHour = (datetimeLocal: string): string => {
   const minutes = String(date.getMinutes()).padStart(2, "0");
 
   return `${year}-${month}-${day}T${hours}:${minutes}`;
-};
+}
 
 interface EditArtistDialogProps {
   artist: Artist;
@@ -100,7 +95,7 @@ export function EditArtistDialog({ artist, onClose }: EditArtistDialogProps) {
     return null;
   }
 
-  const onSubmit = async (data: EditArtistFormData) => {
+  async function onSubmit(data: EditArtistFormData) {
     // Check Core team permissions
     if (!canEdit) {
       toast({
@@ -131,9 +126,9 @@ export function EditArtistDialog({ artist, onClose }: EditArtistDialogProps) {
     } catch (error) {
       // Error handling is done in the mutation hook
     }
-  };
+  }
 
-  const handleSubtractOneHour = () => {
+  function handleSubtractOneHour() {
     const currentTimeStart = form.getValues("time_start");
     const currentTimeEnd = form.getValues("time_end");
 
@@ -147,7 +142,7 @@ export function EditArtistDialog({ artist, onClose }: EditArtistDialogProps) {
         currentTimeEnd ? subtractOneHour(currentTimeEnd) : "",
       );
     }
-  };
+  }
 
   return (
     <Dialog open onOpenChange={() => onClose?.()}>

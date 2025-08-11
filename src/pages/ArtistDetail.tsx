@@ -9,19 +9,11 @@ import { ArtistNotes } from "@/components/ArtistDetail/ArtistNotes";
 import { useArtistDetail } from "@/components/ArtistDetail/useArtistDetail";
 import { useUrlState } from "@/hooks/useUrlState";
 
-const ArtistDetail = () => {
+function ArtistDetail() {
   const { id } = useParams<{ id: string }>();
 
   const { state: urlState } = useUrlState();
-  const {
-    artist,
-    user,
-    userVote,
-    loading,
-    handleVote,
-    getVoteCount,
-    netVoteScore,
-  } = useArtistDetail(id);
+  const { artist, user, loading } = useArtistDetail(id);
 
   if (loading) {
     return <ArtistLoadingState />;
@@ -43,14 +35,7 @@ const ArtistDetail = () => {
             artistName={artist.name}
           />
 
-          <ArtistInfoCard
-            artist={artist}
-            userVote={userVote}
-            netVoteScore={netVoteScore}
-            onVote={handleVote}
-            getVoteCount={getVoteCount}
-            use24Hour={urlState.use24Hour}
-          />
+          <ArtistInfoCard artist={artist} use24Hour={urlState.use24Hour} />
         </div>
 
         {/* Artist Group Voting Section */}
@@ -65,6 +50,6 @@ const ArtistDetail = () => {
       </div>
     </div>
   );
-};
+}
 
 export default ArtistDetail;
