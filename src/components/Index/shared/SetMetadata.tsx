@@ -13,6 +13,12 @@ export function SetMetadata() {
         index,
     );
 
+  const timeRangeFormatted = formatTimeRange(
+    set.time_start,
+    set.time_end,
+    use24Hour,
+  );
+
   return (
     <div className="flex items-center flex-wrap gap-2">
       {/* Genres */}
@@ -36,12 +42,10 @@ export function SetMetadata() {
             <span>{set.stages.name}</span>
           </div>
         )}
-        {formatTimeRange(set.time_start, set.time_end, use24Hour) && (
+        {timeRangeFormatted && (
           <div className="flex items-center gap-1 text-sm text-purple-200">
             <Clock className="h-3 w-3" />
-            <span>
-              {formatTimeRange(set.time_start, set.time_end, use24Hour)}
-            </span>
+            <span>{timeRangeFormatted}</span>
           </div>
         )}
       </div>
