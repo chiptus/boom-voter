@@ -52,6 +52,9 @@ export function useCreateGroupMutation() {
       queryClient.invalidateQueries({
         queryKey: groupQueries.user(variables.userId),
       });
+      queryClient.invalidateQueries({
+        queryKey: groupQueries.all(),
+      });
       toast({
         title: "Success",
         description: "Group created successfully",

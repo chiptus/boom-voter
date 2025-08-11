@@ -65,6 +65,8 @@ function Groups() {
     if (result) {
       setNewGroupName("");
       setNewGroupDescription("");
+      // Redirect to the newly created group
+      navigate(`/groups/${result.id}`);
     }
     setCreating(false);
   }
