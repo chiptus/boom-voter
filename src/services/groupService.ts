@@ -108,7 +108,7 @@ export const groupService = {
     const { data: profile, error: profileError } = await supabase
       .from("profiles")
       .select("id")
-      .or(`username.eq.${usernameOrEmail},email.eq.${usernameOrEmail}`)
+      .or(`username.ilike.${usernameOrEmail},email.ilike.${usernameOrEmail}`)
       .single();
 
     // If not found in profiles, check auth.users by email

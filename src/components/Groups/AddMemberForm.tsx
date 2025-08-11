@@ -32,7 +32,12 @@ export function AddMemberForm({ groupId }: AddMemberFormProps) {
   } = useForm<FormData>();
 
   async function onSubmitInvite(data: FormData) {
-    inviteToGroupMutation.mutate(data.usernameOrEmail.trim(), {
+    const input = data.usernameOrEmail.trim();
+    // For email format, make it lowercase for case-insensitive matching
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const processedInput = emailRegex.test(input) ? input.toLowerCase() : input;
+
+    inviteToGroupMutation.mutate(processedInput, {
       onSuccess() {
         reset(); // Clear the form on success
       },
