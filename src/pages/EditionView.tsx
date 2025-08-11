@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 
 import { useAuth } from "@/contexts/AuthContext";
 import { useProfileQuery } from "@/hooks/queries/useProfileQuery";
@@ -17,12 +17,16 @@ import { ScheduleHorizontalTimelineView } from "@/components/schedule/ScheduleHo
 import ErrorBoundary from "@/components/ErrorBoundary";
 import { useEditionSetsQuery } from "@/hooks/queries/useEditionSetsQuery";
 import { useFestivalEdition } from "@/contexts/FestivalEditionContext";
+import { GroupsCTA } from "@/components/Groups/GroupsCTA";
+import { GroupsOnboardingModal } from "@/components/Groups/GroupsOnboardingModal";
+import { useGroups } from "@/hooks/useGroups";
 
 export default function EditionView() {
   const { user, loading: authLoading, hasUsername } = useAuth();
   const { inviteValidation, isValidating, hasValidInvite } =
     useInviteValidation();
   const [showAuthDialog, setShowAuthDialog] = useState(false);
+  const [showGroupsOnboarding, setShowGroupsOnboarding] = useState(false);
   const { state: urlState, updateUrlState, clearFilters } = useUrlState();
 
   // Get festival/edition context
@@ -42,9 +46,31 @@ export default function EditionView() {
   // Get profile loading state to prevent dialog flashing
   const { isLoading: profileLoading } = useProfileQuery(user?.id);
 
+  // Get user's groups to check if they need onboarding
+  const { groups } = useGroups();
+
   const showUsernameSetup = useMemo(() => {
     return !!user && !authLoading && !profileLoading && !hasUsername;
   }, [user, authLoading, profileLoading, hasUsername]);
+
+  // Show groups onboarding for new authenticated users who aren't in any groups
+  useEffect(() => {
+    if (
+      user &&
+      hasUsername &&
+      !authLoading &&
+      !profileLoading &&
+      !hasValidInvite && // Don't show if they came via invite (already know about groups)
+      groups.length === 0 && // Only show if user has no groups
+      !localStorage.getItem("groupsOnboardingDismissed")
+    ) {
+      // Small delay to let other dialogs settle
+      const timer = setTimeout(() => {
+        setShowGroupsOnboarding(true);
+      }, 1000);
+      return () => clearTimeout(timer);
+    }
+  }, [user, hasUsername, authLoading, profileLoading, hasValidInvite, groups]);
 
   // Show loading while context is not ready
   if (!isContextReady || setsLoading) {
@@ -124,6 +150,11 @@ export default function EditionView() {
           showGroupsButton={true}
         />
 
+        {/* Only show Groups CTA for users with no groups */}
+        {groups.length === 0 && (
+          <GroupsCTA onSignInClick={() => setShowAuthDialog(true)} />
+        )}
+
         <FilterSortControls
           state={urlState}
           onStateChange={updateUrlState}
@@ -167,6 +198,11 @@ export default function EditionView() {
             }}
           />
         )}
+
+        <GroupsOnboardingModal
+          open={showGroupsOnboarding}
+          onOpenChange={setShowGroupsOnboarding}
+        />
       </div>
     </div>
   );
