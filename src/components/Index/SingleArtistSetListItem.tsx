@@ -11,7 +11,7 @@ export function SingleArtistSetListItem() {
       data-testid="artist-item"
     >
       {/* Mobile Layout (sm and below) */}
-      <div className="block md:hidden space-y-3">
+      <div className="flex flex-col md:hidden space-y-3">
         <div className="flex items-start gap-3 relative">
           <SetImage size="sm" />
           <div className="flex-1 min-w-0">
@@ -23,7 +23,9 @@ export function SingleArtistSetListItem() {
 
         <SetDescription className="text-purple-200 text-sm" />
 
-        <SetVotingButtons size="sm" layout="horizontal" />
+        <div className="self-end">
+          <SetVotingButtons size="sm" layout="horizontal" />
+        </div>
       </div>
 
       {/* Desktop Layout (md and above) */}
