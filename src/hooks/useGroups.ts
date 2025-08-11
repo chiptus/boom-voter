@@ -2,7 +2,6 @@ import {
   useUserGroupsQuery,
   useDeleteGroupMutation,
   useJoinGroupMutation,
-  useLeaveGroupMutation,
 } from "./queries/useGroupsQuery";
 import { groupService } from "@/services/groupService";
 import { useToast } from "@/components/ui/use-toast";
@@ -21,27 +20,12 @@ export function useGroups() {
 
   const deleteGroupMutation = useDeleteGroupMutation();
   const joinGroupMutation = useJoinGroupMutation();
-  const leaveGroupMutation = useLeaveGroupMutation();
 
   async function joinGroup(groupId: string) {
     if (!user) return false;
 
     try {
       await joinGroupMutation.mutateAsync({
-        groupId,
-        userId: user.id,
-      });
-      return true;
-    } catch (error) {
-      return false;
-    }
-  }
-
-  async function leaveGroup(groupId: string) {
-    if (!user) return false;
-
-    try {
-      await leaveGroupMutation.mutateAsync({
         groupId,
         userId: user.id,
       });
@@ -163,7 +147,7 @@ export function useGroups() {
     groups,
     loading: loading || groupsLoading,
     joinGroup,
-    leaveGroup,
+
     inviteToGroup,
     deleteGroup,
     getGroupMembers,

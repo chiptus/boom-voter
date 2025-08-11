@@ -9,7 +9,7 @@ import { MyGroupsList } from "@/components/Groups/MyGroupsList";
 
 function Groups() {
   const navigate = useNavigate();
-  const { user, groups, loading, leaveGroup, deleteGroup } = useGroups();
+  const { user, groups, loading, deleteGroup } = useGroups();
   const [createDialogOpen, setCreateDialogOpen] = useState(false);
 
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
@@ -33,12 +33,6 @@ function Groups() {
     setGroupToDelete(null);
   }
 
-  async function handleLeaveGroup(groupId: string) {
-    if (window.confirm("Are you sure you want to leave this group?")) {
-      await leaveGroup(groupId);
-    }
-  }
-
   if (!user) {
     return <SignInRequired />;
   }
@@ -51,9 +45,7 @@ function Groups() {
         <MyGroupsList
           groups={groups}
           loading={loading}
-          onView={(id) => navigate(`/groups/${id}`)}
           onDelete={handleDeleteGroup}
-          onLeave={handleLeaveGroup}
         />
 
         <CreateGroupDialog

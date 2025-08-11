@@ -1,23 +1,21 @@
 import { GroupCard } from "./GroupCard";
 import { Card, CardContent } from "@/components/ui/card";
+import { Group } from "@/types/groups";
 import { Users } from "lucide-react";
 
 export function MyGroupsList({
   groups,
   loading,
-  onView,
   onDelete,
-  onLeave,
 }: {
-  groups: any[];
+  groups: Group[];
   loading: boolean;
-  onView: (id: string) => void;
   onDelete: (id: string, name: string) => void;
-  onLeave: (id: string) => void;
 }) {
   if (loading) {
     return <div className="text-center text-white">Loading groups...</div>;
   }
+
   if (groups.length === 0) {
     return (
       <Card className="bg-white/10 border-purple-400/30">
@@ -33,15 +31,14 @@ export function MyGroupsList({
       </Card>
     );
   }
+
   return (
     <div className="space-y-4">
       {groups.map((group) => (
         <GroupCard
           key={group.id}
           group={group}
-          onView={() => onView(group.id)}
           onDelete={() => onDelete(group.id, group.name)}
-          onLeave={() => onLeave(group.id)}
         />
       ))}
     </div>

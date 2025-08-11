@@ -46,18 +46,6 @@ export const groupService = {
     }
   },
 
-  async leaveGroup(groupId: string, userId: string): Promise<void> {
-    const { error } = await supabase
-      .from("group_members")
-      .delete()
-      .eq("group_id", groupId)
-      .eq("user_id", userId);
-
-    if (error) {
-      throw new Error("Failed to leave group");
-    }
-  },
-
   async deleteGroup(groupId: string, userId: string): Promise<void> {
     const { error } = await supabase
       .from("groups")
