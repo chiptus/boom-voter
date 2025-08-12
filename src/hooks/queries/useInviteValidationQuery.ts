@@ -4,9 +4,9 @@ import { inviteQueries } from "@/services/queries";
 import { useToast } from "@/components/ui/use-toast";
 import type { InviteValidation } from "@/types/invites";
 
-const validateInviteToken = async (
+async function validateInviteToken(
   token: string,
-): Promise<InviteValidation | null> => {
+): Promise<InviteValidation | null> {
   const { data, error } = await supabase.rpc("validate_invite_token", {
     token,
   });
@@ -21,9 +21,9 @@ const validateInviteToken = async (
   }
 
   return null;
-};
+}
 
-export const useInviteValidationQuery = (token: string | null) => {
+export function useInviteValidationQuery(token: string | null) {
   return useQuery({
     queryKey: inviteQueries.validation(token || ""),
     queryFn: () => validateInviteToken(token!),
@@ -32,9 +32,9 @@ export const useInviteValidationQuery = (token: string | null) => {
     gcTime: 0, // Don't cache invite validations
     retry: false, // Don't retry failed validations
   });
-};
+}
 
-export const useInviteMutation = () => {
+export function useInviteMutation() {
   const { toast } = useToast();
 
   return useMutation({
@@ -83,4 +83,4 @@ export const useInviteMutation = () => {
       return false;
     },
   });
-};
+}

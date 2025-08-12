@@ -6,7 +6,7 @@ import {
   useInviteMutation,
 } from "@/hooks/queries/useInviteValidationQuery";
 
-export const useInviteValidation = () => {
+export function useInviteValidation() {
   const [searchParams] = useSearchParams();
   const [inviteToken, setInviteToken] = useState<string | null>(null);
   const { toast } = useToast();
@@ -19,7 +19,6 @@ export const useInviteValidation = () => {
     }
   }, [searchParams]);
 
-  // Use React Query for validation
   const {
     data: inviteValidation,
     isLoading: isValidating,
@@ -61,7 +60,7 @@ export const useInviteValidation = () => {
     }
   }, [inviteValidation, toast]);
 
-  const useInvite = async (userId: string) => {
+  async function useInvite(userId: string) {
     if (!inviteToken) return false;
 
     try {
@@ -81,11 +80,11 @@ export const useInviteValidation = () => {
       // Error handling is done in the mutation
       return false;
     }
-  };
+  }
 
-  const clearInvite = () => {
+  function clearInvite() {
     setInviteToken(null);
-  };
+  }
 
   return {
     inviteToken,
@@ -96,4 +95,4 @@ export const useInviteValidation = () => {
     clearInvite,
     hasValidInvite: inviteValidation?.is_valid === true,
   };
-};
+}

@@ -54,8 +54,8 @@ export function AdminActions({
           >
             <Link to="/admin">
               <Settings className="h-4 w-4 mr-2" />
+              Admin Dashboard
             </Link>
-            Admin Dashboard
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>

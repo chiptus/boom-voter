@@ -17,19 +17,19 @@ import { User } from "@supabase/supabase-js";
 interface UsernameSetupDialogProps {
   open: boolean;
   user: User;
-  onSuccess: () => void;
+  onSuccess?: () => void;
 }
 
-export const UsernameSetupDialog = ({
+export function UsernameSetupDialog({
   open,
   user,
-  onSuccess,
-}: UsernameSetupDialogProps) => {
+  onSuccess = () => {},
+}: UsernameSetupDialogProps) {
   const [username, setUsername] = useState("");
   const { toast } = useToast();
   const updateProfileMutation = useUpdateProfileMutation();
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (!username.trim()) return;
 
@@ -55,7 +55,7 @@ export const UsernameSetupDialog = ({
         },
       },
     );
-  };
+  }
 
   return (
     <Dialog open={open} onOpenChange={() => {}}>
@@ -99,4 +99,4 @@ export const UsernameSetupDialog = ({
       </DialogContent>
     </Dialog>
   );
-};
+}
