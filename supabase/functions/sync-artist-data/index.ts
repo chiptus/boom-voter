@@ -283,7 +283,7 @@ serve(async (req) => {
 
     console.log("Starting SoundCloud artist data sync...");
 
-    // Get count of artists that need syncing
+    // Get count of artists that need syncing, prioritizing those with null last_soundcloud_sync
     const { data: artists, error: fetchError } = await supabase
       .from("artists")
       .select("id, name, soundcloud_url, image_url, last_soundcloud_sync")
@@ -291,7 +291,8 @@ serve(async (req) => {
       .or(
         "last_soundcloud_sync.is.null,last_soundcloud_sync.lt." +
           new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString(),
-      );
+      )
+      .order("last_soundcloud_sync", { ascending: true, nullsFirst: true });
 
     if (fetchError) {
       console.error("Error fetching artists:", fetchError);
@@ -362,7 +363,7 @@ async function processSoundCloudArtists(
 
       const soundcloudUrl = artist.soundcloud_url;
 
-      if (!soundcloudUrl.includes("soundcloud.com/")) {
+      if (!soundcloudUrl || !soundcloudUrl.includes("soundcloud.com/")) {
         console.warn(
           `Invalid SoundCloud URL for ${artist.name}: ${soundcloudUrl}`,
         );
