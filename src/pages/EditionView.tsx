@@ -39,16 +39,7 @@ export default function EditionView() {
     );
   }
 
-  // If no festival or edition context, this shouldn't happen due to routing
-  if (!festival || !edition) {
-    return (
-      <div className="min-h-screen bg-app-gradient flex items-center justify-center">
-        <div className="text-white text-xl">Festival context not found</div>
-      </div>
-    );
-  }
-
-  if (setsLoading) {
+  if (!festival || !edition || setsLoading) {
     return (
       <div className="min-h-screen bg-app-gradient flex items-center justify-center">
         <div className="text-white text-xl">Loading sets...</div>
