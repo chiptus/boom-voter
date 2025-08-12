@@ -5,8 +5,7 @@ import { FestivalSet } from "@/services/queries";
 
 import { EmptyArtistsState } from "./EmptyArtistsState";
 import { FestivalSetProvider } from "./FestivalSetContext";
-import { SingleArtistSetListItem } from "./SingleArtistSetListItem";
-import { MultiArtistSetListItem } from "./MultiArtistSetListItem";
+import { SetListItem } from "./SetListItem";
 
 export function SetsPanel({
   sets,
@@ -54,11 +53,7 @@ export function SetsPanel({
           onAuthRequired={openAuthDialog}
           use24Hour={use24Hour}
         >
-          {set.artists.length > 1 ? (
-            <MultiArtistSetListItem />
-          ) : (
-            <SingleArtistSetListItem />
-          )}
+          <SetListItem />
         </FestivalSetProvider>
       ))}
     </div>

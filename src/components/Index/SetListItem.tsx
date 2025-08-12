@@ -4,7 +4,7 @@ import { SetMetadata } from "./shared/SetMetadata";
 import { SetDescription } from "./shared/SetDescription";
 import { SetVotingButtons } from "./shared/SetVotingButtons";
 
-export function SingleArtistSetListItem() {
+export function SetListItem() {
   return (
     <div
       className="bg-white/10 backdrop-blur-md border-purple-400/30 hover:bg-white/15 transition-all duration-300 rounded-lg p-4"
@@ -16,7 +16,6 @@ export function SingleArtistSetListItem() {
           <SetImage size="sm" />
           <div className="flex-1 min-w-0">
             <SetHeader size="sm" />
-
             <SetMetadata />
           </div>
         </div>
