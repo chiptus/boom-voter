@@ -22,12 +22,10 @@ import {
 } from "@/components/ui/form";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/contexts/AuthContext";
-import { useUserPermissionsQuery } from "@/hooks/queries/useGroupsQuery";
+import { useUserPermissions as useUserPermissionsQuery } from "@/hooks/queries/auth/useUserPermissions";
 import { useGenresQuery } from "@/hooks/queries/genres/useGenres";
-import {
-  Artist,
-  useUpdateArtistMutation,
-} from "@/hooks/queries/useArtistsQuery";
+import { Artist } from "@/hooks/queries/artists/useArtists";
+import { useUpdateArtist as useUpdateArtistMutation } from "@/hooks/queries/artists/useUpdateArtist";
 import { StageSelector } from "../StageSelector";
 import { toDatetimeLocal, toISOString } from "@/lib/timeUtils";
 

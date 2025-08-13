@@ -14,9 +14,9 @@ import { Badge } from "@/components/ui/badge";
 import { Edit2, Archive, Search, Music, Plus } from "lucide-react";
 import {
   Artist,
-  useArchiveArtistMutation,
-  useArtistsQuery,
-} from "@/hooks/queries/useArtistsQuery";
+  useArtists as useArtistsQuery,
+} from "@/hooks/queries/artists/useArtists";
+import { useArchiveArtist as useArchiveArtistMutation } from "@/hooks/queries/artists/useArchiveArtist";
 import { AddArtistDialog } from "./AddArtistDialog";
 import { EditArtistDialog } from "./EditArtistDialog";
 import { GenreBadge } from "../Index/GenreBadge";

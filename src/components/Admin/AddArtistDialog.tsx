@@ -23,9 +23,9 @@ import {
 import { Music } from "lucide-react";
 import { StageSelector } from "../StageSelector";
 import { useAuth } from "@/contexts/AuthContext";
-import { useUserPermissionsQuery } from "@/hooks/queries/useGroupsQuery";
+import { useUserPermissions as useUserPermissionsQuery } from "@/hooks/queries/auth/useUserPermissions";
 import { useGenresQuery } from "@/hooks/queries/genres/useGenres";
-import { useCreateArtistMutation } from "@/hooks/queries/useArtistsQuery";
+import { useCreateArtist as useCreateArtistMutation } from "@/hooks/queries/artists/useCreateArtist";
 import { GenreMultiSelect } from "../GenreMultiSelect";
 
 // Form validation schema
