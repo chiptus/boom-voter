@@ -1,0 +1,51 @@
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
+import { userGroupsKeys } from "./useUserGroups";
+
+// Mutation function
+async function deleteGroup(variables: { groupId: string; userId: string }) {
+  const { groupId, userId } = variables;
+
+  const { error } = await supabase
+    .from("groups")
+    .delete()
+    .eq("id", groupId)
+    .eq("created_by", userId);
+
+  if (error) {
+    throw new Error("Failed to delete group");
+  }
+
+  return true;
+}
+
+// Hook
+export function useDeleteGroup() {
+  const queryClient = useQueryClient();
+  const { toast } = useToast();
+
+  return useMutation({
+    mutationFn: deleteGroup,
+    onSuccess: (_data, variables) => {
+      // Invalidate all group-related queries
+      queryClient.invalidateQueries({
+        queryKey: userGroupsKeys.user(variables.userId),
+      });
+      queryClient.invalidateQueries({
+        queryKey: userGroupsKeys.all,
+      });
+      toast({
+        title: "Success",
+        description: "Group deleted successfully",
+      });
+    },
+    onError: (error) => {
+      toast({
+        title: "Error",
+        description: error?.message || "Failed to delete group",
+        variant: "destructive",
+      });
+    },
+  });
+}

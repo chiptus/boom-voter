@@ -154,13 +154,13 @@ export function SetFormDialog({
   );
 
   // Helper function to convert ISO datetime to datetime-local format
-  const formatDateTimeLocal = (isoString: string | null): string => {
+  function formatDateTimeLocal(isoString: string | null): string {
     if (!isoString) return "";
     // Remove the timezone part and return in format: YYYY-MM-DDTHH:mm
     return isoString.slice(0, 16);
-  };
+  }
 
-  const onSubmit = async (data: SetFormData) => {
+  async function onSubmit(data: SetFormData) {
     if (!user) {
       return; // Should not happen if user is authenticated
     }
@@ -181,7 +181,7 @@ export function SetFormDialog({
       if (editingSet) {
         const updatedSet = await updateSetMutation.mutateAsync({
           id: editingSet.id,
-          data: submitData,
+          updates: submitData,
         });
         setId = updatedSet.id;
       } else {
@@ -217,7 +217,7 @@ export function SetFormDialog({
     } catch (error) {
       // Error handling is done in the mutation hooks
     }
-  };
+  }
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
