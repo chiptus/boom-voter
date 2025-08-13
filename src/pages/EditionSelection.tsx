@@ -11,8 +11,10 @@ import { Button } from "@/components/ui/button";
 import { useFestivalEdition } from "@/contexts/FestivalEditionContext";
 import { AppHeader } from "@/components/AppHeader";
 import { Link, useNavigate } from "react-router-dom";
-import type { FestivalEdition } from "@/services/queries";
-import { useFestivalEditionsForFestival } from "@/hooks/queries/useFestivalQuery";
+import {
+  useFestivalEditionsForFestival,
+  FestivalEdition,
+} from "@/hooks/queries/festivals/useFestivals";
 import { useEffect } from "react";
 import { getSubdomainInfo } from "@/lib/subdomain";
 

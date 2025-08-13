@@ -7,9 +7,11 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { useFestivalsQuery } from "@/hooks/queries/useFestivalQuery";
+import {
+  useFestivalsQuery,
+  Festival,
+} from "@/hooks/queries/festivals/useFestivals";
 import { AppHeader } from "@/components/AppHeader";
-import { Festival } from "@/services/queries";
 import { useEffect } from "react";
 import {
   createFestivalSubdomainUrl,

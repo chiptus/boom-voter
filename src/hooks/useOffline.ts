@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { offlineStorage } from "@/lib/offlineStorage";
-import { Artist, FestivalSet } from "@/services/queries";
+import { Artist } from "@/hooks/queries/artists/useArtists";
+import { FestivalSet } from "@/hooks/queries/sets/useSets";
 export const useOnlineStatus = () => {
   const [isOnline, setIsOnline] = useState(navigator.onLine);
 
