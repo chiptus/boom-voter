@@ -1,7 +1,7 @@
 import { useMemo } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useOfflineArtistData } from "@/hooks/useOfflineArtistData";
-import { useUserPermissionsQuery } from "@/hooks/queries/useGroupsQuery";
+import { useUserPermissionsQuery } from "@/hooks/queries/auth/useUserPermissions";
 
 export function useArtistDetail(id: string | undefined) {
   const { user, loading: authLoading } = useAuth();

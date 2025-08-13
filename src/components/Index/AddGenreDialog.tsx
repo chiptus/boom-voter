@@ -13,7 +13,7 @@ import {
 } from "@/components/ui/dialog";
 import { Plus } from "lucide-react";
 
-import { useUserPermissionsQuery } from "@/hooks/queries/useGroupsQuery";
+import { useUserPermissionsQuery } from "@/hooks/queries/auth/useUserPermissions";
 import { useAuth } from "@/contexts/AuthContext";
 
 interface AddGenreDialogProps {

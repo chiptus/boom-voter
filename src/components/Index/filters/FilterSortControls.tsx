@@ -1,7 +1,8 @@
 import { useState, useEffect } from "react";
 import type { SortOption, FilterSortState } from "@/hooks/useUrlState";
 import { useGenres } from "@/hooks/queries/genres/useGenres";
-import { useGroups } from "@/hooks/useGroups";
+import { useAuth } from "@/contexts/AuthContext";
+import { useUserGroupsQuery } from "@/hooks/queries/groups/useUserGroups";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -36,7 +37,8 @@ export function FilterSortControls({
   const [isFiltersExpanded, setIsFiltersExpanded] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
   const { genres } = useGenres();
-  const { groups } = useGroups();
+  const { user } = useAuth();
+  const { data: groups = [] } = useUserGroupsQuery(user?.id);
 
   useEffect(() => {
     function checkMobile() {

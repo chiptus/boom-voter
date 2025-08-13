@@ -8,7 +8,8 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
-import { useGroups } from "@/hooks/useGroups";
+import { useAuth } from "@/contexts/AuthContext";
+import { useUserGroupsQuery } from "@/hooks/queries/groups/useUserGroups";
 import { useGroupVotesQuery } from "@/hooks/queries/useGroupVotesQuery";
 import { Users, ThumbsUp, Heart, ThumbsDown } from "lucide-react";
 
@@ -55,8 +56,9 @@ const getVoteColor = (voteType: number) => {
   }
 };
 
-export const ArtistGroupVoting = ({ artistId }: ArtistGroupVotingProps) => {
-  const { groups, user } = useGroups();
+export function ArtistGroupVoting({ artistId }: ArtistGroupVotingProps) {
+  const { user } = useAuth();
+  const { data: groups = [] } = useUserGroupsQuery(user?.id);
   const [selectedGroupId, setSelectedGroupId] = useState<string>("");
 
   // Set default group when groups load
@@ -183,4 +185,4 @@ export const ArtistGroupVoting = ({ artistId }: ArtistGroupVotingProps) => {
       </CardContent>
     </Card>
   );
-};
+}
