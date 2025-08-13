@@ -1,4 +1,5 @@
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import type { Database } from "@/integrations/supabase/types";
 
@@ -54,5 +55,118 @@ export function useStagesByEditionQuery(editionId: string | undefined) {
     queryKey: stagesKeys.byEdition(editionId || ""),
     queryFn: () => fetchStagesByEdition(editionId!),
     enabled: !!editionId,
+  });
+}
+
+// Mutation functions
+async function createStage(stageData: {
+  name: string;
+  festival_edition_id: string;
+}) {
+  const { data, error } = await supabase
+    .from("stages")
+    .insert(stageData)
+    .select()
+    .single();
+
+  if (error) throw error;
+  return data;
+}
+
+async function updateStage(stageId: string, stageData: { name: string }) {
+  const { data, error } = await supabase
+    .from("stages")
+    .update(stageData)
+    .eq("id", stageId)
+    .select()
+    .single();
+
+  if (error) throw error;
+  return data;
+}
+
+async function deleteStage(stageId: string) {
+  const { error } = await supabase.from("stages").delete().eq("id", stageId);
+
+  if (error) throw error;
+  return true;
+}
+
+// Mutation hooks
+export function useCreateStageMutation() {
+  const queryClient = useQueryClient();
+  const { toast } = useToast();
+
+  return useMutation({
+    mutationFn: createStage,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: stagesKeys.all });
+      toast({
+        title: "Success",
+        description: "Stage created successfully",
+      });
+    },
+    onError: (error) => {
+      console.error("Error creating stage:", error);
+      toast({
+        title: "Error",
+        description: "Failed to create stage",
+        variant: "destructive",
+      });
+    },
+  });
+}
+
+export function useUpdateStageMutation() {
+  const queryClient = useQueryClient();
+  const { toast } = useToast();
+
+  return useMutation({
+    mutationFn: ({
+      stageId,
+      stageData,
+    }: {
+      stageId: string;
+      stageData: { name: string };
+    }) => updateStage(stageId, stageData),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: stagesKeys.all });
+      toast({
+        title: "Success",
+        description: "Stage updated successfully",
+      });
+    },
+    onError: (error) => {
+      console.error("Error updating stage:", error);
+      toast({
+        title: "Error",
+        description: "Failed to update stage",
+        variant: "destructive",
+      });
+    },
+  });
+}
+
+export function useDeleteStageMutation() {
+  const queryClient = useQueryClient();
+  const { toast } = useToast();
+
+  return useMutation({
+    mutationFn: deleteStage,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: stagesKeys.all });
+      toast({
+        title: "Success",
+        description: "Stage deleted successfully",
+      });
+    },
+    onError: (error) => {
+      console.error("Error deleting stage:", error);
+      toast({
+        title: "Error",
+        description: "Failed to delete stage",
+        variant: "destructive",
+      });
+    },
   });
 }

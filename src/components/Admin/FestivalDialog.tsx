@@ -1,6 +1,9 @@
 import { useState, useEffect } from "react";
-import { useQueryClient } from "@tanstack/react-query";
-import { queryFunctions } from "@/services/queries";
+import {
+  useCreateFestivalMutation,
+  useUpdateFestivalMutation,
+  Festival,
+} from "@/hooks/queries/festivals/useFestivals";
 import { useToast } from "@/hooks/use-toast";
 import {
   Dialog,
@@ -15,7 +18,6 @@ import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { Loader2 } from "lucide-react";
-import type { Festival } from "@/services/queries";
 import { generateSlug, isValidSlug, sanitizeSlug } from "@/lib/slug";
 
 interface FestivalFormData {
@@ -37,8 +39,9 @@ export function FestivalDialog({
   onOpenChange,
   editingFestival,
 }: FestivalDialogProps) {
+  const createFestivalMutation = useCreateFestivalMutation();
+  const updateFestivalMutation = useUpdateFestivalMutation();
   const { toast } = useToast();
-  const queryClient = useQueryClient();
 
   const [formData, setFormData] = useState<FestivalFormData>({
     name: "",
@@ -134,28 +137,21 @@ export function FestivalDialog({
     try {
       const festivalData = {
         ...formData,
-        description: formData.description || null,
+        description: formData.description,
         website_url: formData.website_url || null,
       };
 
       if (editingFestival) {
-        await queryFunctions.updateFestival(editingFestival.id, festivalData);
-        toast({
-          title: "Success",
-          description: "Festival updated successfully",
+        await updateFestivalMutation.mutateAsync({
+          festivalId: editingFestival.id,
+          festivalData: festivalData,
         });
       } else {
-        await queryFunctions.createFestival({
+        await createFestivalMutation.mutateAsync({
           ...festivalData,
           logo_url: null,
         });
-        toast({
-          title: "Success",
-          description: "Festival created successfully",
-        });
       }
-
-      queryClient.invalidateQueries({ queryKey: ["festivals"] });
       onOpenChange(false);
     } catch (error) {
       toast({

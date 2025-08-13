@@ -1,7 +1,11 @@
 import { useState } from "react";
-import { useQueryClient } from "@tanstack/react-query";
-import { queryFunctions } from "@/services/queries";
-import { useStagesQuery } from "@/hooks/queries/stages/useStages";
+import {
+  useStagesQuery,
+  useCreateStageMutation,
+  useUpdateStageMutation,
+  useDeleteStageMutation,
+  Stage,
+} from "@/hooks/queries/stages/useStages";
 import { useToast } from "@/hooks/use-toast";
 import {
   Table,
@@ -25,7 +29,6 @@ import {
 import { Label } from "@/components/ui/label";
 import { Loader2, Plus, Edit2, Trash2, MapPin, Upload } from "lucide-react";
 import { CSVImportDialog } from "./CSVImportDialog";
-import type { Stage } from "@/services/queries";
 
 interface StageFormData {
   name: string;
@@ -35,10 +38,12 @@ interface StageManagementProps {
   editionId: string;
 }
 
-export const StageManagement = ({ editionId }: StageManagementProps) => {
+export function StageManagement({ editionId }: StageManagementProps) {
   const { data: stages = [], isLoading } = useStagesQuery();
+  const createStageMutation = useCreateStageMutation();
+  const updateStageMutation = useUpdateStageMutation();
+  const deleteStageMutation = useDeleteStageMutation();
   const { toast } = useToast();
-  const queryClient = useQueryClient();
 
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingStage, setEditingStage] = useState<Stage | null>(null);
@@ -47,27 +52,27 @@ export const StageManagement = ({ editionId }: StageManagementProps) => {
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const resetForm = () => {
+  function resetForm() {
     setFormData({
       name: "",
     });
     setEditingStage(null);
-  };
+  }
 
-  const handleCreate = () => {
+  function handleCreate() {
     resetForm();
     setIsDialogOpen(true);
-  };
+  }
 
-  const handleEdit = (stage: Stage) => {
+  function handleEdit(stage: Stage) {
     setFormData({
       name: stage.name,
     });
     setEditingStage(stage);
     setIsDialogOpen(true);
-  };
+  }
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (!formData.name.trim()) {
       toast({
@@ -81,38 +86,27 @@ export const StageManagement = ({ editionId }: StageManagementProps) => {
     setIsSubmitting(true);
     try {
       if (editingStage) {
-        await queryFunctions.updateStage(editingStage.id, formData);
-        toast({
-          title: "Success",
-          description: "Stage updated successfully",
+        await updateStageMutation.mutateAsync({
+          stageId: editingStage.id,
+          stageData: formData,
         });
       } else {
-        await queryFunctions.createStage({
+        await createStageMutation.mutateAsync({
           ...formData,
           festival_edition_id: editionId,
         });
-        toast({
-          title: "Success",
-          description: "Stage created successfully",
-        });
       }
 
-      queryClient.invalidateQueries({ queryKey: ["stages"] });
       setIsDialogOpen(false);
       resetForm();
     } catch (error) {
-      toast({
-        title: "Error",
-        description:
-          error instanceof Error ? error.message : "Failed to save stage",
-        variant: "destructive",
-      });
+      // Error handling is done in the mutation hooks
     } finally {
       setIsSubmitting(false);
     }
-  };
+  }
 
-  const handleDelete = async (stage: Stage) => {
+  async function handleDelete(stage: Stage) {
     if (
       !confirm(
         `Are you sure you want to delete "${stage.name}"? This will also affect all sets assigned to this stage.`,
@@ -122,21 +116,11 @@ export const StageManagement = ({ editionId }: StageManagementProps) => {
     }
 
     try {
-      await queryFunctions.deleteStage(stage.id);
-      toast({
-        title: "Success",
-        description: "Stage deleted successfully",
-      });
-      queryClient.invalidateQueries({ queryKey: ["stages"] });
+      await deleteStageMutation.mutateAsync(stage.id);
     } catch (error) {
-      toast({
-        title: "Error",
-        description:
-          error instanceof Error ? error.message : "Failed to delete stage",
-        variant: "destructive",
-      });
+      // Error handling is done in the mutation hook
     }
-  };
+  }
 
   // Filter stages by selected edition
   const filteredStages = stages.filter(
@@ -277,4 +261,4 @@ export const StageManagement = ({ editionId }: StageManagementProps) => {
       </CardContent>
     </Card>
   );
-};
+}

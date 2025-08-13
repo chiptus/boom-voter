@@ -1,7 +1,11 @@
 import { useState } from "react";
-import { useQueryClient } from "@tanstack/react-query";
-import { queryFunctions } from "@/services/queries";
-import { useFestivalEditionsForFestival } from "@/hooks/queries/useFestivalQuery";
+import {
+  useFestivalEditionsForFestival,
+  useCreateFestivalEditionMutation,
+  useUpdateFestivalEditionMutation,
+  useDeleteFestivalEditionMutation,
+  FestivalEdition,
+} from "@/hooks/queries/festivals/useFestivals";
 import { useToast } from "@/hooks/use-toast";
 import {
   Table,
@@ -25,7 +29,6 @@ import {
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Loader2, Plus, Edit2, Trash2, CalendarDays } from "lucide-react";
-import type { FestivalEdition } from "@/services/queries";
 import { cn } from "@/lib/utils";
 import { generateSlug, isValidSlug, sanitizeSlug } from "@/lib/slug";
 
@@ -51,8 +54,10 @@ export const FestivalEditionManagement = ({
     festivalId,
     { all: true },
   );
+  const createEditionMutation = useCreateFestivalEditionMutation();
+  const updateEditionMutation = useUpdateFestivalEditionMutation();
+  const deleteEditionMutation = useDeleteFestivalEditionMutation();
   const { toast } = useToast();
-  const queryClient = useQueryClient();
 
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingEdition, setEditingEdition] = useState<FestivalEdition | null>(
@@ -167,23 +172,13 @@ export const FestivalEditionManagement = ({
       };
 
       if (editingEdition) {
-        await queryFunctions.updateFestivalEdition(
-          editingEdition.id,
-          submitData,
-        );
-        toast({
-          title: "Success",
-          description: "Festival edition updated successfully",
+        await updateEditionMutation.mutateAsync({
+          editionId: editingEdition.id,
+          editionData: submitData,
         });
       } else {
-        await queryFunctions.createFestivalEdition(submitData);
-        toast({
-          title: "Success",
-          description: "Festival edition created successfully",
-        });
+        await createEditionMutation.mutateAsync(submitData);
       }
-
-      queryClient.invalidateQueries({ queryKey: ["festival-editions"] });
       setIsDialogOpen(false);
       resetForm();
     } catch (error) {
@@ -210,21 +205,9 @@ export const FestivalEditionManagement = ({
     }
 
     try {
-      await queryFunctions.deleteFestivalEdition(edition.id);
-      toast({
-        title: "Success",
-        description: "Festival edition deleted successfully",
-      });
-      queryClient.invalidateQueries({ queryKey: ["festival-editions"] });
+      await deleteEditionMutation.mutateAsync(edition.id);
     } catch (error) {
-      toast({
-        title: "Error",
-        description:
-          error instanceof Error
-            ? error.message
-            : "Failed to delete festival edition",
-        variant: "destructive",
-      });
+      // Error handling is done in the mutation hook
     }
   };
 

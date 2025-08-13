@@ -1,7 +1,8 @@
-import { useQueryClient } from "@tanstack/react-query";
-import { queryFunctions } from "@/services/queries";
-import { useFestivalsQuery } from "@/hooks/queries/useFestivalQuery";
-import { useToast } from "@/hooks/use-toast";
+import {
+  useFestivalsQuery,
+  useDeleteFestivalMutation,
+  Festival,
+} from "@/hooks/queries/festivals/useFestivals";
 import {
   Table,
   TableBody,
@@ -13,7 +14,6 @@ import {
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Loader2, Edit2, Trash2, Image as ImageIcon } from "lucide-react";
-import type { Festival } from "@/services/queries";
 import { cn } from "@/lib/utils";
 import { FestivalLogoDialog } from "./FestivalLogoDialog";
 import { useState } from "react";
@@ -28,8 +28,7 @@ export function FestivalManagementTable({
   selected: string;
 }) {
   const { data: festivals = [], isLoading } = useFestivalsQuery({ all: true });
-  const { toast } = useToast();
-  const queryClient = useQueryClient();
+  const deleteFestivalMutation = useDeleteFestivalMutation();
 
   const [logoDialogOpen, setLogoDialogOpen] = useState(false);
   const [selectedFestivalForLogo, setSelectedFestivalForLogo] =
@@ -45,19 +44,9 @@ export function FestivalManagementTable({
     }
 
     try {
-      await queryFunctions.deleteFestival(festival.id);
-      toast({
-        title: "Success",
-        description: "Festival deleted successfully",
-      });
-      queryClient.invalidateQueries({ queryKey: ["festivals"] });
+      await deleteFestivalMutation.mutateAsync(festival.id);
     } catch (error) {
-      toast({
-        title: "Error",
-        description:
-          error instanceof Error ? error.message : "Failed to delete festival",
-        variant: "destructive",
-      });
+      // Error handling is done in the mutation hook
     }
   }
 
