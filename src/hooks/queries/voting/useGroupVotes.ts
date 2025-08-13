@@ -1,5 +1,13 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { offlineStorage } from "@/lib/offlineStorage";
+import { useOnlineStatus } from "@/hooks/useOffline";
+
+export interface GroupVote {
+  vote_type: number;
+  user_id: string;
+  username: string | null;
+}
 
 // Query key factory
 export const groupVotesKeys = {
@@ -12,13 +20,7 @@ export const groupVotesKeys = {
 async function fetchGroupVotes(
   setId: string,
   groupId: string,
-): Promise<
-  Array<{
-    vote_type: number;
-    user_id: string;
-    username: string | null;
-  }>
-> {
+): Promise<GroupVote[]> {
   // First get group member user IDs
   const { data: groupMembers, error: membersError } = await supabase
     .from("group_members")
@@ -73,11 +75,38 @@ async function fetchGroupVotes(
   });
 }
 
-// Hook
+// Hook with offline support
 export function useGroupVotes(setId: string, groupId: string) {
+  const isOnline = useOnlineStatus();
+
   return useQuery({
     queryKey: groupVotesKeys.votes(setId, groupId),
-    queryFn: () => fetchGroupVotes(setId, groupId),
+    queryFn: async (): Promise<GroupVote[]> => {
+      if (!setId || !groupId) return [];
+
+      try {
+        if (isOnline) {
+          return await fetchGroupVotes(setId, groupId);
+        } else {
+          return await offlineStorage.getSetGroupVotes(setId, groupId);
+        }
+      } catch (error) {
+        console.error("Error fetching group votes:", error);
+        return [];
+      }
+    },
     enabled: !!setId && !!groupId,
+    staleTime: 30 * 1000, // 30 seconds
+    gcTime: 5 * 60 * 1000, // 5 minutes
+    retry: (failureCount) => {
+      // Don't retry if we're offline and have no cached data
+      if (!isOnline) return false;
+      return failureCount < 2;
+    },
   });
+}
+
+// Alias for backwards compatibility
+export function useGroupVotesQuery(setId: string, groupId: string) {
+  return useGroupVotes(setId, groupId);
 }

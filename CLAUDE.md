@@ -118,3 +118,5 @@ src/
 - All database operations go through Supabase RLS policies
 - Group-based permissions affect data visibility
 - PWA manifest configured for "UpLine" branding
+
+- dont use export from unless specifically required

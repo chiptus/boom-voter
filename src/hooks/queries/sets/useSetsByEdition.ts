@@ -46,10 +46,10 @@ async function fetchSetsByEdition(editionId: string): Promise<FestivalSet[]> {
 }
 
 // Hook
-export function useSetsByEdition(editionId: string) {
+export function useSetsByEdition(editionId: string | undefined) {
   return useQuery({
-    queryKey: setsKeys.byEdition(editionId),
-    queryFn: () => fetchSetsByEdition(editionId),
+    queryKey: setsKeys.byEdition(editionId || ""),
+    queryFn: () => fetchSetsByEdition(editionId!),
     enabled: !!editionId,
   });
 }

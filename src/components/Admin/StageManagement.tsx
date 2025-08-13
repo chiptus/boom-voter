@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { queryFunctions } from "@/services/queries";
-import { useStagesQuery } from "@/hooks/queries/useStagesQuery";
+import { useStagesQuery } from "@/hooks/queries/stages/useStages";
 import { useToast } from "@/hooks/use-toast";
 import {
   Table,

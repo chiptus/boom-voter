@@ -1,4 +1,4 @@
-import { useStagesQuery } from "@/hooks/queries/useStagesQuery";
+import { useStagesQuery } from "@/hooks/queries/stages/useStages";
 import {
   Table,
   TableBody,

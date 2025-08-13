@@ -2,7 +2,7 @@ import { useEffect, useState, useRef, useCallback } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { useStagesQuery } from "@/hooks/queries/useStagesQuery";
+import { useStagesQuery } from "@/hooks/queries/stages/useStages";
 import { useArtistsQuery } from "@/hooks/queries/useArtistsQuery";
 import {
   useCreateSetMutation,

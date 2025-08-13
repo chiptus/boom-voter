@@ -2,6 +2,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { profileKeys } from "./useProfile";
+import { profileOfflineService } from "@/services/profileOfflineService";
 
 // Mutation function
 async function updateProfile(variables: {
@@ -55,10 +56,18 @@ export function useUpdateProfile() {
 
   return useMutation({
     mutationFn: updateProfile,
-    onSuccess: (data) => {
+    onSuccess: async (data, variables) => {
+      // Update the profile cache
+      queryClient.setQueryData(profileKeys.detail(variables.userId), data);
+
+      // Update offline cache
+      await profileOfflineService.cacheProfile(variables.userId, data);
+
+      // Invalidate to ensure consistency
       queryClient.invalidateQueries({
-        queryKey: profileKeys.detail(data.id),
+        queryKey: profileKeys.detail(variables.userId),
       });
+
       toast({
         title: "Success",
         description: "Profile updated successfully",
@@ -72,4 +81,9 @@ export function useUpdateProfile() {
       });
     },
   });
+}
+
+// Alias for backwards compatibility
+export function useUpdateProfileMutation() {
+  return useUpdateProfile();
 }

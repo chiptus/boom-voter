@@ -23,7 +23,7 @@ import {
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/contexts/AuthContext";
 import { useUserPermissionsQuery } from "@/hooks/queries/useGroupsQuery";
-import { useGenresQuery } from "@/hooks/queries/useGenresQuery";
+import { useGenresQuery } from "@/hooks/queries/genres/useGenres";
 import { useUpdateArtistMutation } from "@/hooks/queries/useArtistsQuery";
 import { StageSelector } from "../StageSelector";
 import { toDatetimeLocal, toISOString } from "@/lib/timeUtils";

@@ -8,7 +8,7 @@ import {
 } from "@/components/ui/select";
 import { X } from "lucide-react";
 import type { FilterSortState } from "@/hooks/useUrlState";
-import { useStagesQuery } from "@/hooks/queries/useStagesQuery";
+import { useStagesQuery } from "@/hooks/queries/stages/useStages";
 import { TimeFormatToggle } from "./TimeFormatToggle";
 
 interface MobileFiltersProps {
