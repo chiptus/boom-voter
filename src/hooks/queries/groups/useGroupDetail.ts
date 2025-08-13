@@ -25,7 +25,7 @@ async function fetchGroupById(groupId: string): Promise<Group | null> {
 }
 
 // Hook
-export function useGroupDetail(groupId: string) {
+export function useGroupDetailQuery(groupId: string) {
   return useQuery({
     queryKey: groupDetailKeys.detail(groupId),
     queryFn: () => fetchGroupById(groupId),

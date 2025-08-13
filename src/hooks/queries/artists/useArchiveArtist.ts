@@ -19,7 +19,7 @@ async function archiveArtist(artistId: string) {
 }
 
 // Hook
-export function useArchiveArtist() {
+export function useArchiveArtistMutation() {
   const queryClient = useQueryClient();
   const { toast } = useToast();
 

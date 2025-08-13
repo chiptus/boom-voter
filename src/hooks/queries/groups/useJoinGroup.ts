@@ -20,7 +20,7 @@ async function joinGroup(variables: { groupId: string; userId: string }) {
 }
 
 // Hook
-export function useJoinGroup() {
+export function useJoinGroupMutation() {
   const queryClient = useQueryClient();
   const { toast } = useToast();
 

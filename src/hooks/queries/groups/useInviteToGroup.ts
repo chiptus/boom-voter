@@ -96,7 +96,7 @@ async function inviteToGroup(variables: {
 }
 
 // Hook
-export function useInviteToGroup(groupId: string) {
+export function useInviteToGroupMutation(groupId: string) {
   const queryClient = useQueryClient();
   const { toast } = useToast();
 

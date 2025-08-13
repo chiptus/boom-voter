@@ -119,7 +119,7 @@ async function updateArtist(variables: {
 }
 
 // Hook
-export function useUpdateArtist() {
+export function useUpdateArtistMutation() {
   const queryClient = useQueryClient();
   const { toast } = useToast();
 

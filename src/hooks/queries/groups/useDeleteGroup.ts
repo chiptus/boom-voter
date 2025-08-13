@@ -21,7 +21,7 @@ async function deleteGroup(variables: { groupId: string; userId: string }) {
 }
 
 // Hook
-export function useDeleteGroup() {
+export function useDeleteGroupMutation() {
   const queryClient = useQueryClient();
   const { toast } = useToast();
 

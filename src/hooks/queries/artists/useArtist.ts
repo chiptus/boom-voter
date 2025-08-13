@@ -9,8 +9,7 @@ async function fetchArtist(id: string): Promise<Artist> {
     .select(
       `
       *,
-      artist_music_genres (music_genre_id),
-      votes (vote_type, user_id)
+      artist_music_genres (music_genre_id)
     `,
     )
     .eq("id", id)
@@ -26,7 +25,7 @@ async function fetchArtist(id: string): Promise<Artist> {
 }
 
 // Hook
-export function useArtist(id: string) {
+export function useArtistQuery(id: string) {
   return useQuery({
     queryKey: artistsKeys.detail(id),
     queryFn: () => fetchArtist(id),

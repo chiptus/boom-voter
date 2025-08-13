@@ -47,7 +47,7 @@ async function fetchSetBySlug(slug: string): Promise<FestivalSet> {
 }
 
 // Hook
-export function useSetBySlug(slug: string) {
+export function useSetBySlugQuery(slug: string) {
   return useQuery({
     queryKey: setsKeys.bySlug(slug),
     queryFn: () => fetchSetBySlug(slug),

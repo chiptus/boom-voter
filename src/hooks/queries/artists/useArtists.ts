@@ -38,7 +38,7 @@ async function fetchArtists(): Promise<Artist[]> {
 }
 
 // Hook
-export function useArtists() {
+export function useArtistsQuery() {
   return useQuery({
     queryKey: artistsKeys.lists(),
     queryFn: fetchArtists,

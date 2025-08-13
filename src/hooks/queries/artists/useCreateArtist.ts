@@ -77,7 +77,7 @@ async function createArtist(
 }
 
 // Hook
-export function useCreateArtist() {
+export function useCreateArtistMutation() {
   const queryClient = useQueryClient();
   const { toast } = useToast();
 

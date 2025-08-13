@@ -6,7 +6,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Artist } from "@/hooks/queries/useArtistsQuery";
+import { Artist } from "@/hooks/queries/artists/useArtists";
 import { ExternalLink, Music, Play, Clock, MapPin } from "lucide-react";
 import { formatTimeRange } from "@/lib/timeUtils";
 import { GenreBadge } from "../Index/GenreBadge";

@@ -23,7 +23,7 @@ async function removeArtistFromSet(variables: {
 }
 
 // Hook
-export function useRemoveArtistFromSet() {
+export function useRemoveArtistFromSetMutation() {
   const queryClient = useQueryClient();
   const { toast } = useToast();
 

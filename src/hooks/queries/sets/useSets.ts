@@ -83,7 +83,7 @@ async function fetchSets(): Promise<FestivalSet[]> {
 }
 
 // Hook
-export function useSets() {
+export function useSetsQuery() {
   return useQuery({
     queryKey: setsKeys.lists(),
     queryFn: fetchSets,

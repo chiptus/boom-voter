@@ -2,7 +2,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useRef } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useOnlineStatus, useOfflineData } from "@/hooks/useOffline";
-import { useSetsQuery } from "./useSetsQuery";
+import { useSetsQuery } from "./sets/useSets";
 import { RealtimeChannel } from "@supabase/supabase-js";
 import { FestivalSet, setsKeys } from "./sets/useSets";
 import { userVotesKeys } from "./voting/useUserVotes";

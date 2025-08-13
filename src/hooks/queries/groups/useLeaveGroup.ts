@@ -21,7 +21,7 @@ async function leaveGroup(variables: { groupId: string; userId: string }) {
 }
 
 // Hook
-export function useLeaveGroup() {
+export function useLeaveGroupMutation() {
   const queryClient = useQueryClient();
   const { toast } = useToast();
 

@@ -33,7 +33,7 @@ async function updateSet(variables: {
 }
 
 // Hook
-export function useUpdateSet() {
+export function useUpdateSetMutation() {
   const queryClient = useQueryClient();
   const { toast } = useToast();
 

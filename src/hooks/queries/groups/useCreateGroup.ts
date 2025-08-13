@@ -40,7 +40,7 @@ async function createGroup(variables: {
 }
 
 // Hook
-export function useCreateGroup() {
+export function useCreateGroupMutation() {
   const queryClient = useQueryClient();
   const { toast } = useToast();
 

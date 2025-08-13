@@ -9,8 +9,7 @@ async function fetchArtistBySlug(slug: string): Promise<Artist> {
     .select(
       `
       *,
-      artist_music_genres (music_genre_id),
-      votes (vote_type, user_id)
+      artist_music_genres (music_genre_id)
     `,
     )
     .eq("slug", slug)
@@ -26,7 +25,7 @@ async function fetchArtistBySlug(slug: string): Promise<Artist> {
 }
 
 // Hook
-export function useArtistBySlug(slug: string) {
+export function useArtistBySlugQuery(slug: string) {
   return useQuery({
     queryKey: artistsKeys.bySlug(slug),
     queryFn: () => fetchArtistBySlug(slug),

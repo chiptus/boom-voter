@@ -2,7 +2,7 @@ import { useEffect, useState, useMemo, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import type { FilterSortState } from "../../hooks/useUrlState";
 import { useStagesQuery } from "@/hooks/queries/stages/useStages";
-import { FestivalSet } from "@/hooks/queries/useSetsQuery";
+import { FestivalSet } from "@/hooks/queries/sets/useSets";
 
 export function useSetFiltering(
   sets: FestivalSet[],

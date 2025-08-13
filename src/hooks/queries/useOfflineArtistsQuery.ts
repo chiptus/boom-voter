@@ -2,7 +2,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useRef } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useOnlineStatus, useOfflineData } from "@/hooks/useOffline";
-import { Artist, useArtistsQuery } from "./useArtistsQuery";
+import { Artist, useArtistsQuery } from "./artists/useArtists";
 import { RealtimeChannel } from "@supabase/supabase-js";
 
 // Note: Currently not using merge logic, but keeping for future enhancement

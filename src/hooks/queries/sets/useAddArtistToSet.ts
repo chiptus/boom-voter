@@ -21,7 +21,7 @@ async function addArtistToSet(variables: {
 }
 
 // Hook
-export function useAddArtistToSet() {
+export function useAddArtistToSetMutation() {
   const queryClient = useQueryClient();
   const { toast } = useToast();
 

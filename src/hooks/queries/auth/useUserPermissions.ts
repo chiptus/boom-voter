@@ -43,7 +43,7 @@ async function checkUserPermissions(
 }
 
 // Hook
-export function useUserPermissions(
+export function useUserPermissionsQuery(
   userId: string | undefined,
   permission: "edit_artists" | "is_admin",
 ) {

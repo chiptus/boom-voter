@@ -1,5 +1,5 @@
 import { useOfflineArtistsQuery } from "./queries/useOfflineArtistsQuery";
-import { useArchiveArtistMutation } from "./queries/useArtistsQuery";
+import { useArchiveArtistMutation } from "./queries/artists/useArchiveArtist";
 
 export const useOfflineArtistData = () => {
   // Use the new React Query-based offline artists hook

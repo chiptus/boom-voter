@@ -50,7 +50,7 @@ async function fetchGroupMembers(groupId: string): Promise<GroupMember[]> {
 }
 
 // Hook
-export function useGroupMembers(groupId: string) {
+export function useGroupMembersQuery(groupId: string) {
   return useQuery({
     queryKey: groupMembersKeys.members(groupId),
     queryFn: () => fetchGroupMembers(groupId),

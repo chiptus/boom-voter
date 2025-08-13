@@ -4,8 +4,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Loader2, Plus, Music, Upload } from "lucide-react";
 import { CSVImportDialog } from "./CSVImportDialog";
 import { FestivalSet } from "@/hooks/queries/sets/useSets";
-import { useSets as useSetsQuery } from "@/hooks/queries/sets/useSets";
-import { useDeleteSet as useDeleteSetMutation } from "@/hooks/queries/sets/useDeleteSet";
+import { useSetsQuery } from "@/hooks/queries/sets/useSets";
+import { useDeleteSetMutation } from "@/hooks/queries/sets/useDeleteSet";
 import { SetFormDialog } from "./SetFormDialog";
 import { SetsTable } from "./SetsTable";
 

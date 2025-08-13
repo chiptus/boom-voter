@@ -43,7 +43,7 @@ async function fetchUserGroups(userId: string): Promise<Group[]> {
 }
 
 // Hook
-export function useUserGroups(userId: string | undefined) {
+export function useUserGroupsQuery(userId: string | undefined) {
   return useQuery({
     queryKey: userGroupsKeys.user(userId!),
     queryFn: () => fetchUserGroups(userId!),

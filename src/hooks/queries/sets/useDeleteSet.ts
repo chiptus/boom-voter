@@ -17,7 +17,7 @@ async function deleteSet(id: string): Promise<void> {
 }
 
 // Hook
-export function useDeleteSet() {
+export function useDeleteSetMutation() {
   const queryClient = useQueryClient();
   const { toast } = useToast();
 

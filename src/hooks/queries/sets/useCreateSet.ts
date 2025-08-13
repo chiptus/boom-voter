@@ -55,7 +55,7 @@ async function createSet(
 }
 
 // Hook
-export function useCreateSet() {
+export function useCreateSetMutation() {
   const queryClient = useQueryClient();
   const { toast } = useToast();
 
