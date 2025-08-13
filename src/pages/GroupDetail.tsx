@@ -20,7 +20,7 @@ import {
   useGroupMembersQuery,
 } from "@/hooks/queries/useGroupsQuery";
 import { useQueryClient } from "@tanstack/react-query";
-import { groupQueries } from "@/services/queries";
+import { groupMembersKeys } from "@/hooks/queries/groups/useGroupMembers";
 
 function GroupDetail() {
   const { groupId } = useParams<{ groupId: string }>();
@@ -271,7 +271,7 @@ function GroupDetail() {
       if (success) {
         // Refresh the member list using React Query
         queryClient.invalidateQueries({
-          queryKey: groupQueries.members(groupId),
+          queryKey: groupMembersKeys.members(groupId),
         });
       }
       setRemovingMember(null);
