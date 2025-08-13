@@ -24,10 +24,12 @@ import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/contexts/AuthContext";
 import { useUserPermissionsQuery } from "@/hooks/queries/useGroupsQuery";
 import { useGenresQuery } from "@/hooks/queries/genres/useGenres";
-import { useUpdateArtistMutation } from "@/hooks/queries/useArtistsQuery";
+import {
+  Artist,
+  useUpdateArtistMutation,
+} from "@/hooks/queries/useArtistsQuery";
 import { StageSelector } from "../StageSelector";
 import { toDatetimeLocal, toISOString } from "@/lib/timeUtils";
-import { Artist } from "@/services/queries";
 
 // Form validation schema
 const editArtistFormSchema = z.object({

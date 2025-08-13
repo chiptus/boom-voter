@@ -8,7 +8,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Clock, MapPin, Users } from "lucide-react";
 import { ArtistVotingButtons } from "./SetVotingButtons";
-import { FestivalSet } from "@/services/queries";
+import { FestivalSet } from "@/hooks/queries/useSetsQuery";
 import { formatTimeRange } from "@/lib/timeUtils";
 import { GenreBadge } from "../Index/GenreBadge";
 import { IndividualArtistCard } from "./IndividualArtistCard";

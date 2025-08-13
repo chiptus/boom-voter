@@ -3,8 +3,8 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Loader2, Plus, Music, Upload } from "lucide-react";
 import { CSVImportDialog } from "./CSVImportDialog";
-import type { FestivalSet } from "@/services/queries";
 import {
+  FestivalSet,
   useDeleteSetMutation,
   useSetsQuery,
 } from "@/hooks/queries/useSetsQuery";
@@ -15,7 +15,7 @@ interface SetManagementProps {
   editionId: string;
 }
 
-export const SetManagement = ({ editionId }: SetManagementProps) => {
+export function SetManagement({ editionId }: SetManagementProps) {
   const { data: sets = [], isLoading } = useSetsQuery();
 
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -23,17 +23,17 @@ export const SetManagement = ({ editionId }: SetManagementProps) => {
 
   const deleteSetMutation = useDeleteSetMutation();
 
-  const handleCreate = () => {
+  function handleCreate() {
     setEditingSet(null);
     setIsDialogOpen(true);
-  };
+  }
 
-  const handleEdit = (set: FestivalSet) => {
+  function handleEdit(set: FestivalSet) {
     setEditingSet(set);
     setIsDialogOpen(true);
-  };
+  }
 
-  const handleDelete = async (set: FestivalSet) => {
+  async function handleDelete(set: FestivalSet) {
     if (
       !confirm(
         `Are you sure you want to delete "${set.name}"? This will also delete all votes for this set.`,
@@ -43,12 +43,12 @@ export const SetManagement = ({ editionId }: SetManagementProps) => {
     }
 
     deleteSetMutation.mutate(set.id);
-  };
+  }
 
-  const handleCloseDialog = () => {
+  function handleCloseDialog() {
     setIsDialogOpen(false);
     setEditingSet(null);
-  };
+  }
 
   // Filter sets by selected edition
   const filteredSets = sets.filter(
@@ -107,4 +107,4 @@ export const SetManagement = ({ editionId }: SetManagementProps) => {
       />
     </Card>
   );
-};
+}

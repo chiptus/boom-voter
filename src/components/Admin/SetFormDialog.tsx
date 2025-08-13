@@ -9,6 +9,7 @@ import {
   useUpdateSetMutation,
   useAddArtistToSetMutation,
   useRemoveArtistFromSetMutation,
+  FestivalSet,
 } from "@/hooks/queries/useSetsQuery";
 import { useAuth } from "@/contexts/AuthContext";
 import {
@@ -37,7 +38,6 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Loader2 } from "lucide-react";
-import type { FestivalSet } from "@/services/queries";
 import { ArtistMultiSelect } from "./ArtistMultiSelect";
 
 // Form validation schema

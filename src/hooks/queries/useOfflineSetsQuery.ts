@@ -3,9 +3,8 @@ import { useEffect, useRef } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useOnlineStatus, useOfflineData } from "@/hooks/useOffline";
 import { useSetsQuery } from "./useSetsQuery";
-import type { FestivalSet } from "@/services/queries";
 import { RealtimeChannel } from "@supabase/supabase-js";
-import { setsKeys } from "./sets/useSets";
+import { FestivalSet, setsKeys } from "./sets/useSets";
 import { userVotesKeys } from "./voting/useUserVotes";
 
 export function useOfflineSetsQuery() {

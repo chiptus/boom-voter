@@ -12,7 +12,7 @@ import { useProfileQuery } from "@/hooks/queries/useProfileQuery";
 import { profileOfflineService } from "@/services/profileOfflineService";
 import { useToast } from "@/hooks/use-toast";
 import { AuthDialog } from "@/components/AuthDialog";
-import { Profile } from "@/services/queries";
+import { Profile } from "@/hooks/queries/auth/useProfile";
 
 interface AuthContextType {
   // Auth state

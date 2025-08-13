@@ -12,8 +12,8 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Edit2, Archive, Search, Music, Plus } from "lucide-react";
-import type { Artist } from "@/services/queries";
 import {
+  Artist,
   useArchiveArtistMutation,
   useArtistsQuery,
 } from "@/hooks/queries/useArtistsQuery";

@@ -3,7 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { offlineStorage } from "@/lib/offlineStorage";
 import { useOnlineStatus, useOfflineQueue } from "@/hooks/useOffline";
-import type { SetNote } from "@/services/queries";
+import { SetNote } from "./artists/useArtistNotes";
 
 interface OfflineNote {
   id: string;
@@ -14,10 +14,10 @@ interface OfflineNote {
   synced: boolean;
 }
 
-const mergeOfflineAndServerNotes = (
+function mergeOfflineAndServerNotes(
   offlineNotes: OfflineNote[],
   serverNotes: SetNote[],
-): SetNote[] => {
+): SetNote[] {
   // Transform offline notes to match server format
   const processedOfflineNotes = offlineNotes.map((note) => ({
     id: note.id,
@@ -42,12 +42,12 @@ const mergeOfflineAndServerNotes = (
     (a, b) =>
       new Date(b.created_at).getTime() - new Date(a.created_at).getTime(),
   );
-};
+}
 
-const fetchNotesWithOffline = async (
+async function fetchNotesWithOffline(
   setId: string,
   isOnline: boolean,
-): Promise<SetNote[]> => {
+): Promise<SetNote[]> {
   // Always load offline notes first
   const offlineNotes = await offlineStorage.getNotes(setId);
 
@@ -124,9 +124,9 @@ const fetchNotesWithOffline = async (
       author_email: "",
     }));
   }
-};
+}
 
-export const useOfflineNotesQuery = (setId: string, userId: string | null) => {
+export function useOfflineNotesQuery(setId: string, userId: string | null) {
   const isOnline = useOnlineStatus();
 
   return useQuery({
@@ -136,9 +136,9 @@ export const useOfflineNotesQuery = (setId: string, userId: string | null) => {
     staleTime: 2 * 60 * 1000, // 2 minutes - notes don't change often
     refetchOnWindowFocus: isOnline, // Only refetch on focus when online
   });
-};
+}
 
-export const useSaveNoteMutation = (setId: string) => {
+export function useSaveNoteMutation(setId: string) {
   const queryClient = useQueryClient();
   const { toast } = useToast();
   const isOnline = useOnlineStatus();
@@ -213,9 +213,9 @@ export const useSaveNoteMutation = (setId: string) => {
       });
     },
   });
-};
+}
 
-export const useDeleteNoteMutation = (setId: string) => {
+export function useDeleteNoteMutation(setId: string) {
   const queryClient = useQueryClient();
   const { toast } = useToast();
   const isOnline = useOnlineStatus();
@@ -262,4 +262,4 @@ export const useDeleteNoteMutation = (setId: string) => {
       });
     },
   });
-};
+}
