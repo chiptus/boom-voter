@@ -3,11 +3,12 @@ import { useEffect, useRef } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useOnlineStatus, useOfflineData } from "@/hooks/useOffline";
 import { useSetsQuery } from "./useSetsQuery";
-import { setQueries, voteQueries } from "@/services/queries";
 import type { FestivalSet } from "@/services/queries";
 import { RealtimeChannel } from "@supabase/supabase-js";
+import { setsKeys } from "./sets/useSets";
+import { userVotesKeys } from "./voting/useUserVotes";
 
-export const useOfflineSetsQuery = () => {
+export function useOfflineSetsQuery() {
   const queryClient = useQueryClient();
   const channelRef = useRef<RealtimeChannel | null>(null);
   const isOnline = useOnlineStatus();
@@ -91,8 +92,8 @@ export const useOfflineSetsQuery = () => {
           },
           () => {
             // Invalidate queries to refetch fresh data
-            queryClient.invalidateQueries({ queryKey: setQueries.all() });
-            queryClient.invalidateQueries({ queryKey: voteQueries.all() });
+            queryClient.invalidateQueries({ queryKey: setsKeys.all });
+            queryClient.invalidateQueries({ queryKey: userVotesKeys.all });
           },
         )
         .subscribe((_, err) => {
@@ -118,7 +119,7 @@ export const useOfflineSetsQuery = () => {
     };
   }, [queryClient, isOnline]);
 
-  const fetchSets = async () => {
+  async function fetchSets() {
     if (isOnline) {
       refetch();
       combinedQuery.refetch();
@@ -126,7 +127,7 @@ export const useOfflineSetsQuery = () => {
       offlineQuery.refetch();
       combinedQuery.refetch();
     }
-  };
+  }
 
   return {
     sets: combinedQuery.data?.sets || [],
@@ -137,4 +138,4 @@ export const useOfflineSetsQuery = () => {
     fetchSets,
     refetch: fetchSets,
   };
-};
+}

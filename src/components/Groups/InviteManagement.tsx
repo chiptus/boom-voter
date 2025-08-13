@@ -16,18 +16,18 @@ import {
   useGroupInvitesQuery,
   useGenerateInviteMutation,
   useDeleteInviteMutation,
-} from "@/hooks/queries/useInvitesQuery";
-import type { GroupInvite } from "@/types/invites";
+  GroupInvite,
+} from "@/hooks/queries/groups/useInvitesQuery";
 
 interface InviteManagementProps {
   groupId: string;
   groupName: string;
 }
 
-export const InviteManagement = ({
+export function InviteManagement({
   groupId,
   groupName,
-}: InviteManagementProps) => {
+}: InviteManagementProps) {
   const [expirationDays, setExpirationDays] = useState<string>("");
   const [maxUses, setMaxUses] = useState<string>("");
 
@@ -38,7 +38,7 @@ export const InviteManagement = ({
   const generateInviteMutation = useGenerateInviteMutation(groupId);
   const deleteInviteMutation = useDeleteInviteMutation(groupId);
 
-  const generateInvite = () => {
+  function generateInvite() {
     const options: {
       expiresAt?: Date;
       maxUses?: number;
@@ -61,9 +61,9 @@ export const InviteManagement = ({
         setMaxUses("");
       },
     });
-  };
+  }
 
-  const copyInviteLink = async (token: string) => {
+  async function copyInviteLink(token: string) {
     const inviteUrl = `${window.location.origin}/?invite=${token}`;
     try {
       await navigator.clipboard.writeText(inviteUrl);
@@ -78,27 +78,27 @@ export const InviteManagement = ({
         variant: "destructive",
       });
     }
-  };
+  }
 
-  const deleteInvite = (inviteId: string) => {
+  function deleteInvite(inviteId: string) {
     if (!window.confirm("Are you sure you want to delete this invite?")) return;
     deleteInviteMutation.mutate(inviteId);
-  };
+  }
 
-  const formatDate = (dateString: string) => {
+  function formatDate(dateString: string) {
     return new Date(dateString).toLocaleDateString();
-  };
+  }
 
-  const isExpired = (expiresAt?: string) => {
+  function isExpired(expiresAt?: string) {
     if (!expiresAt) return false;
     return new Date(expiresAt) <= new Date();
-  };
+  }
 
-  const isOverused = (invite: GroupInvite) => {
+  function isOverused(invite: GroupInvite) {
     return (
       invite.max_uses !== undefined && invite.used_count >= invite.max_uses
     );
-  };
+  }
 
   return (
     <div className="space-y-6">
@@ -229,4 +229,4 @@ export const InviteManagement = ({
       </Card>
     </div>
   );
-};
+}
