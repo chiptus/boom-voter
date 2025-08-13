@@ -7,30 +7,10 @@ export type Json =
   | Json[];
 
 export type Database = {
-  graphql_public: {
-    Tables: {
-      [_ in never]: never;
-    };
-    Views: {
-      [_ in never]: never;
-    };
-    Functions: {
-      graphql: {
-        Args: {
-          extensions?: Json;
-          operationName?: string;
-          query?: string;
-          variables?: Json;
-        };
-        Returns: Json;
-      };
-    };
-    Enums: {
-      [_ in never]: never;
-    };
-    CompositeTypes: {
-      [_ in never]: never;
-    };
+  // Allows to automatically instanciate createClient with right options
+  // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
+  __InternalSupabase: {
+    PostgrestVersion: "12.2.3 (519615d)";
   };
   public: {
     Tables: {
@@ -626,6 +606,10 @@ export type Database = {
         Args: { check_user_id: string };
         Returns: boolean;
       };
+      check_username_exists: {
+        Args: { check_username: string; exclude_user_id?: string };
+        Returns: boolean;
+      };
       get_user_id_by_email: {
         Args: { user_email: string };
         Returns: string;
@@ -670,6 +654,10 @@ export type Database = {
           is_valid: boolean;
           reason: string;
         }[];
+      };
+      validate_profile_update: {
+        Args: { user_id: string; new_username?: string };
+        Returns: string;
       };
     };
     Enums: {
@@ -802,9 +790,6 @@ export type CompositeTypes<
     : never;
 
 export const Constants = {
-  graphql_public: {
-    Enums: {},
-  },
   public: {
     Enums: {
       admin_role: ["super_admin", "admin", "moderator"],

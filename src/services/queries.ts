@@ -1490,9 +1490,31 @@ export const mutationFunctions = {
 
   async updateProfile(variables: {
     userId: string;
-    updates: { email?: string | null; username?: string | null };
+    updates: { username?: string | null };
   }) {
     const { userId, updates } = variables;
+
+    // Validate username uniqueness before attempting update
+    const { data: validationResult, error: validationError } =
+      await supabase.rpc("validate_profile_update", {
+        user_id: userId,
+        new_username: updates.username?.trim(),
+      });
+
+    console.log(
+      "Validation result:",
+      validationResult,
+      "Error:",
+      validationError,
+    );
+
+    if (validationError) {
+      throw new Error("Failed to validate profile data");
+    }
+
+    if (validationResult) {
+      throw new Error(validationResult);
+    }
 
     const { data, error } = await supabase
       .from("profiles")

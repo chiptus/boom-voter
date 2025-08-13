@@ -26,20 +26,20 @@ interface AuthDialogProps {
   groupName?: string;
 }
 
-export const AuthDialog = ({
+export function AuthDialog({
   open,
   onOpenChange,
   onSuccess,
   inviteToken,
   groupName,
-}: AuthDialogProps) => {
+}: AuthDialogProps) {
   const [email, setEmail] = useState("");
   const [otp, setOtp] = useState("");
   const [loading, setLoading] = useState(false);
   const [step, setStep] = useState<"email" | "otp">("email");
   const { toast } = useToast();
 
-  const handleSendMagicLink = async (e: React.FormEvent) => {
+  async function handleSendMagicLink(e: React.FormEvent) {
     e.preventDefault();
     setLoading(true);
 
@@ -71,9 +71,9 @@ export const AuthDialog = ({
       setStep("otp");
     }
     setLoading(false);
-  };
+  }
 
-  const handleVerifyOtp = async (e: React.FormEvent) => {
+  async function handleVerifyOtp(e: React.FormEvent) {
     e.preventDefault();
     if (otp.length !== 6) return;
 
@@ -99,16 +99,16 @@ export const AuthDialog = ({
       onSuccess();
     }
     setLoading(false);
-  };
+  }
 
-  const handleResend = async () => {
+  async function handleResend() {
     await handleSendMagicLink({ preventDefault: () => {} } as React.FormEvent);
-  };
+  }
 
-  const handleBack = () => {
+  function handleBack() {
     setStep("email");
     setOtp("");
-  };
+  }
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -208,4 +208,4 @@ export const AuthDialog = ({
       </DialogContent>
     </Dialog>
   );
-};
+}

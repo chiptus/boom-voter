@@ -7,7 +7,7 @@ import {
 import { profileOfflineService } from "@/services/profileOfflineService";
 import { useOfflineProfileToast } from "@/hooks/useOfflineProfileToast";
 
-export const useProfileQuery = (userId?: string) => {
+export function useProfileQuery(userId?: string) {
   const { showOfflineProfileToast, isOnline } = useOfflineProfileToast();
 
   return useQuery({
@@ -55,9 +55,9 @@ export const useProfileQuery = (userId?: string) => {
       return failureCount < 2;
     },
   });
-};
+}
 
-export const useUpdateProfileMutation = () => {
+export function useUpdateProfileMutation() {
   const queryClient = useQueryClient();
 
   return useMutation({
@@ -75,4 +75,4 @@ export const useUpdateProfileMutation = () => {
       });
     },
   });
-};
+}
