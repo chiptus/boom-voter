@@ -7,10 +7,12 @@ export function MyGroupsList({
   groups,
   loading,
   onDelete,
+  showMembershipBadges = false,
 }: {
   groups: Group[];
   loading: boolean;
   onDelete: (id: string, name: string) => void;
+  showMembershipBadges?: boolean;
 }) {
   if (loading) {
     return <div className="text-center text-white">Loading groups...</div>;
@@ -39,6 +41,7 @@ export function MyGroupsList({
           key={group.id}
           group={group}
           onDelete={() => onDelete(group.id, group.name)}
+          showMembershipBadge={showMembershipBadges}
         />
       ))}
     </div>

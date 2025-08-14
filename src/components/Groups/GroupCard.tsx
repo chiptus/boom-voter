@@ -16,9 +16,11 @@ import { useAuth } from "@/contexts/AuthContext";
 export function GroupCard({
   group,
   onDelete,
+  showMembershipBadge = false,
 }: {
   group: Group;
   onDelete: () => void;
+  showMembershipBadge?: boolean;
 }) {
   const { user } = useAuth();
   const leaveGroupMutation = useLeaveGroupMutation();
@@ -38,6 +40,18 @@ export function GroupCard({
                   >
                     <Crown className="h-3 w-3 mr-1" />
                     Creator
+                  </Badge>
+                )}
+                {showMembershipBadge && (
+                  <Badge
+                    variant={group.is_member ? "default" : "outline"}
+                    className={
+                      group.is_member
+                        ? "text-xs bg-green-600/50 text-green-100 border-green-400/30"
+                        : "text-xs bg-transparent text-gray-300 border-gray-400/30"
+                    }
+                  >
+                    {group.is_member ? "Member" : "Not Member"}
                   </Badge>
                 )}
               </CardTitle>

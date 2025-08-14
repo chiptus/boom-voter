@@ -4,6 +4,8 @@ export type Group = Database["public"]["Tables"]["groups"]["Row"] & {
   member_count?: number;
   is_creator?: boolean;
   archived?: boolean;
+  is_member?: boolean;
+  created_at?: string;
 };
 
 export type GroupMember =

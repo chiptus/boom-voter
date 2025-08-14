@@ -5,27 +5,50 @@ import type { Group } from "@/types/groups";
 // Query key factory
 export const userGroupsKeys = {
   all: ["groups"] as const,
-  user: (userId: string) => [...userGroupsKeys.all, "user", userId] as const,
+  user: (userId: string, params?: unknown) =>
+    [...userGroupsKeys.all, "user", userId, params] as const,
 };
 
-// Business logic function
-async function fetchUserGroups(userId: string): Promise<Group[]> {
-  // First fetch groups, filtering out archived ones
-  const { data: groupsData, error } = await supabase
-    .from("groups")
-    .select("*")
-    .eq("archived", false)
-    .order("created_at", { ascending: false });
+// Check if user is admin
+async function isUserAdmin(userId: string): Promise<boolean> {
+  const { data: isAdminData, error: isAdminError } = await supabase
+    .from("admin_roles")
+    .select("id")
+    .eq("user_id", userId)
+    .limit(1);
 
-  if (error) {
-    throw new Error(error.message || "Failed to fetch groups");
+  if (isAdminError) {
+    console.error("Error checking admin role:", isAdminError);
+    return false;
   }
 
-  if (!groupsData) return [];
+  return isAdminData && isAdminData.length > 0;
+}
 
-  // Then fetch member counts separately
-  const groupsWithCounts = await Promise.all(
-    groupsData.map(async (group) => {
+// Get user's group IDs
+async function getUserGroupIds(userId: string): Promise<string[]> {
+  const { data: userGroups, error: userGroupsError } = await supabase
+    .from("group_members")
+    .select("group_id")
+    .eq("user_id", userId);
+
+  if (userGroupsError) {
+    console.error("Error fetching user groups:", userGroupsError);
+    throw new Error("Failed to fetch user groups");
+  }
+
+  return userGroups?.map((ug) => ug.group_id) || [];
+}
+
+// Helper function to add member counts to groups
+async function addMemberCounts(
+  groups: any[],
+  userId: string,
+  userGroupIds: string[],
+  isUserGroupsOnly: boolean = false,
+): Promise<Group[]> {
+  return await Promise.all(
+    groups.map(async (group) => {
       const { count } = await supabase
         .from("group_members")
         .select("*", { count: "exact", head: true })
@@ -35,18 +58,77 @@ async function fetchUserGroups(userId: string): Promise<Group[]> {
         ...group,
         member_count: count || 0,
         is_creator: group.created_by === userId,
+        is_member: isUserGroupsOnly ? true : userGroupIds.includes(group.id),
       };
     }),
   );
-
-  return groupsWithCounts;
 }
 
-// Hook
-export function useUserGroupsQuery(userId: string | undefined) {
+// Fetch groups from database
+async function fetchGroupsFromDb(
+  shouldFetchAll: boolean,
+  userGroupIds: string[],
+): Promise<any[]> {
+  let groupsQuery = supabase
+    .from("groups")
+    .select("*")
+    .eq("archived", false)
+    .order("created_at", { ascending: false });
+
+  if (!shouldFetchAll) {
+    // Fetch only user's groups
+    if (userGroupIds.length === 0) {
+      return []; // User has no groups
+    }
+    groupsQuery = groupsQuery.in("id", userGroupIds);
+  }
+
+  const { data: groupsData, error } = await groupsQuery;
+
+  if (error) {
+    throw new Error(error.message || "Failed to fetch groups");
+  }
+
+  return groupsData || [];
+}
+
+// Business logic function
+async function fetchUserGroups(
+  userId: string,
+  { all = false }: { all?: boolean } = {},
+): Promise<Group[]> {
+  const userGroupIds = await getUserGroupIds(userId);
+
+  let shouldFetchAllGroups = false;
+  if (all) {
+    const isAdmin = await isUserAdmin(userId);
+    shouldFetchAllGroups = isAdmin;
+  }
+
+  const groupsData = await fetchGroupsFromDb(
+    shouldFetchAllGroups,
+    userGroupIds,
+  );
+
+  if (groupsData.length === 0) {
+    return [];
+  }
+
+  return addMemberCounts(
+    groupsData,
+    userId,
+    userGroupIds,
+    !shouldFetchAllGroups,
+  );
+}
+
+export function useUserGroupsQuery(
+  userId: string | undefined,
+  params: { all?: boolean } = {},
+) {
   return useQuery({
-    queryKey: userGroupsKeys.user(userId!),
-    queryFn: () => fetchUserGroups(userId!),
+    queryKey: userGroupsKeys.user(userId!, params),
+    queryFn: () => fetchUserGroups(userId!, params),
     enabled: !!userId,
   });
 }
