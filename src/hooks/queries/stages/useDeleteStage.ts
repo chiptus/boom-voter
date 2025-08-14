@@ -4,7 +4,10 @@ import { supabase } from "@/integrations/supabase/client";
 import { stagesKeys } from "./types";
 
 async function deleteStage(stageId: string) {
-  const { error } = await supabase.from("stages").delete().eq("id", stageId);
+  const { error } = await supabase
+    .from("stages")
+    .update({ archived: true })
+    .eq("id", stageId);
 
   if (error) throw error;
 }

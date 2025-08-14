@@ -9,7 +9,7 @@ async function deleteGroup(variables: { groupId: string; userId: string }) {
 
   const { error } = await supabase
     .from("groups")
-    .delete()
+    .update({ archived: true })
     .eq("id", groupId)
     .eq("created_by", userId);
 

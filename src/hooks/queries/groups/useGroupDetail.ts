@@ -15,6 +15,7 @@ async function fetchGroupById(groupId: string): Promise<Group | null> {
     .from("groups")
     .select("*")
     .eq("id", groupId)
+    .eq("archived", false)
     .single();
 
   if (error) {

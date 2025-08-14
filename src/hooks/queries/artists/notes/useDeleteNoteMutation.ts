@@ -1,6 +1,7 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+import { artistsKeys } from "../useArtists";
 
 async function deleteArtistNote(noteId: string) {
   const { error } = await supabase
@@ -19,8 +20,7 @@ export function useDeleteNoteMutation() {
   return useMutation({
     mutationFn: deleteArtistNote,
     onSuccess: () => {
-      // Invalidate all artist notes queries to refresh the list
-      queryClient.invalidateQueries({ queryKey: ["artists"] });
+      queryClient.invalidateQueries({ queryKey: artistsKeys.all });
       toast({
         title: "Success",
         description: "Note deleted successfully",
