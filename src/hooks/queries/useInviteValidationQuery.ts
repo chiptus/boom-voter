@@ -2,7 +2,7 @@ import { useQuery, useMutation } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
 import type { InviteValidation } from "@/types/invites";
-import { inviteKeys } from "./groups/useInvitesQuery";
+import { inviteKeys } from "./groups/invites/types";
 
 async function validateInviteToken(
   token: string,

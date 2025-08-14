@@ -3,7 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { offlineStorage } from "@/lib/offlineStorage";
 import { useOnlineStatus, useOfflineQueue } from "@/hooks/useOffline";
-import { SetNote } from "./artists/useArtistNotes";
+import { SetNote } from "./artists/notes/types";
 
 interface OfflineNote {
   id: string;

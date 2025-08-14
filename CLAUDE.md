@@ -121,3 +121,5 @@ src/
 - PWA manifest configured for "UpLine" branding
 
 - dont use export from unless specifically required
+
+- try to use mutation.mutate(variables, {onSuccess, onError}) instead of try{await mutation.mutateAsync(variables)}catch(err){}
