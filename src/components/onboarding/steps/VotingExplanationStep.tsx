@@ -5,7 +5,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Heart, Star, X, ArrowLeft } from "lucide-react";
-
+import votingImage from "./voting.png?url";
 interface VotingExplanationStepProps {
   onNext: () => void;
   onPrevious: () => void;
@@ -16,7 +16,8 @@ export function VotingExplanationStep({
   onPrevious,
 }: VotingExplanationStepProps) {
   return (
-    <>
+    <div className="flex flex-col h-full">
+      {/* Header - fixed */}
       <DialogHeader>
         <DialogTitle className="flex items-center space-x-2">
           <Heart className="h-5 w-5" />
@@ -28,12 +29,15 @@ export function VotingExplanationStep({
         </DialogDescription>
       </DialogHeader>
 
-      <div className="space-y-4 mt-4">
-        {/* Placeholder for screenshot */}
-        <div className="bg-gray-100 dark:bg-gray-800 rounded-lg p-4 text-center">
-          <p className="text-xs text-gray-600 dark:text-gray-400">
-            📸 Voting system screenshot placeholder
-          </p>
+      {/* Scrollable content */}
+      <div className="flex-1 overflow-y-auto space-y-4 mt-4 min-h-0">
+        {/* Voting system screenshot */}
+        <div className="rounded-lg overflow-hidden">
+          <img
+            src={votingImage}
+            alt="Voting system showing Must Go, Interested, and Won't Go options"
+            className="w-full h-auto rounded-lg"
+          />
         </div>
 
         {/* Vote Types */}
@@ -93,22 +97,22 @@ export function VotingExplanationStep({
             you can quickly see which artists your friends are excited about!
           </p>
         </div>
-
-        {/* Navigation */}
-        <div className="flex gap-2">
-          <Button
-            variant="outline"
-            onClick={onPrevious}
-            className="flex items-center gap-2"
-          >
-            <ArrowLeft className="h-4 w-4" />
-            Back
-          </Button>
-          <Button onClick={onNext} className="flex-1">
-            Next: Timeline
-          </Button>
-        </div>
       </div>
-    </>
+
+      {/* Navigation - fixed at bottom */}
+      <div className="flex gap-2 pt-4 mt-4 border-t">
+        <Button
+          variant="outline"
+          onClick={onPrevious}
+          className="flex items-center gap-2"
+        >
+          <ArrowLeft className="h-4 w-4" />
+          Back
+        </Button>
+        <Button onClick={onNext} className="flex-1">
+          Next: Timeline
+        </Button>
+      </div>
+    </div>
   );
 }

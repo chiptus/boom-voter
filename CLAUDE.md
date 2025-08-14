@@ -123,3 +123,5 @@ src/
 - dont use export from unless specifically required
 
 - try to use mutation.mutate(variables, {onSuccess, onError}) instead of try{await mutation.mutateAsync(variables)}catch(err){}
+
+- don't add comments unless really necessary

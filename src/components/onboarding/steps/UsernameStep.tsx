@@ -56,7 +56,8 @@ export function UsernameStep({
   }
 
   return (
-    <>
+    <div className="flex flex-col h-full">
+      {/* Header - fixed */}
       <DialogHeader>
         <DialogTitle className="flex items-center space-x-2">
           <UserIcon className="h-5 w-5" />
@@ -68,27 +69,34 @@ export function UsernameStep({
         </DialogDescription>
       </DialogHeader>
 
-      <form onSubmit={handleSubmit} className="space-y-4 mt-4">
-        <div>
-          <Label htmlFor="username">Username</Label>
-          <Input
-            id="username"
-            type="text"
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
-            required
-            placeholder="Your display name"
-            autoFocus
-          />
-        </div>
+      {/* Form content - scrollable if needed */}
+      <div className="flex-1 overflow-y-auto mt-4 min-h-0">
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div>
+            <Label htmlFor="username">Username</Label>
+            <Input
+              id="username"
+              type="text"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              required
+              placeholder="Your display name"
+              autoFocus
+            />
+          </div>
+        </form>
+      </div>
+
+      {/* Button - fixed at bottom */}
+      <div className="pt-4 mt-4 border-t">
         <Button
-          type="submit"
+          onClick={handleSubmit}
           className="w-full"
           disabled={updateProfileMutation.isPending || !username.trim()}
         >
           {updateProfileMutation.isPending ? "Setting up..." : "Continue"}
         </Button>
-      </form>
-    </>
+      </div>
+    </div>
   );
 }
