@@ -1,7 +1,9 @@
 import { useState } from "react";
-import { useQueryClient } from "@tanstack/react-query";
-import { queryFunctions } from "@/services/queries";
-import { useFestivalEditionsForFestival } from "@/hooks/queries/useFestivalQuery";
+import { useFestivalEditionsForFestivalQuery } from "@/hooks/queries/festivals/editions/useFestivalEditionsForFestival";
+import { useCreateFestivalEditionMutation } from "@/hooks/queries/festivals/editions/useCreateFestivalEdition";
+import { useUpdateFestivalEditionMutation } from "@/hooks/queries/festivals/editions/useUpdateFestivalEdition";
+import { useDeleteFestivalEditionMutation } from "@/hooks/queries/festivals/editions/useDeleteFestivalEdition";
+import { FestivalEdition } from "@/hooks/queries/festivals/editions/types";
 import { useToast } from "@/hooks/use-toast";
 import {
   Table,
@@ -25,7 +27,6 @@ import {
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Loader2, Plus, Edit2, Trash2, CalendarDays } from "lucide-react";
-import type { FestivalEdition } from "@/services/queries";
 import { cn } from "@/lib/utils";
 import { generateSlug, isValidSlug, sanitizeSlug } from "@/lib/slug";
 
@@ -38,7 +39,7 @@ interface EditionFormData {
   published: boolean;
 }
 
-export const FestivalEditionManagement = ({
+export function FestivalEditionManagement({
   festivalId,
   onSelect,
   selected,
@@ -46,13 +47,13 @@ export const FestivalEditionManagement = ({
   festivalId: string;
   onSelect: (editionId: string) => void;
   selected: string;
-}) => {
-  const { data: editions = [], isLoading } = useFestivalEditionsForFestival(
-    festivalId,
-    { all: true },
-  );
+}) {
+  const { data: editions = [], isLoading } =
+    useFestivalEditionsForFestivalQuery(festivalId, { all: true });
+  const createEditionMutation = useCreateFestivalEditionMutation();
+  const updateEditionMutation = useUpdateFestivalEditionMutation();
+  const deleteEditionMutation = useDeleteFestivalEditionMutation();
   const { toast } = useToast();
-  const queryClient = useQueryClient();
 
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingEdition, setEditingEdition] = useState<FestivalEdition | null>(
@@ -69,7 +70,7 @@ export const FestivalEditionManagement = ({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [slugError, setSlugError] = useState("");
 
-  const resetForm = () => {
+  function resetForm() {
     setFormData({
       name: "",
       slug: "",
@@ -80,14 +81,14 @@ export const FestivalEditionManagement = ({
     });
     setEditingEdition(null);
     setSlugError("");
-  };
+  }
 
-  const handleCreate = () => {
+  function handleCreate() {
     resetForm();
     setIsDialogOpen(true);
-  };
+  }
 
-  const handleEdit = (edition: FestivalEdition) => {
+  function handleEdit(edition: FestivalEdition) {
     setFormData({
       name: edition.name,
       slug: edition.slug || generateSlug(edition.name),
@@ -99,10 +100,10 @@ export const FestivalEditionManagement = ({
     setEditingEdition(edition);
     setSlugError("");
     setIsDialogOpen(true);
-  };
+  }
 
   // Auto-generate slug when name changes
-  const handleNameChange = (name: string) => {
+  function handleNameChange(name: string) {
     setFormData((prev) => ({
       ...prev,
       name,
@@ -112,10 +113,10 @@ export const FestivalEditionManagement = ({
           ? generateSlug(name)
           : prev.slug,
     }));
-  };
+  }
 
   // Validate slug when it changes
-  const handleSlugChange = (slug: string) => {
+  function handleSlugChange(slug: string) {
     const cleanSlug = sanitizeSlug(slug);
     setFormData((prev) => ({ ...prev, slug: cleanSlug }));
 
@@ -126,9 +127,9 @@ export const FestivalEditionManagement = ({
     } else {
       setSlugError("");
     }
-  };
+  }
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (!formData.name.trim()) {
       toast({
@@ -167,23 +168,13 @@ export const FestivalEditionManagement = ({
       };
 
       if (editingEdition) {
-        await queryFunctions.updateFestivalEdition(
-          editingEdition.id,
-          submitData,
-        );
-        toast({
-          title: "Success",
-          description: "Festival edition updated successfully",
+        await updateEditionMutation.mutateAsync({
+          editionId: editingEdition.id,
+          editionData: submitData,
         });
       } else {
-        await queryFunctions.createFestivalEdition(submitData);
-        toast({
-          title: "Success",
-          description: "Festival edition created successfully",
-        });
+        await createEditionMutation.mutateAsync(submitData);
       }
-
-      queryClient.invalidateQueries({ queryKey: ["festival-editions"] });
       setIsDialogOpen(false);
       resetForm();
     } catch (error) {
@@ -198,9 +189,9 @@ export const FestivalEditionManagement = ({
     } finally {
       setIsSubmitting(false);
     }
-  };
+  }
 
-  const handleDelete = async (edition: FestivalEdition) => {
+  async function handleDelete(edition: FestivalEdition) {
     if (
       !confirm(
         `Are you sure you want to delete "${edition.name}"? This will also delete all associated stages and sets.`,
@@ -210,23 +201,11 @@ export const FestivalEditionManagement = ({
     }
 
     try {
-      await queryFunctions.deleteFestivalEdition(edition.id);
-      toast({
-        title: "Success",
-        description: "Festival edition deleted successfully",
-      });
-      queryClient.invalidateQueries({ queryKey: ["festival-editions"] });
+      await deleteEditionMutation.mutateAsync(edition.id);
     } catch (error) {
-      toast({
-        title: "Error",
-        description:
-          error instanceof Error
-            ? error.message
-            : "Failed to delete festival edition",
-        variant: "destructive",
-      });
+      // Error handling is done in the mutation hook
     }
-  };
+  }
 
   if (isLoading) {
     return (
@@ -441,4 +420,4 @@ export const FestivalEditionManagement = ({
       </CardContent>
     </Card>
   );
-};
+}

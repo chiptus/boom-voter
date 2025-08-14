@@ -3,8 +3,9 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
 import { offlineStorage } from "@/lib/offlineStorage";
 import { useOnlineStatus, useOfflineQueue } from "@/hooks/useOffline";
-import { voteQueries, setQueries, FestivalSet } from "@/services/queries";
 import type { User } from "@supabase/supabase-js";
+import { FestivalSet, setsKeys } from "./sets/useSets";
+import { userVotesKeys } from "./voting/useUserVotes";
 
 interface OfflineVote {
   id: string;
@@ -101,7 +102,7 @@ export function useOfflineVotingQuery(user: User | null) {
   const isOnline = useOnlineStatus();
 
   return useQuery({
-    queryKey: voteQueries.user(user?.id || ""),
+    queryKey: userVotesKeys.user(user?.id || ""),
     queryFn: () => fetchUserVotesWithOffline(user!.id, isOnline),
     enabled: !!user?.id,
     staleTime: isOnline ? 30 * 1000 : Infinity, // 30 seconds for online, infinite for offline
@@ -134,7 +135,7 @@ export function useOfflineVoteMutation(
 
       // Get current vote to determine if this is a toggle
       const currentVotes =
-        (queryClient.getQueryData(voteQueries.user(userId)) as Record<
+        (queryClient.getQueryData(userVotesKeys.user(userId)) as Record<
           string,
           number
         >) || {};
@@ -164,7 +165,7 @@ export function useOfflineVoteMutation(
 
       // Update query cache immediately for optimistic updates
       queryClient.setQueryData(
-        voteQueries.user(userId),
+        userVotesKeys.user(userId),
         (oldData: Record<string, number> = {}) => {
           const newData = { ...oldData };
           if (isToggle) {
@@ -177,58 +178,55 @@ export function useOfflineVoteMutation(
       );
 
       // Also update the sets cache to reflect vote count changes
-      queryClient.setQueriesData(
-        { queryKey: setQueries.all() },
-        (oldData: any) => {
-          if (!oldData) return oldData;
+      queryClient.setQueriesData({ queryKey: setsKeys.all }, (oldData: any) => {
+        if (!oldData) return oldData;
 
-          // Handle different data structures (could be array of sets or object with sets property)
-          function updateSetsArray(sets: Array<FestivalSet>) {
-            return sets.map((set: FestivalSet) => {
-              if (set.id === setId) {
-                const updatedVotes = [...(set.votes || [])];
+        // Handle different data structures (could be array of sets or object with sets property)
+        function updateSetsArray(sets: Array<FestivalSet>) {
+          return sets.map((set: FestivalSet) => {
+            if (set.id === setId) {
+              const updatedVotes = [...(set.votes || [])];
 
-                // Remove existing vote from this user for this set
-                const existingVoteIndex = updatedVotes.findIndex(
-                  (vote: any) => vote.user_id === userId,
-                );
-                if (existingVoteIndex !== -1) {
-                  updatedVotes.splice(existingVoteIndex, 1);
-                }
-
-                // Add new vote if not a toggle
-                if (!isToggle) {
-                  updatedVotes.push({
-                    vote_type: voteType,
-                    user_id: userId,
-                  });
-                }
-
-                return {
-                  ...set,
-                  votes: updatedVotes,
-                };
+              // Remove existing vote from this user for this set
+              const existingVoteIndex = updatedVotes.findIndex(
+                (vote: any) => vote.user_id === userId,
+              );
+              if (existingVoteIndex !== -1) {
+                updatedVotes.splice(existingVoteIndex, 1);
               }
-              return set;
-            });
-          }
 
-          // Handle array of sets
-          if (Array.isArray(oldData)) {
-            return updateSetsArray(oldData);
-          }
+              // Add new vote if not a toggle
+              if (!isToggle) {
+                updatedVotes.push({
+                  vote_type: voteType,
+                  user_id: userId,
+                });
+              }
 
-          // Handle object with sets property
-          if (oldData.sets && Array.isArray(oldData.sets)) {
-            return {
-              ...oldData,
-              sets: updateSetsArray(oldData.sets),
-            };
-          }
+              return {
+                ...set,
+                votes: updatedVotes,
+              };
+            }
+            return set;
+          });
+        }
 
-          return oldData;
-        },
-      );
+        // Handle array of sets
+        if (Array.isArray(oldData)) {
+          return updateSetsArray(oldData);
+        }
+
+        // Handle object with sets property
+        if (oldData.sets && Array.isArray(oldData.sets)) {
+          return {
+            ...oldData,
+            sets: updateSetsArray(oldData.sets),
+          };
+        }
+
+        return oldData;
+      });
 
       // If online, sync immediately
       if (isOnline) {
@@ -291,7 +289,7 @@ export function useOfflineVoteMutation(
       // Revert optimistic update on error
       if (user?.id) {
         queryClient.invalidateQueries({
-          queryKey: voteQueries.user(user.id),
+          queryKey: userVotesKeys.user(user.id),
         });
       }
     },

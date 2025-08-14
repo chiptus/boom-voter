@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Clock, MapPin, ExternalLink, Music, Play } from "lucide-react";
 import { ArtistVotingButtons } from "./SetVotingButtons";
-import { FestivalSet } from "@/services/queries";
+import { FestivalSet } from "@/hooks/queries/sets/useSets";
 import { formatTimeRange } from "@/lib/timeUtils";
 import { GenreBadge } from "../Index/GenreBadge";
 

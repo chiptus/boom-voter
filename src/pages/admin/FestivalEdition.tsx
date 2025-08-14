@@ -3,7 +3,7 @@ import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Loader2, MapPin, Music } from "lucide-react";
 import { useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { useFestivalEditionsForFestival } from "@/hooks/queries/useFestivalQuery";
+import { useFestivalEditionsForFestivalQuery } from "@/hooks/queries/festivals/editions/useFestivalEditionsForFestival";
 
 export default function FestivalEdition() {
   const { festivalId, editionId } = useParams<{
@@ -25,7 +25,7 @@ export default function FestivalEdition() {
     }
   }, [location.pathname, festivalId, editionId, navigate]);
 
-  const editionsQuery = useFestivalEditionsForFestival(festivalId);
+  const editionsQuery = useFestivalEditionsForFestivalQuery(festivalId);
 
   if (!festivalId || !editionId) {
     return <div>Festival or edition not found</div>;
@@ -59,17 +59,17 @@ export default function FestivalEdition() {
   }
 
   // Determine current subtab based on URL
-  const getCurrentSubTab = () => {
+  function getCurrentSubTab() {
     const path = location.pathname;
     if (path.includes("/sets")) return "sets";
     return "stages";
-  };
+  }
 
   const currentSubTab = getCurrentSubTab();
 
-  const handleSubTabChange = (value: string) => {
+  function handleSubTabChange(value: string) {
     navigate(`/admin/festivals/${festivalId}/editions/${editionId}/${value}`);
-  };
+  }
 
   return (
     <div className="space-y-6">

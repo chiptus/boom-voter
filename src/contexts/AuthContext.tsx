@@ -8,11 +8,11 @@ import {
 } from "react";
 import { User } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
-import { useProfileQuery } from "@/hooks/queries/useProfileQuery";
+import { useProfileQuery } from "@/hooks/queries/auth/useProfile";
 import { profileOfflineService } from "@/services/profileOfflineService";
 import { useToast } from "@/hooks/use-toast";
 import { AuthDialog } from "@/components/AuthDialog";
-import { Profile } from "@/services/queries";
+import { Profile } from "@/hooks/queries/auth/useProfile";
 
 interface AuthContextType {
   // Auth state
@@ -124,25 +124,25 @@ export function AuthProvider({ children }: AuthProviderProps) {
     };
   }, [toast, user?.id]);
 
-  const signOut = async () => {
+  async function signOut() {
     // Clear cached profile before signing out
     if (user?.id) {
       await profileOfflineService.clearCachedProfile(user.id);
     }
     await supabase.auth.signOut();
-  };
+  }
 
-  const showAuthDialog = (token?: string, name?: string) => {
+  function showAuthDialog(token?: string, name?: string) {
     setInviteToken(token);
     setGroupName(name);
     setAuthDialogOpen(true);
-  };
+  }
 
-  const hideAuthDialog = () => {
+  function hideAuthDialog() {
     setAuthDialogOpen(false);
     setInviteToken(undefined);
     setGroupName(undefined);
-  };
+  }
 
   const hasUsername = useMemo(() => {
     return Boolean(profile?.username && profile?.username.trim() !== "");

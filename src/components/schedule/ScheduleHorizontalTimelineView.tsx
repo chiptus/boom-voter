@@ -4,7 +4,7 @@ import { calculateTimelineData } from "@/lib/timelineCalculator";
 import { StageLabels } from "./StageLabels";
 import { TimelineContainer } from "./TimelineContainer";
 import { useFestivalEdition } from "@/contexts/FestivalEditionContext";
-import { useEditionSetsQuery } from "@/hooks/queries/useEditionSetsQuery";
+import { useSetsByEditionQuery as useEditionSetsQuery } from "@/hooks/queries/sets/useSetsByEdition";
 
 interface ScheduleHorizontalTimelineViewProps {
   userVotes: Record<string, number>;

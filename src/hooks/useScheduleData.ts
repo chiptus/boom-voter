@@ -1,7 +1,7 @@
 import { useMemo } from "react";
 import { formatDateTime } from "@/lib/timeUtils";
 import { format, startOfDay } from "date-fns";
-import type { FestivalSet } from "@/services/queries";
+import type { FestivalSet } from "@/hooks/queries/sets/useSets";
 
 export interface ScheduleDay {
   date: string;

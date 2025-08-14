@@ -1,4 +1,5 @@
-import { Artist, FestivalSet } from "@/services/queries";
+import { Artist } from "@/hooks/queries/artists/useArtists";
+import { FestivalSet } from "@/hooks/queries/sets/useSets";
 import { openDB, IDBPDatabase } from "idb";
 
 interface OfflineVote {

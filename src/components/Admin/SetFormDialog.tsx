@@ -2,14 +2,13 @@ import { useEffect, useState, useRef, useCallback } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { useStagesQuery } from "@/hooks/queries/useStagesQuery";
-import { useArtistsQuery } from "@/hooks/queries/useArtistsQuery";
-import {
-  useCreateSetMutation,
-  useUpdateSetMutation,
-  useAddArtistToSetMutation,
-  useRemoveArtistFromSetMutation,
-} from "@/hooks/queries/useSetsQuery";
+import { useStagesQuery } from "@/hooks/queries/stages/useStages";
+import { useArtistsQuery } from "@/hooks/queries/artists/useArtists";
+import { FestivalSet } from "@/hooks/queries/sets/useSets";
+import { useCreateSetMutation } from "@/hooks/queries/sets/useCreateSet";
+import { useUpdateSetMutation } from "@/hooks/queries/sets/useUpdateSet";
+import { useAddArtistToSetMutation } from "@/hooks/queries/sets/useAddArtistToSet";
+import { useRemoveArtistFromSetMutation } from "@/hooks/queries/sets/useRemoveArtistFromSet";
 import { useAuth } from "@/contexts/AuthContext";
 import {
   Dialog,
@@ -37,7 +36,6 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Loader2 } from "lucide-react";
-import type { FestivalSet } from "@/services/queries";
 import { ArtistMultiSelect } from "./ArtistMultiSelect";
 
 // Form validation schema
@@ -154,13 +152,13 @@ export function SetFormDialog({
   );
 
   // Helper function to convert ISO datetime to datetime-local format
-  const formatDateTimeLocal = (isoString: string | null): string => {
+  function formatDateTimeLocal(isoString: string | null): string {
     if (!isoString) return "";
     // Remove the timezone part and return in format: YYYY-MM-DDTHH:mm
     return isoString.slice(0, 16);
-  };
+  }
 
-  const onSubmit = async (data: SetFormData) => {
+  async function onSubmit(data: SetFormData) {
     if (!user) {
       return; // Should not happen if user is authenticated
     }
@@ -181,7 +179,7 @@ export function SetFormDialog({
       if (editingSet) {
         const updatedSet = await updateSetMutation.mutateAsync({
           id: editingSet.id,
-          data: submitData,
+          updates: submitData,
         });
         setId = updatedSet.id;
       } else {
@@ -217,7 +215,7 @@ export function SetFormDialog({
     } catch (error) {
       // Error handling is done in the mutation hooks
     }
-  };
+  }
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>

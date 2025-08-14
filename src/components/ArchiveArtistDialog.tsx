@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import { Trash } from "lucide-react";
-import { Artist } from "@/services/queries";
+import { Artist } from "@/hooks/queries/artists/useArtists";
 
 interface ArchiveArtistDialogProps {
   artist: Artist;
@@ -20,15 +20,15 @@ interface ArchiveArtistDialogProps {
   trigger?: React.ReactNode;
 }
 
-export const ArchiveArtistDialog = ({
+export function ArchiveArtistDialog({
   artist,
   onArchive,
   trigger,
-}: ArchiveArtistDialogProps) => {
+}: ArchiveArtistDialogProps) {
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
 
-  const handleArchive = async () => {
+  async function handleArchive() {
     try {
       setLoading(true);
       // Handle both function signatures
@@ -43,7 +43,7 @@ export const ArchiveArtistDialog = ({
     } finally {
       setLoading(false);
     }
-  };
+  }
 
   const defaultTrigger = (
     <Button
@@ -82,4 +82,4 @@ export const ArchiveArtistDialog = ({
       </AlertDialogContent>
     </AlertDialog>
   );
-};
+}

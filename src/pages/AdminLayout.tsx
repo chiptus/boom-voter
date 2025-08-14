@@ -2,7 +2,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { AppHeader } from "@/components/AppHeader";
 import { Outlet, useNavigate, useLocation } from "react-router-dom";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { useUserPermissionsQuery } from "@/hooks/queries/useGroupsQuery";
+import { useUserPermissionsQuery } from "@/hooks/queries/auth/useUserPermissions";
 import { useEffect } from "react";
 import { Music, Calendar, BarChart3, UserPlus } from "lucide-react";
 
@@ -31,16 +31,16 @@ export default function AdminLayout() {
   }, [user, authLoading, navigate, isLoadingPermissions, canEdit]);
 
   // Determine current tab based on location
-  const getCurrentTab = () => {
+  function getCurrentTab() {
     const path = location.pathname;
     if (path.startsWith("/admin/festivals")) return "festivals";
     if (path.includes("/content")) return "content";
     if (path.includes("/analytics")) return "analytics";
     if (path.includes("/admins")) return "admins";
     return "artists";
-  };
+  }
 
-  const handleTabChange = (value: string) => {
+  function handleTabChange(value: string) {
     switch (value) {
       case "artists":
         navigate("/admin");
@@ -55,7 +55,7 @@ export default function AdminLayout() {
         navigate("/admin/admins");
         break;
     }
-  };
+  }
 
   if (isLoadingPermissions || authLoading || isLoadingSuperAdmin) {
     return (

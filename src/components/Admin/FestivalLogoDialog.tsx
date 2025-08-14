@@ -1,6 +1,6 @@
 import { useState } from "react";
-import { useQueryClient } from "@tanstack/react-query";
-import { queryFunctions } from "@/services/queries";
+import { useUpdateFestivalMutation } from "@/hooks/queries/festivals/useUpdateFestival";
+import { Festival } from "@/hooks/queries/festivals/types";
 import { useToast } from "@/hooks/use-toast";
 import {
   Dialog,
@@ -12,7 +12,6 @@ import {
 import { Button } from "@/components/ui/button";
 import { Loader2, Image as ImageIcon, Trash2 } from "lucide-react";
 import { FileUpload } from "@/components/ui/file-upload";
-import type { Festival } from "@/services/queries";
 import { uploadFestivalLogo, deleteFestivalLogo } from "@/services/storage";
 
 interface FestivalLogoDialogProps {
@@ -27,7 +26,7 @@ export function FestivalLogoDialog({
   festival,
 }: FestivalLogoDialogProps) {
   const { toast } = useToast();
-  const queryClient = useQueryClient();
+  const updateFestivalMutation = useUpdateFestivalMutation();
 
   const [logoFile, setLogoFile] = useState<File | null>(null);
   const [isUploading, setIsUploading] = useState(false);
@@ -43,16 +42,16 @@ export function FestivalLogoDialog({
       // No need to delete old logo since we're using upsert to overwrite
 
       // Update festival with new logo URL
-      await queryFunctions.updateFestival(festival.id, {
-        logo_url: uploadResult.url,
+      await updateFestivalMutation.mutateAsync({
+        festivalId: festival.id,
+        festivalData: {
+          name: festival.name,
+          slug: festival.slug,
+          description: festival.description || undefined,
+          logo_url: uploadResult.url,
+        },
       });
 
-      toast({
-        title: "Success",
-        description: "Festival logo uploaded successfully",
-      });
-
-      queryClient.invalidateQueries({ queryKey: ["festivals"] });
       setLogoFile(null);
       onOpenChange(false);
     } catch (error) {
@@ -76,16 +75,16 @@ export function FestivalLogoDialog({
       await deleteFestivalLogo(festival.logo_url);
 
       // Update festival to remove logo URL
-      await queryFunctions.updateFestival(festival.id, {
-        logo_url: null,
+      await updateFestivalMutation.mutateAsync({
+        festivalId: festival.id,
+        festivalData: {
+          name: festival.name,
+          slug: festival.slug,
+          description: festival.description || undefined,
+          logo_url: null,
+        },
       });
 
-      toast({
-        title: "Success",
-        description: "Festival logo removed successfully",
-      });
-
-      queryClient.invalidateQueries({ queryKey: ["festivals"] });
       onOpenChange(false);
     } catch (error) {
       toast({

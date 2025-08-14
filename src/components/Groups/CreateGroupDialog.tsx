@@ -7,7 +7,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { useCreateGroupMutation } from "@/hooks/queries/useGroupsQuery";
+import { useCreateGroupMutation } from "@/hooks/queries/groups/useCreateGroup";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";

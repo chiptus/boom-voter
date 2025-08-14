@@ -1,4 +1,4 @@
-import { useStagesQuery } from "@/hooks/queries/useStagesQuery";
+import { useStagesQuery } from "@/hooks/queries/stages/useStages";
 import {
   Table,
   TableBody,
@@ -11,7 +11,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Edit2, Trash2 } from "lucide-react";
 import { formatTimeRange } from "@/lib/timeUtils";
-import type { FestivalSet } from "@/services/queries";
+import { FestivalSet } from "@/hooks/queries/sets/useSets";
 
 interface SetsTableProps {
   sets: FestivalSet[];
@@ -22,10 +22,10 @@ interface SetsTableProps {
 export function SetsTable({ sets, onEdit, onDelete }: SetsTableProps) {
   const { data: stages = [] } = useStagesQuery();
 
-  const getStageName = (stageId: string | null) => {
+  function getStageName(stageId: string | null) {
     if (!stageId) return "—";
     return stages.find((s) => s.id === stageId)?.name || "Unknown Stage";
-  };
+  }
 
   if (sets.length === 0) {
     return (

@@ -2,13 +2,12 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useRef } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useOnlineStatus, useOfflineData } from "@/hooks/useOffline";
-import { useArtistsQuery } from "./useArtistsQuery";
-import type { Artist } from "@/services/queries";
+import { Artist, useArtistsQuery } from "./artists/useArtists";
 import { RealtimeChannel } from "@supabase/supabase-js";
 
 // Note: Currently not using merge logic, but keeping for future enhancement
 
-export const useOfflineArtistsQuery = () => {
+export function useOfflineArtistsQuery() {
   const queryClient = useQueryClient();
   const channelRef = useRef<RealtimeChannel | null>(null);
   const isOnline = useOnlineStatus();
@@ -119,7 +118,7 @@ export const useOfflineArtistsQuery = () => {
     };
   }, [queryClient, isOnline]);
 
-  const fetchArtists = async () => {
+  async function fetchArtists() {
     if (isOnline) {
       refetch();
       combinedQuery.refetch();
@@ -127,7 +126,7 @@ export const useOfflineArtistsQuery = () => {
       offlineQuery.refetch();
       combinedQuery.refetch();
     }
-  };
+  }
 
   return {
     artists: combinedQuery.data?.artists || [],
@@ -138,4 +137,4 @@ export const useOfflineArtistsQuery = () => {
     fetchArtists,
     refetch: fetchArtists,
   };
-};
+}

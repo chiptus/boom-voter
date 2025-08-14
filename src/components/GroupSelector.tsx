@@ -6,7 +6,8 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Users } from "lucide-react";
-import { useGroups } from "@/hooks/useGroups";
+import { useAuth } from "@/contexts/AuthContext";
+import { useUserGroupsQuery } from "@/hooks/queries/groups/useUserGroups";
 
 interface GroupSelectorProps {
   selectedGroupId?: string;
@@ -17,7 +18,11 @@ export const GroupSelector = ({
   selectedGroupId,
   onGroupChange,
 }: GroupSelectorProps) => {
-  const { groups, loading } = useGroups();
+  const { user, loading: authLoading } = useAuth();
+  const { data: groups = [], isLoading: groupsLoading } = useUserGroupsQuery(
+    user?.id,
+  );
+  const loading = authLoading || groupsLoading;
 
   if (loading) {
     return (

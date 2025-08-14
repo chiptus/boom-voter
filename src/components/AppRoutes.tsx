@@ -5,7 +5,7 @@ import { MainDomainRoutes } from "./MainDomainRoutes";
 import { SubdomainRoutes } from "./SubdomainRoutes";
 import { AppFooter } from "@/components/legal/AppFooter";
 import { useMemo } from "react";
-import { useProfileQuery } from "@/hooks/queries/useProfileQuery";
+import { useProfileQuery } from "@/hooks/queries/auth/useProfile";
 import { UsernameSetupDialog } from "./Index/UsernameSetupDialog";
 
 interface AppRoutesProps {

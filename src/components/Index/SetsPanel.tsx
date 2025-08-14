@@ -1,7 +1,7 @@
 import { User } from "@supabase/supabase-js";
 
 import { useOfflineVoting } from "@/hooks/useOfflineVoting";
-import { FestivalSet } from "@/services/queries";
+import { FestivalSet } from "@/hooks/queries/sets/useSets";
 
 import { EmptyArtistsState } from "./EmptyArtistsState";
 import { FestivalSetProvider } from "./FestivalSetContext";

@@ -12,11 +12,8 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Edit2, Archive, Search, Music, Plus } from "lucide-react";
-import type { Artist } from "@/services/queries";
-import {
-  useArchiveArtistMutation,
-  useArtistsQuery,
-} from "@/hooks/queries/useArtistsQuery";
+import { Artist, useArtistsQuery } from "@/hooks/queries/artists/useArtists";
+import { useArchiveArtistMutation } from "@/hooks/queries/artists/useArchiveArtist";
 import { AddArtistDialog } from "./AddArtistDialog";
 import { EditArtistDialog } from "./EditArtistDialog";
 import { GenreBadge } from "../Index/GenreBadge";

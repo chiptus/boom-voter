@@ -9,7 +9,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Users, Trash2, Crown } from "lucide-react";
 import { Link } from "react-router-dom";
-import { useLeaveGroupMutation } from "@/hooks/queries/useGroupsQuery";
+import { useLeaveGroupMutation } from "@/hooks/queries/groups/useLeaveGroup";
 import { Group } from "@/types/groups";
 import { useAuth } from "@/contexts/AuthContext";
 

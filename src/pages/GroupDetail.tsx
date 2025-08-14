@@ -10,24 +10,21 @@ import {
 } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Users, UserMinus, Crown } from "lucide-react";
-import { useGroups } from "@/hooks/useGroups";
+import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/components/ui/use-toast";
 import { InviteManagement } from "@/components/Groups/InviteManagement";
 import { AddMemberForm } from "@/components/Groups/AddMemberForm";
 import { Button } from "@/components/ui/button";
-import {
-  useGroupDetailQuery,
-  useGroupMembersQuery,
-} from "@/hooks/queries/useGroupsQuery";
-import { useQueryClient } from "@tanstack/react-query";
-import { groupQueries } from "@/services/queries";
+import { useGroupDetailQuery } from "@/hooks/queries/groups/useGroupDetail";
+import { useGroupMembersQuery } from "@/hooks/queries/groups/useGroupMembers";
+import { useRemoveMemberMutation } from "@/hooks/queries/groups/useRemoveMember";
 
 function GroupDetail() {
   const { groupId } = useParams<{ groupId: string }>();
   const navigate = useNavigate();
-  const { user, removeMemberFromGroup, loading: authLoading } = useGroups();
+  const { user, loading: authLoading } = useAuth();
+  const removeMemberMutation = useRemoveMemberMutation(groupId || "");
   const { toast } = useToast();
-  const queryClient = useQueryClient();
   const [removingMember, setRemovingMember] = useState<string | null>(null);
 
   // React Query hooks
@@ -267,14 +264,17 @@ function GroupDetail() {
       )
     ) {
       setRemovingMember(memberId);
-      const success = await removeMemberFromGroup(groupId, memberUserId);
-      if (success) {
-        // Refresh the member list using React Query
-        queryClient.invalidateQueries({
-          queryKey: groupQueries.members(groupId),
+      try {
+        await removeMemberMutation.mutateAsync({
+          userId: memberUserId,
+          currentUserId: user.id,
         });
+        // The mutation automatically invalidates queries and shows toast
+      } catch (error) {
+        // Error handling is done in the mutation
+      } finally {
+        setRemovingMember(null);
       }
-      setRemovingMember(null);
     }
   }
 }

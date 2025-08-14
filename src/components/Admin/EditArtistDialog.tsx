@@ -22,12 +22,12 @@ import {
 } from "@/components/ui/form";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/contexts/AuthContext";
-import { useUserPermissionsQuery } from "@/hooks/queries/useGroupsQuery";
-import { useGenresQuery } from "@/hooks/queries/useGenresQuery";
-import { useUpdateArtistMutation } from "@/hooks/queries/useArtistsQuery";
+import { useUserPermissionsQuery } from "@/hooks/queries/auth/useUserPermissions";
+import { useGenresQuery } from "@/hooks/queries/genres/useGenres";
+import { Artist } from "@/hooks/queries/artists/useArtists";
+import { useUpdateArtistMutation } from "@/hooks/queries/artists/useUpdateArtist";
 import { StageSelector } from "../StageSelector";
 import { toDatetimeLocal, toISOString } from "@/lib/timeUtils";
-import { Artist } from "@/services/queries";
 
 // Form validation schema
 const editArtistFormSchema = z.object({

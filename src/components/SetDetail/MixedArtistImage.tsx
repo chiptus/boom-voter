@@ -1,4 +1,4 @@
-import { Artist } from "@/services/queries";
+import { Artist } from "@/hooks/queries/artists/useArtists";
 import { ArtistImageLoader } from "../ArtistImageLoader";
 
 interface MixedArtistImageProps {

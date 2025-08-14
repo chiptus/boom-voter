@@ -13,7 +13,7 @@ import {
 } from "@/components/ui/dialog";
 import { Plus } from "lucide-react";
 
-import { useUserPermissionsQuery } from "@/hooks/queries/useGroupsQuery";
+import { useUserPermissionsQuery } from "@/hooks/queries/auth/useUserPermissions";
 import { useAuth } from "@/contexts/AuthContext";
 
 interface AddGenreDialogProps {
@@ -21,7 +21,7 @@ interface AddGenreDialogProps {
   onOpenChange: (open: boolean) => void;
 }
 
-export const AddGenreDialog = ({ open, onOpenChange }: AddGenreDialogProps) => {
+export function AddGenreDialog({ open, onOpenChange }: AddGenreDialogProps) {
   const { user, loading: authLoading } = useAuth();
   const { data: canEdit = false, isLoading: isLoadingPermissions } =
     useUserPermissionsQuery(user?.id, "edit_artists");
@@ -34,13 +34,9 @@ export const AddGenreDialog = ({ open, onOpenChange }: AddGenreDialogProps) => {
     return null;
   }
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setLoading(true);
-
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
 
     if (!user) {
       toast({
@@ -91,7 +87,7 @@ export const AddGenreDialog = ({ open, onOpenChange }: AddGenreDialogProps) => {
       onOpenChange(false);
     }
     setLoading(false);
-  };
+  }
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -126,4 +122,4 @@ export const AddGenreDialog = ({ open, onOpenChange }: AddGenreDialogProps) => {
       </DialogContent>
     </Dialog>
   );
-};
+}
