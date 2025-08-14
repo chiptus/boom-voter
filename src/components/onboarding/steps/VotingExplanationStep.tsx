@@ -4,7 +4,8 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Heart, Star, X, ArrowLeft } from "lucide-react";
+import { ArrowLeft, Vote } from "lucide-react";
+import { VOTE_CONFIG } from "@/lib/voteConfig";
 import votingImage from "./voting.png?url";
 interface VotingExplanationStepProps {
   onNext: () => void;
@@ -20,7 +21,7 @@ export function VotingExplanationStep({
       {/* Header - fixed */}
       <DialogHeader>
         <DialogTitle className="flex items-center space-x-2">
-          <Heart className="h-5 w-5" />
+          <Vote className="h-5 w-5" />
           <span>Voting System</span>
         </DialogTitle>
         <DialogDescription>
@@ -42,53 +43,28 @@ export function VotingExplanationStep({
 
         {/* Vote Types */}
         <div className="space-y-3">
-          <div className="bg-green-50 dark:bg-green-900/20 rounded-lg p-3">
-            <div className="flex items-center gap-3">
-              <div className="w-7 h-7 bg-green-600 rounded-full flex items-center justify-center flex-shrink-0">
-                <Heart className="h-3 w-3 text-white" />
+          {Object.entries(VOTE_CONFIG).map(([key, config]) => {
+            const IconComponent = config.icon;
+            return (
+              <div key={key} className={`${config.bgColor} rounded-lg p-3`}>
+                <div className="flex items-center gap-3">
+                  <div
+                    className={`w-7 h-7 ${config.circleColor} rounded-full flex items-center justify-center flex-shrink-0`}
+                  >
+                    <IconComponent className="h-3 w-3 text-white" />
+                  </div>
+                  <div>
+                    <h4 className={`font-medium text-sm ${config.textColor}`}>
+                      {config.label}
+                    </h4>
+                    <p className={`text-xs ${config.descColor}`}>
+                      {config.description}
+                    </p>
+                  </div>
+                </div>
               </div>
-              <div>
-                <h4 className="font-medium text-sm text-green-900 dark:text-green-100">
-                  Must Go
-                </h4>
-                <p className="text-xs text-green-700 dark:text-green-300">
-                  Artists you absolutely can't miss (+2 points)
-                </p>
-              </div>
-            </div>
-          </div>
-
-          <div className="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-3">
-            <div className="flex items-center gap-3">
-              <div className="w-7 h-7 bg-blue-600 rounded-full flex items-center justify-center flex-shrink-0">
-                <Star className="h-3 w-3 text-white" />
-              </div>
-              <div>
-                <h4 className="font-medium text-sm text-blue-900 dark:text-blue-100">
-                  Interested
-                </h4>
-                <p className="text-xs text-blue-700 dark:text-blue-300">
-                  Artists you'd like to see if there's time (+1 point)
-                </p>
-              </div>
-            </div>
-          </div>
-
-          <div className="bg-red-50 dark:bg-red-900/20 rounded-lg p-3">
-            <div className="flex items-center gap-3">
-              <div className="w-7 h-7 bg-red-600 rounded-full flex items-center justify-center flex-shrink-0">
-                <X className="h-3 w-3 text-white" />
-              </div>
-              <div>
-                <h4 className="font-medium text-sm text-red-900 dark:text-red-100">
-                  Won't Go
-                </h4>
-                <p className="text-xs text-red-700 dark:text-red-300">
-                  Artists you'd prefer to skip (-1 point)
-                </p>
-              </div>
-            </div>
-          </div>
+            );
+          })}
         </div>
 
         <div className="bg-purple-50 dark:bg-purple-900/20 rounded-lg p-3">
