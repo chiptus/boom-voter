@@ -7,10 +7,30 @@ export type Json =
   | Json[];
 
 export type Database = {
-  // Allows to automatically instanciate createClient with right options
-  // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
-  __InternalSupabase: {
-    PostgrestVersion: "12.2.3 (519615d)";
+  graphql_public: {
+    Tables: {
+      [_ in never]: never;
+    };
+    Views: {
+      [_ in never]: never;
+    };
+    Functions: {
+      graphql: {
+        Args: {
+          extensions?: Json;
+          operationName?: string;
+          query?: string;
+          variables?: Json;
+        };
+        Returns: Json;
+      };
+    };
+    Enums: {
+      [_ in never]: never;
+    };
+    CompositeTypes: {
+      [_ in never]: never;
+    };
   };
   public: {
     Tables: {
@@ -417,18 +437,21 @@ export type Database = {
       };
       profiles: {
         Row: {
+          completed_onboarding: boolean | null;
           created_at: string;
           email: string | null;
           id: string;
           username: string | null;
         };
         Insert: {
+          completed_onboarding?: boolean | null;
           created_at?: string;
           email?: string | null;
           id: string;
           username?: string | null;
         };
         Update: {
+          completed_onboarding?: boolean | null;
           created_at?: string;
           email?: string | null;
           id?: string;
@@ -656,7 +679,7 @@ export type Database = {
         }[];
       };
       validate_profile_update: {
-        Args: { user_id: string; new_username?: string };
+        Args: { new_username?: string; user_id: string };
         Returns: string;
       };
     };
@@ -790,6 +813,9 @@ export type CompositeTypes<
     : never;
 
 export const Constants = {
+  graphql_public: {
+    Enums: {},
+  },
   public: {
     Enums: {
       admin_role: ["super_admin", "admin", "moderator"],

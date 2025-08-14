@@ -6,7 +6,7 @@ import { SubdomainRoutes } from "./SubdomainRoutes";
 import { AppFooter } from "@/components/legal/AppFooter";
 import { useMemo } from "react";
 import { useProfileQuery } from "@/hooks/queries/auth/useProfile";
-import { UsernameSetupDialog } from "./Index/UsernameSetupDialog";
+import { OnboardingDialog } from "./onboarding/OnboardingDialog";
 
 interface AppRoutesProps {
   subdomainInfo: {
@@ -17,16 +17,16 @@ interface AppRoutesProps {
 }
 
 export function AppRoutes({ subdomainInfo }: AppRoutesProps) {
-  const { user, loading: authLoading, hasUsername } = useAuth();
+  const { user, loading: authLoading, needsOnboarding } = useAuth();
   const { inviteValidation, isValidating, hasValidInvite } =
     useInviteValidation();
 
   // Get profile loading state to prevent dialog flashing
   const { isLoading: profileLoading } = useProfileQuery(user?.id);
 
-  const showUsernameSetup = useMemo(() => {
-    return !!user && !authLoading && !profileLoading && !hasUsername;
-  }, [user, authLoading, profileLoading, hasUsername]);
+  const showOnboarding = useMemo(() => {
+    return !!user && !authLoading && !profileLoading && needsOnboarding;
+  }, [user, authLoading, profileLoading, needsOnboarding]);
 
   // Show loading while validating invite
   if (isValidating) {
@@ -80,7 +80,16 @@ export function AppRoutes({ subdomainInfo }: AppRoutesProps) {
         )}
       </div>
       <AppFooter />
-      {user && <UsernameSetupDialog open={showUsernameSetup} user={user} />}
+      {user && (
+        <OnboardingDialog
+          open={showOnboarding}
+          user={user}
+          onComplete={() => {
+            // Onboarding completion is handled by the dialog itself
+            // The username update will trigger hasUsername to become true
+          }}
+        />
+      )}
     </div>
   );
 }
