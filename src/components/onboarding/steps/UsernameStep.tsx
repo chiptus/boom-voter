@@ -2,7 +2,6 @@ import { useUpdateProfileMutation } from "@/hooks/queries/auth/useUpdateProfile"
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import {
   DialogDescription,
   DialogHeader,
@@ -10,6 +9,15 @@ import {
 } from "@/components/ui/dialog";
 import { User as UserIcon } from "lucide-react";
 import { User } from "@supabase/supabase-js";
+import { useForm } from "react-hook-form";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
 
 interface UsernameStepProps {
   user: User;
@@ -17,6 +25,10 @@ interface UsernameStepProps {
   setUsername: (username: string) => void;
   onNext: () => void;
 }
+
+type UsernameFormData = {
+  username: string;
+};
 
 export function UsernameStep({
   user,
@@ -27,14 +39,22 @@ export function UsernameStep({
   const { toast } = useToast();
   const updateProfileMutation = useUpdateProfileMutation();
 
-  function handleSubmit(e: React.FormEvent) {
-    e.preventDefault();
-    if (!username.trim()) return;
+  const form = useForm<UsernameFormData>({
+    defaultValues: {
+      username: username,
+    },
+  });
+
+  function handleSubmit(data: UsernameFormData) {
+    const trimmedUsername = data.username.trim();
+    if (!trimmedUsername) return;
+
+    setUsername(trimmedUsername);
 
     updateProfileMutation.mutate(
       {
         userId: user.id,
-        updates: { username: username.trim() },
+        updates: { username: trimmedUsername },
       },
       {
         onSuccess: () => {
@@ -71,28 +91,58 @@ export function UsernameStep({
 
       {/* Form content - scrollable if needed */}
       <div className="flex-1 overflow-y-auto mt-4 min-h-0">
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <Label htmlFor="username">Username</Label>
-            <Input
-              id="username"
-              type="text"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
-              required
-              placeholder="Your display name"
-              autoFocus
+        <Form {...form}>
+          <form
+            onSubmit={form.handleSubmit(handleSubmit)}
+            className="space-y-4"
+          >
+            <FormField
+              control={form.control}
+              name="username"
+              rules={{
+                required: "Username is required",
+                minLength: {
+                  value: 2,
+                  message: "Username must be at least 2 characters",
+                },
+                maxLength: {
+                  value: 50,
+                  message: "Username must be less than 50 characters",
+                },
+                pattern: {
+                  value: /^[a-zA-Z0-9_-]+$/,
+                  message:
+                    "Username can only contain letters, numbers, hyphens, and underscores",
+                },
+              }}
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Username</FormLabel>
+                  <FormControl>
+                    <Input
+                      placeholder="Your display name"
+                      autoFocus
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
             />
-          </div>
-        </form>
+          </form>
+        </Form>
       </div>
 
       {/* Button - fixed at bottom */}
       <div className="pt-4 mt-4 border-t">
         <Button
-          onClick={handleSubmit}
+          onClick={form.handleSubmit(handleSubmit)}
           className="w-full"
-          disabled={updateProfileMutation.isPending || !username.trim()}
+          disabled={
+            updateProfileMutation.isPending ||
+            !form.formState.isValid ||
+            !form.watch("username")?.trim()
+          }
         >
           {updateProfileMutation.isPending ? "Setting up..." : "Continue"}
         </Button>
