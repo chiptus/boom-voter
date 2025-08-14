@@ -107,6 +107,7 @@ src/
 - Custom hooks use camelCase with "use" prefix
 - Services and utilities use camelCase
 - **Function Style**: Always use function declarations (`function name() {}`) instead of arrow function expressions (`const name = () => {}`) for components and named functions
+- **Query Hook Naming**: Query hooks must end with "Query" (e.g., `useGroupsQuery`, `useUserPermissionsQuery`) and mutation hooks must end with "Mutation" (e.g., `useUpdateGroupMutation`, `useCreateArtistMutation`)
 - **Dialog Components**: Always include both `DialogTitle` AND `DialogDescription` in `DialogHeader` to prevent accessibility warnings
 - **React Router**: Use future flags `v7_startTransition` and `v7_relativeSplatPath` in BrowserRouter to prepare for v7 upgrade
 - **Component Extraction**: When a section of JSX + logic becomes substantial (>30 lines) or reusable, extract it into a separate component. Place in appropriate directory: page-specific components in `components/PageName/`, reusable ones in `components/`
