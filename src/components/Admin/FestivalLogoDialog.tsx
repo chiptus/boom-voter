@@ -1,8 +1,6 @@
 import { useState } from "react";
-import {
-  useUpdateFestivalMutation,
-  Festival,
-} from "@/hooks/queries/festivals/useFestivals";
+import { useUpdateFestivalMutation } from "@/hooks/queries/festivals/useUpdateFestival";
+import { Festival } from "@/hooks/queries/festivals/types";
 import { useToast } from "@/hooks/use-toast";
 import {
   Dialog,

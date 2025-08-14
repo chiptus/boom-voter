@@ -1,11 +1,9 @@
 import { createContext, PropsWithChildren, useContext, useMemo } from "react";
 import { matchPath, useLocation } from "react-router-dom";
-import {
-  useFestivalEditionBySlugQuery,
-  useFestivalBySlugQuery,
-  Festival,
-  FestivalEdition,
-} from "@/hooks/queries/festivals/useFestivals";
+import { useFestivalBySlugQuery } from "@/hooks/queries/festivals/useFestivalBySlug";
+import { Festival } from "@/hooks/queries/festivals/types";
+import { useFestivalEditionBySlugQuery } from "@/hooks/queries/festivals/editions/useFestivalEditionBySlug";
+import { FestivalEdition } from "@/hooks/queries/festivals/editions/types";
 import { getSubdomainInfo } from "@/lib/subdomain";
 
 interface FestivalEditionContextType {

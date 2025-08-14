@@ -1,11 +1,9 @@
 import { useState } from "react";
-import {
-  useFestivalEditionsForFestival,
-  useCreateFestivalEditionMutation,
-  useUpdateFestivalEditionMutation,
-  useDeleteFestivalEditionMutation,
-  FestivalEdition,
-} from "@/hooks/queries/festivals/useFestivals";
+import { useFestivalEditionsForFestivalQuery } from "@/hooks/queries/festivals/editions/useFestivalEditionsForFestival";
+import { useCreateFestivalEditionMutation } from "@/hooks/queries/festivals/editions/useCreateFestivalEdition";
+import { useUpdateFestivalEditionMutation } from "@/hooks/queries/festivals/editions/useUpdateFestivalEdition";
+import { useDeleteFestivalEditionMutation } from "@/hooks/queries/festivals/editions/useDeleteFestivalEdition";
+import { FestivalEdition } from "@/hooks/queries/festivals/editions/types";
 import { useToast } from "@/hooks/use-toast";
 import {
   Table,
@@ -41,7 +39,7 @@ interface EditionFormData {
   published: boolean;
 }
 
-export const FestivalEditionManagement = ({
+export function FestivalEditionManagement({
   festivalId,
   onSelect,
   selected,
@@ -49,11 +47,9 @@ export const FestivalEditionManagement = ({
   festivalId: string;
   onSelect: (editionId: string) => void;
   selected: string;
-}) => {
-  const { data: editions = [], isLoading } = useFestivalEditionsForFestival(
-    festivalId,
-    { all: true },
-  );
+}) {
+  const { data: editions = [], isLoading } =
+    useFestivalEditionsForFestivalQuery(festivalId, { all: true });
   const createEditionMutation = useCreateFestivalEditionMutation();
   const updateEditionMutation = useUpdateFestivalEditionMutation();
   const deleteEditionMutation = useDeleteFestivalEditionMutation();
@@ -74,7 +70,7 @@ export const FestivalEditionManagement = ({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [slugError, setSlugError] = useState("");
 
-  const resetForm = () => {
+  function resetForm() {
     setFormData({
       name: "",
       slug: "",
@@ -85,14 +81,14 @@ export const FestivalEditionManagement = ({
     });
     setEditingEdition(null);
     setSlugError("");
-  };
+  }
 
-  const handleCreate = () => {
+  function handleCreate() {
     resetForm();
     setIsDialogOpen(true);
-  };
+  }
 
-  const handleEdit = (edition: FestivalEdition) => {
+  function handleEdit(edition: FestivalEdition) {
     setFormData({
       name: edition.name,
       slug: edition.slug || generateSlug(edition.name),
@@ -104,10 +100,10 @@ export const FestivalEditionManagement = ({
     setEditingEdition(edition);
     setSlugError("");
     setIsDialogOpen(true);
-  };
+  }
 
   // Auto-generate slug when name changes
-  const handleNameChange = (name: string) => {
+  function handleNameChange(name: string) {
     setFormData((prev) => ({
       ...prev,
       name,
@@ -117,10 +113,10 @@ export const FestivalEditionManagement = ({
           ? generateSlug(name)
           : prev.slug,
     }));
-  };
+  }
 
   // Validate slug when it changes
-  const handleSlugChange = (slug: string) => {
+  function handleSlugChange(slug: string) {
     const cleanSlug = sanitizeSlug(slug);
     setFormData((prev) => ({ ...prev, slug: cleanSlug }));
 
@@ -131,9 +127,9 @@ export const FestivalEditionManagement = ({
     } else {
       setSlugError("");
     }
-  };
+  }
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (!formData.name.trim()) {
       toast({
@@ -193,9 +189,9 @@ export const FestivalEditionManagement = ({
     } finally {
       setIsSubmitting(false);
     }
-  };
+  }
 
-  const handleDelete = async (edition: FestivalEdition) => {
+  async function handleDelete(edition: FestivalEdition) {
     if (
       !confirm(
         `Are you sure you want to delete "${edition.name}"? This will also delete all associated stages and sets.`,
@@ -209,7 +205,7 @@ export const FestivalEditionManagement = ({
     } catch (error) {
       // Error handling is done in the mutation hook
     }
-  };
+  }
 
   if (isLoading) {
     return (
@@ -424,4 +420,4 @@ export const FestivalEditionManagement = ({
       </CardContent>
     </Card>
   );
-};
+}

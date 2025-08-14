@@ -3,7 +3,7 @@ import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Loader2, MapPin, Music } from "lucide-react";
 import { useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { useFestivalEditionsForFestival } from "@/hooks/queries/festivals/useFestivals";
+import { useFestivalEditionsForFestivalQuery } from "@/hooks/queries/festivals/editions/useFestivalEditionsForFestival";
 
 export default function FestivalEdition() {
   const { festivalId, editionId } = useParams<{
@@ -25,7 +25,7 @@ export default function FestivalEdition() {
     }
   }, [location.pathname, festivalId, editionId, navigate]);
 
-  const editionsQuery = useFestivalEditionsForFestival(festivalId);
+  const editionsQuery = useFestivalEditionsForFestivalQuery(festivalId);
 
   if (!festivalId || !editionId) {
     return <div>Festival or edition not found</div>;

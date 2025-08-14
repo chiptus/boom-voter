@@ -1,11 +1,9 @@
 import { useState } from "react";
-import {
-  useStagesQuery,
-  useCreateStageMutation,
-  useUpdateStageMutation,
-  useDeleteStageMutation,
-  Stage,
-} from "@/hooks/queries/stages/useStages";
+import { useStagesQuery } from "@/hooks/queries/stages/useStages";
+import { useCreateStageMutation } from "@/hooks/queries/stages/useCreateStage";
+import { useUpdateStageMutation } from "@/hooks/queries/stages/useUpdateStage";
+import { useDeleteStageMutation } from "@/hooks/queries/stages/useDeleteStage";
+import { Stage } from "@/hooks/queries/stages/types";
 import { useToast } from "@/hooks/use-toast";
 import {
   Table,

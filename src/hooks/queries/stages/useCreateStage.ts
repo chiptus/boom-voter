@@ -1,0 +1,42 @@
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
+import { stagesKeys } from "./types";
+
+async function createStage(stageData: {
+  name: string;
+  festival_edition_id: string;
+}) {
+  const { data, error } = await supabase
+    .from("stages")
+    .insert(stageData)
+    .select()
+    .single();
+
+  if (error) throw error;
+  return data;
+}
+
+export function useCreateStageMutation() {
+  const queryClient = useQueryClient();
+  const { toast } = useToast();
+
+  return useMutation({
+    mutationFn: createStage,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: stagesKeys.all });
+      toast({
+        title: "Success",
+        description: "Stage created successfully",
+      });
+    },
+    onError: (error) => {
+      console.error("Error creating stage:", error);
+      toast({
+        title: "Error",
+        description: "Failed to create stage",
+        variant: "destructive",
+      });
+    },
+  });
+}

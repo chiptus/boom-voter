@@ -11,16 +11,14 @@ import { Button } from "@/components/ui/button";
 import { useFestivalEdition } from "@/contexts/FestivalEditionContext";
 import { AppHeader } from "@/components/AppHeader";
 import { Link, useNavigate } from "react-router-dom";
-import {
-  useFestivalEditionsForFestival,
-  FestivalEdition,
-} from "@/hooks/queries/festivals/useFestivals";
+import { useFestivalEditionsForFestivalQuery } from "@/hooks/queries/festivals/editions/useFestivalEditionsForFestival";
+import { FestivalEdition } from "@/hooks/queries/festivals/editions/types";
 import { useEffect } from "react";
 import { getSubdomainInfo } from "@/lib/subdomain";
 
 export default function EditionSelection() {
   const { festival } = useFestivalEdition();
-  const editionListQuery = useFestivalEditionsForFestival(festival?.id);
+  const editionListQuery = useFestivalEditionsForFestivalQuery(festival?.id);
   const navigate = useNavigate();
   const subdomainInfo = getSubdomainInfo();
 

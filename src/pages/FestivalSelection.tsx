@@ -7,10 +7,8 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import {
-  useFestivalsQuery,
-  Festival,
-} from "@/hooks/queries/festivals/useFestivals";
+import { useFestivalsQuery } from "@/hooks/queries/festivals/useFestivals";
+import { Festival } from "@/hooks/queries/festivals/types";
 import { AppHeader } from "@/components/AppHeader";
 import { useEffect } from "react";
 import {

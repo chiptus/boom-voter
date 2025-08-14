@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Calendar, Plus } from "lucide-react";
 import { FestivalDialog } from "@/components/Admin/FestivalDialog";
 import { FestivalManagementTable } from "@/components/Admin/FestivalManagementTable";
-import { Festival } from "@/hooks/queries/festivals/useFestivals";
+import { Festival } from "@/hooks/queries/festivals/types";
 import { Button } from "@/components/ui/button";
 
 export default function AdminFestivals() {
@@ -16,13 +16,13 @@ export default function AdminFestivals() {
     festivalId?: string;
   }>();
 
-  const handleFestivalChange = (festivalId: string) => {
+  function handleFestivalChange(festivalId: string) {
     if (festivalId === "none") {
       navigate("/admin/festivals");
     } else {
       navigate(`/admin/festivals/${festivalId}`);
     }
-  };
+  }
 
   return (
     <div className="space-y-6">

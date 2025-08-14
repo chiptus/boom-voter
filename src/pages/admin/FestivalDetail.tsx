@@ -1,7 +1,7 @@
 import { useParams, useNavigate, Outlet } from "react-router-dom";
 import { FestivalEditionManagement } from "@/components/Admin/FestivalEditionManagement";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
-import { useFestivalQuery } from "@/hooks/queries/festivals/useFestivals";
+import { useFestivalQuery } from "@/hooks/queries/festivals/useFestival";
 import { Loader2 } from "lucide-react";
 
 export default function FestivalDetail() {
