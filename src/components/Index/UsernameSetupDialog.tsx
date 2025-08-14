@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useUpdateProfileMutation } from "@/hooks/queries/useProfileQuery";
+import { useUpdateProfileMutation } from "@/hooks/queries/auth/useUpdateProfile";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";

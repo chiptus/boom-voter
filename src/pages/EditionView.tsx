@@ -8,7 +8,7 @@ import { useUrlState } from "@/hooks/useUrlState";
 import { SetsPanel } from "@/components/Index/SetsPanel";
 import { ScheduleHorizontalTimelineView } from "@/components/schedule/ScheduleHorizontalTimelineView";
 import ErrorBoundary from "@/components/ErrorBoundary";
-import { useEditionSetsQuery } from "@/hooks/queries/useEditionSetsQuery";
+import { useSetsByEditionQuery } from "@/hooks/queries/sets/useSetsByEdition";
 import { useFestivalEdition } from "@/contexts/FestivalEditionContext";
 
 export default function EditionView() {
@@ -20,7 +20,7 @@ export default function EditionView() {
   const { festival, edition, isContextReady } = useFestivalEdition();
 
   // Fetch sets for the current edition
-  const { data: sets = [], isLoading: setsLoading } = useEditionSetsQuery(
+  const { data: sets = [], isLoading: setsLoading } = useSetsByEditionQuery(
     edition?.id,
   );
   const { userVotes, handleVote } = useOfflineVoting(user);

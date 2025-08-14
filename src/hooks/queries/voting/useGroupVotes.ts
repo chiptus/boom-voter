@@ -76,7 +76,7 @@ async function fetchGroupVotes(
 }
 
 // Hook with offline support
-export function useGroupVotes(setId: string, groupId: string) {
+export function useGroupVotesQuery(setId: string, groupId: string) {
   const isOnline = useOnlineStatus();
 
   return useQuery({
@@ -104,9 +104,4 @@ export function useGroupVotes(setId: string, groupId: string) {
       return failureCount < 2;
     },
   });
-}
-
-// Alias for backwards compatibility
-export function useGroupVotesQuery(setId: string, groupId: string) {
-  return useGroupVotes(setId, groupId);
 }

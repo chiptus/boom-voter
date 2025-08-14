@@ -10,14 +10,14 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { useAuth } from "@/contexts/AuthContext";
 import { useUserGroupsQuery } from "@/hooks/queries/groups/useUserGroups";
-import { useGroupVotesQuery } from "@/hooks/queries/useGroupVotesQuery";
+import { useGroupVotesQuery } from "@/hooks/queries/voting/useGroupVotes";
 import { Users, ThumbsUp, Heart, ThumbsDown } from "lucide-react";
 
 interface SetGroupVotingProps {
   setId: string;
 }
 
-const getVoteIcon = (voteType: number) => {
+function getVoteIcon(voteType: number) {
   switch (voteType) {
     case 2:
       return <Heart className="h-4 w-4" />;
@@ -28,9 +28,9 @@ const getVoteIcon = (voteType: number) => {
     default:
       return null;
   }
-};
+}
 
-const getVoteLabel = (voteType: number) => {
+function getVoteLabel(voteType: number) {
   switch (voteType) {
     case 2:
       return "Must Go";
@@ -41,9 +41,9 @@ const getVoteLabel = (voteType: number) => {
     default:
       return "Unknown";
   }
-};
+}
 
-const getVoteColor = (voteType: number) => {
+function getVoteColor(voteType: number) {
   switch (voteType) {
     case 2:
       return "bg-red-500/20 text-red-400 border-red-400/30";
@@ -54,9 +54,9 @@ const getVoteColor = (voteType: number) => {
     default:
       return "bg-gray-500/20 text-gray-400 border-gray-400/30";
   }
-};
+}
 
-export const SetGroupVoting = ({ setId: artistId }: SetGroupVotingProps) => {
+export function SetGroupVoting({ setId: artistId }: SetGroupVotingProps) {
   const { user } = useAuth();
   const { data: groups = [] } = useUserGroupsQuery(user?.id);
   const [selectedGroupId, setSelectedGroupId] = useState<string>("");
@@ -185,4 +185,4 @@ export const SetGroupVoting = ({ setId: artistId }: SetGroupVotingProps) => {
       </CardContent>
     </Card>
   );
-};
+}

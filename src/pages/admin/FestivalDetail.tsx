@@ -1,7 +1,7 @@
 import { useParams, useNavigate, Outlet } from "react-router-dom";
 import { FestivalEditionManagement } from "@/components/Admin/FestivalEditionManagement";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
-import { useFestivalQuery } from "@/hooks/queries/useFestivalQuery";
+import { useFestivalQuery } from "@/hooks/queries/festivals/useFestivals";
 import { Loader2 } from "lucide-react";
 
 export default function FestivalDetail() {
@@ -39,9 +39,9 @@ export default function FestivalDetail() {
     );
   }
 
-  const handleEditionSelect = (editionId: string) => {
+  function handleEditionSelect(editionId: string) {
     navigate(`/admin/festivals/${festivalId}/editions/${editionId}/stages`);
-  };
+  }
 
   const festival = festivalQuery.data;
 

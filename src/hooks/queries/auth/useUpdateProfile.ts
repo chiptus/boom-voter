@@ -50,7 +50,7 @@ async function updateProfile(variables: {
 }
 
 // Hook
-export function useUpdateProfile() {
+export function useUpdateProfileMutation() {
   const queryClient = useQueryClient();
   const { toast } = useToast();
 
@@ -81,9 +81,4 @@ export function useUpdateProfile() {
       });
     },
   });
-}
-
-// Alias for backwards compatibility
-export function useUpdateProfileMutation() {
-  return useUpdateProfile();
 }

@@ -5,7 +5,7 @@ import {
   useFestivalBySlugQuery,
   Festival,
   FestivalEdition,
-} from "@/hooks/queries/useFestivalQuery";
+} from "@/hooks/queries/festivals/useFestivals";
 import { getSubdomainInfo } from "@/lib/subdomain";
 
 interface FestivalEditionContextType {

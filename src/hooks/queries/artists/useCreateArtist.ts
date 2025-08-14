@@ -39,18 +39,6 @@ async function createArtist(
     throw new Error("Failed to create artist");
   }
 
-  // Generate and update the slug using the created ID
-  const slug = generateSlug(data.name);
-  const { error: slugError } = await supabase
-    .from("artists")
-    .update({ slug })
-    .eq("id", data.id);
-
-  if (slugError) {
-    console.error("Error updating artist slug:", slugError);
-    throw new Error("Failed to generate artist slug");
-  }
-
   if (artistData.genre_ids.length > 0) {
     const { error: genreError } = await supabase
       .from("artist_music_genres")
@@ -69,7 +57,6 @@ async function createArtist(
 
   return {
     ...data,
-    slug,
     artist_music_genres: artistData.genre_ids.map((genreId) => ({
       music_genre_id: genreId,
     })),

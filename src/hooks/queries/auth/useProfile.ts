@@ -28,7 +28,7 @@ async function fetchProfile(userId: string) {
 }
 
 // Hook with offline support
-export function useProfile(userId: string | undefined) {
+export function useProfileQuery(userId: string | undefined) {
   const { showOfflineProfileToast, isOnline } = useOfflineProfileToast();
 
   return useQuery({
@@ -76,9 +76,4 @@ export function useProfile(userId: string | undefined) {
       return failureCount < 2;
     },
   });
-}
-
-// Alias for backwards compatibility
-export function useProfileQuery(userId?: string) {
-  return useProfile(userId);
 }
