@@ -5,9 +5,6 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Sparkles, Music, Users, ArrowRight } from "lucide-react";
-import { useUpdateProfileMutation } from "@/hooks/queries/auth/useUpdateProfile";
-import { useAuth } from "@/contexts/AuthContext";
-import { useToast } from "@/hooks/use-toast";
 
 interface WelcomeStepProps {
   username: string;
@@ -15,38 +12,6 @@ interface WelcomeStepProps {
 }
 
 export function WelcomeStep({ username, onComplete }: WelcomeStepProps) {
-  const { user } = useAuth();
-  const { toast } = useToast();
-  const updateProfileMutation = useUpdateProfileMutation();
-
-  function handleComplete() {
-    if (!user) return;
-
-    updateProfileMutation.mutate(
-      {
-        userId: user.id,
-        updates: { completed_onboarding: true },
-      },
-      {
-        onSuccess: () => {
-          toast({
-            title: "Welcome to UpLine!",
-            description:
-              "You're all set to start planning your festival experience.",
-          });
-          onComplete();
-        },
-        onError: (error) => {
-          toast({
-            title: "Error",
-            description: error.message,
-            variant: "destructive",
-          });
-        },
-      },
-    );
-  }
-
   return (
     <div className="flex flex-col h-full">
       {/* Header - fixed */}
@@ -92,17 +57,8 @@ export function WelcomeStep({ username, onComplete }: WelcomeStepProps) {
 
       {/* Button - fixed at bottom */}
       <div className="pt-4 mt-4 border-t">
-        <Button
-          onClick={handleComplete}
-          className="w-full"
-          size="lg"
-          disabled={updateProfileMutation.isPending}
-        >
-          <span>
-            {updateProfileMutation.isPending
-              ? "Setting up..."
-              : "Start Exploring"}
-          </span>
+        <Button onClick={onComplete} className="w-full" size="lg">
+          <span>Start Exploring</span>
           <ArrowRight className="h-4 w-4 ml-2" />
         </Button>
       </div>
