@@ -90,6 +90,7 @@ export function OnboardingDialog({
           <GroupsExplanationStep
             onNext={handleNext}
             onPrevious={handlePrevious}
+            onSkip={onComplete}
           />
         );
       case "voting":
@@ -97,6 +98,7 @@ export function OnboardingDialog({
           <VotingExplanationStep
             onNext={handleNext}
             onPrevious={handlePrevious}
+            onSkip={onComplete}
           />
         );
       case "timeline":
@@ -104,6 +106,7 @@ export function OnboardingDialog({
           <TimelineExplanationStep
             onNext={handleNext}
             onPrevious={handlePrevious}
+            onSkip={onComplete}
           />
         );
       case "welcome":
@@ -116,7 +119,7 @@ export function OnboardingDialog({
   return (
     <Dialog open={open} onOpenChange={() => {}}>
       <DialogContent
-        className="sm:max-w-lg max-h-[95vh] w-[95vw] sm:w-full flex flex-col p-4 sm:p-6 my-4 sm:my-auto"
+        className="sm:max-w-lg max-h-[95vh] w-[95vw] sm:w-full flex flex-col p-4 sm:p-6 my-4 sm:my-auto [&>button]:hidden"
         onInteractOutside={(e) => e.preventDefault()}
       >
         {renderStep()}

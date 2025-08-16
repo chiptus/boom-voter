@@ -11,11 +11,13 @@ import votingImage from "./voting.png?url";
 interface VotingExplanationStepProps {
   onNext: () => void;
   onPrevious: () => void;
+  onSkip?: () => void;
 }
 
 export function VotingExplanationStep({
   onNext,
   onPrevious,
+  onSkip,
 }: VotingExplanationStepProps) {
   return (
     <div className="flex flex-col h-full">
@@ -88,7 +90,16 @@ export function VotingExplanationStep({
           <ArrowLeft className="h-4 w-4" />
           Back
         </Button>
-        <Button onClick={onNext} className="flex-1">
+        {onSkip && (
+          <Button
+            variant="ghost"
+            onClick={onSkip}
+            className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
+          >
+            Skip
+          </Button>
+        )}
+        <Button onClick={onNext} className="ml-auto">
           Next: Timeline
         </Button>
       </div>

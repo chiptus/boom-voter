@@ -10,11 +10,13 @@ import groupsImage from "./groups.png?url";
 interface GroupsExplanationStepProps {
   onNext: () => void;
   onPrevious: () => void;
+  onSkip?: () => void;
 }
 
 export function GroupsExplanationStep({
   onNext,
   onPrevious,
+  onSkip,
 }: GroupsExplanationStepProps) {
   return (
     <div className="flex flex-col h-full">
@@ -81,18 +83,29 @@ export function GroupsExplanationStep({
       </OnboardingContent>
 
       {/* Navigation - fixed at bottom */}
-      <div className="flex gap-2 pt-4 mt-4 border-t">
-        <Button
-          variant="outline"
-          onClick={onPrevious}
-          className="flex items-center gap-2"
-        >
-          <ArrowLeft className="h-4 w-4" />
-          Back
-        </Button>
-        <Button onClick={onNext} className="flex-1">
-          Next: Voting System
-        </Button>
+      <div className="flex flex-col gap-2 pt-4 mt-4 border-t">
+        <div className="flex gap-2">
+          <Button
+            variant="outline"
+            onClick={onPrevious}
+            className="flex items-center gap-2"
+          >
+            <ArrowLeft className="h-4 w-4" />
+            Back
+          </Button>
+          {onSkip && (
+            <Button
+              variant="ghost"
+              onClick={onSkip}
+              className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
+            >
+              Skip
+            </Button>
+          )}
+          <Button onClick={onNext} className="ml-auto">
+            Next: Voting
+          </Button>
+        </div>
       </div>
     </div>
   );
