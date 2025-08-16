@@ -15,7 +15,8 @@
       "Bash(mv:*)",
       "mcp__ide__getDiagnostics",
       "Bash(git checkout:*)",
-      "Bash(mkdir:*)"
+      "Bash(mkdir:*)",
+      "Bash(npx oxlint:*)"
     ],
     "deny": []
   }

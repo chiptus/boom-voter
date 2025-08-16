@@ -111,6 +111,7 @@ src/
 - **Dialog Components**: Always include both `DialogTitle` AND `DialogDescription` in `DialogHeader` to prevent accessibility warnings
 - **React Router**: Use future flags `v7_startTransition` and `v7_relativeSplatPath` in BrowserRouter to prepare for v7 upgrade
 - **Component Extraction**: When a section of JSX + logic becomes substantial (>30 lines) or reusable, extract it into a separate component. Place in appropriate directory: page-specific components in `components/PageName/`, reusable ones in `components/`
+- **Forms**: ALL forms must use react-hook-form with proper validation. Never use plain HTML forms or manual state management for form inputs. Use @hookform/resolvers for validation schemas when needed.
 
 ### Important Notes
 
@@ -123,3 +124,5 @@ src/
 - dont use export from unless specifically required
 
 - try to use mutation.mutate(variables, {onSuccess, onError}) instead of try{await mutation.mutateAsync(variables)}catch(err){}
+
+- don't add comments unless really necessary

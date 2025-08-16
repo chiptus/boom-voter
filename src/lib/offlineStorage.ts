@@ -20,11 +20,12 @@ interface OfflineNote {
   synced: boolean;
 }
 
-export type OffineProfile = {
+export type OfflineProfile = {
   created_at: string;
   email: string | null;
   id: string;
   username: string | null;
+  completed_onboarding: boolean | null;
 };
 
 export type OfflineSetting = {
@@ -197,6 +198,7 @@ class OfflineStorageManager {
         const setIndex = tx.objectStore("notes").index("setId");
         return setIndex.getAll(id);
       } catch (err) {
+        console.error("Error fetching notes for set:", err);
         return [];
       }
     }
@@ -223,7 +225,7 @@ class OfflineStorageManager {
   }
 
   // Profile methods (secure offline caching)
-  async saveProfile(userId: string, profile: OffineProfile): Promise<void> {
+  async saveProfile(userId: string, profile: OfflineProfile): Promise<void> {
     const db = await this.ensureDB();
     // Only cache non-sensitive profile data
     const safeProfile = {
@@ -236,7 +238,7 @@ class OfflineStorageManager {
     await db.put("settings", { key: `profile_${userId}`, value: safeProfile });
   }
 
-  async getProfile(userId: string): Promise<OffineProfile> {
+  async getProfile(userId: string): Promise<OfflineProfile> {
     const db = await this.ensureDB();
     const result = await db.get("settings", `profile_${userId}`);
     return result?.value;

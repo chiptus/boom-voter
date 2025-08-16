@@ -19,7 +19,7 @@ interface AuthContextType {
   user: User | null;
   profile: Profile | null;
   loading: boolean;
-  hasUsername: boolean;
+  needsOnboarding: boolean;
 
   // Auth actions
   signOut: () => Promise<void>;
@@ -144,15 +144,22 @@ export function AuthProvider({ children }: AuthProviderProps) {
     setGroupName(undefined);
   }
 
-  const hasUsername = useMemo(() => {
-    return Boolean(profile?.username && profile?.username.trim() !== "");
+  const needsOnboarding = useMemo(() => {
+    if (!profile) return false; // Don't show onboarding until profile is loaded
+
+    const hasUsername = Boolean(
+      profile.username && profile.username.trim() !== "",
+    );
+    const hasCompletedOnboarding = Boolean(profile.completed_onboarding);
+
+    return !hasUsername || !hasCompletedOnboarding;
   }, [profile]);
 
   const contextValue: AuthContextType = {
     user,
     profile: profile || null,
     loading,
-    hasUsername,
+    needsOnboarding,
     signOut,
     showAuthDialog,
     hideAuthDialog,

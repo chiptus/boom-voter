@@ -11,49 +11,11 @@ import { Badge } from "@/components/ui/badge";
 import { useAuth } from "@/contexts/AuthContext";
 import { useUserGroupsQuery } from "@/hooks/queries/groups/useUserGroups";
 import { useGroupVotesQuery } from "@/hooks/queries/voting/useGroupVotes";
-import { Users, ThumbsUp, Heart, ThumbsDown } from "lucide-react";
+import { Users } from "lucide-react";
+import { VOTE_CONFIG, VOTES_TYPES, getVoteConfig } from "@/lib/voteConfig";
 
 interface ArtistGroupVotingProps {
   artistId: string;
-}
-
-function getVoteIcon(voteType: number) {
-  switch (voteType) {
-    case 2:
-      return <Heart className="h-4 w-4" />;
-    case 1:
-      return <ThumbsUp className="h-4 w-4" />;
-    case -1:
-      return <ThumbsDown className="h-4 w-4" />;
-    default:
-      return null;
-  }
-}
-
-function getVoteLabel(voteType: number) {
-  switch (voteType) {
-    case 2:
-      return "Must Go";
-    case 1:
-      return "Interested";
-    case -1:
-      return "Won't Go";
-    default:
-      return "Unknown";
-  }
-}
-
-function getVoteColor(voteType: number) {
-  switch (voteType) {
-    case 2:
-      return "bg-red-500/20 text-red-400 border-red-400/30";
-    case 1:
-      return "bg-green-500/20 text-green-400 border-green-400/30";
-    case -1:
-      return "bg-gray-500/20 text-gray-400 border-gray-400/30";
-    default:
-      return "bg-gray-500/20 text-gray-400 border-gray-400/30";
-  }
 }
 
 export function ArtistGroupVoting({ artistId }: ArtistGroupVotingProps) {
@@ -129,33 +91,26 @@ export function ArtistGroupVoting({ artistId }: ArtistGroupVotingProps) {
           <div className="space-y-4">
             {/* Vote Summary */}
             <div className="grid grid-cols-3 gap-4">
-              <div className="text-center">
-                <div className="flex items-center justify-center gap-2 mb-1">
-                  <Heart className="h-4 w-4 text-red-400" />
-                  <span className="text-white font-semibold">
-                    {voteCounts[2]}
-                  </span>
-                </div>
-                <p className="text-red-400 text-sm">Must Go</p>
-              </div>
-              <div className="text-center">
-                <div className="flex items-center justify-center gap-2 mb-1">
-                  <ThumbsUp className="h-4 w-4 text-green-400" />
-                  <span className="text-white font-semibold">
-                    {voteCounts[1]}
-                  </span>
-                </div>
-                <p className="text-green-400 text-sm">Interested</p>
-              </div>
-              <div className="text-center">
-                <div className="flex items-center justify-center gap-2 mb-1">
-                  <ThumbsDown className="h-4 w-4 text-gray-400" />
-                  <span className="text-white font-semibold">
-                    {voteCounts[-1]}
-                  </span>
-                </div>
-                <p className="text-gray-400 text-sm">Won't Go</p>
-              </div>
+              {VOTES_TYPES.map((voteTypeKey) => {
+                const config = VOTE_CONFIG[voteTypeKey];
+                const voteType = config.value;
+                const IconComponent = config.icon;
+                return (
+                  <div key={voteType} className="text-center">
+                    <div className="flex items-center justify-center gap-2 mb-1">
+                      <IconComponent
+                        className={`h-4 w-4 ${config.iconColor}`}
+                      />
+                      <span className="text-white font-semibold">
+                        {voteCounts[voteType as keyof typeof voteCounts]}
+                      </span>
+                    </div>
+                    <p className={`text-sm ${config.iconColor}`}>
+                      {config.label}
+                    </p>
+                  </div>
+                );
+              })}
             </div>
 
             {/* Individual Votes */}
@@ -163,22 +118,26 @@ export function ArtistGroupVoting({ artistId }: ArtistGroupVotingProps) {
               <h4 className="text-white font-medium text-sm mb-2">
                 Individual Votes:
               </h4>
-              {groupVotes.map((vote) => (
-                <div
-                  key={vote.user_id}
-                  className="flex items-center justify-between py-2 px-3 rounded-lg bg-white/5"
-                >
-                  <span className="text-purple-200">
-                    {vote.username || "Unknown User"}
-                  </span>
-                  <Badge
-                    className={`${getVoteColor(vote.vote_type)} flex items-center gap-1`}
+              {groupVotes.map((vote) => {
+                const configKey = getVoteConfig(vote.vote_type);
+                const config = configKey ? VOTE_CONFIG[configKey] : null;
+                return (
+                  <div
+                    key={vote.user_id}
+                    className="flex items-center justify-between py-2 px-3 rounded-lg bg-white/5"
                   >
-                    {getVoteIcon(vote.vote_type)}
-                    {getVoteLabel(vote.vote_type)}
-                  </Badge>
-                </div>
-              ))}
+                    <span className="text-purple-200">
+                      {vote.username || "Unknown User"}
+                    </span>
+                    <Badge
+                      className={`${config?.bgColor} ${config?.textColor} border-transparent flex items-center gap-1`}
+                    >
+                      {config && <config.icon className="h-3 w-3" />}
+                      {config?.label}
+                    </Badge>
+                  </div>
+                );
+              })}
             </div>
           </div>
         )}

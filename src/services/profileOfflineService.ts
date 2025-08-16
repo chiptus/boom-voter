@@ -1,7 +1,7 @@
-import { OffineProfile, offlineStorage } from "@/lib/offlineStorage";
+import { OfflineProfile, offlineStorage } from "@/lib/offlineStorage";
 
 export const profileOfflineService = {
-  async cacheProfile(userId: string, profile: OffineProfile): Promise<void> {
+  async cacheProfile(userId: string, profile: OfflineProfile): Promise<void> {
     try {
       await offlineStorage.saveProfile(userId, profile);
     } catch (error) {
@@ -9,7 +9,7 @@ export const profileOfflineService = {
     }
   },
 
-  async getCachedProfile(userId: string): Promise<OffineProfile | null> {
+  async getCachedProfile(userId: string): Promise<OfflineProfile | null> {
     try {
       return await offlineStorage.getProfile(userId);
     } catch (error) {
