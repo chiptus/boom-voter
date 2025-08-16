@@ -90,7 +90,7 @@ export function UsernameStep({
       </DialogHeader>
 
       {/* Form content - scrollable if needed */}
-      <div className="flex-1 overflow-y-auto mt-4 min-h-0">
+      <div className="flex-1 overflow-y-auto mt-3 sm:mt-4 min-h-0">
         <Form {...form}>
           <form
             onSubmit={form.handleSubmit(handleSubmit)}

@@ -116,7 +116,7 @@ export function OnboardingDialog({
   return (
     <Dialog open={open} onOpenChange={() => {}}>
       <DialogContent
-        className="sm:max-w-lg max-h-[95vh] w-[95vw] sm:w-full h-[95vh] sm:h-auto flex flex-col p-6"
+        className="sm:max-w-lg max-h-[95vh] w-[95vw] sm:w-full flex flex-col p-4 sm:p-6 my-4 sm:my-auto"
         onInteractOutside={(e) => e.preventDefault()}
       >
         {renderStep()}

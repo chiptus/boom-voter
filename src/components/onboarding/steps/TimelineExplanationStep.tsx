@@ -5,8 +5,8 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Calendar, Clock, MapPin, ArrowLeft } from "lucide-react";
-
-import image from "./timeline.png?url"; // Assuming you have this image in the same directory
+import { OnboardingContent } from "../OnboardingContent";
+import image from "./timeline.png?url";
 
 interface TimelineExplanationStepProps {
   onNext: () => void;
@@ -32,13 +32,13 @@ export function TimelineExplanationStep({
       </DialogHeader>
 
       {/* Scrollable content */}
-      <div className="flex-1 overflow-y-auto space-y-4 mt-4 min-h-0">
+      <OnboardingContent>
         {/* Timeline feature screenshot */}
         <div className="rounded-lg overflow-hidden">
           <img
             src={image}
             alt="Timeline feature showing festival schedule and stage layout"
-            className="w-full h-auto rounded-lg"
+            className="w-full h-auto max-h-56 sm:max-h-80 object-contain rounded-lg"
           />
         </div>
 
@@ -90,7 +90,7 @@ export function TimelineExplanationStep({
             will highlight your favorites when it's available!
           </p>
         </div>
-      </div>
+      </OnboardingContent>
 
       {/* Navigation - fixed at bottom */}
       <div className="flex gap-2 pt-4 mt-4 border-t">

@@ -5,6 +5,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Users, Plus, Eye, ArrowLeft } from "lucide-react";
+import { OnboardingContent } from "../OnboardingContent";
 import groupsImage from "./groups.png?url";
 interface GroupsExplanationStepProps {
   onNext: () => void;
@@ -29,12 +30,12 @@ export function GroupsExplanationStep({
         </DialogDescription>
       </DialogHeader>
 
-      <div className="flex-1 overflow-y-auto space-y-4 mt-4 min-h-0">
+      <OnboardingContent>
         <div className="rounded-lg overflow-hidden">
           <img
             src={groupsImage}
             alt="Groups feature showing collaborative planning"
-            className="w-full h-auto rounded-lg"
+            className="w-full h-auto max-h-56 sm:max-h-60 object-contain rounded-lg"
           />
         </div>
 
@@ -42,13 +43,12 @@ export function GroupsExplanationStep({
           <div className="bg-purple-50 dark:bg-purple-900/20 rounded-lg p-3">
             <div className="flex items-center gap-2 mb-1">
               <Plus className="h-4 w-4 text-purple-600" />
-              <h4 className="font-medium text-sm text-purple-900 dark:text-purple-100">
+              <h4 className="font-medium text-sm sm:text-base text-purple-900 dark:text-purple-100">
                 Create Groups
               </h4>
             </div>
-            <p className="text-xs text-purple-700 dark:text-purple-300">
-              Make groups with your friends, family, or fellow festival-goers to
-              coordinate your plans.
+            <p className="text-xs sm:text-sm text-purple-700 dark:text-purple-300">
+              Make groups with your friends to coordinate your plans.
             </p>
           </div>
 
@@ -78,7 +78,7 @@ export function GroupsExplanationStep({
             </p>
           </div>
         </div>
-      </div>
+      </OnboardingContent>
 
       {/* Navigation - fixed at bottom */}
       <div className="flex gap-2 pt-4 mt-4 border-t">
