@@ -22,12 +22,13 @@ async function createArtist(
     genre_ids: string[];
   },
 ): Promise<Artist> {
+  const { genre_ids, ...artist } = artistData;
   // First, create the artist without slug
   const { data, error } = await supabase
     .from("artists")
     .insert({
-      ...artistData,
-      slug: generateSlug(artistData.name),
+      ...artist,
+      slug: generateSlug(artist.name),
       created_at: new Date().toISOString(),
       updated_at: new Date().toISOString(),
     })
@@ -39,11 +40,11 @@ async function createArtist(
     throw new Error("Failed to create artist");
   }
 
-  if (artistData.genre_ids.length > 0) {
+  if (genre_ids.length > 0) {
     const { error: genreError } = await supabase
       .from("artist_music_genres")
       .insert(
-        artistData.genre_ids.map((genreId) => ({
+        genre_ids.map((genreId) => ({
           artist_id: data.id,
           music_genre_id: genreId,
         })),
@@ -57,7 +58,7 @@ async function createArtist(
 
   return {
     ...data,
-    artist_music_genres: artistData.genre_ids.map((genreId) => ({
+    artist_music_genres: genre_ids.map((genreId) => ({
       music_genre_id: genreId,
     })),
   };

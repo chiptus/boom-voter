@@ -63,11 +63,11 @@ export function formatDateTime(
   return format(date, dateTimeFormat);
 }
 
-export const formatTimeOnly = (
+export function formatTimeOnly(
   startTime: string | null,
   endTime: string | null,
   use24Hour: boolean = false,
-): string | null => {
+): string | null {
   if (!startTime) return null;
 
   const start = parseISO(startTime);
@@ -82,7 +82,7 @@ export const formatTimeOnly = (
   }
 
   return format(start, timeFormat);
-};
+}
 
 // Get user's timezone
 function getUserTimeZone(): string {

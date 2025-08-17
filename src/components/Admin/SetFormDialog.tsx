@@ -37,6 +37,7 @@ import {
 } from "@/components/ui/select";
 import { Loader2 } from "lucide-react";
 import { ArtistMultiSelect } from "./ArtistMultiSelect";
+import { toDatetimeLocal, toISOString } from "@/lib/timeUtils";
 
 // Form validation schema
 const setFormSchema = z.object({
@@ -103,8 +104,8 @@ export function SetFormDialog({
           name: editingSet.name,
           description: editingSet.description || "",
           stage_id: editingSet.stage_id || "none",
-          time_start: formatDateTimeLocal(editingSet.time_start),
-          time_end: formatDateTimeLocal(editingSet.time_end),
+          time_start: toDatetimeLocal(editingSet.time_start),
+          time_end: toDatetimeLocal(editingSet.time_end),
           estimated_date: "",
           artist_ids: editingSet.artists?.map((a) => a.id) || [],
         });
@@ -151,13 +152,6 @@ export function SetFormDialog({
     (stage) => stage.festival_edition_id === editionId,
   );
 
-  // Helper function to convert ISO datetime to datetime-local format
-  function formatDateTimeLocal(isoString: string | null): string {
-    if (!isoString) return "";
-    // Remove the timezone part and return in format: YYYY-MM-DDTHH:mm
-    return isoString.slice(0, 16);
-  }
-
   async function onSubmit(data: SetFormData) {
     if (!user) {
       return; // Should not happen if user is authenticated
@@ -170,8 +164,8 @@ export function SetFormDialog({
         festival_edition_id: editionId,
         stage_id:
           data.stage_id && data.stage_id !== "none" ? data.stage_id : null,
-        time_start: data.time_start || null,
-        time_end: data.time_end || null,
+        time_start: data.time_start ? toISOString(data.time_start) : null,
+        time_end: data.time_end ? toISOString(data.time_end) : null,
         created_by: user.id,
       };
 

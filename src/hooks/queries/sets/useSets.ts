@@ -42,7 +42,7 @@ async function fetchSets(): Promise<FestivalSet[]> {
     `,
     )
     .eq("archived", false)
-    .order("created_at", { ascending: false });
+    .order("time_start", { ascending: true });
 
   if (error) {
     console.error("Error fetching sets:", error);
