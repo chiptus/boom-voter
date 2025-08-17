@@ -30,7 +30,7 @@ async function fetchSets(): Promise<FestivalSet[]> {
     .select(
       `
       *,
-      set_artists!inner (
+      set_artists (
         artists (
           *,
           artist_music_genres (
@@ -49,21 +49,6 @@ async function fetchSets(): Promise<FestivalSet[]> {
     throw new Error("Failed to fetch sets");
   }
 
-  // Get stages separately since the FK relationship isn't working
-  const { data: stagesData } = await supabase
-    .from("stages")
-    .select("*")
-    .eq("archived", false);
-
-  const stagesMap =
-    stagesData?.reduce(
-      (acc, stage) => {
-        acc[stage.id] = stage;
-        return acc;
-      },
-      {} as Record<string, Stage>,
-    ) || {};
-
   // Transform the data to match expected structure
   const transformedData =
     data?.map((set) => ({
@@ -72,10 +57,8 @@ async function fetchSets(): Promise<FestivalSet[]> {
         set.set_artists
           ?.map((sa) => ({
             ...sa.artists,
-            votes: [], // Artists in sets don't have individual votes
           }))
           .filter(Boolean) || [],
-      stages: set.stage_id ? stagesMap[set.stage_id] : null,
       set_artists: undefined, // Remove junction data from final response
     })) || [];
 

@@ -7,13 +7,13 @@ import type { ScheduleSet } from "@/hooks/useScheduleData";
 import { useMemo } from "react";
 
 interface ArtistScheduleBlockProps {
-  artist: ScheduleSet;
+  set: ScheduleSet;
   userVote?: number;
   onVote?: (setId: string, voteType: number) => void;
 }
 
 export function ArtistScheduleBlock({
-  artist: set,
+  set,
   userVote,
   onVote,
 }: ArtistScheduleBlockProps) {

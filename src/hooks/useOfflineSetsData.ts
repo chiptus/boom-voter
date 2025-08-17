@@ -1,6 +1,6 @@
 import { useOfflineSetsQuery } from "./queries/useOfflineSetsQuery";
 
-export const useOfflineSetsData = () => {
+export function useOfflineSetsData() {
   // Use the new React Query-based offline sets hook
   const { sets, dataSource, loading, error, fetchSets, refetch } =
     useOfflineSetsQuery();
@@ -13,4 +13,4 @@ export const useOfflineSetsData = () => {
     fetchArtists: fetchSets, // Keep original API name for compatibility
     refetch,
   };
-};
+}

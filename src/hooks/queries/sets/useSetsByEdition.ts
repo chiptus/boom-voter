@@ -10,7 +10,7 @@ async function fetchSetsByEdition(editionId: string): Promise<FestivalSet[]> {
       `
       *,
       stages (name),
-      set_artists!inner (
+      set_artists (
         artists (
           *,
           artist_music_genres (music_genre_id)
@@ -36,7 +36,6 @@ async function fetchSetsByEdition(editionId: string): Promise<FestivalSet[]> {
         set.set_artists
           ?.map((sa) => ({
             ...sa.artists,
-            votes: [], // Artists in sets don't have individual votes
           }))
           .filter(Boolean) || [],
       set_artists: undefined, // Remove junction data from final response

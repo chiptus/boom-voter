@@ -11,7 +11,7 @@ export interface ScheduleDay {
 
 export interface ScheduleStage {
   name: string;
-  artists: ScheduleSet[]; // Now represents sets, not individual artists
+  sets: ScheduleSet[]; // Now represents sets, not individual artists
 }
 
 export interface ScheduleArtist {
@@ -116,7 +116,7 @@ export function useScheduleData(
         const stages: ScheduleStage[] = Object.entries(stageGroups).map(
           ([stageName, stageSets]) => ({
             name: stageName,
-            artists: stageSets.sort((a, b) => {
+            sets: stageSets.sort((a, b) => {
               if (!a.startTime || !b.startTime) return 0;
               return a.startTime.getTime() - b.startTime.getTime();
             }),

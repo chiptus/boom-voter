@@ -12,7 +12,7 @@ export interface TimelineData {
   timeSlots: Date[];
   stages: Array<{
     name: string;
-    artists: HorizontalTimelineSet[];
+    sets: HorizontalTimelineSet[];
   }>;
   totalWidth: number;
   festivalStart: Date;
@@ -58,7 +58,7 @@ export function calculateTimelineData(
       }
 
       // Calculate positions for sets relative to festival start
-      const enhancedSets = stage.artists.map((set): HorizontalTimelineSet => {
+      const enhancedSets = stage.sets.map((set): HorizontalTimelineSet => {
         if (!set.startTime || !set.endTime) return set;
 
         const startMinutes = differenceInMinutes(set.startTime, earliestTime);
@@ -85,7 +85,7 @@ export function calculateTimelineData(
   const unifiedStages = Object.entries(allStageGroups)
     .map(([stageName, sets]) => ({
       name: stageName,
-      artists: sets.sort((a, b) => {
+      sets: sets.sort((a, b) => {
         if (!a.startTime || !b.startTime) return 0;
         return a.startTime.getTime() - b.startTime.getTime();
       }),
@@ -105,7 +105,7 @@ function calculateEarliestSetTime(scheduleDays: ScheduleDay[]) {
 
   scheduleDays.forEach((day) => {
     day.stages.forEach((stage) => {
-      stage.artists.forEach((artist) => {
+      stage.sets.forEach((artist) => {
         if (artist.startTime) {
           if (!earliestSetTime || artist.startTime < earliestSetTime) {
             earliestSetTime = artist.startTime;

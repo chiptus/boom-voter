@@ -4,7 +4,7 @@ import type { HorizontalTimelineSet } from "@/lib/timelineCalculator";
 interface StageRowProps {
   stage: {
     name: string;
-    artists: HorizontalTimelineSet[];
+    sets: HorizontalTimelineSet[];
   };
   totalWidth: number;
   userVotes: Record<string, number>;
@@ -24,7 +24,7 @@ export function StageRow({
         className="relative h-24 bg-white/5 rounded-lg border border-purple-400/20"
         style={{ minWidth: totalWidth }}
       >
-        {stage.artists.map((set) => {
+        {stage.sets.map((set) => {
           if (!set.horizontalPosition) return null;
 
           return (
@@ -37,10 +37,8 @@ export function StageRow({
               }}
             >
               <div className="h-full pr-1">
-                {" "}
-                {/* Add right padding for spacing */}
                 <ArtistScheduleBlock
-                  artist={set}
+                  set={set}
                   userVote={userVotes[set.id]}
                   onVote={onVote}
                 />
