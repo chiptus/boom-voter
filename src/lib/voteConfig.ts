@@ -3,23 +3,7 @@ import { Star, Heart, X } from "lucide-react";
 export const VOTES_TYPES = ["mustGo", "interested", "wontGo"] as const;
 export type VoteType = (typeof VOTES_TYPES)[number];
 
-type VoteConfig = {
-  value: number;
-  label: string;
-  icon: React.ComponentType<any>;
-  bgColor: string;
-  iconColor: string;
-  textColor: string;
-  descColor: string;
-  circleColor: string;
-
-  buttonSelected: string;
-  buttonUnselected: string;
-  spinnerColor: string;
-  description: string;
-};
-
-export const VOTE_CONFIG: Record<VoteType, VoteConfig> = {
+export const VOTE_CONFIG = {
   mustGo: {
     value: 2,
     label: "Must Go",
@@ -67,8 +51,12 @@ export const VOTE_CONFIG: Record<VoteType, VoteConfig> = {
   },
 } as const;
 
-export function getVoteConfig(voteValue: number): VoteType | null {
+export function getVoteConfig(voteValue: number): VoteType | undefined {
   return (
-    VOTES_TYPES.find((key) => VOTE_CONFIG[key].value === voteValue) || null
+    VOTES_TYPES.find((key) => VOTE_CONFIG[key].value === voteValue) || undefined
   );
+}
+
+export function getVoteValue(voteType: VoteType): -1 | 1 | 2 | undefined {
+  return VOTE_CONFIG[voteType].value;
 }
