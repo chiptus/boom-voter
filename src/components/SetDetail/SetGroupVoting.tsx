@@ -13,6 +13,7 @@ import { useUserGroupsQuery } from "@/hooks/queries/groups/useUserGroups";
 import { useGroupVotesQuery } from "@/hooks/queries/voting/useGroupVotes";
 import { Users } from "lucide-react";
 import { VOTE_CONFIG, VOTES_TYPES, getVoteConfig } from "@/lib/voteConfig";
+import { cn } from "@/lib/utils";
 
 interface SetGroupVotingProps {
   setId: string;
@@ -96,18 +97,25 @@ export function SetGroupVoting({ setId: artistId }: SetGroupVotingProps) {
                 const voteType = config.value;
                 const IconComponent = config.icon;
                 return (
-                  <div key={voteType} className="text-center">
-                    <div className="flex items-center justify-center gap-2 mb-1">
-                      <IconComponent
-                        className={`h-4 w-4 ${config.iconColor}`}
-                      />
-                      <span className="text-white font-semibold">
-                        {voteCounts[voteType as keyof typeof voteCounts]}
-                      </span>
+                  <div className="flex flex-col items-center" key={voteType}>
+                    <div
+                      key={voteType}
+                      className={cn(
+                        "flex items-center justify-center flex-col rounded-md size-24",
+                        config.bgColor,
+                        config.textColor,
+                      )}
+                    >
+                      <div className="flex items-center justify-center gap-2 mb-1">
+                        <IconComponent
+                          className={`h-4 w-4 ${config.iconColor}`}
+                        />
+                        <span className="font-semibold">
+                          {voteCounts[voteType as keyof typeof voteCounts]}
+                        </span>
+                      </div>
+                      <p className={`text-sm`}>{config.label}</p>
                     </div>
-                    <p className={`text-sm ${config.iconColor}`}>
-                      {config.label}
-                    </p>
                   </div>
                 );
               })}
