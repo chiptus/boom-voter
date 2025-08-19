@@ -1,10 +1,12 @@
 import { Card, CardContent } from "@/components/ui/card";
-import { Clock, Heart, ThumbsUp, ThumbsDown } from "lucide-react";
+import { Clock } from "lucide-react";
 import { Link } from "react-router-dom";
 import { formatTimeOnly } from "@/lib/timeUtils";
 import { format } from "date-fns";
 import type { ScheduleSet } from "@/hooks/useScheduleData";
 import { useMemo } from "react";
+import { VOTE_CONFIG, getVoteConfig } from "@/lib/voteConfig";
+import { cn } from "@/lib/utils";
 
 interface ArtistScheduleBlockProps {
   set: ScheduleSet;
@@ -72,7 +74,6 @@ export function ArtistScheduleBlock({
             </div>
           )} */}
         </div>
-
         <div className="space-y-1 text-sm text-purple-200">
           {set.startTime && set.endTime && (
             <div className="flex items-center gap-1">
@@ -90,43 +91,33 @@ export function ArtistScheduleBlock({
           )}
         </div>
 
-        {onVote && (
-          <div className="flex gap-3 mt-2">
-            <div
-              className={`flex items-center gap-1 cursor-pointer ${
-                userVote === 2
-                  ? "text-green-400"
-                  : "text-purple-300 hover:text-green-400"
-              }`}
-              onClick={() => handleVote(2)}
-            >
-              <Heart className="h-3 w-3" />
-              <span className="text-xs">{getVoteCount(2)}</span>
-            </div>
-            <div
-              className={`flex items-center gap-1 cursor-pointer ${
-                userVote === 1
-                  ? "text-blue-400"
-                  : "text-purple-300 hover:text-blue-400"
-              }`}
-              onClick={() => handleVote(1)}
-            >
-              <ThumbsUp className="h-3 w-3" />
-              <span className="text-xs">{getVoteCount(1)}</span>
-            </div>
-            <div
-              className={`flex items-center gap-1 cursor-pointer ${
-                userVote === -1
-                  ? "text-red-400"
-                  : "text-purple-300 hover:text-red-400"
-              }`}
-              onClick={() => handleVote(-1)}
-            >
-              <ThumbsDown className="h-3 w-3" />
-              <span className="text-xs">{getVoteCount(-1)}</span>
-            </div>
-          </div>
-        )}
+        <div className="flex gap-3 mt-2">
+          {[2, 1, -1].map((voteValue) => {
+            const voteType = getVoteConfig(voteValue);
+            if (!voteType) return null;
+
+            const config = VOTE_CONFIG[voteType];
+            const IconComponent = config.icon;
+            const isSelected = userVote === voteValue;
+
+            return (
+              <button
+                key={voteValue}
+                className={cn(
+                  `flex items-center gap-1 cursor-pointer hover:text-purple-300`,
+                  isSelected
+                    ? `${config.iconColor} hover:text-purple-300`
+                    : `${config.descColor} `,
+                )}
+                onClick={() => handleVote(voteValue)}
+                type="button"
+              >
+                <IconComponent className="h-3 w-3" />
+                <span className="text-xs">{getVoteCount(voteValue)}</span>
+              </button>
+            );
+          })}
+        </div>
       </CardContent>
     </Card>
   );

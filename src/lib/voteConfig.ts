@@ -27,7 +27,7 @@ export const VOTE_CONFIG: Record<VoteType, VoteConfig> = {
     bgColor: "bg-orange-50 dark:bg-orange-900/20",
     iconColor: "text-orange-600",
     textColor: "text-orange-900 dark:text-orange-100",
-    descColor: "text-orange-700 dark:text-orange-300",
+    descColor: "text-orange-600 dark:text-orange-300",
     circleColor: "bg-orange-600",
     buttonSelected: "bg-orange-600 hover:bg-orange-700",
     buttonUnselected:
@@ -42,7 +42,7 @@ export const VOTE_CONFIG: Record<VoteType, VoteConfig> = {
     bgColor: "bg-blue-50 dark:bg-blue-900/20",
     iconColor: "text-blue-600",
     textColor: "text-blue-900 dark:text-blue-100",
-    descColor: "text-blue-700 dark:text-blue-300",
+    descColor: "text-blue-600 dark:text-blue-300",
     circleColor: "bg-blue-600",
     buttonSelected: "bg-blue-600 hover:bg-blue-700",
     buttonUnselected:
@@ -57,7 +57,7 @@ export const VOTE_CONFIG: Record<VoteType, VoteConfig> = {
     bgColor: "bg-gray-50 dark:bg-gray-900/20",
     iconColor: "text-gray-600",
     textColor: "text-gray-900 dark:text-gray-100",
-    descColor: "text-gray-700 dark:text-gray-300",
+    descColor: "text-gray-600 dark:text-gray-300",
     circleColor: "bg-gray-600",
     buttonSelected: "bg-gray-600 hover:bg-gray-700",
     buttonUnselected:

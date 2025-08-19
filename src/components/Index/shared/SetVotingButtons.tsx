@@ -32,6 +32,11 @@ export function SetVotingButtons({
 
   return (
     <div className={containerClass}>
+      {votingLoading && (
+        <div
+          className={`h-4 w-4 animate-spin rounded-full border-2 border-t-transparent`}
+        />
+      )}
       {voteButtons.map(({ config, vote }) => {
         const IconComponent = config.icon;
         const isSelected = userVote === vote;
@@ -53,11 +58,6 @@ export function SetVotingButtons({
                 ? getVoteCount(vote)
                 : `${config.label} (${getVoteCount(vote)})`}
             </Button>
-            {votingLoading && (
-              <div
-                className={`h-4 w-4 animate-spin rounded-full border-2 ${config.spinnerColor} border-t-transparent`}
-              />
-            )}
           </div>
         );
       })}
