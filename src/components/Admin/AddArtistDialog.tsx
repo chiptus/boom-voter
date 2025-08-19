@@ -104,8 +104,8 @@ export function AddArtistDialog({
       return;
     }
 
-    try {
-      await createArtistMutation.mutateAsync({
+    createArtistMutation.mutate(
+      {
         name: data.name,
         description: data.description || "",
         genre_ids: data.genre_ids || [],
@@ -116,14 +116,14 @@ export function AddArtistDialog({
         stage: data.stage || null,
         time_start: data.timeStart || null,
         time_end: data.timeEnd || null,
-      });
-
-      // Reset form
-      form.reset();
-      onSuccess();
-    } catch (error) {
-      // Error handling is done in the mutation hook
-    }
+      },
+      {
+        onSuccess() {
+          form.reset();
+          onSuccess();
+        },
+      },
+    );
   }
 
   return (

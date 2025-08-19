@@ -200,11 +200,7 @@ export function FestivalEditionManagement({
       return;
     }
 
-    try {
-      await deleteEditionMutation.mutateAsync(edition.id);
-    } catch (error) {
-      // Error handling is done in the mutation hook
-    }
+    deleteEditionMutation.mutate(edition.id);
   }
 
   if (isLoading) {

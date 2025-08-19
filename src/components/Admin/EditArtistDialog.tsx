@@ -106,8 +106,8 @@ export function EditArtistDialog({ artist, onClose }: EditArtistDialogProps) {
       return;
     }
 
-    try {
-      await updateArtistMutation.mutateAsync({
+    updateArtistMutation.mutate(
+      {
         id: artist.id,
         updates: {
           name: data.name,
@@ -120,12 +120,13 @@ export function EditArtistDialog({ artist, onClose }: EditArtistDialogProps) {
           soundcloud_url: data.soundcloud_url || null,
           image_url: data.image_url || null,
         },
-      });
-
-      onClose?.();
-    } catch (error) {
-      // Error handling is done in the mutation hook
-    }
+      },
+      {
+        onSuccess() {
+          onClose?.();
+        },
+      },
+    );
   }
 
   function handleSubtractOneHour() {

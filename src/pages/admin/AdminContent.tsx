@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { AddArtistDialog } from "@/components/Admin/AddArtistDialog";
-import { AddGenreDialog } from "@/components/Index/AddGenreDialog";
+import { AddGenreDialog } from "@/components/Admin/AddGenreDialog";
 import { Button } from "@/components/ui/button";
 import {
   Card,
