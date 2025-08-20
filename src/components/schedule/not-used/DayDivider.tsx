@@ -6,10 +6,7 @@ interface DayDividerProps {
   isFirst?: boolean;
 }
 
-export const DayDivider = ({
-  displayDate,
-  isFirst = false,
-}: DayDividerProps) => {
+export function DayDivider({ displayDate, isFirst = false }: DayDividerProps) {
   return (
     <div className={`py-6 ${!isFirst ? "mt-8" : ""}`}>
       <div className="flex items-center gap-4 mb-6">
@@ -21,4 +18,4 @@ export const DayDivider = ({
       </div>
     </div>
   );
-};
+}

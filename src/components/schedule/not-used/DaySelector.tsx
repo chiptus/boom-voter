@@ -8,11 +8,11 @@ interface DaySelectorProps {
   onDayChange: (day: string) => void;
 }
 
-export const DaySelector = ({
+export function DaySelector({
   days,
   selectedDay,
   onDayChange,
-}: DaySelectorProps) => {
+}: DaySelectorProps) {
   if (days.length <= 1) return null;
 
   return (
@@ -37,4 +37,4 @@ export const DaySelector = ({
       </ScrollArea>
     </div>
   );
-};
+}

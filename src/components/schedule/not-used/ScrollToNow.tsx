@@ -6,7 +6,7 @@ interface ScrollToNowProps {
   visible?: boolean;
 }
 
-export const ScrollToNow = ({ onClick, visible = true }: ScrollToNowProps) => {
+export function ScrollToNow({ onClick, visible = true }: ScrollToNowProps) {
   if (!visible) return null;
 
   return (
@@ -18,4 +18,4 @@ export const ScrollToNow = ({ onClick, visible = true }: ScrollToNowProps) => {
       <Clock className="h-5 w-5" />
     </Button>
   );
-};
+}

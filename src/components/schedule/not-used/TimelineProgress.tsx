@@ -6,11 +6,11 @@ interface TimelineProgressProps {
   visible?: boolean;
 }
 
-export const TimelineProgress = ({
+export function TimelineProgress({
   currentPosition,
   totalItems,
   visible = true,
-}: TimelineProgressProps) => {
+}: TimelineProgressProps) {
   if (!visible || totalItems === 0) return null;
 
   const progress = Math.min((currentPosition / totalItems) * 100, 100);
@@ -28,4 +28,4 @@ export const TimelineProgress = ({
       </div>
     </div>
   );
-};
+}

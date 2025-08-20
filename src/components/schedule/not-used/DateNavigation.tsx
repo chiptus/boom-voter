@@ -9,11 +9,11 @@ interface DateNavigationProps {
   containerRef: React.RefObject<HTMLDivElement>;
 }
 
-export const DateNavigation = ({
+export function DateNavigation({
   onScrollToDate,
   onScrollToNow,
   containerRef,
-}: DateNavigationProps) => {
+}: DateNavigationProps) {
   const { scheduleDays } = useScheduleData();
 
   const scrollToTop = useCallback(() => {
@@ -63,4 +63,4 @@ export const DateNavigation = ({
       </div>
     </div>
   );
-};
+}

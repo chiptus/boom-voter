@@ -7,10 +7,10 @@ interface FloatingDateIndicatorProps {
   visible: boolean;
 }
 
-export const FloatingDateIndicator = ({
+export function FloatingDateIndicator({
   currentDate,
   visible,
-}: FloatingDateIndicatorProps) => {
+}: FloatingDateIndicatorProps) {
   const [show, setShow] = useState(false);
 
   useEffect(() => {
@@ -32,4 +32,4 @@ export const FloatingDateIndicator = ({
       </div>
     </div>
   );
-};
+}

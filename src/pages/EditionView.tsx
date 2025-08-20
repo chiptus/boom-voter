@@ -6,10 +6,11 @@ import { useSetFiltering } from "@/components/Index/useSetFiltering";
 import { useOfflineVoting } from "@/hooks/useOfflineVoting";
 import { useUrlState } from "@/hooks/useUrlState";
 import { SetsPanel } from "@/components/Index/SetsPanel";
-import { ScheduleHorizontalTimelineView } from "@/components/schedule/ScheduleHorizontalTimelineView";
 import ErrorBoundary from "@/components/ErrorBoundary";
 import { useSetsByEditionQuery } from "@/hooks/queries/sets/useSetsByEdition";
 import { useFestivalEdition } from "@/contexts/FestivalEditionContext";
+import { ScheduleVerticalTimelineView } from "@/components/schedule/vertical/ScheduleVerticalTimelineView";
+import { MobileFirstVerticalTimeline } from "@/components/schedule/vertical/MobileFirstVerticalTimeline";
 
 export default function EditionView() {
   const { user, showAuthDialog } = useAuth();
@@ -85,7 +86,7 @@ export default function EditionView() {
               />
             )}
             {urlState.mainView === "timeline" && (
-              <ScheduleHorizontalTimelineView
+              <MobileFirstVerticalTimeline
                 userVotes={userVotes}
                 onVote={handleVoteAction}
               />
