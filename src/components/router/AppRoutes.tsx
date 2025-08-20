@@ -6,7 +6,7 @@ import { SubdomainRoutes } from "./SubdomainRoutes";
 import { AppFooter } from "@/components/legal/AppFooter";
 import { useMemo } from "react";
 import { useProfileQuery } from "@/hooks/queries/auth/useProfile";
-import { OnboardingDialog } from "./onboarding/OnboardingDialog";
+import { OnboardingDialog } from "../onboarding/OnboardingDialog";
 
 interface AppRoutesProps {
   subdomainInfo: {

@@ -2,15 +2,10 @@ import { Routes, Route } from "react-router-dom";
 import EditionView from "@/pages/EditionView";
 import Schedule from "@/pages/Schedule";
 import { SetDetails } from "@/pages/SetDetails";
-import Groups from "@/pages/Groups";
-import GroupDetail from "@/pages/GroupDetail";
 
 // Legal pages
-import PrivacyPolicy from "@/pages/PrivacyPolicy";
-import TermsOfService from "@/pages/TermsOfService";
-import CookiePolicy from "@/pages/CookiePolicy";
-import NotFound from "@/pages/NotFound";
 import EditionSelection from "@/pages/EditionSelection";
+import { GlobalRoutes } from "./GlobalRoutes";
 
 /**
  * Routes for subdomain access (boom-festival.getupline.com)
@@ -28,17 +23,7 @@ export function SubdomainRoutes() {
       />
       <Route path="/editions/:editionSlug/schedule" element={<Schedule />} />
 
-      {/* Global routes still available */}
-      <Route path="/groups" element={<Groups />} />
-      <Route path="/groups/:groupId" element={<GroupDetail />} />
-
-      {/* Legal pages */}
-      <Route path="/privacy" element={<PrivacyPolicy />} />
-      <Route path="/terms" element={<TermsOfService />} />
-      <Route path="/cookies" element={<CookiePolicy />} />
-
-      {/* Catch-all */}
-      <Route path="*" element={<NotFound />} />
+      <Route path="*" element={<GlobalRoutes />} />
     </Routes>
   );
 }

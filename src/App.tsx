@@ -11,7 +11,7 @@ import {
 import { AuthProvider } from "@/contexts/AuthContext";
 import { useState, useEffect } from "react";
 import { FestivalEditionProvider } from "./contexts/FestivalEditionContext";
-import { AppRoutes } from "./components/AppRoutes";
+import { AppRoutes } from "./components/router/AppRoutes";
 
 function App() {
   const [subdomainInfo] = useState(() => getSubdomainInfo());
