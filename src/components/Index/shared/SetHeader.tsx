@@ -1,7 +1,6 @@
-import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { CardTitle } from "@/components/ui/card";
-import { Eye, EyeOff, Users } from "lucide-react";
+import { Users } from "lucide-react";
 import { SocialPlatformLinkList } from "./SocialPlatformLinkList";
 import { useFestivalSet } from "../FestivalSetContext";
 
@@ -10,20 +9,8 @@ interface SetHeaderProps {
 }
 
 export function SetHeader({ size = "lg" }: SetHeaderProps) {
-  const {
-    set,
-    userKnowledge,
-    onKnowledgeToggle,
-    onAuthRequired,
-    isMultiArtist,
-  } = useFestivalSet();
+  const { set, isMultiArtist } = useFestivalSet();
 
-  async function handleKnowledgeToggle() {
-    const result = await onKnowledgeToggle(set.id);
-    if (result.requiresAuth) {
-      onAuthRequired();
-    }
-  }
   const titleClass =
     size === "sm"
       ? "text-white text-lg font-semibold truncate"
@@ -42,25 +29,6 @@ export function SetHeader({ size = "lg" }: SetHeaderProps) {
           {set.artists.length}
         </Badge>
       )}
-
-      {/* Knowledge Toggle */}
-      <Button
-        variant="ghost"
-        size="sm"
-        onClick={handleKnowledgeToggle}
-        className={`p-1 h-6 w-6 ${
-          userKnowledge
-            ? "text-purple-400 hover:text-purple-300"
-            : "text-purple-600 hover:text-purple-500"
-        }`}
-        title={userKnowledge ? "I know this artist" : "Mark as known"}
-      >
-        {userKnowledge ? (
-          <Eye className="h-3 w-3" />
-        ) : (
-          <EyeOff className="h-3 w-3" />
-        )}
-      </Button>
 
       {/* Social Platform Links */}
       {!isMultiArtist && set.artists.length > 0 && (

@@ -4,7 +4,7 @@ import { useOfflineVoting } from "@/hooks/useOfflineVoting";
 import { useUserPermissionsQuery } from "@/hooks/queries/auth/useUserPermissions";
 import { useOfflineSetsData } from "@/hooks/useOfflineSetsData";
 
-export const useSetDetail = (slug: string | undefined) => {
+export function useSetDetail(slug: string | undefined) {
   const { user, loading: authLoading } = useAuth();
   const { data: canEdit = false, isLoading: isLoadingPermissions } =
     useUserPermissionsQuery(user?.id, "edit_artists");
@@ -21,20 +21,22 @@ export const useSetDetail = (slug: string | undefined) => {
     return sets.find((a) => a.slug === slug) || null;
   }, [slug, sets]);
 
-  const handleVoteAction = async (voteType: number) => {
+  async function handleVoteAction(voteType: number) {
     if (!currentSet?.id) return;
     await handleVote(currentSet.id, voteType);
-  };
+  }
 
-  const getVoteCount = (voteType: number) => {
+  function getVoteCount(voteType: number) {
     if (!currentSet) return 0;
     return (
       currentSet.votes?.filter((vote) => vote.vote_type === voteType).length ||
       0
     );
-  };
+  }
 
-  const netVoteScore = currentSet ? getVoteCount(1) - getVoteCount(-1) : 0;
+  const netVoteScore = currentSet
+    ? 2 * getVoteCount(2) + getVoteCount(1) - getVoteCount(-1)
+    : 0;
 
   const userVote = userVotes[currentSet?.id || ""] || null;
 
@@ -48,4 +50,4 @@ export const useSetDetail = (slug: string | undefined) => {
     getVoteCount,
     netVoteScore,
   };
-};
+}
