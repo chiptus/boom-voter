@@ -11,14 +11,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import {
-  Filter,
-  RefreshCw,
-  Users,
-  Calendar,
-  List,
-  ChevronDown,
-} from "lucide-react";
+import { Filter, RefreshCw, Users, ChevronDown } from "lucide-react";
 import { SortControls } from "./SortControls";
 import { MobileFilters } from "./MobileFilters";
 import { DesktopFilters } from "./DesktopFilters";
@@ -74,45 +67,13 @@ export function FilterSortControls({
       {/* Primary Controls Row */}
       <div className="bg-white/10 backdrop-blur-md border border-purple-400/30 rounded-lg p-4">
         <div className="flex items-center justify-between gap-2">
-          {/* View Toggle - Always prominent */}
-          <div className="flex items-center gap-1 bg-white/10 backdrop-blur-md rounded-lg p-1">
-            <Button
-              variant={state.mainView === "list" ? "default" : "ghost"}
-              size="sm"
-              onClick={() => onStateChange({ mainView: "list" })}
-              className={
-                state.mainView === "list"
-                  ? "bg-purple-600 hover:bg-purple-700 text-white"
-                  : "text-purple-200 hover:text-white hover:bg-white/10"
-              }
-            >
-              <List className="h-4 w-4" />
-              <span className="hidden md:inline ml-2">Artists</span>
-            </Button>
-            <Button
-              variant={state.mainView === "timeline" ? "default" : "ghost"}
-              size="sm"
-              onClick={() => onStateChange({ mainView: "timeline" })}
-              className={
-                state.mainView === "timeline"
-                  ? "bg-purple-600 hover:bg-purple-700 text-white"
-                  : "text-purple-200 hover:text-white hover:bg-white/10"
-              }
-            >
-              <Calendar className="h-4 w-4" />
-              <span className="hidden md:inline ml-2">Timeline</span>
-            </Button>
-          </div>
-
           {/* Context-Aware Controls */}
           <div className="flex items-center gap-2">
-            {/* Sort Controls - Only show in list view */}
-            {state.mainView === "list" && (
-              <SortControls sort={state.sort} onSortChange={handleSortChange} />
-            )}
+            {/* Sort Controls */}
+            <SortControls sort={state.sort} onSortChange={handleSortChange} />
 
             {/* Refresh Rankings - Only show when locked */}
-            {state.sortLocked && state.mainView === "list" && (
+            {state.sortLocked && (
               <Button
                 variant="outline"
                 size="sm"

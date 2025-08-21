@@ -149,4 +149,19 @@
   .bg-app-card-gradient {
     @apply bg-gradient-to-br from-app-accent/40 to-app-button/40;
   }
+
+  /* Hide scrollbars for mobile tab navigation */
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* Safe area padding for mobile bottom navigation */
+  .safe-area-pb {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
 }

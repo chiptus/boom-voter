@@ -7,14 +7,15 @@ export type SortOption =
   | "rating-desc"
   | "popularity-desc"
   | "date-asc";
-export type MainViewOption = "list" | "timeline";
+export type TimelineView = "horizontal" | "list";
+export type MainTab = "artists" | "timeline" | "map" | "info" | "social";
 
 export interface FilterSortState {
   sort: SortOption;
   stages: string[];
   genres: string[];
   minRating: number;
-  mainView: MainViewOption;
+  timelineView: TimelineView;
   use24Hour: boolean;
   groupId?: string;
   invite?: string;
@@ -27,7 +28,7 @@ const defaultState: FilterSortState = {
   stages: [],
   genres: [],
   minRating: 0,
-  mainView: "list",
+  timelineView: "list",
   use24Hour: true,
   groupId: undefined,
   invite: undefined,
@@ -50,9 +51,9 @@ export const useUrlState = () => {
       minRating:
         parseInt(searchParams.get("minRating") || "0") ||
         defaultState.minRating,
-      mainView:
-        (searchParams.get("mainView") as MainViewOption) ||
-        defaultState.mainView,
+      timelineView:
+        (searchParams.get("timelineView") as TimelineView) ||
+        defaultState.timelineView,
       use24Hour:
         searchParams.get("use24Hour") === "true" || defaultState.use24Hour,
       groupId: searchParams.get("groupId") || defaultState.groupId,
@@ -84,8 +85,8 @@ export const useUrlState = () => {
       if (newState.minRating > 0) {
         newParams.set("minRating", newState.minRating.toString());
       }
-      if (newState.mainView !== defaultState.mainView) {
-        newParams.set("mainView", newState.mainView);
+      if (newState.timelineView !== defaultState.timelineView) {
+        newParams.set("timelineView", newState.timelineView);
       }
       if (newState.use24Hour !== defaultState.use24Hour) {
         newParams.set("use24Hour", newState.use24Hour.toString());

@@ -2,7 +2,7 @@ import { useMemo } from "react";
 import { useScheduleData } from "@/hooks/useScheduleData";
 import { useFestivalEdition } from "@/contexts/FestivalEditionContext";
 import { useSetsByEditionQuery as useEditionSetsQuery } from "@/hooks/queries/sets/useSetsByEdition";
-import { format, isSameDay } from "date-fns";
+import { isSameDay } from "date-fns";
 import { TimeSlotGroup } from "./TimeSlotGroup";
 import type { ScheduleSet } from "@/hooks/useScheduleData";
 
@@ -13,7 +13,7 @@ interface MobileFirstVerticalTimelineProps {
 
 interface TimeSlot {
   time: Date;
-  sets: ScheduleSet[];
+  sets: (ScheduleSet & { stageName: string })[];
 }
 
 export function MobileFirstVerticalTimeline({
@@ -30,14 +30,14 @@ export function MobileFirstVerticalTimeline({
 
     // Collect all unique start times
     const allSets: (ScheduleSet & { stageName: string })[] = [];
-    
-    scheduleDays.forEach(day => {
-      day.stages.forEach(stage => {
-        stage.sets.forEach(set => {
+
+    scheduleDays.forEach((day) => {
+      day.stages.forEach((stage) => {
+        stage.sets.forEach((set) => {
           if (set.startTime) {
             allSets.push({
               ...set,
-              stageName: stage.name
+              stageName: stage.name,
             });
           }
         });
@@ -45,11 +45,14 @@ export function MobileFirstVerticalTimeline({
     });
 
     // Group sets by start time
-    const timeGroups = new Map<string, (ScheduleSet & { stageName: string })[]>();
-    
-    allSets.forEach(set => {
+    const timeGroups = new Map<
+      string,
+      (ScheduleSet & { stageName: string })[]
+    >();
+
+    allSets.forEach((set) => {
       if (!set.startTime) return;
-      
+
       const timeKey = set.startTime.toISOString();
       if (!timeGroups.has(timeKey)) {
         timeGroups.set(timeKey, []);
@@ -61,7 +64,7 @@ export function MobileFirstVerticalTimeline({
     const slots: TimeSlot[] = Array.from(timeGroups.entries())
       .map(([timeKey, sets]) => ({
         time: new Date(timeKey),
-        sets: sets.map(({ stageName, ...set }) => ({ ...set, stageName }))
+        sets: sets,
       }))
       .sort((a, b) => a.time.getTime() - b.time.getTime());
 
@@ -104,8 +107,9 @@ export function MobileFirstVerticalTimeline({
     <div className="space-y-6">
       {timeSlots.map((slot, index) => {
         const prevSlot = index > 0 ? timeSlots[index - 1] : null;
-        const showDateHeader = !prevSlot || !isSameDay(slot.time, prevSlot.time);
-        
+        const showDateHeader =
+          !prevSlot || !isSameDay(slot.time, prevSlot.time);
+
         return (
           <TimeSlotGroup
             key={slot.time.toISOString()}
