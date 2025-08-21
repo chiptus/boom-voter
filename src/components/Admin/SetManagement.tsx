@@ -94,6 +94,7 @@ export function SetManagement({ editionId }: SetManagementProps) {
           sets={filteredSets}
           onEdit={handleEdit}
           onDelete={handleDelete}
+          editionId={editionId}
         />
       </CardContent>
 

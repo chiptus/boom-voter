@@ -1,4 +1,4 @@
-import { useStagesQuery } from "@/hooks/queries/stages/useStages";
+import { useStagesByEditionQuery } from "@/hooks/queries/stages/useStagesByEdition";
 import {
   Table,
   TableBody,
@@ -17,10 +17,16 @@ interface SetsTableProps {
   sets: FestivalSet[];
   onEdit: (set: FestivalSet) => void;
   onDelete: (set: FestivalSet) => void;
+  editionId: string;
 }
 
-export function SetsTable({ sets, onEdit, onDelete }: SetsTableProps) {
-  const { data: stages = [] } = useStagesQuery();
+export function SetsTable({
+  sets,
+  onEdit,
+  onDelete,
+  editionId,
+}: SetsTableProps) {
+  const { data: stages = [] } = useStagesByEditionQuery(editionId);
 
   function getStageName(stageId: string | null) {
     if (!stageId) return "—";

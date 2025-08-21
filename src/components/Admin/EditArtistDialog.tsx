@@ -26,8 +26,6 @@ import { useUserPermissionsQuery } from "@/hooks/queries/auth/useUserPermissions
 import { useGenresQuery } from "@/hooks/queries/genres/useGenres";
 import { Artist } from "@/hooks/queries/artists/useArtists";
 import { useUpdateArtistMutation } from "@/hooks/queries/artists/useUpdateArtist";
-import { StageSelector } from "../StageSelector";
-import { toDatetimeLocal, toISOString } from "@/lib/timeUtils";
 
 // Form validation schema
 const editArtistFormSchema = z.object({
@@ -37,27 +35,9 @@ const editArtistFormSchema = z.object({
   spotify_url: z.string().url().optional().or(z.literal("")),
   soundcloud_url: z.string().url().optional().or(z.literal("")),
   image_url: z.string().url().optional().or(z.literal("")),
-  stage: z.string().optional(),
-  time_start: z.string().optional(),
-  time_end: z.string().optional(),
 });
 
 type EditArtistFormData = z.infer<typeof editArtistFormSchema>;
-
-// Helper function to subtract one hour from datetime-local string
-function subtractOneHour(datetimeLocal: string): string {
-  if (!datetimeLocal) return "";
-  const date = new Date(datetimeLocal);
-  date.setHours(date.getHours() - 1);
-
-  const year = date.getFullYear();
-  const month = String(date.getMonth() + 1).padStart(2, "0");
-  const day = String(date.getDate()).padStart(2, "0");
-  const hours = String(date.getHours()).padStart(2, "0");
-  const minutes = String(date.getMinutes()).padStart(2, "0");
-
-  return `${year}-${month}-${day}T${hours}:${minutes}`;
-}
 
 interface EditArtistDialogProps {
   artist: Artist;
@@ -82,9 +62,6 @@ export function EditArtistDialog({ artist, onClose }: EditArtistDialogProps) {
       name: artist.name,
       description: artist.description || "",
       genre_ids: artist.artist_music_genres?.map((g) => g.music_genre_id) || [],
-      stage: artist.stage || "",
-      time_start: toDatetimeLocal(artist.time_start),
-      time_end: toDatetimeLocal(artist.time_end),
       spotify_url: artist.spotify_url || "",
       soundcloud_url: artist.soundcloud_url || "",
       image_url: artist.image_url || "",
@@ -113,9 +90,6 @@ export function EditArtistDialog({ artist, onClose }: EditArtistDialogProps) {
           name: data.name,
           description: data.description || null,
           genre_ids: data.genre_ids,
-          stage: data.stage || null,
-          time_start: data.time_start ? toISOString(data.time_start) : null,
-          time_end: data.time_end ? toISOString(data.time_end) : null,
           spotify_url: data.spotify_url || null,
           soundcloud_url: data.soundcloud_url || null,
           image_url: data.image_url || null,
@@ -127,22 +101,6 @@ export function EditArtistDialog({ artist, onClose }: EditArtistDialogProps) {
         },
       },
     );
-  }
-
-  function handleSubtractOneHour() {
-    const currentTimeStart = form.getValues("time_start");
-    const currentTimeEnd = form.getValues("time_end");
-
-    if (currentTimeStart || currentTimeEnd) {
-      form.setValue(
-        "time_start",
-        currentTimeStart ? subtractOneHour(currentTimeStart) : "",
-      );
-      form.setValue(
-        "time_end",
-        currentTimeEnd ? subtractOneHour(currentTimeEnd) : "",
-      );
-    }
   }
 
   return (
@@ -190,65 +148,6 @@ export function EditArtistDialog({ artist, onClose }: EditArtistDialogProps) {
                       }
                       disabled={isLoadingGenres}
                     />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="stage"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Stage (Optional)</FormLabel>
-                  <FormControl>
-                    <StageSelector
-                      value={field.value || ""}
-                      onValueChange={field.onChange}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="time_start"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Performance Start Time</FormLabel>
-                  <FormControl>
-                    <Input type="datetime-local" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <div className="flex justify-center">
-              <Button
-                type="button"
-                variant="outline"
-                size="sm"
-                onClick={handleSubtractOneHour}
-                disabled={
-                  !form.getValues("time_start") && !form.getValues("time_end")
-                }
-              >
-                -1 Hour
-              </Button>
-            </div>
-
-            <FormField
-              control={form.control}
-              name="time_end"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Performance End Time</FormLabel>
-                  <FormControl>
-                    <Input type="datetime-local" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>

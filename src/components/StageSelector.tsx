@@ -6,16 +6,18 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { useStagesQuery } from "@/hooks/queries/stages/useStages";
+import { useStagesByEditionQuery } from "@/hooks/queries/stages/useStagesByEdition";
 
 export function StageSelector({
   value,
   onValueChange,
+  editionId,
 }: {
-  value: string;
+  editionId: string;
+  value: string | undefined;
   onValueChange: (value: string) => void;
 }) {
-  const { data: stages = [], isLoading } = useStagesQuery();
+  const { data: stages = [], isLoading } = useStagesByEditionQuery(editionId);
 
   return (
     <div className="space-y-2">

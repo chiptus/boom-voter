@@ -28,6 +28,7 @@ export default function EditionView() {
   const { filteredAndSortedSets, lockCurrentOrder } = useSetFiltering(
     sets || [],
     urlState,
+    edition?.id,
   );
 
   // Show loading while context is not ready
@@ -69,6 +70,7 @@ export default function EditionView() {
           state={urlState}
           onStateChange={updateUrlState}
           onClear={clearFilters}
+          editionId={edition.id}
         />
 
         <div className="mt-8">

@@ -1,16 +1,17 @@
 import { useEffect, useState, useMemo, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import type { FilterSortState } from "../../hooks/useUrlState";
-import { useStagesQuery } from "@/hooks/queries/stages/useStages";
+import { useStagesByEditionQuery } from "@/hooks/queries/stages/useStagesByEdition";
 import { FestivalSet } from "@/hooks/queries/sets/useSets";
 
 export function useSetFiltering(
   sets: FestivalSet[],
-  filterSortState?: FilterSortState,
+  filterSortState: FilterSortState,
+  editionId: string | undefined,
 ) {
   // todo - refactor to useGroupMembersQuery
   const [groupMemberIds, setGroupMemberIds] = useState<string[]>([]);
-  const { data: _stages = [] } = useStagesQuery();
+  const { data: _stages = [] } = useStagesByEditionQuery(editionId);
   const [lockedOrder, setLockedOrder] = useState<FestivalSet[]>([]);
 
   useEffect(() => {
@@ -105,38 +106,62 @@ export function useSetFiltering(
       });
 
     // Sort sets
-    filtered.sort((a, b) => {
-      let primarySort = 0;
+    filtered
+      // sort by soundcloud followers
+      .sort((setA, setB) => {
+        const aFollowers = Math.max(
+          ...setA.artists.map((artist) => artist.soundcloud_followers || 0),
+        );
+        const bFollowers = Math.max(
+          ...setB.artists.map((artist) => artist.soundcloud_followers || 0),
+        );
+        console.log(
+          `Sorting by followers: ${setA.name} (${aFollowers}) vs ${setB.name} (${bFollowers})`,
+        );
+        if (aFollowers && bFollowers) {
+          return bFollowers - aFollowers;
+        } else if (aFollowers) {
+          return 1; // a has followers, b does not
+        } else if (bFollowers) {
+          return -1; // b has followers, a does not
+        }
 
-      switch (filterSortState.sort) {
-        case "name-asc":
-          return a.name.localeCompare(b.name);
-        case "name-desc":
-          return b.name.localeCompare(a.name);
-        case "rating-desc":
-          primarySort = calculateRating(b) - calculateRating(a);
-          break;
-        case "popularity-desc":
-          primarySort =
-            getWeightedPopularityScore(b) - getWeightedPopularityScore(a);
-          break;
-        case "date-asc":
-          if (!a.time_start && !b.time_start) {
-            primarySort = 0;
+        return 0;
+      })
+      // sort by state
+      .sort((a, b) => {
+        let primarySort = 0;
+
+        switch (filterSortState.sort) {
+          case "name-asc":
+            return a.name.localeCompare(b.name);
+          case "name-desc":
+            return b.name.localeCompare(a.name);
+          case "rating-desc":
+            primarySort = calculateRating(b) - calculateRating(a);
             break;
-          }
-          if (!a.time_start) return 1;
-          if (!b.time_start) return -1;
-          primarySort =
-            new Date(a.time_start).getTime() - new Date(b.time_start).getTime();
-          break;
-        default:
-          primarySort = 0;
-      }
+          case "popularity-desc":
+            primarySort =
+              getWeightedPopularityScore(b) - getWeightedPopularityScore(a);
+            break;
+          case "date-asc":
+            if (!a.time_start && !b.time_start) {
+              primarySort = 0;
+              break;
+            }
+            if (!a.time_start) return 1;
+            if (!b.time_start) return -1;
+            primarySort =
+              new Date(a.time_start).getTime() -
+              new Date(b.time_start).getTime();
+            break;
+          default:
+            primarySort = 0;
+        }
 
-      // If primary sort values are equal, sort alphabetically
-      return primarySort !== 0 ? primarySort : a.name.localeCompare(b.name);
-    });
+        // If primary sort values are equal, sort alphabetically
+        return primarySort !== 0 ? primarySort : a.name.localeCompare(b.name);
+      });
 
     // If sort is locked, use the locked order but with updated vote data
     if (filterSortState.sortLocked && lockedOrder.length > 0) {

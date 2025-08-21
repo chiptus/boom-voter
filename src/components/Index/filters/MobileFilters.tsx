@@ -8,8 +8,7 @@ import {
 } from "@/components/ui/select";
 import { X } from "lucide-react";
 import type { FilterSortState } from "@/hooks/useUrlState";
-import { useStagesQuery } from "@/hooks/queries/stages/useStages";
-import { TimeFormatToggle } from "./TimeFormatToggle";
+import { useStagesByEditionQuery } from "@/hooks/queries/stages/useStagesByEdition";
 
 interface MobileFiltersProps {
   state: FilterSortState;
@@ -17,31 +16,34 @@ interface MobileFiltersProps {
   groups: Array<{ id: string; name: string; member_count?: number }>;
   onStateChange: (updates: Partial<FilterSortState>) => void;
   onClear: () => void;
+  editionId: string;
 }
 
-export const MobileFilters = ({
+export function MobileFilters({
   state,
   genres,
   onStateChange,
   onClear,
-}: MobileFiltersProps) => {
-  const { data: stages = [], isLoading: stagesLoading } = useStagesQuery();
+  editionId,
+}: MobileFiltersProps) {
+  const { data: stages = [], isLoading: stagesLoading } =
+    useStagesByEditionQuery(editionId);
 
-  const handleStageSelect = (value: string) => {
+  function handleStageSelect(value: string) {
     if (value === "all") {
       onStateChange({ stages: [] });
     } else {
       onStateChange({ stages: [value] });
     }
-  };
+  }
 
-  const handleGenreSelect = (value: string) => {
+  function handleGenreSelect(value: string) {
     if (value === "all") {
       onStateChange({ genres: [] });
     } else {
       onStateChange({ genres: [value] });
     }
-  };
+  }
 
   const hasActiveFilters =
     state.stages.length > 0 || state.genres.length > 0 || state.minRating > 0;
@@ -139,12 +141,6 @@ export const MobileFilters = ({
         </Select>
       </div>
 
-      <TimeFormatToggle
-        use24Hour={state.use24Hour}
-        onChange={(use24Hour) => onStateChange({ use24Hour })}
-      />
-
-      {/* Clear Filters */}
       {hasActiveFilters && (
         <Button
           variant="outline"
@@ -158,4 +154,4 @@ export const MobileFilters = ({
       )}
     </div>
   );
-};
+}

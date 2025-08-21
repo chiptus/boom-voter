@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useStagesQuery } from "@/hooks/queries/stages/useStages";
+import { useStagesByEditionQuery } from "@/hooks/queries/stages/useStagesByEdition";
 import { useCreateStageMutation } from "@/hooks/queries/stages/useCreateStage";
 import { useUpdateStageMutation } from "@/hooks/queries/stages/useUpdateStage";
 import { useDeleteStageMutation } from "@/hooks/queries/stages/useDeleteStage";
@@ -37,7 +37,7 @@ interface StageManagementProps {
 }
 
 export function StageManagement({ editionId }: StageManagementProps) {
-  const { data: stages = [], isLoading } = useStagesQuery();
+  const { data: stages = [], isLoading } = useStagesByEditionQuery(editionId);
   const createStageMutation = useCreateStageMutation();
   const updateStageMutation = useUpdateStageMutation();
   const deleteStageMutation = useDeleteStageMutation();

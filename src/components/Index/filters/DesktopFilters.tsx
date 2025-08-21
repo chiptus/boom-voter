@@ -1,8 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { X } from "lucide-react";
 import type { FilterSortState } from "@/hooks/useUrlState";
-import { useStagesQuery } from "@/hooks/queries/stages/useStages";
-import { TimeFormatToggle } from "./TimeFormatToggle";
+import { useStagesByEditionQuery } from "@/hooks/queries/stages/useStagesByEdition";
 
 interface DesktopFiltersProps {
   state: FilterSortState;
@@ -10,29 +9,32 @@ interface DesktopFiltersProps {
   groups: Array<{ id: string; name: string; member_count?: number }>;
   onStateChange: (updates: Partial<FilterSortState>) => void;
   onClear: () => void;
+  editionId: string;
 }
 
-export const DesktopFilters = ({
+export function DesktopFilters({
   state,
   genres,
   onStateChange,
   onClear,
-}: DesktopFiltersProps) => {
-  const { data: stages = [], isLoading: stagesLoading } = useStagesQuery();
+  editionId,
+}: DesktopFiltersProps) {
+  const { data: stages = [], isLoading: stagesLoading } =
+    useStagesByEditionQuery(editionId);
 
-  const handleStageToggle = (stageId: string) => {
+  function handleStageToggle(stageId: string) {
     const newStages = state.stages.includes(stageId)
       ? state.stages.filter((s) => s !== stageId)
       : [...state.stages, stageId];
     onStateChange({ stages: newStages });
-  };
+  }
 
-  const handleGenreToggle = (genreId: string) => {
+  function handleGenreToggle(genreId: string) {
     const newGenres = state.genres.includes(genreId)
       ? state.genres.filter((g) => g !== genreId)
       : [...state.genres, genreId];
     onStateChange({ genres: newGenres });
-  };
+  }
 
   const hasActiveFilters =
     state.stages.length > 0 || state.genres.length > 0 || state.minRating > 0;
@@ -113,12 +115,6 @@ export const DesktopFilters = ({
         </div>
       </div>
 
-      <TimeFormatToggle
-        use24Hour={state.use24Hour}
-        onChange={(use24Hour) => onStateChange({ use24Hour })}
-      />
-
-      {/* Clear Filters */}
       {hasActiveFilters && (
         <Button
           variant="outline"
@@ -132,4 +128,4 @@ export const DesktopFilters = ({
       )}
     </div>
   );
-};
+}

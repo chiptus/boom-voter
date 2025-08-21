@@ -2,7 +2,6 @@ import { useEffect, useState, useRef, useCallback } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { useStagesQuery } from "@/hooks/queries/stages/useStages";
 import { useArtistsQuery } from "@/hooks/queries/artists/useArtists";
 import { FestivalSet } from "@/hooks/queries/sets/useSets";
 import { useCreateSetMutation } from "@/hooks/queries/sets/useCreateSet";
@@ -28,16 +27,10 @@ import {
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { Loader2 } from "lucide-react";
 import { ArtistMultiSelect } from "./ArtistMultiSelect";
 import { toDatetimeLocal, toISOString } from "@/lib/timeUtils";
+import { StageSelector } from "../StageSelector";
 
 // Form validation schema
 const setFormSchema = z.object({
@@ -65,7 +58,6 @@ export function SetFormDialog({
   editingSet,
   editionId,
 }: SetFormDialogProps) {
-  const { data: stages = [] } = useStagesQuery();
   const { data: artists = [] } = useArtistsQuery();
   const { user } = useAuth();
 
@@ -146,10 +138,6 @@ export function SetFormDialog({
       return "";
     },
     [artists],
-  );
-
-  const availableStages = stages.filter(
-    (stage) => stage.festival_edition_id === editionId,
   );
 
   async function onSubmit(data: SetFormData) {
@@ -287,25 +275,11 @@ export function SetFormDialog({
               control={form.control}
               name="stage_id"
               render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Stage</FormLabel>
-                  <FormControl>
-                    <Select value={field.value} onValueChange={field.onChange}>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select stage" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="none">No stage assigned</SelectItem>
-                        {availableStages.map((stage) => (
-                          <SelectItem key={stage.id} value={stage.id}>
-                            {stage.name}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
+                <StageSelector
+                  editionId={editionId}
+                  value={field.value}
+                  onValueChange={field.onChange}
+                />
               )}
             />
 

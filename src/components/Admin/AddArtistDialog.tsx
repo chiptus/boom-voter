@@ -21,7 +21,6 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Music } from "lucide-react";
-import { StageSelector } from "../StageSelector";
 import { useAuth } from "@/contexts/AuthContext";
 import { useUserPermissionsQuery } from "@/hooks/queries/auth/useUserPermissions";
 import { useGenresQuery } from "@/hooks/queries/genres/useGenres";
@@ -36,9 +35,6 @@ const artistFormSchema = z.object({
   spotifyUrl: z.string().url().optional().or(z.literal("")),
   soundcloudUrl: z.string().url().optional().or(z.literal("")),
   imageUrl: z.string().url().optional().or(z.literal("")),
-  stage: z.string().optional(),
-  timeStart: z.string().optional(),
-  timeEnd: z.string().optional(),
 });
 
 type ArtistFormData = z.infer<typeof artistFormSchema>;
@@ -74,9 +70,6 @@ export function AddArtistDialog({
       spotifyUrl: "",
       soundcloudUrl: "",
       imageUrl: "",
-      stage: "",
-      timeStart: "",
-      timeEnd: "",
     },
   });
 
@@ -113,9 +106,6 @@ export function AddArtistDialog({
         spotify_url: data.spotifyUrl || null,
         soundcloud_url: data.soundcloudUrl || null,
         image_url: data.imageUrl || null,
-        stage: data.stage || null,
-        time_start: data.timeStart || null,
-        time_end: data.timeEnd || null,
       },
       {
         onSuccess() {
@@ -191,51 +181,6 @@ export function AddArtistDialog({
                       rows={3}
                       {...field}
                     />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="stage"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Stage (Optional)</FormLabel>
-                  <FormControl>
-                    <StageSelector
-                      value={field.value || ""}
-                      onValueChange={field.onChange}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="timeStart"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Performance Start Time (Optional)</FormLabel>
-                  <FormControl>
-                    <Input type="datetime-local" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="timeEnd"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Performance End Time (Optional)</FormLabel>
-                  <FormControl>
-                    <Input type="datetime-local" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>

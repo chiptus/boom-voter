@@ -18,6 +18,9 @@ async function createArtist(
     | "votes"
     | "estimated_date"
     | "slug"
+    | "stage"
+    | "time_end"
+    | "time_start"
   > & {
     genre_ids: string[];
   },

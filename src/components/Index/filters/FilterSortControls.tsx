@@ -27,12 +27,14 @@ interface FilterSortControlsProps {
   state: FilterSortState;
   onStateChange: (updates: Partial<FilterSortState>) => void;
   onClear: () => void;
+  editionId: string;
 }
 
 export function FilterSortControls({
   state,
   onStateChange,
   onClear,
+  editionId,
 }: FilterSortControlsProps) {
   const [isFiltersExpanded, setIsFiltersExpanded] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
@@ -201,6 +203,7 @@ export function FilterSortControls({
               groups={groups}
               onStateChange={onStateChange}
               onClear={onClear}
+              editionId={editionId}
             />
           ) : (
             <DesktopFilters
@@ -209,6 +212,7 @@ export function FilterSortControls({
               groups={groups}
               onStateChange={onStateChange}
               onClear={onClear}
+              editionId={editionId}
             />
           )}
         </div>
