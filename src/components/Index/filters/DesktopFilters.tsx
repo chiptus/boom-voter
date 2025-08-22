@@ -6,7 +6,6 @@ import { useStagesByEditionQuery } from "@/hooks/queries/stages/useStagesByEditi
 interface DesktopFiltersProps {
   state: FilterSortState;
   genres: Array<{ id: string; name: string }>;
-  groups: Array<{ id: string; name: string; member_count?: number }>;
   onStateChange: (updates: Partial<FilterSortState>) => void;
   onClear: () => void;
   editionId: string;
