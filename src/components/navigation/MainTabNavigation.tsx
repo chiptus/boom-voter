@@ -1,3 +1,4 @@
+import { cn } from "@/lib/utils";
 import { Calendar, List, Map, Info, MessageSquare } from "lucide-react";
 import { NavLink, useParams } from "react-router-dom";
 
@@ -8,31 +9,31 @@ const TAB_CONFIG = {
     icon: List,
     label: "Vote",
     shortLabel: "Vote",
-    emoji: "🎭",
+    disabled: false,
   },
   timeline: {
     icon: Calendar,
     label: "Schedule",
     shortLabel: "Schedule",
-    emoji: "📅",
+    disabled: false,
   },
   map: {
     icon: Map,
     label: "Map",
     shortLabel: "Map",
-    emoji: "🗺️",
+    disabled: true,
   },
   info: {
     icon: Info,
     label: "Info",
     shortLabel: "Info",
-    emoji: "ℹ️",
+    disabled: true,
   },
   social: {
     icon: MessageSquare,
     label: "Social",
     shortLabel: "Social",
-    emoji: "📱",
+    disabled: true,
   },
 } as const;
 
@@ -68,16 +69,18 @@ export function MainTabNavigation() {
                   key={tab}
                   to={to}
                   end={tab === "artists"} // Only match exact path for artists tab
-                  className={({ isActive }) => `
+                  className={({ isActive }) =>
+                    cn(
+                      `
                     flex items-center justify-center gap-2
                     px-6 py-3 rounded-lg
-                    transition-all duration-200 active:scale-95
-                    ${
+                    transition-all duration-200 active:scale-95`,
                       isActive
                         ? "bg-purple-600 text-white shadow-lg"
-                        : "text-purple-200 hover:text-white hover:bg-white/10"
-                    }
-                  `}
+                        : "text-purple-200 hover:text-white hover:bg-white/10",
+                      config.disabled ? "cursor-not-allowed opacity-50" : "",
+                    )
+                  }
                 >
                   <config.icon className="h-5 w-5" />
                   <span className="font-medium">{config.label}</span>
@@ -108,6 +111,7 @@ export function MainTabNavigation() {
                       ? "text-purple-400"
                       : "text-gray-400 active:text-purple-300"
                   }
+                  ${config.disabled ? "cursor-not-allowed opacity-50" : ""}
                 `}
               >
                 {({ isActive }) => (
