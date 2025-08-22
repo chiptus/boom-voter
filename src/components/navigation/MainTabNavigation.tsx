@@ -127,9 +127,6 @@ export function MainTabNavigation() {
           })}
         </div>
       </div>
-
-      {/* Mobile: Add bottom padding to main content to account for fixed bottom nav */}
-      <div className="md:hidden h-16"></div>
     </>
   );
 }

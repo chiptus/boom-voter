@@ -14,16 +14,16 @@ export function TimelineTab({ userVotes, onVote }: TimelineTabProps) {
   const timelineView = urlState.timelineView;
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-3 md:space-y-6">
       {/* Timeline View Toggle - Mobile-first */}
-      <div className="flex items-center justify-center mb-4">
+      <div className="flex items-center justify-center mb-2 md:mb-4">
         <div className="bg-white/10 backdrop-blur-md rounded-lg p-1 mx-2 sm:mx-0">
           <div className="flex gap-1">
             <button
               onClick={() => updateUrlState({ timelineView: "horizontal" })}
               className={`
-                flex items-center justify-center px-4 py-3 rounded-lg
-                min-w-[100px] transition-all duration-200 active:scale-95
+                flex items-center justify-center px-3 md:px-4 py-2 md:py-3 rounded-lg
+                min-w-[80px] md:min-w-[100px] transition-all duration-200 active:scale-95
                 ${
                   timelineView === "horizontal"
                     ? "bg-purple-600 text-white shadow-lg"
@@ -40,8 +40,8 @@ export function TimelineTab({ userVotes, onVote }: TimelineTabProps) {
             <button
               onClick={() => updateUrlState({ timelineView: "list" })}
               className={`
-                flex items-center justify-center px-4 py-3 rounded-lg
-                min-w-[100px] transition-all duration-200 active:scale-95
+                flex items-center justify-center px-3 md:px-4 py-2 md:py-3 rounded-lg
+                min-w-[80px] md:min-w-[100px] transition-all duration-200 active:scale-95
                 ${
                   timelineView === "list"
                     ? "bg-purple-600 text-white shadow-lg"

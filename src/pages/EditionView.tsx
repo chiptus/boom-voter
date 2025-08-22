@@ -27,19 +27,19 @@ export default function EditionView() {
 
   return (
     <div className="min-h-screen bg-app-gradient">
-      <div className="container mx-auto px-4 py-8 pb-20 md:pb-8">
+      <div className="container mx-auto px-4 py-4 md:py-8 pb-20 md:pb-8">
         <AppHeader
           title={festival.name}
-          subtitle={edition.name}
-          description="Festival voting platform"
+          // subtitle={edition.name}
+          // description="Festival voting platform"
           logoUrl={festival.logo_url}
-          showGroupsButton={true}
+          showGroupsButton
         />
 
         {/* Main Tab Navigation */}
         <MainTabNavigation />
 
-        <div className="mt-8">
+        <div className="mt-4 md:mt-8">
           <ErrorBoundary>
             <Outlet />
           </ErrorBoundary>

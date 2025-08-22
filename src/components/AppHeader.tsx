@@ -17,12 +17,9 @@ interface AppHeaderProps {
 
   // Page content
   title?: string;
+  logoUrl?: string | null;
   subtitle?: string;
   description?: string;
-  logoUrl?: string | null;
-
-  // Actions
-  actions?: ReactNode;
 
   // Navigation options
   showGroupsButton?: boolean;
@@ -35,12 +32,12 @@ export function AppHeader({
   showBackButton = false,
   backLabel = "Back",
   title,
-  subtitle,
-  description,
+  // subtitle,
+  // description,
   logoUrl,
-  actions,
+  // actions,
   showGroupsButton = false,
-  children,
+  // children,
 }: AppHeaderProps) {
   const navigate = useNavigate();
   const { user, profile, signOut, showAuthDialog } = useAuth();
@@ -62,15 +59,17 @@ export function AppHeader({
 
   return (
     <TooltipProvider>
-      <div className="mb-8">
+      <div className="mb-4 md:mb-8">
         {/* Top Bar - App Branding, User Identity & Navigation */}
-        <div className="flex items-center justify-between mb-6 pb-6 border-b border-purple-400/20">
+        <div className="flex items-center justify-between mb-3 md:mb-6 pb-3 md:pb-6 border-b border-purple-400/20">
           {/* Left Side - Branding */}
           <div className="flex items-center gap-4">
             <Link to="/">
               <div className="flex items-center gap-3">
                 <Music className="h-6 w-6 text-purple-400" />
-                <h1 className="text-2xl font-bold text-white">UpLine</h1>
+                <h1 className="text-xl md:text-2xl font-bold text-white">
+                  UpLine
+                </h1>
               </div>
             </Link>
 
@@ -126,49 +125,71 @@ export function AppHeader({
             </div>
           </div>
         </div>
-
-        {/* Page Content Section */}
-        {(title || subtitle || description || children) && (
-          <div className="text-center space-y-4">
+        {title && (
+          <div className="text-center space-y-2 md:space-y-4">
             {title && (
-              <div className="flex items-center justify-center gap-3 mb-6">
+              <div className="flex items-center justify-center gap-2 md:gap-3 mb-3 md:mb-6">
                 {logoUrl ? (
                   <img
                     src={logoUrl}
                     alt={`${title} logo`}
-                    className="h-40 w-auto max-w-sm object-contain rounded"
+                    className="h-20 md:h-32 lg:h-40 w-auto max-w-sm object-contain rounded"
                   />
                 ) : (
                   <>
-                    <Music className="h-8 w-8 text-purple-400 animate-pulse" />
-                    <h2 className="text-4xl font-bold text-white tracking-tight">
+                    <Music className="h-6 md:h-8 w-6 md:w-8 text-purple-400 animate-pulse md:block hidden" />
+                    <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold text-white tracking-tight hidden md:block">
                       {title}
                     </h2>
-                    <Heart className="h-8 w-8 text-pink-400 animate-pulse" />
+                    <Heart className="h-6 md:h-8 w-6 md:w-8 text-pink-400 animate-pulse md:block hidden" />
+                  </>
+                )}
+              </div>
+            )}
+          </div>
+        )}
+        {/* Page Content Section
+        {(title || subtitle || description || children) && (
+          <div className="text-center space-y-2 md:space-y-4">
+            {title && (
+              <div className="flex items-center justify-center gap-2 md:gap-3 mb-3 md:mb-6">
+                {logoUrl ? (
+                  <img
+                    src={logoUrl}
+                    alt={`${title} logo`}
+                    className="h-20 md:h-32 lg:h-40 w-auto max-w-sm object-contain rounded"
+                  />
+                ) : (
+                  <>
+                    <Music className="h-6 md:h-8 w-6 md:w-8 text-purple-400 animate-pulse md:block hidden" />
+                    <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold text-white tracking-tight hidden md:block">
+                      {title}
+                    </h2>
+                    <Heart className="h-6 md:h-8 w-6 md:w-8 text-pink-400 animate-pulse md:block hidden" />
                   </>
                 )}
               </div>
             )}
 
             {subtitle && (
-              <p className="text-xl text-purple-200 font-medium mb-4">
+              <p className="text-lg md:text-xl text-purple-200 font-medium mb-2 md:mb-4">
                 {subtitle}
               </p>
             )}
 
             {description && (
-              <p className="text-purple-300 mb-6 max-w-2xl mx-auto leading-relaxed">
+              <p className="text-sm md:text-base text-purple-300 mb-4 md:mb-6 max-w-2xl mx-auto leading-relaxed">
                 {description}
               </p>
             )}
 
             {actions && (
-              <div className="flex justify-center mb-8">{actions}</div>
+              <div className="flex justify-center mb-4 md:mb-8">{actions}</div>
             )}
 
             {children}
           </div>
-        )}
+        )} */}
       </div>
     </TooltipProvider>
   );
