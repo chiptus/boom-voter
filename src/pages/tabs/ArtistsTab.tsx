@@ -18,6 +18,7 @@ export function ArtistsTab() {
   const { filteredAndSortedSets, lockCurrentOrder } = useSetFiltering(
     sets || [],
     urlState,
+    edition?.id,
   );
 
   if (setsLoading) {
@@ -34,6 +35,7 @@ export function ArtistsTab() {
         state={urlState}
         onStateChange={updateUrlState}
         onClear={clearFilters}
+        editionId={edition?.id || ""}
       />
 
       <div className="mt-8">

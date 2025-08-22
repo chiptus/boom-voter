@@ -126,3 +126,7 @@ src/
 - try to use mutation.mutate(variables, {onSuccess, onError}) instead of try{await mutation.mutateAsync(variables)}catch(err){}
 
 - don't add comments unless really necessary
+
+## Git Workflow
+
+- **Auto-commit Rule**: For every user message that requests code changes, automatically commit the changes after implementation with an appropriate commit message
