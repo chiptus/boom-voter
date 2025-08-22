@@ -36,14 +36,14 @@ const SORT_ICONS = {
   "date-asc": Calendar,
 } as const;
 
-export const SortControls = ({ sort, onSortChange }: SortControlsProps) => {
+export function SortControls({ sort, onSortChange }: SortControlsProps) {
   const CurrentSortIcon = SORT_ICONS[sort];
 
   return (
     <div className="flex items-center gap-2">
       <SortAsc className="h-4 w-4 text-purple-300 hidden sm:block" />
       <Select value={sort} onValueChange={onSortChange}>
-        <SelectTrigger className="w-10 sm:w-32 bg-white/10 border-purple-400/30 text-purple-100">
+        <SelectTrigger className="w-10 sm:w-44 bg-white/10 border-purple-400/30 text-purple-100">
           <div className="hidden sm:block">
             <SelectValue />
           </div>
@@ -145,4 +145,4 @@ export const SortControls = ({ sort, onSortChange }: SortControlsProps) => {
       </Popover>
     </div>
   );
-};
+}
