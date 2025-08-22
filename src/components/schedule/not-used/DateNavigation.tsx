@@ -1,21 +1,20 @@
 import { Button } from "@/components/ui/button";
 import { Calendar, Clock, ChevronUp } from "lucide-react";
-import { useScheduleData } from "@/hooks/useScheduleData";
 import { useCallback } from "react";
 
 interface DateNavigationProps {
+  scheduleDays: { date: string; displayDate: string }[];
   onScrollToDate: (dateIndex: number) => void;
   onScrollToNow: () => void;
   containerRef: React.RefObject<HTMLDivElement>;
 }
 
 export function DateNavigation({
+  scheduleDays,
   onScrollToDate,
   onScrollToNow,
   containerRef,
 }: DateNavigationProps) {
-  const { scheduleDays } = useScheduleData();
-
   const scrollToTop = useCallback(() => {
     containerRef.current?.scrollTo({ top: 0, behavior: "smooth" });
   }, [containerRef]);

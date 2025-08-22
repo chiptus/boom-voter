@@ -112,6 +112,7 @@ src/
 - **React Router**: Use future flags `v7_startTransition` and `v7_relativeSplatPath` in BrowserRouter to prepare for v7 upgrade
 - **Component Extraction**: When a section of JSX + logic becomes substantial (>30 lines) or reusable, extract it into a separate component. Place in appropriate directory: page-specific components in `components/PageName/`, reusable ones in `components/`
 - **Forms**: ALL forms must use react-hook-form with proper validation. Never use plain HTML forms or manual state management for form inputs. Use @hookform/resolvers for validation schemas when needed.
+- **Long Components**: Break long components (>150 lines) into smaller focused pieces. Follow the FilterSortControls pattern of primary controls + expandable sections.
 
 ### Important Notes
 

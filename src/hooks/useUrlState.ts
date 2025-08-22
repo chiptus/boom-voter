@@ -36,7 +36,7 @@ const defaultState: FilterSortState = {
   votePerspective: undefined,
 };
 
-export const useUrlState = () => {
+export function useUrlState() {
   const [searchParams, setSearchParams] = useSearchParams();
 
   const getStateFromUrl = useCallback((): FilterSortState => {
@@ -126,4 +126,4 @@ export const useUrlState = () => {
     updateUrlState,
     clearFilters,
   };
-};
+}

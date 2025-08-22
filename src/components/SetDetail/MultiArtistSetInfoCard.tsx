@@ -6,12 +6,13 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Clock, MapPin, Users } from "lucide-react";
+import { Clock, Users } from "lucide-react";
 import { ArtistVotingButtons } from "./SetVotingButtons";
 import { FestivalSet } from "@/hooks/queries/sets/useSets";
 import { formatTimeRange } from "@/lib/timeUtils";
 import { GenreBadge } from "../Index/GenreBadge";
 import { IndividualArtistCard } from "./IndividualArtistCard";
+import { StagePin } from "@/components/Index/shared/StagePin";
 
 interface MultiArtistSetInfoCardProps {
   set: FestivalSet;
@@ -85,12 +86,7 @@ export function MultiArtistSetInfoCard({
 
               {/* Performance Information */}
               <div className="flex flex-wrap gap-4 mb-4 text-purple-200">
-                {set.stages?.name && (
-                  <div className="flex items-center gap-2">
-                    <MapPin className="h-4 w-4" />
-                    <span className="text-sm">{set.stages.name}</span>
-                  </div>
-                )}
+                <StagePin stageId={set.stage_id} />
                 {formatTimeRange(set.time_start, set.time_end, use24Hour) && (
                   <div className="flex items-center gap-2">
                     <Clock className="h-4 w-4" />

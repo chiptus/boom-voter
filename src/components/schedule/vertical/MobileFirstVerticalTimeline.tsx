@@ -2,9 +2,11 @@ import { useMemo } from "react";
 import { useScheduleData } from "@/hooks/useScheduleData";
 import { useFestivalEdition } from "@/contexts/FestivalEditionContext";
 import { useSetsByEditionQuery as useEditionSetsQuery } from "@/hooks/queries/sets/useSetsByEdition";
-import { isSameDay } from "date-fns";
+import { isSameDay, format } from "date-fns";
 import { TimeSlotGroup } from "./TimeSlotGroup";
 import type { ScheduleSet } from "@/hooks/useScheduleData";
+import { useTimelineUrlState } from "@/hooks/useTimelineUrlState";
+import { useStagesByEditionQuery } from "@/hooks/queries/stages/useStagesByEdition";
 
 interface MobileFirstVerticalTimelineProps {
   userVotes: Record<string, number>;
@@ -23,18 +25,62 @@ export function MobileFirstVerticalTimeline({
   const { edition } = useFestivalEdition();
   const { data: editionSets = [], isLoading: setsLoading } =
     useEditionSetsQuery(edition?.id);
-  const { scheduleDays, loading, error } = useScheduleData(editionSets);
+  const stagesQuery = useStagesByEditionQuery(edition?.id);
+  const { scheduleDays, loading, error } = useScheduleData(
+    editionSets,
+    stagesQuery.data,
+  );
+  const { state: filters } = useTimelineUrlState();
+  const { selectedDay, selectedTime, selectedStages } = filters;
 
   const timeSlots = useMemo(() => {
     if (!scheduleDays.length) return [];
 
-    // Collect all unique start times
+    // Helper function to check if a set matches the day filter
+    function matchesDay(set: ScheduleSet) {
+      if (selectedDay === "all") return true;
+      if (!set.startTime) return false;
+
+      const setDate = format(set.startTime, "yyyy-MM-dd");
+      return setDate === selectedDay;
+    }
+
+    // Helper function to check if a set matches the time filter
+    function matchesTime(set: ScheduleSet) {
+      if (selectedTime === "all") return true;
+      if (!set.startTime) return false;
+
+      const hour = set.startTime.getHours();
+      switch (selectedTime) {
+        case "morning":
+          return hour >= 6 && hour < 12;
+        case "afternoon":
+          return hour >= 12 && hour < 18;
+        case "evening":
+          return hour >= 18 && hour < 24;
+        default:
+          return true;
+      }
+    }
+
+    // Helper function to check if a set matches the stage filter
+    function matchesStage(stageName: string) {
+      if (selectedStages.length === 0) return true;
+      return selectedStages.includes(stageName);
+    }
+
+    // Collect all unique start times with filtering
     const allSets: (ScheduleSet & { stageName: string })[] = [];
 
     scheduleDays.forEach((day) => {
       day.stages.forEach((stage) => {
+        if (!matchesStage(stage.id)) {
+          console.log("Skipping stage:", stage.name, selectedStages);
+          return;
+        }
+
         stage.sets.forEach((set) => {
-          if (set.startTime) {
+          if (set.startTime && matchesDay(set) && matchesTime(set)) {
             allSets.push({
               ...set,
               stageName: stage.name,
@@ -69,7 +115,7 @@ export function MobileFirstVerticalTimeline({
       .sort((a, b) => a.time.getTime() - b.time.getTime());
 
     return slots;
-  }, [scheduleDays]);
+  }, [scheduleDays, selectedDay, selectedTime, selectedStages]);
 
   if (loading || setsLoading) {
     return (

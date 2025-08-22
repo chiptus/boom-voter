@@ -1,61 +1,26 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import {
-  Calendar,
-  Clock,
-  MapPin,
-  Filter,
-  X,
-  ChevronDown,
-  ChevronUp,
-} from "lucide-react";
+import { Filter, X, ChevronDown, ChevronUp } from "lucide-react";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { useStagesByEditionQuery } from "@/hooks/queries/stages/useStagesByEdition";
-import { useFestivalEdition } from "@/contexts/FestivalEditionContext";
 import { ViewToggle } from "./ViewToggle";
-import type { TimelineView } from "@/hooks/useUrlState";
+import { DayFilterSelect } from "./DayFilterSelect";
+import { TimeFilterSelect } from "./TimeFilterSelect";
+import { StageFilterButtons } from "./StageFilterButtons";
+import { useTimelineUrlState } from "@/hooks/useTimelineUrlState";
 
-type DayFilter = "all" | "friday" | "saturday" | "sunday";
-type TimeFilter = "all" | "morning" | "afternoon" | "evening";
-
-interface TimelineFiltersProps {
-  currentView: TimelineView;
-  onViewChange: (view: TimelineView) => void;
-}
-
-export function TimelineFilters({
-  currentView,
-  onViewChange,
-}: TimelineFiltersProps) {
-  const [selectedDay, setSelectedDay] = useState<DayFilter>("all");
-  const [selectedTime, setSelectedTime] = useState<TimeFilter>("all");
-  const [selectedStages, setSelectedStages] = useState<string[]>([]);
+export function TimelineFilters() {
   const [isExpanded, setIsExpanded] = useState(false);
 
-  const { edition } = useFestivalEdition();
-  const { data: stages = [] } = useStagesByEditionQuery(edition?.id);
   const isMobile = useIsMobile();
+  const { state, updateState, clearFilters } = useTimelineUrlState();
+  const { timelineView, selectedDay, selectedTime, selectedStages } = state;
 
-  const handleStageToggle = (stageId: string) => {
-    setSelectedStages((prev) =>
-      prev.includes(stageId)
-        ? prev.filter((id) => id !== stageId)
-        : [...prev, stageId],
-    );
-  };
-
-  const clearAllFilters = () => {
-    setSelectedDay("all");
-    setSelectedTime("all");
-    setSelectedStages([]);
-  };
+  function handleStageToggle(stageId: string) {
+    const newStages = selectedStages.includes(stageId)
+      ? selectedStages.filter((id) => id !== stageId)
+      : [...selectedStages, stageId];
+    updateState({ selectedStages: newStages });
+  }
 
   const hasActiveFilters =
     selectedDay !== "all" ||
@@ -75,7 +40,10 @@ export function TimelineFilters({
       <div className="bg-white/10 backdrop-blur-md border border-purple-400/30 rounded-lg p-4">
         <div className="flex items-center gap-2">
           {/* View Toggle */}
-          <ViewToggle currentView={currentView} onViewChange={onViewChange} />
+          <ViewToggle
+            currentView={timelineView}
+            onViewChange={(view) => updateState({ timelineView: view })}
+          />
 
           {/* Spacer to push filters to right */}
           <div className="ml-auto" />
@@ -122,7 +90,7 @@ export function TimelineFilters({
               <Button
                 variant="ghost"
                 size="sm"
-                onClick={clearAllFilters}
+                onClick={clearFilters}
                 className="text-red-400 hover:text-red-300 hover:bg-red-400/10"
               >
                 <X className="h-3 w-3 mr-1" />
@@ -131,98 +99,18 @@ export function TimelineFilters({
             )}
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-3 md:gap-4">
-            {/* Day Filter */}
-            <div className="space-y-2">
-              <div className="flex items-center gap-2">
-                <Calendar className="h-3 w-3 text-purple-300" />
-                <label className="text-sm font-medium text-purple-200">
-                  Day
-                </label>
-              </div>
-              <Select
-                value={selectedDay}
-                onValueChange={(value: DayFilter) => setSelectedDay(value)}
-              >
-                <SelectTrigger className="bg-white/10 border-purple-400/30 text-purple-100">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent className="bg-gray-800 border-purple-400/30">
-                  <SelectItem value="all" className="text-purple-100">
-                    All Days
-                  </SelectItem>
-                  <SelectItem value="friday" className="text-purple-100">
-                    Friday
-                  </SelectItem>
-                  <SelectItem value="saturday" className="text-purple-100">
-                    Saturday
-                  </SelectItem>
-                  <SelectItem value="sunday" className="text-purple-100">
-                    Sunday
-                  </SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-
-            {/* Time Filter */}
-            <div className="space-y-2">
-              <div className="flex items-center gap-2">
-                <Clock className="h-3 w-3 text-purple-300" />
-                <label className="text-sm font-medium text-purple-200">
-                  Time
-                </label>
-              </div>
-              <Select
-                value={selectedTime}
-                onValueChange={(value: TimeFilter) => setSelectedTime(value)}
-              >
-                <SelectTrigger className="bg-white/10 border-purple-400/30 text-purple-100">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent className="bg-gray-800 border-purple-400/30">
-                  <SelectItem value="all" className="text-purple-100">
-                    All Day
-                  </SelectItem>
-                  <SelectItem value="morning" className="text-purple-100">
-                    Morning (6-12)
-                  </SelectItem>
-                  <SelectItem value="afternoon" className="text-purple-100">
-                    Afternoon (12-18)
-                  </SelectItem>
-                  <SelectItem value="evening" className="text-purple-100">
-                    Evening (18-24)
-                  </SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-
-            {/* Stages Filter */}
-            <div className="space-y-2">
-              <div className="flex items-center gap-2">
-                <MapPin className="h-3 w-3 text-purple-300" />
-                <label className="text-sm font-medium text-purple-200">
-                  Stages
-                </label>
-              </div>
-              <div className="flex flex-wrap gap-2 max-h-20 overflow-y-auto">
-                {stages.map((stage) => (
-                  <Button
-                    key={stage.id}
-                    variant={
-                      selectedStages.includes(stage.id) ? "default" : "outline"
-                    }
-                    size="sm"
-                    onClick={() => handleStageToggle(stage.id)}
-                    className={
-                      selectedStages.includes(stage.id)
-                        ? "bg-purple-600 hover:bg-purple-700 text-xs"
-                        : "border-purple-400 text-purple-400 hover:bg-purple-400 hover:text-white text-xs"
-                    }
-                  >
-                    {stage.name}
-                  </Button>
-                ))}
-              </div>
-            </div>
+            <DayFilterSelect
+              selectedDay={selectedDay}
+              onDayChange={(day) => updateState({ selectedDay: day })}
+            />
+            <TimeFilterSelect
+              selectedTime={selectedTime}
+              onTimeChange={(time) => updateState({ selectedTime: time })}
+            />
+            <StageFilterButtons
+              selectedStages={selectedStages}
+              onStageToggle={handleStageToggle}
+            />
           </div>
         </div>
       )}

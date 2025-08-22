@@ -2,6 +2,7 @@ import { useMemo } from "react";
 import { formatDateTime } from "@/lib/timeUtils";
 import { format, startOfDay } from "date-fns";
 import type { FestivalSet } from "@/hooks/queries/sets/useSets";
+import { Stage } from "./queries/stages/types";
 
 export interface ScheduleDay {
   date: string;
@@ -10,15 +11,16 @@ export interface ScheduleDay {
 }
 
 export interface ScheduleStage {
+  id: string;
   name: string;
-  sets: ScheduleSet[]; // Now represents sets, not individual artists
+  sets: ScheduleSet[];
 }
 
 export interface ScheduleArtist {
   id: string;
   name: string;
   slug?: string;
-  stage?: string;
+  stageId?: string;
   startTime?: Date;
   endTime?: Date;
   votes?: { vote_type: number; user_id: string }[];
@@ -36,26 +38,20 @@ export interface ScheduleSet extends ScheduleArtist {
 }
 
 export function useScheduleData(
-  sets?: FestivalSet[],
+  sets: FestivalSet[] | undefined,
+  stages: Array<Stage> | undefined,
   use24Hour: boolean = false,
 ) {
   const loading = false;
   const error = null;
 
   const scheduleDays = useMemo(() => {
-    // Enhanced defensive checks
-    if (!sets) {
-      return [];
-    }
-
-    if (!Array.isArray(sets) || sets.length === 0) {
+    if (!sets || !stages || !Array.isArray(sets) || sets.length === 0) {
       return [];
     }
 
     // Filter sets with performance times and stages
-    const performingSets = sets.filter(
-      (set) => set.time_start && set.stages?.name,
-    );
+    const performingSets = sets.filter((set) => set.time_start && set.stage_id);
 
     // Parse and enhance set data
     const enhancedSets: ScheduleSet[] = performingSets.map((set) => {
@@ -66,7 +62,7 @@ export function useScheduleData(
         id: set.id,
         name: set.name,
         slug: set.slug,
-        stage: set.stages?.name || "",
+        stageId: set.stage_id || "",
         startTime,
         endTime,
         votes: set.votes || [],
@@ -77,6 +73,8 @@ export function useScheduleData(
         })),
       };
     });
+
+    console.log({ enhancedSets });
 
     // Group sets by day
     const dayGroups = enhancedSets.reduce(
@@ -102,36 +100,50 @@ export function useScheduleData(
         // Group by stage
         const stageGroups = daySets.reduce(
           (acc, set) => {
-            const stageName = set.stage || "Main Stage";
-            if (!acc[stageName]) {
-              acc[stageName] = [];
+            const stageId = set.stageId;
+            if (!stageId) {
+              console.log("no stageId", set);
+              return acc;
             }
-            acc[stageName].push(set);
+
+            if (!acc[stageId]) {
+              acc[stageId] = [];
+            }
+
+            acc[stageId].push(set);
             return acc;
           },
           {} as Record<string, ScheduleSet[]>,
         );
 
         // Sort sets within each stage by time
-        const stages: ScheduleStage[] = Object.entries(stageGroups).map(
-          ([stageName, stageSets]) => ({
-            name: stageName,
-            sets: stageSets.sort((a, b) => {
-              if (!a.startTime || !b.startTime) return 0;
-              return a.startTime.getTime() - b.startTime.getTime();
-            }),
-          }),
-        );
+        const scheduleStages: ScheduleStage[] = Object.entries(stageGroups)
+          .map(([stageId, stageSets]) => {
+            const stage = stages.find((s) => s.id === stageId);
+            if (!stage) {
+              return null;
+            }
+
+            return {
+              id: stageId,
+              name: stage?.name,
+              sets: stageSets.sort((a, b) => {
+                if (!a.startTime || !b.startTime) return 0;
+                return a.startTime.getTime() - b.startTime.getTime();
+              }),
+            };
+          })
+          .filter((v: ScheduleStage | null): v is ScheduleStage => !!v);
 
         return {
           date: dateKey,
           displayDate: format(date, "EEEE, MMM d"),
-          stages: stages.sort((a, b) => a.name.localeCompare(b.name)),
+          stages: scheduleStages.sort((a, b) => a.name.localeCompare(b.name)),
         };
       });
 
     return scheduleDays;
-  }, [sets, use24Hour]);
+  }, [sets, use24Hour, stages]);
 
   const allStages = useMemo(() => {
     const stageSet = new Set<string>();
