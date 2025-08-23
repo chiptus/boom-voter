@@ -14,10 +14,7 @@ export class TestHelpers {
     await this.page.goto("/");
 
     // Click sign in button
-    const signInButton = this.page
-      .getByRole("button", { name: /sign in/i })
-      .or(this.page.getByRole("link", { name: /sign in/i }))
-      .or(this.page.getByText(/sign in/i));
+    const signInButton = this.page.getByRole("button", { name: /sign in/i });
 
     await signInButton.click();
 
@@ -29,12 +26,8 @@ export class TestHelpers {
     const emailInput = this.page
       .getByLabel(/email/i)
       .or(this.page.getByPlaceholder(/email/i));
-    const passwordInput = this.page
-      .getByLabel(/password/i)
-      .or(this.page.getByPlaceholder(/password/i));
 
     await emailInput.fill(email);
-    await passwordInput.fill(password);
 
     // Submit form
     const submitButton = this.page
