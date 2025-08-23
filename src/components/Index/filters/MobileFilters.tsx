@@ -1,4 +1,3 @@
-import { Button } from "@/components/ui/button";
 import {
   Select,
   SelectContent,
@@ -6,7 +5,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { X } from "lucide-react";
 import type { FilterSortState } from "@/hooks/useUrlState";
 import { useStagesByEditionQuery } from "@/hooks/queries/stages/useStagesByEdition";
 
@@ -14,7 +12,6 @@ interface MobileFiltersProps {
   state: FilterSortState;
   genres: Array<{ id: string; name: string }>;
   onStateChange: (updates: Partial<FilterSortState>) => void;
-  onClear: () => void;
   editionId: string;
 }
 
@@ -22,7 +19,6 @@ export function MobileFilters({
   state,
   genres,
   onStateChange,
-  onClear,
   editionId,
 }: MobileFiltersProps) {
   const { data: stages = [], isLoading: stagesLoading } =
@@ -43,9 +39,6 @@ export function MobileFilters({
       onStateChange({ genres: [value] });
     }
   }
-
-  const hasActiveFilters =
-    state.stages.length > 0 || state.genres.length > 0 || state.minRating > 0;
 
   return (
     <div className="space-y-4">
@@ -139,18 +132,6 @@ export function MobileFilters({
           </SelectContent>
         </Select>
       </div>
-
-      {hasActiveFilters && (
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={onClear}
-          className="w-full border-red-400 text-red-400 hover:bg-red-400 hover:text-white"
-        >
-          <X className="h-3 w-3 mr-1" />
-          Clear All Filters
-        </Button>
-      )}
     </div>
   );
 }

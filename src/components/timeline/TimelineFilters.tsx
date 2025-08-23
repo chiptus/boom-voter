@@ -1,17 +1,15 @@
 import { useState } from "react";
-import { Button } from "@/components/ui/button";
-import { Filter, X, ChevronDown, ChevronUp } from "lucide-react";
-import { useIsMobile } from "@/hooks/use-mobile";
 import { ViewToggle } from "./ViewToggle";
 import { DayFilterSelect } from "./DayFilterSelect";
 import { TimeFilterSelect } from "./TimeFilterSelect";
 import { StageFilterButtons } from "./StageFilterButtons";
 import { useTimelineUrlState } from "@/hooks/useTimelineUrlState";
+import { FilterToggle } from "@/components/common/filters/FilterToggle";
+import { FilterContainer } from "@/components/common/filters/FilterContainer";
 
 export function TimelineFilters() {
   const [isExpanded, setIsExpanded] = useState(false);
 
-  const isMobile = useIsMobile();
   const { state, updateState, clearFilters } = useTimelineUrlState();
   const { timelineView, selectedDay, selectedTime, selectedStages } = state;
 
@@ -32,61 +30,29 @@ export function TimelineFilters() {
 
   return (
     <div className="space-y-3 md:space-y-4">
-      <div className="bg-white/10 backdrop-blur-md border border-purple-400/30 rounded-lg p-4">
-        <div className="flex items-center gap-2">
-          <ViewToggle
-            currentView={timelineView}
-            onViewChange={(view) => updateState({ timelineView: view })}
-          />
+      <FilterContainer>
+        <div className="flex items-center gap-2 flex-wrap">
+          <div className="w-full sm:w-auto">
+            <ViewToggle
+              currentView={timelineView}
+              onViewChange={(view) => updateState({ timelineView: view })}
+            />
+          </div>
 
           <div className="ml-auto" />
 
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => setIsExpanded(!isExpanded)}
-            className={`flex items-center gap-2 ${
-              isExpanded
-                ? "bg-purple-600/50 text-purple-100 hover:bg-purple-600/60"
-                : "text-purple-300 hover:text-purple-100"
-            }`}
-          >
-            <Filter className="h-4 w-4" />
-            <span className="hidden md:inline">Filters</span>
-            {isMobile &&
-              (isExpanded ? (
-                <ChevronUp className="h-4 w-4 text-purple-300" />
-              ) : (
-                <ChevronDown className="h-4 w-4 text-purple-300" />
-              ))}
-            {hasActiveFilters && (
-              <span className="bg-purple-600 text-white text-xs px-2 py-0.5 rounded-full ml-1">
-                {activeFilterCount}
-              </span>
-            )}
-          </Button>
+          <FilterToggle
+            isExpanded={isExpanded}
+            onToggle={() => setIsExpanded(!isExpanded)}
+            hasActiveFilters={hasActiveFilters}
+            activeFilterCount={activeFilterCount}
+            onClearFilters={hasActiveFilters ? clearFilters : undefined}
+          />
         </div>
-      </div>
+      </FilterContainer>
 
       {shouldShowFilters && (
-        <div className="bg-white/10 backdrop-blur-md border border-purple-400/30 rounded-lg p-4">
-          <div className="flex items-center justify-between mb-4">
-            <div className="flex items-center gap-2">
-              <Filter className="h-4 w-4 text-purple-300" />
-              <span className="text-purple-100 font-medium">Filters</span>
-            </div>
-            {hasActiveFilters && (
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={clearFilters}
-                className="text-red-400 hover:text-red-300 hover:bg-red-400/10"
-              >
-                <X className="h-3 w-3 mr-1" />
-                Clear
-              </Button>
-            )}
-          </div>
+        <FilterContainer>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-3 md:gap-4">
             <DayFilterSelect
               selectedDay={selectedDay}
@@ -101,7 +67,7 @@ export function TimelineFilters() {
               onStageToggle={handleStageToggle}
             />
           </div>
-        </div>
+        </FilterContainer>
       )}
     </div>
   );

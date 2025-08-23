@@ -5,7 +5,8 @@ import { SortControls } from "./SortControls";
 import { MobileFilters } from "./MobileFilters";
 import { DesktopFilters } from "./DesktopFilters";
 import { GroupFilterDropdown } from "./GroupFilterDropdown";
-import { FilterToggle } from "./FilterToggle";
+import { FilterToggle } from "@/components/common/filters/FilterToggle";
+import { FilterContainer } from "@/components/common/filters/FilterContainer";
 import { RefreshButton } from "./RefreshButton";
 
 interface FilterSortControlsProps {
@@ -53,7 +54,7 @@ export function FilterSortControls({
 
   return (
     <div className="space-y-4">
-      <div className="bg-white/10 backdrop-blur-md border border-purple-400/30 rounded-lg p-4">
+      <FilterContainer>
         <div className="flex items-center gap-2">
           <SortControls sort={state.sort} onSortChange={handleSortChange} />
 
@@ -71,20 +72,20 @@ export function FilterSortControls({
             onToggle={() => setIsFiltersExpanded(!isFiltersExpanded)}
             hasActiveFilters={hasActiveFilters}
             activeFilterCount={activeFilterCount}
+            onClearFilters={hasActiveFilters ? onClear : undefined}
           />
         </div>
-      </div>
+      </FilterContainer>
 
       {isFiltersExpanded && (
-        <div className="bg-white/10 backdrop-blur-md border border-purple-400/30 rounded-lg p-4">
+        <FilterContainer>
           <Filters
             state={state}
             genres={genres}
             onStateChange={onStateChange}
-            onClear={onClear}
             editionId={editionId}
           />
-        </div>
+        </FilterContainer>
       )}
     </div>
   );
