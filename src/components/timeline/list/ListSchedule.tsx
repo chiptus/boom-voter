@@ -8,7 +8,7 @@ import type { ScheduleSet } from "@/hooks/useScheduleData";
 import { useTimelineUrlState } from "@/hooks/useTimelineUrlState";
 import { useStagesByEditionQuery } from "@/hooks/queries/stages/useStagesByEdition";
 
-interface MobileFirstVerticalTimelineProps {
+interface ListScheduleProps {
   userVotes: Record<string, number>;
   onVote: (artistId: string, voteType: number) => void;
 }
@@ -18,10 +18,7 @@ interface TimeSlot {
   sets: (ScheduleSet & { stageName: string })[];
 }
 
-export function MobileFirstVerticalTimeline({
-  userVotes,
-  onVote,
-}: MobileFirstVerticalTimelineProps) {
+export function ListSchedule({ userVotes, onVote }: ListScheduleProps) {
   const { edition } = useFestivalEdition();
   const { data: editionSets = [], isLoading: setsLoading } =
     useEditionSetsQuery(edition?.id);

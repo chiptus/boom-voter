@@ -1,4 +1,4 @@
-import { ArtistScheduleBlock } from "./ArtistScheduleBlock";
+import { SetBlock } from "./SetBlock";
 import type { HorizontalTimelineSet } from "@/lib/timelineCalculator";
 
 interface StageRowProps {
@@ -37,7 +37,7 @@ export function StageRow({
               }}
             >
               <div className="h-full pr-1">
-                <ArtistScheduleBlock
+                <SetBlock
                   set={set}
                   userVote={userVotes[set.id]}
                   onVote={onVote}

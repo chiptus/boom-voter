@@ -1,5 +1,5 @@
-import { ScheduleHorizontalTimelineView } from "@/components/schedule/ScheduleHorizontalTimelineView";
-import { MobileFirstVerticalTimeline } from "@/components/schedule/vertical/MobileFirstVerticalTimeline";
+import { Timeline } from "@/components/timeline/horizontal/Timeline";
+import { ListSchedule } from "@/components/timeline/list/ListSchedule";
 import { TimelineFilters } from "./TimelineFilters";
 import { useTimelineUrlState } from "@/hooks/useTimelineUrlState";
 
@@ -17,9 +17,9 @@ export function TimelineTab({ userVotes, onVote }: TimelineTabProps) {
       <TimelineFilters />
 
       {timelineView === "horizontal" ? (
-        <ScheduleHorizontalTimelineView userVotes={userVotes} onVote={onVote} />
+        <Timeline userVotes={userVotes} onVote={onVote} />
       ) : (
-        <MobileFirstVerticalTimeline userVotes={userVotes} onVote={onVote} />
+        <ListSchedule userVotes={userVotes} onVote={onVote} />
       )}
     </div>
   );

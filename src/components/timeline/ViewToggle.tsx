@@ -23,10 +23,7 @@ export function ViewToggle({ currentView, onViewChange }: ViewToggleProps) {
           `}
         >
           <BarChart3 className="h-4 w-4 sm:h-5 sm:w-5" />
-          <span className="ml-2 text-sm font-medium">
-            <span className="sm:hidden">Grid</span>
-            <span className="hidden sm:inline">Horizontal</span>
-          </span>
+          <span className="ml-2 text-sm font-medium">Timeline</span>
         </button>
         <button
           onClick={() => onViewChange("list")}
@@ -41,10 +38,7 @@ export function ViewToggle({ currentView, onViewChange }: ViewToggleProps) {
           `}
         >
           <List className="h-4 w-4 sm:h-5 sm:w-5" />
-          <span className="ml-2 text-sm font-medium">
-            <span className="sm:hidden">Feed</span>
-            <span className="hidden sm:inline">List</span>
-          </span>
+          <span className="ml-2 text-sm font-medium">List</span>
         </button>
       </div>
     </div>

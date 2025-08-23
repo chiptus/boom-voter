@@ -88,7 +88,7 @@ export function VerticalTimeScale({
           <div className="h-px w-2 bg-purple-400/30"></div>
         </div>
       ))}
-      
+
       <div className="absolute top-0 right-0 bottom-0 w-px bg-purple-400/20"></div>
     </div>
   );

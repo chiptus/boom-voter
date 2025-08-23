@@ -9,15 +9,12 @@ import { useTimelineUrlState } from "@/hooks/useTimelineUrlState";
 import { format } from "date-fns";
 import { useStagesByEditionQuery } from "@/hooks/queries/stages/useStagesByEdition";
 
-interface ScheduleHorizontalTimelineViewProps {
+interface TimelineProps {
   userVotes: Record<string, number>;
   onVote: (artistId: string, voteType: number) => void;
 }
 
-export function ScheduleHorizontalTimelineView({
-  userVotes,
-  onVote,
-}: ScheduleHorizontalTimelineViewProps) {
+export function Timeline({ userVotes, onVote }: TimelineProps) {
   const { edition } = useFestivalEdition();
   const { data: editionSets = [], isLoading: setsLoading } =
     useEditionSetsQuery(edition?.id);

@@ -22,33 +22,25 @@ export function TimelineFilters() {
     updateState({ selectedStages: newStages });
   }
 
-  const hasActiveFilters =
-    selectedDay !== "all" ||
-    selectedTime !== "all" ||
-    selectedStages.length > 0;
   const activeFilterCount =
     (selectedDay !== "all" ? 1 : 0) +
     (selectedTime !== "all" ? 1 : 0) +
     selectedStages.length;
+  const hasActiveFilters = activeFilterCount > 0;
 
-  // Auto-expand on desktop, collapsible on mobile
-  const shouldShowFilters = !isMobile || isExpanded;
+  const shouldShowFilters = isExpanded;
 
   return (
     <div className="space-y-3 md:space-y-4">
-      {/* Primary Controls Row */}
       <div className="bg-white/10 backdrop-blur-md border border-purple-400/30 rounded-lg p-4">
         <div className="flex items-center gap-2">
-          {/* View Toggle */}
           <ViewToggle
             currentView={timelineView}
             onViewChange={(view) => updateState({ timelineView: view })}
           />
 
-          {/* Spacer to push filters to right */}
           <div className="ml-auto" />
 
-          {/* Filters Toggle */}
           <Button
             variant="ghost"
             size="sm"
@@ -76,15 +68,12 @@ export function TimelineFilters() {
         </div>
       </div>
 
-      {/* Expandable Filters */}
       {shouldShowFilters && (
         <div className="bg-white/10 backdrop-blur-md border border-purple-400/30 rounded-lg p-4">
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-2">
               <Filter className="h-4 w-4 text-purple-300" />
-              <span className="text-purple-100 font-medium">
-                Timeline Filters
-              </span>
+              <span className="text-purple-100 font-medium">Filters</span>
             </div>
             {hasActiveFilters && (
               <Button
