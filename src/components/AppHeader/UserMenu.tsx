@@ -21,12 +21,12 @@ interface UserMenuProps {
   isMobile?: boolean;
 }
 
-export const UserMenu = ({
+export function UserMenu({
   user,
   profile,
   onSignOut,
   isMobile,
-}: UserMenuProps) => {
+}: UserMenuProps) {
   const displayName = profile?.username || user.email?.split("@")[0] || "User";
 
   return (
@@ -92,4 +92,4 @@ export const UserMenu = ({
       </DropdownMenuContent>
     </DropdownMenu>
   );
-};
+}

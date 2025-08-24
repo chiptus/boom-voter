@@ -13,7 +13,7 @@ export const CookieConsentBanner = () => {
 
   return (
     <>
-      <div className="fixed bottom-0 left-0 right-0 z-50 p-4">
+      <div className="fixed bottom-0 md:bottom-0 left-0 right-0 z-50 p-4 pb-24 md:pb-4">
         <Card className="mx-auto max-w-4xl p-6 bg-background/95 backdrop-blur border shadow-lg">
           <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
             <div className="flex-1">

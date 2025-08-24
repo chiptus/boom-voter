@@ -8,6 +8,13 @@ export interface HorizontalTimelineSet extends ScheduleSet {
   };
 }
 
+export interface VerticalTimelineSet extends ScheduleSet {
+  verticalPosition?: {
+    top: number;
+    height: number;
+  };
+}
+
 export interface TimelineData {
   timeSlots: Date[];
   stages: Array<{
@@ -15,6 +22,17 @@ export interface TimelineData {
     sets: HorizontalTimelineSet[];
   }>;
   totalWidth: number;
+  festivalStart: Date;
+  festivalEnd: Date;
+}
+
+export interface VerticalTimelineData {
+  timeSlots: Date[];
+  stages: Array<{
+    name: string;
+    sets: VerticalTimelineSet[];
+  }>;
+  totalHeight: number;
   festivalStart: Date;
   festivalEnd: Date;
 }
@@ -146,4 +164,80 @@ function calculateLatestSetTime(scheduleDays: ScheduleDay[]) {
   latestTime.setMinutes(59, 59, 999);
 
   return latestTime;
+}
+
+export function calculateVerticalTimelineData(
+  festivalStartDate: Date,
+  festivalEndDate: Date,
+  scheduleDays: ScheduleDay[],
+): VerticalTimelineData | null {
+  if (!scheduleDays || scheduleDays.length === 0) return null;
+
+  if (!festivalStartDate || !festivalEndDate) {
+    return null;
+  }
+
+  const earliestSetTime = calculateEarliestSetTime(scheduleDays);
+  const earliestTime = earliestSetTime || new Date(festivalStartDate);
+
+  const latestSetTime = calculateLatestSetTime(scheduleDays);
+  const latestTime = latestSetTime || new Date(festivalEndDate);
+
+  const timeSlots = [];
+  const totalMinutes = differenceInMinutes(latestTime, earliestTime);
+  const totalHours = Math.ceil(totalMinutes / 60);
+
+  for (let i = 0; i <= totalHours; i++) {
+    const timeSlot = new Date(earliestTime.getTime() + i * 60 * 60 * 1000);
+    timeSlots.push(timeSlot);
+  }
+
+  const allStageGroups: Record<string, VerticalTimelineSet[]> = {};
+
+  scheduleDays.forEach((day) => {
+    day.stages.forEach((stage) => {
+      if (!allStageGroups[stage.name]) {
+        allStageGroups[stage.name] = [];
+      }
+
+      const enhancedSets = stage.sets.map((set): VerticalTimelineSet => {
+        if (!set.startTime || !set.endTime) return set;
+
+        const startMinutes = differenceInMinutes(set.startTime, earliestTime);
+        const duration = differenceInMinutes(set.endTime, set.startTime);
+
+        // Calculate vertical positions (1 minute = 2px)
+        const top = startMinutes * 2;
+        const height = Math.max(duration * 2, 60); // Minimum height of 60px
+
+        return {
+          ...set,
+          verticalPosition: {
+            top,
+            height,
+          },
+        };
+      });
+
+      allStageGroups[stage.name].push(...enhancedSets);
+    });
+  });
+
+  const unifiedStages = Object.entries(allStageGroups)
+    .map(([stageName, sets]) => ({
+      name: stageName,
+      sets: sets.sort((a, b) => {
+        if (!a.startTime || !b.startTime) return 0;
+        return a.startTime.getTime() - b.startTime.getTime();
+      }),
+    }))
+    .sort((a, b) => a.name.localeCompare(b.name));
+
+  return {
+    timeSlots,
+    stages: unifiedStages,
+    totalHeight: totalHours * 120, // 120px per hour
+    festivalStart: earliestTime,
+    festivalEnd: latestTime,
+  };
 }

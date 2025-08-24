@@ -5,8 +5,8 @@ const Schedule = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    // Redirect to main page with timeline view
-    navigate("/?mainView=timeline", { replace: true });
+    // Redirect to timeline tab
+    navigate("../timeline", { replace: true, relative: "path" });
   }, [navigate]);
 
   return (

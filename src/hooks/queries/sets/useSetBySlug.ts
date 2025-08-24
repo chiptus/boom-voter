@@ -39,7 +39,6 @@ async function fetchSetBySlug(slug: string): Promise<FestivalSet> {
           votes: [],
         }))
         .filter(Boolean) || [],
-    stages: data.stage_id && data.stages ? data.stages : null,
     votes: data.votes || [],
   };
 

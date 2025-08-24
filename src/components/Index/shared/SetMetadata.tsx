@@ -2,9 +2,11 @@ import { MapPin, Clock } from "lucide-react";
 import { formatTimeRange } from "@/lib/timeUtils";
 import { GenreBadge } from "../GenreBadge";
 import { useFestivalSet } from "../FestivalSetContext";
+import { useStageQuery } from "@/hooks/queries/stages/useStageQuery";
 
 export function SetMetadata() {
   const { set, use24Hour } = useFestivalSet();
+  const stageQuery = useStageQuery(set?.stage_id);
   const uniqueGenres = set.artists
     ?.flatMap((a) => a.artist_music_genres || [])
     .filter(
@@ -36,10 +38,10 @@ export function SetMetadata() {
 
       {/* Stage and Time Information */}
       <div className="flex flex-wrap gap-2 items-center">
-        {set.stages?.name && (
+        {stageQuery.data && (
           <div className="flex items-center gap-1 text-purple-200 text-xs">
             <MapPin className="h-3 w-3" />
-            <span>{set.stages.name}</span>
+            <span>{stageQuery.data.name}</span>
           </div>
         )}
         {timeRangeFormatted && (

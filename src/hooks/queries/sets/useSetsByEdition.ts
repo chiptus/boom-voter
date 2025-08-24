@@ -9,7 +9,6 @@ async function fetchSetsByEdition(editionId: string): Promise<FestivalSet[]> {
     .select(
       `
       *,
-      stages (name),
       set_artists (
         artists (
           *,

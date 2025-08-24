@@ -3,16 +3,22 @@ import { Routes, Route } from "react-router-dom";
 import { SubdomainRedirect } from "./SubdomainRedirect";
 import FestivalSelection from "@/pages/FestivalSelection";
 import EditionSelection from "@/pages/EditionSelection";
-import { SetDetails } from "@/pages/SetDetails";
-import EditionView from "@/pages/EditionView";
-import Schedule from "@/pages/Schedule";
 import { GlobalRoutes } from "./GlobalRoutes";
+import { createEditionRoutes } from "./EditionRoutes";
+import { useState } from "react";
 
 /**
  * Routes for main domain access (getupline.com)
  * Includes festival selection and full admin interface
  */
 export function MainDomainRoutes() {
+  const [editionRoutes] = useState(
+    createEditionRoutes({
+      basePath: "/festivals/:festivalSlug/editions/:editionSlug",
+      WrapperComponent: SubdomainRedirect,
+    }),
+  );
+
   return (
     <>
       <Routes>
@@ -23,18 +29,8 @@ export function MainDomainRoutes() {
           path="/festivals/:festivalSlug"
           element={<SubdomainRedirect component={EditionSelection} />}
         />
-        <Route
-          path="/festivals/:festivalSlug/editions/:editionSlug"
-          element={<SubdomainRedirect component={EditionView} />}
-        />
-        <Route
-          path="/festivals/:festivalSlug/editions/:editionSlug/sets/:setSlug"
-          element={<SubdomainRedirect component={SetDetails} />}
-        />
-        <Route
-          path="/festivals/:festivalSlug/editions/:editionSlug/schedule"
-          element={<SubdomainRedirect component={Schedule} />}
-        />
+        {/* Edition routes with subdomain redirect wrapper */}
+        {editionRoutes}
 
         <Route path="*" element={<GlobalRoutes />} />
       </Routes>
