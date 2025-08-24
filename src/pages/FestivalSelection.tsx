@@ -82,9 +82,13 @@ export default function FestivalSelection() {
           description="Choose a festival to start voting and collaborating with your community."
         />
 
-        <div className="mt-12 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+        <ul
+          className="mt-12 grid gap-6 md:grid-cols-2 lg:grid-cols-3"
+          data-testid="festival-selection"
+          aria-label="Festival List"
+        >
           {availableFestivals.map((festival: Festival) => (
-            <div
+            <li
               key={festival.id}
               className="block cursor-pointer"
               onClick={() => handleFestivalClick(festival)}
@@ -135,9 +139,9 @@ export default function FestivalSelection() {
                   </div>
                 </CardContent>
               </Card>
-            </div>
+            </li>
           ))}
-        </div>
+        </ul>
 
         <div className="mt-16 text-center">
           <p className="text-purple-200 text-sm">

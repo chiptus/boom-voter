@@ -20,7 +20,6 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - `npm run test:e2e:debug` - Debug tests
 - `npm run test:e2e:report` - Show test report
 - `npm run test:setup` - Setup test environment
-- `npm run test:setup:full` - Setup full local Supabase
 
 ## Architecture Overview
 
