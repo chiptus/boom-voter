@@ -125,7 +125,7 @@ function GroupDetail() {
   return (
     <div className="min-h-screen bg-app-gradient">
       <div className="container mx-auto px-4 py-8">
-        <AppHeader showBackButton backTo="/groups" backLabel="Back to Groups" />
+        <AppHeader showBackButton backLabel="Back to Groups" />
 
         <div className="mb-8">
           <div className="flex items-center space-x-4 mb-2">

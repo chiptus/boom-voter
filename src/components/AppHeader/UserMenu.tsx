@@ -11,6 +11,8 @@ import {
 import { Button } from "@/components/ui/button";
 import { UserAvatar } from "./UserAvatar";
 import { Database } from "@/integrations/supabase/types";
+import { Link } from "react-router-dom";
+import { useUserPermissionsQuery } from "@/hooks/queries/auth/useUserPermissions";
 
 type Profile = Database["public"]["Tables"]["profiles"]["Row"];
 
@@ -28,6 +30,11 @@ export function UserMenu({
   isMobile,
 }: UserMenuProps) {
   const displayName = profile?.username || user.email?.split("@")[0] || "User";
+
+  const { data: isAdmin = false } = useUserPermissionsQuery(
+    user.id,
+    "is_admin",
+  );
 
   return (
     <DropdownMenu>
@@ -79,6 +86,22 @@ export function UserMenu({
           <Settings className="mr-2 h-4 w-4" />
           <span>Settings</span>
         </DropdownMenuItem>
+
+        {isAdmin && (
+          <>
+            <DropdownMenuSeparator className="bg-purple-400/20" />
+
+            <DropdownMenuItem
+              asChild
+              className="text-white hover:bg-purple-600 focus:bg-purple-600 cursor-pointer"
+            >
+              <Link to="/admin">
+                <Settings className="h-4 w-4 mr-2" />
+                Admin Dashboard
+              </Link>
+            </DropdownMenuItem>
+          </>
+        )}
 
         <DropdownMenuSeparator className="bg-purple-400/20" />
 

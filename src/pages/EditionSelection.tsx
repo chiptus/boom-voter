@@ -82,7 +82,6 @@ export default function EditionSelection() {
         <div className="container mx-auto px-4 py-8">
           <AppHeader
             showBackButton
-            backTo="/"
             backLabel="Back to Festivals"
             title={festival.name}
             subtitle="No editions available"
@@ -145,7 +144,6 @@ export default function EditionSelection() {
       <div className="container mx-auto px-4 py-8">
         <AppHeader
           showBackButton
-          backTo="/"
           backLabel="Back to Festivals"
           title={festival.name}
           subtitle="Choose Festival Edition"

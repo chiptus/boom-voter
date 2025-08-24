@@ -39,7 +39,7 @@ export function SetDetails() {
   return (
     <div className="min-h-screen bg-app-gradient">
       <div className="container mx-auto px-4 py-8">
-        <AppHeader showBackButton backTo="/" backLabel="Back to Artists" />
+        <AppHeader showBackButton backLabel="Back to Artists" />
 
         {/* Set Header */}
         {isMultiArtistSet ? (

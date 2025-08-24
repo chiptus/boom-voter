@@ -7,7 +7,6 @@ export function GroupsHeader({ onCreate }: { onCreate: () => void }) {
     <div>
       <AppHeader
         showBackButton
-        backTo="/"
         backLabel="Back to Artists"
         title="My Groups"
         subtitle="Create and manage your festival groups"

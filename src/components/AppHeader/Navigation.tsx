@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { ArrowLeft, Users } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -13,10 +13,9 @@ interface NavigationProps {
   backLabel?: string;
   showGroupsButton?: boolean;
   isMobile: boolean;
-  onBackClick?: () => void;
 }
 
-const TooltipButton = ({
+function TooltipButton({
   children,
   tooltip,
   isMobile,
@@ -24,9 +23,9 @@ const TooltipButton = ({
 }: {
   children: React.ReactNode;
   tooltip: string;
-  [key: string]: unknown;
   isMobile: boolean;
-}) => {
+  [key: string]: unknown;
+}) {
   if (!isMobile) {
     return <Button {...props}>{children}</Button>;
   }
@@ -41,16 +40,16 @@ const TooltipButton = ({
       </TooltipContent>
     </Tooltip>
   );
-};
+}
 
-export const Navigation = ({
+export function Navigation({
   showBackButton,
   backLabel = "Back",
   showGroupsButton,
   isMobile,
-  onBackClick,
-}: NavigationProps) => {
+}: NavigationProps) {
   const { user } = useAuth();
+  const navigate = useNavigate();
 
   return (
     <div className="flex items-center gap-3">
@@ -59,7 +58,7 @@ export const Navigation = ({
         <TooltipButton
           variant="outline"
           size={isMobile ? "sm" : "default"}
-          onClick={onBackClick}
+          onClick={() => navigate(-1)}
           className="border-purple-400/50 text-purple-300 hover:bg-purple-600 hover:text-white hover:border-purple-600 transition-colors"
           tooltip={backLabel}
           isMobile={isMobile}
@@ -86,4 +85,4 @@ export const Navigation = ({
       )}
     </div>
   );
-};
+}

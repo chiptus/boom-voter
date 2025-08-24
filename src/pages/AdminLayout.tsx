@@ -71,9 +71,8 @@ export default function AdminLayout() {
     <div className="min-h-screen bg-app-gradient">
       <div className="container mx-auto px-4 py-8">
         <AppHeader
-          showBackButton={true}
-          backTo="/"
-          backLabel="Back to Artists"
+          showBackButton
+          backLabel="Back to app"
           title="Admin Dashboard"
           subtitle="Platform Management"
           description="Manage artists, genres, and admin permissions"

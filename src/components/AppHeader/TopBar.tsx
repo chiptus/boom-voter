@@ -7,7 +7,6 @@ interface TopBarProps {
   showBackButton?: boolean;
   backLabel?: string;
   showGroupsButton?: boolean;
-  onBackClick: () => void;
 
   // Festival context
   isTitleVisible: boolean;
@@ -19,7 +18,7 @@ export function TopBar({
   showBackButton = false,
   backLabel = "Back",
   showGroupsButton = false,
-  onBackClick,
+
   isTitleVisible,
   logoUrl,
   title,
@@ -40,7 +39,6 @@ export function TopBar({
         showBackButton={showBackButton}
         backLabel={backLabel}
         showGroupsButton={showGroupsButton}
-        onBackClick={onBackClick}
         isMobile={isMobile}
       />
     </div>

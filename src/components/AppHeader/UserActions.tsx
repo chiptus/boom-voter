@@ -2,14 +2,12 @@ import { Button } from "@/components/ui/button";
 import { LogIn } from "lucide-react";
 import { Navigation } from "./Navigation";
 import { UserMenu } from "./UserMenu";
-import { AdminActions } from "./AdminActions";
 import { useAuth } from "@/contexts/AuthContext";
 
 interface UserActionsProps {
   showBackButton?: boolean;
   backLabel?: string;
   showGroupsButton?: boolean;
-  onBackClick: () => void;
   isMobile: boolean;
 }
 
@@ -17,7 +15,6 @@ export function UserActions({
   showBackButton = false,
   backLabel = "Back",
   showGroupsButton = false,
-  onBackClick,
   isMobile,
 }: UserActionsProps) {
   const { user, profile, signOut, showAuthDialog } = useAuth();
@@ -29,14 +26,7 @@ export function UserActions({
         backLabel={backLabel}
         showGroupsButton={showGroupsButton}
         isMobile={isMobile}
-        onBackClick={onBackClick}
       />
-
-      {user && (
-        <div className="flex items-center gap-3">
-          <AdminActions userId={user.id} isMobile={isMobile} />
-        </div>
-      )}
 
       <div className="flex items-center">
         {user ? (

@@ -1,13 +1,21 @@
-import { forwardRef } from "react";
+import { forwardRef, useCallback } from "react";
 import { Music, Heart } from "lucide-react";
 
 interface TitleSectionProps {
   title?: string;
   logoUrl?: string | null;
+  onLogoRefChange?: (ref: HTMLElement | null) => void;
 }
 
 export const TitleSection = forwardRef<HTMLDivElement, TitleSectionProps>(
-  ({ title, logoUrl }, ref) => {
+  ({ title, logoUrl, onLogoRefChange }, ref) => {
+    const logoRefCallback = useCallback(
+      (node: HTMLImageElement | null) => {
+        onLogoRefChange?.(node);
+      },
+      [onLogoRefChange],
+    );
+
     if (!title) return null;
 
     return (
@@ -18,6 +26,7 @@ export const TitleSection = forwardRef<HTMLDivElement, TitleSectionProps>(
         <div className="flex items-center justify-center gap-2 md:gap-3 mb-3 md:mb-6">
           {logoUrl ? (
             <img
+              ref={logoRefCallback}
               src={logoUrl}
               alt={`${title} logo`}
               className="h-20 md:h-32 lg:h-40 w-auto max-w-sm object-contain rounded"
