@@ -115,9 +115,9 @@ export function useSetFiltering(
         const bFollowers = Math.max(
           ...setB.artists.map((artist) => artist.soundcloud_followers || 0),
         );
-        console.log(
-          `Sorting by followers: ${setA.name} (${aFollowers}) vs ${setB.name} (${bFollowers})`,
-        );
+        // console.log(
+        //   `Sorting by followers: ${setA.name} (${aFollowers}) vs ${setB.name} (${bFollowers})`,
+        // );
         if (aFollowers && bFollowers) {
           return bFollowers - aFollowers;
         } else if (aFollowers) {

@@ -42,17 +42,20 @@ function getSlugs(pathname: string) {
     isMainDomain: subdomainInfo.isMainDomain,
   });
 
+  let basePath = "";
   // For main domain, extract festival slug from URL path
   if (pathname.includes("/festivals/")) {
     const match = matchPath({ path: "/festivals/:festivalSlug/*" }, pathname);
     festivalSlug = match?.params.festivalSlug || festivalSlug || "";
     pathname = pathname.replace(`/festivals/${festivalSlug}`, "");
+    basePath = `/festivals/${festivalSlug}`;
   }
 
   if (!pathname.includes("/editions")) {
     console.log("🔍 No editions in pathname, returning:", { festivalSlug });
     return {
       festivalSlug,
+      basePath,
     };
   }
 
@@ -69,6 +72,7 @@ function getSlugs(pathname: string) {
       editionSlug,
     });
     return {
+      basePath: basePath + `/editions/${editionSlug}`,
       festivalSlug,
       editionSlug,
     };
@@ -87,6 +91,7 @@ function getSlugs(pathname: string) {
     pathname,
   });
   return {
+    basePath: basePath + `/editions/${editionSlug}`,
     festivalSlug,
     editionSlug,
   };
@@ -102,7 +107,7 @@ function useParseSlugs() {
 export function FestivalEditionProvider({
   children,
 }: PropsWithChildren<unknown>) {
-  const { festivalSlug, editionSlug } = useParseSlugs();
+  const { festivalSlug, editionSlug, basePath } = useParseSlugs();
 
   const festivalQuery = useFestivalBySlugQuery(festivalSlug);
 
@@ -124,17 +129,6 @@ export function FestivalEditionProvider({
       (editionSlug && edition && festival)
     )
   );
-
-  const basePath = useMemo(() => {
-    if (festivalSlug && editionSlug) {
-      // Main domain: /festivals/boom/editions/2024
-      return `/festivals/${festivalSlug}/editions/${editionSlug}`;
-    } else if (editionSlug) {
-      // Subdomain: /editions/2024
-      return `/editions/${editionSlug}`;
-    }
-    return "";
-  }, [festivalSlug, editionSlug]);
 
   const contextValue: FestivalEditionContextType = {
     festival: festival || null,
