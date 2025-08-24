@@ -13,6 +13,7 @@ interface FestivalEditionContextType {
 
   // Utils
   isContextReady: boolean;
+  basePath: string;
 }
 
 const FestivalEditionContext = createContext<
@@ -124,10 +125,22 @@ export function FestivalEditionProvider({
     )
   );
 
+  const basePath = useMemo(() => {
+    if (festivalSlug && editionSlug) {
+      // Main domain: /festivals/boom/editions/2024
+      return `/festivals/${festivalSlug}/editions/${editionSlug}`;
+    } else if (editionSlug) {
+      // Subdomain: /editions/2024
+      return `/editions/${editionSlug}`;
+    }
+    return "";
+  }, [festivalSlug, editionSlug]);
+
   const contextValue: FestivalEditionContextType = {
     festival: festival || null,
     edition: edition || null,
     isContextReady,
+    basePath,
   };
 
   return (

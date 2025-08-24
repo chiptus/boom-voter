@@ -1,17 +1,18 @@
 import { cn } from "@/lib/utils";
 import { Calendar, List, Map, Info, MessageSquare } from "lucide-react";
-import { NavLink, useParams } from "react-router-dom";
+import { NavLink } from "react-router-dom";
+import { useFestivalEdition } from "@/contexts/FestivalEditionContext";
 
-export type MainTab = "artists" | "timeline" | "map" | "info" | "social";
+export type MainTab = "sets" | "schedule" | "map" | "info" | "social";
 
 const TAB_CONFIG = {
-  artists: {
+  sets: {
     icon: List,
     label: "Vote",
     shortLabel: "Vote",
     disabled: false,
   },
-  timeline: {
+  schedule: {
     icon: Calendar,
     label: "Schedule",
     shortLabel: "Schedule",
@@ -38,21 +39,7 @@ const TAB_CONFIG = {
 } as const;
 
 export function MainTabNavigation() {
-  const { editionSlug, festivalSlug } = useParams();
-
-  // Build base path depending on whether we're on main domain or subdomain
-  function getBasePath(): string {
-    if (festivalSlug && editionSlug) {
-      // Main domain: /festivals/boom/editions/2024
-      return `/festivals/${festivalSlug}/editions/${editionSlug}`;
-    } else if (editionSlug) {
-      // Subdomain: /editions/2024
-      return `/editions/${editionSlug}`;
-    }
-    return "";
-  }
-
-  const basePath = getBasePath();
+  const { basePath } = useFestivalEdition();
 
   return (
     <>
@@ -62,13 +49,11 @@ export function MainTabNavigation() {
           <div className="flex gap-1 justify-center">
             {Object.entries(TAB_CONFIG).map(([tabKey, config]) => {
               const tab = tabKey as MainTab;
-              const to = tab === "artists" ? basePath : `${basePath}/${tab}`;
 
               return (
                 <NavLink
                   key={tab}
-                  to={to}
-                  end={tab === "artists"} // Only match exact path for artists tab
+                  to={`${basePath}/${tab}`}
                   className={({ isActive }) =>
                     cn(
                       `
@@ -96,13 +81,11 @@ export function MainTabNavigation() {
         <div className="flex">
           {Object.entries(TAB_CONFIG).map(([tabKey, config]) => {
             const tab = tabKey as MainTab;
-            const to = tab === "artists" ? basePath : `${basePath}/${tab}`;
 
             return (
               <NavLink
                 key={tab}
-                to={to}
-                end={tab === "artists"} // Only match exact path for artists tab
+                to={`${basePath}/${tab}`}
                 className={({ isActive }) => `
                   flex-1 flex flex-col items-center justify-center
                   py-2 px-1 transition-colors duration-200 min-h-16

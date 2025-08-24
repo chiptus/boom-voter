@@ -1,8 +1,8 @@
 import { useAuth } from "@/contexts/AuthContext";
 import { useOfflineVoting } from "@/hooks/useOfflineVoting";
-import { TimelineTab as TimelineTabComponent } from "@/components/timeline/TimelineTab";
+import { Timeline } from "@/components/timeline/horizontal/Timeline";
 
-export function TimelineTab() {
+export function ScheduleTabTimeline() {
   const { user, showAuthDialog } = useAuth();
   const { userVotes, handleVote } = useOfflineVoting(user);
 
@@ -13,7 +13,5 @@ export function TimelineTab() {
     }
   }
 
-  return (
-    <TimelineTabComponent userVotes={userVotes} onVote={handleVoteAction} />
-  );
+  return <Timeline userVotes={userVotes} onVote={handleVoteAction} />;
 }
