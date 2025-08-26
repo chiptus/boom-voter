@@ -1,10 +1,18 @@
-import { createContext, PropsWithChildren, useContext, useMemo } from "react";
-import { matchPath, useLocation } from "react-router-dom";
+import {
+  createContext,
+  PropsWithChildren,
+  useContext,
+  useEffect,
+  useMemo,
+} from "react";
+import { matchPath, Navigate, useLocation } from "react-router-dom";
 import { useFestivalBySlugQuery } from "@/hooks/queries/festivals/useFestivalBySlug";
 import { Festival } from "@/hooks/queries/festivals/types";
 import { useFestivalEditionBySlugQuery } from "@/hooks/queries/festivals/editions/useFestivalEditionBySlug";
 import { FestivalEdition } from "@/hooks/queries/festivals/editions/types";
 import { getSubdomainInfo } from "@/lib/subdomain";
+import { AppHeader } from "@/components/AppHeader";
+import { useToast } from "@/hooks/use-toast";
 
 interface FestivalEditionContextType {
   // Current state
@@ -136,6 +144,42 @@ export function FestivalEditionProvider({
     isContextReady,
     basePath,
   };
+  const { toast } = useToast();
+  useEffect(() => {
+    if (festivalQuery.error) {
+      toast({
+        title: "Festival not found",
+        description: `Festival with slug ${festivalSlug} not found`,
+        variant: "destructive",
+      });
+    }
+  }, [festivalQuery.error, toast, festivalSlug]);
+
+  useEffect(() => {
+    if (editionQuery.error) {
+      toast({
+        title: "Festival edition not found",
+        description: `Festival edition with slug ${editionSlug} not found`,
+        variant: "destructive",
+      });
+    }
+  }, [editionQuery.error, toast, editionSlug]);
+
+  if (festivalQuery.error || editionQuery.error) {
+    return (
+      <FestivalEditionContext.Provider value={contextValue}>
+        <div className="min-h-screen bg-app-gradient">
+          <div className="container mx-auto px-4 py-8">
+            <AppHeader
+              backLabel="Back to Festivals"
+              title="Festival not found"
+            />
+            <Navigate to="/" />
+          </div>
+        </div>
+      </FestivalEditionContext.Provider>
+    );
+  }
 
   return (
     <FestivalEditionContext.Provider value={contextValue}>
