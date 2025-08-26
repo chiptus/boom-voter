@@ -1,9 +1,9 @@
 import { useAuth } from "@/contexts/AuthContext";
-import { useInviteValidation } from "@/components/Index/useInviteValidation";
-import { InviteLandingPage } from "@/components/Index/InviteLandingPage";
+import { useInviteValidation } from "@/components/invite/useInviteValidation";
+import { InviteLandingPage } from "@/components/invite/InviteLandingPage";
 import { MainDomainRoutes } from "./MainDomainRoutes";
 import { SubdomainRoutes } from "./SubdomainRoutes";
-import { AppFooter } from "@/components/legal/AppFooter";
+import { AppFooter } from "@/components/layout/AppFooter";
 import { useMemo } from "react";
 import { useProfileQuery } from "@/hooks/queries/auth/useProfile";
 import { OnboardingDialog } from "../onboarding/OnboardingDialog";

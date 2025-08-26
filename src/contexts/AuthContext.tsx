@@ -11,7 +11,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useProfileQuery } from "@/hooks/queries/auth/useProfile";
 import { profileOfflineService } from "@/services/profileOfflineService";
 import { useToast } from "@/hooks/use-toast";
-import { AuthDialog } from "@/components/AuthDialog";
+import { AuthDialog } from "@/components/AuthDialog/AuthDialog";
 import { Profile } from "@/hooks/queries/auth/useProfile";
 
 interface AuthContextType {

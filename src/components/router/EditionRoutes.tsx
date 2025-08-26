@@ -1,15 +1,15 @@
 import { Navigate, Route } from "react-router-dom";
-import EditionView from "@/pages/EditionView";
+import EditionView from "@/pages/EditionView/EditionView";
 import { SetDetails } from "@/pages/SetDetails";
 
 // Tab components
-import { ArtistsTab } from "@/pages/tabs/ArtistsTab";
-import { MapTab } from "@/pages/tabs/MapTab";
-import { InfoTab } from "@/pages/tabs/InfoTab";
-import { SocialTab } from "@/pages/tabs/SocialTab";
-import { ScheduleTabTimeline } from "@/pages/tabs/ScheduleTabTimeline";
-import { ScheduleTabList } from "@/pages/tabs/ScheduleTabList";
-import { ScheduleTab } from "@/pages/tabs/ScheduleTab";
+import { ArtistsTab } from "@/pages/EditionView/tabs/ArtistsTab/ArtistsTab";
+import { MapTab } from "@/pages/EditionView/tabs/MapTab";
+import { InfoTab } from "@/pages/EditionView/tabs/InfoTab";
+import { SocialTab } from "@/pages/EditionView/tabs/SocialTab";
+import { ScheduleTabTimeline } from "@/pages/EditionView/tabs/ScheduleTab/TimelineTab";
+import { ScheduleTabList } from "@/pages/EditionView/tabs/ScheduleTab/ListTab";
+import { ScheduleTab } from "@/pages/EditionView/tabs/ScheduleTab";
 
 interface EditionRoutesProps {
   basePath: string;

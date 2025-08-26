@@ -1,20 +1,20 @@
-import { Route, Routes } from "react-router-dom";
+import { Navigate, Route, Routes } from "react-router-dom";
 
-import AdminAnalytics from "@/pages/admin/AdminAnalytics";
-import AdminDashboard from "@/pages/admin/AdminDashboard";
-import AdminFestivals from "@/pages/admin/AdminFestivals";
-import AdminRoles from "@/pages/admin/AdminRoles";
-import FestivalDetail from "@/pages/admin/FestivalDetail";
-import FestivalEdition from "@/pages/admin/FestivalEdition";
-import FestivalSets from "@/pages/admin/FestivalSets";
-import FestivalStages from "@/pages/admin/FestivalStages";
-import AdminLayout from "@/pages/AdminLayout";
-import CookiePolicy from "@/pages/CookiePolicy";
-import GroupDetail from "@/pages/GroupDetail";
-import Groups from "@/pages/Groups";
-import PrivacyPolicy from "@/pages/PrivacyPolicy";
-import TermsOfService from "@/pages/TermsOfService";
+import AdminAnalytics from "@/pages/admin/Analytics/AdminAnalytics";
+import AdminFestivals from "@/pages/admin/festivals/AdminFestivals";
+import FestivalDetail from "@/pages/admin/festivals/FestivalDetail";
+import FestivalEdition from "@/pages/admin/festivals/FestivalEdition";
+import FestivalSets from "@/pages/admin/festivals/FestivalSets";
+import FestivalStages from "@/pages/admin/festivals/FestivalStages";
+import AdminLayout from "@/pages/admin/AdminLayout";
+import CookiePolicy from "@/pages/legal/CookiePolicy";
+import GroupDetail from "@/pages/groups/GroupDetail";
+import Groups from "@/pages/groups/Groups";
+import PrivacyPolicy from "@/pages/legal/PrivacyPolicy";
+import TermsOfService from "@/pages/legal/TermsOfService";
 import NotFound from "@/pages/NotFound";
+import { AdminRolesTable } from "@/pages/admin/Roles/AdminRolesTable";
+import { ArtistsManagement } from "@/pages/admin/ArtistsManagement/ArtistsManagement";
 
 export function GlobalRoutes() {
   return (
@@ -25,10 +25,10 @@ export function GlobalRoutes() {
 
       {/* Admin routes */}
       <Route path="/admin" element={<AdminLayout />}>
-        <Route index element={<AdminDashboard />} />
-        <Route path="artists" element={<AdminDashboard />} />
+        <Route index element={<Navigate to="artists" />} />
+        <Route path="artists" element={<ArtistsManagement />} />
         <Route path="analytics" element={<AdminAnalytics />} />
-        <Route path="admins" element={<AdminRoles />} />
+        <Route path="admins" element={<AdminRolesTable />} />
         <Route path="festivals" element={<AdminFestivals />}>
           <Route path=":festivalId" element={<FestivalDetail />}>
             <Route path="editions/:editionId" element={<FestivalEdition />}>

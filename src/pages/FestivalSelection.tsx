@@ -9,7 +9,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { useFestivalsQuery } from "@/hooks/queries/festivals/useFestivals";
 import { Festival } from "@/hooks/queries/festivals/types";
-import { AppHeader } from "@/components/AppHeader";
+import { AppHeader } from "@/components/layout/AppHeader";
 import { useEffect } from "react";
 import {
   createFestivalSubdomainUrl,

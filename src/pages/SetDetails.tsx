@@ -1,15 +1,15 @@
 import { useParams } from "react-router-dom";
-import { AppHeader } from "@/components/AppHeader";
-import { ArtistImageCard } from "@/components/SetDetail/SetImageCard";
-import { MixedArtistImage } from "@/components/SetDetail/MixedArtistImage";
-import { SetInfoCard } from "@/components/SetDetail/SetInfoCard";
-import { MultiArtistSetInfoCard } from "@/components/SetDetail/MultiArtistSetInfoCard";
-import { ArtistNotFoundState } from "@/components/SetDetail/SetNotFoundState";
-import { ArtistLoadingState } from "@/components/SetDetail/SetLoadingState";
-import { SetGroupVoting } from "@/components/SetDetail/SetGroupVoting";
-import { ArtistNotes } from "@/components/SetDetail/SetNotes";
+import { AppHeader } from "@/components/layout/AppHeader";
+import { ArtistImageCard } from "./SetDetails/SetImageCard";
+import { MixedArtistImage } from "./SetDetails/MixedArtistImage";
+import { SetInfoCard } from "./SetDetails/SetInfoCard";
+import { MultiArtistSetInfoCard } from "./SetDetails/MultiArtistSetInfoCard";
+import { ArtistNotFoundState } from "./SetDetails/SetNotFoundState";
+import { ArtistLoadingState } from "./SetDetails/SetLoadingState";
+import { SetGroupVoting } from "./SetDetails/SetGroupVoting";
+import { ArtistNotes } from "./SetDetails/SetNotes";
 import { useUrlState } from "@/hooks/useUrlState";
-import { useSetDetail } from "@/components/SetDetail/useSetDetail";
+import { useSetDetail } from "./SetDetails/useSetDetail";
 
 export function SetDetails() {
   const { setSlug } = useParams<{ setSlug: string }>();
