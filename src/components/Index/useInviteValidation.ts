@@ -77,6 +77,7 @@ export function useInviteValidation() {
 
       return true;
     } catch (error) {
+      console.error("failed validating invite", error);
       // Error handling is done in the mutation
       return false;
     }

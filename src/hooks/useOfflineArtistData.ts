@@ -1,7 +1,7 @@
 import { useOfflineArtistsQuery } from "./queries/useOfflineArtistsQuery";
 import { useArchiveArtistMutation } from "./queries/artists/useArchiveArtist";
 
-export const useOfflineArtistData = () => {
+export function useOfflineArtistData() {
   // Use the new React Query-based offline artists hook
   const { artists, dataSource, loading, error, fetchArtists, refetch } =
     useOfflineArtistsQuery();
@@ -19,4 +19,4 @@ export const useOfflineArtistData = () => {
     archivingArtist: archiveArtistMutation.isPending,
     refetch,
   };
-};
+}

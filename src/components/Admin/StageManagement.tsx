@@ -97,8 +97,6 @@ export function StageManagement({ editionId }: StageManagementProps) {
 
       setIsDialogOpen(false);
       resetForm();
-    } catch (error) {
-      // Error handling is done in the mutation hooks
     } finally {
       setIsSubmitting(false);
     }
@@ -113,11 +111,7 @@ export function StageManagement({ editionId }: StageManagementProps) {
       return;
     }
 
-    try {
-      await deleteStageMutation.mutateAsync(stage.id);
-    } catch (error) {
-      // Error handling is done in the mutation hook
-    }
+    deleteStageMutation.mutate(stage.id);
   }
 
   // Filter stages by selected edition

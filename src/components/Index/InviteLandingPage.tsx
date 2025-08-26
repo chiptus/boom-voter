@@ -16,10 +16,10 @@ interface InviteLandingPageProps {
   onSignupSuccess: () => void;
 }
 
-export const InviteLandingPage = ({
+export function InviteLandingPage({
   inviteValidation,
   onSignupSuccess,
-}: InviteLandingPageProps) => {
+}: InviteLandingPageProps) {
   const [showAuthDialog, setShowAuthDialog] = useState(false);
 
   if (!inviteValidation.is_valid) {
@@ -79,4 +79,4 @@ export const InviteLandingPage = ({
       />
     </div>
   );
-};
+}

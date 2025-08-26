@@ -5,7 +5,7 @@ import {
   useDeleteNoteMutation,
 } from "./queries/useOfflineNotesQuery";
 
-export const useOfflineNotes = (setId: string, userId: string | null) => {
+export function useOfflineNotes(setId: string, userId: string | null) {
   // Use React Query for data fetching
   const {
     data: notes = [],
@@ -61,4 +61,4 @@ export const useOfflineNotes = (setId: string, userId: string | null) => {
     deleteNote,
     refreshNotes,
   };
-};
+}

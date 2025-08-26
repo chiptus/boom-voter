@@ -16,7 +16,7 @@ interface ArtistNotesProps {
   userId: string | null;
 }
 
-export const ArtistNotes = ({ artistId, userId }: ArtistNotesProps) => {
+export function ArtistNotes({ artistId, userId }: ArtistNotesProps) {
   const { notes, loading, saving, saveNote, deleteNote } = useOfflineNotes(
     artistId,
     userId,
@@ -40,14 +40,14 @@ export const ArtistNotes = ({ artistId, userId }: ArtistNotesProps) => {
     );
   }
 
-  const handleSave = async () => {
+  async function handleSave() {
     const success = await saveNote(noteContent.trim());
     if (success) {
       setIsEditing(false);
     }
-  };
+  }
 
-  const handleDelete = async (noteId: string) => {
+  async function handleDelete(noteId: string) {
     if (window.confirm("Are you sure you want to delete this note?")) {
       const success = await deleteNote(noteId);
       if (success) {
@@ -55,12 +55,12 @@ export const ArtistNotes = ({ artistId, userId }: ArtistNotesProps) => {
         setIsEditing(false);
       }
     }
-  };
+  }
 
-  const handleCancel = () => {
+  function handleCancel() {
     setNoteContent("");
     setIsEditing(false);
-  };
+  }
 
   if (loading) {
     return (
@@ -182,4 +182,4 @@ export const ArtistNotes = ({ artistId, userId }: ArtistNotesProps) => {
       </CardContent>
     </Card>
   );
-};
+}

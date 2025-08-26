@@ -7,7 +7,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 
-export const EmptyArtistsState = () => {
+export function EmptyArtistsState() {
   return (
     <div className="flex items-center justify-center py-16">
       <Card className="bg-white/10 backdrop-blur-md border-purple-400/30 max-w-md mx-auto text-center">
@@ -42,4 +42,4 @@ export const EmptyArtistsState = () => {
       </Card>
     </div>
   );
-};
+}

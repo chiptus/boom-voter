@@ -6,10 +6,10 @@ interface ArtistImageCardProps {
   artistName: string;
 }
 
-export const ArtistImageCard = ({
+export function ArtistImageCard({
   imageUrl,
   artistName,
-}: ArtistImageCardProps) => {
+}: ArtistImageCardProps) {
   return (
     <div className="lg:col-span-1">
       <Card className="bg-white/10 backdrop-blur-md border-purple-400/30">
@@ -23,4 +23,4 @@ export const ArtistImageCard = ({
       </Card>
     </div>
   );
-};
+}

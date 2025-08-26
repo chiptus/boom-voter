@@ -32,7 +32,7 @@ export function FestivalManagementTable({
   const [selectedFestivalForLogo, setSelectedFestivalForLogo] =
     useState<Festival | null>(null);
 
-  async function handleDelete(festival: Festival) {
+  function handleDelete(festival: Festival) {
     if (
       !confirm(
         `Are you sure you want to delete "${festival.name}"? This will also delete all associated editions, stages, and sets.`,
@@ -41,11 +41,7 @@ export function FestivalManagementTable({
       return;
     }
 
-    try {
-      await deleteFestivalMutation.mutateAsync(festival.id);
-    } catch (error) {
-      // Error handling is done in the mutation hook
-    }
+    deleteFestivalMutation.mutate(festival.id);
   }
 
   function handleLogoManagement(festival: Festival) {

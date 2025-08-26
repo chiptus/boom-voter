@@ -12,10 +12,10 @@ interface TimeFormatToggleProps {
   onChange: (use24Hour: boolean) => void;
 }
 
-export const TimeFormatToggle = ({
+export function TimeFormatToggle({
   use24Hour,
   onChange,
-}: TimeFormatToggleProps) => {
+}: TimeFormatToggleProps) {
   return (
     <TooltipProvider>
       <Tooltip>
@@ -42,4 +42,4 @@ export const TimeFormatToggle = ({
       </Tooltip>
     </TooltipProvider>
   );
-};
+}

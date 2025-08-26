@@ -2,7 +2,7 @@ import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, Music } from "lucide-react";
 
-export const ArtistNotFoundState = () => {
+export function ArtistNotFoundState() {
   return (
     <div className="min-h-screen bg-app-gradient flex items-center justify-center">
       <div className="text-center">
@@ -17,4 +17,4 @@ export const ArtistNotFoundState = () => {
       </div>
     </div>
   );
-};
+}

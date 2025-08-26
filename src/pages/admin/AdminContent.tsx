@@ -17,13 +17,13 @@ export default function AdminContent() {
   const [addGenreOpen, setAddGenreOpen] = useState(false);
   const { toast } = useToast();
 
-  const handleArtistAdded = () => {
+  function handleArtistAdded() {
     setAddArtistOpen(false);
     toast({
       title: "Success",
       description: "Artist added successfully!",
     });
-  };
+  }
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">

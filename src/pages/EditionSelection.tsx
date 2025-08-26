@@ -117,15 +117,15 @@ export default function EditionSelection() {
     );
   }
 
-  const formatDate = (dateString: string) => {
+  function formatDate(dateString: string) {
     return new Date(dateString).toLocaleDateString("en-US", {
       year: "numeric",
       month: "long",
       day: "numeric",
     });
-  };
+  }
 
-  const getEditionStatus = (edition: FestivalEdition) => {
+  function getEditionStatus(edition: FestivalEdition) {
     const now = new Date();
     const startDate = new Date(edition.start_date || "");
     const endDate = new Date(edition.end_date || "");
@@ -137,7 +137,7 @@ export default function EditionSelection() {
     } else {
       return { status: "ended", label: "Ended", color: "gray" };
     }
-  };
+  }
 
   return (
     <div className="min-h-screen bg-app-gradient">

@@ -17,7 +17,7 @@ export const adminQueries = {
 };
 
 // Query Functions
-const fetchAdminRoles = async (): Promise<AdminRole[]> => {
+async function fetchAdminRoles(): Promise<AdminRole[]> {
   const { data: roles, error } = await supabase
     .from("admin_roles")
     .select("*")
@@ -46,19 +46,19 @@ const fetchAdminRoles = async (): Promise<AdminRole[]> => {
   }
 
   return [];
-};
+}
 
 // Hooks
-export const useAdminRolesQuery = () => {
+export function useAdminRolesQuery() {
   return useQuery({
     queryKey: adminQueries.roles(),
     queryFn: fetchAdminRoles,
     staleTime: 5 * 60 * 1000, // 5 minutes
     gcTime: 10 * 60 * 1000, // 10 minutes
   });
-};
+}
 
-export const useAddAdminMutation = () => {
+export function useAddAdminMutation() {
   const queryClient = useQueryClient();
   const { toast } = useToast();
 
@@ -126,9 +126,9 @@ export const useAddAdminMutation = () => {
       });
     },
   });
-};
+}
 
-export const useRemoveAdminMutation = () => {
+export function useRemoveAdminMutation() {
   const queryClient = useQueryClient();
   const { toast } = useToast();
 
@@ -156,9 +156,9 @@ export const useRemoveAdminMutation = () => {
       });
     },
   });
-};
+}
 
-export const useUpdateAdminRoleMutation = () => {
+export function useUpdateAdminRoleMutation() {
   const queryClient = useQueryClient();
   const { toast } = useToast();
 
@@ -192,4 +192,4 @@ export const useUpdateAdminRoleMutation = () => {
       });
     },
   });
-};
+}

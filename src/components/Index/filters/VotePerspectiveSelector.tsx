@@ -16,12 +16,12 @@ interface VotePerspectiveSelectorProps {
   isMobile?: boolean;
 }
 
-export const VotePerspectiveSelector = ({
+export function VotePerspectiveSelector({
   selectedGroupId,
   groups,
   onGroupChange,
   isMobile = false,
-}: VotePerspectiveSelectorProps) => {
+}: VotePerspectiveSelectorProps) {
   const { user } = useAuth();
 
   const perspectiveOptions = [
@@ -43,13 +43,13 @@ export const VotePerspectiveSelector = ({
     })),
   ];
 
-  const getCurrentValue = () => {
+  function getCurrentValue() {
     if (!selectedGroupId) return "all";
     if (selectedGroupId === user?.id) return "mine";
     return selectedGroupId;
-  };
+  }
 
-  const handleChange = (value: string) => {
+  function handleChange(value: string) {
     if (value === "all") {
       onGroupChange(undefined);
     } else if (value === "mine") {
@@ -57,7 +57,7 @@ export const VotePerspectiveSelector = ({
     } else {
       onGroupChange(value);
     }
-  };
+  }
 
   if (isMobile) {
     return (
@@ -154,4 +154,4 @@ export const VotePerspectiveSelector = ({
       </div>
     </div>
   );
-};
+}

@@ -17,13 +17,13 @@ interface DeleteGroupDialogProps {
   isDeleting: boolean;
 }
 
-export const DeleteGroupDialog = ({
+export function DeleteGroupDialog({
   isOpen,
   onClose,
   onConfirm,
   groupName,
   isDeleting,
-}: DeleteGroupDialogProps) => {
+}: DeleteGroupDialogProps) {
   return (
     <AlertDialog open={isOpen} onOpenChange={onClose}>
       <AlertDialogContent className="bg-background border-border">
@@ -55,4 +55,4 @@ export const DeleteGroupDialog = ({
       </AlertDialogContent>
     </AlertDialog>
   );
-};
+}

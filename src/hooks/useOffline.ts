@@ -2,12 +2,16 @@ import { useState, useEffect, useCallback } from "react";
 import { offlineStorage } from "@/lib/offlineStorage";
 import { Artist } from "@/hooks/queries/artists/useArtists";
 import { FestivalSet } from "@/hooks/queries/sets/useSets";
-export const useOnlineStatus = () => {
+export function useOnlineStatus() {
   const [isOnline, setIsOnline] = useState(navigator.onLine);
 
   useEffect(() => {
-    const handleOnline = () => setIsOnline(true);
-    const handleOffline = () => setIsOnline(false);
+    function handleOnline() {
+      return setIsOnline(true);
+    }
+    function handleOffline() {
+      return setIsOnline(false);
+    }
 
     window.addEventListener("online", handleOnline);
     window.addEventListener("offline", handleOffline);
@@ -19,9 +23,9 @@ export const useOnlineStatus = () => {
   }, []);
 
   return isOnline;
-};
+}
 
-export const useOfflineQueue = () => {
+export function useOfflineQueue() {
   const [queueSize, setQueueSize] = useState(0);
   const [syncing, setSyncing] = useState(false);
 
@@ -88,20 +92,20 @@ export const useOfflineQueue = () => {
     syncQueue,
     updateQueueSize,
   };
-};
+}
 
-export const useOfflineData = () => {
+export function useOfflineData() {
   const [offlineReady, setOfflineReady] = useState(false);
 
   useEffect(() => {
-    const initOfflineStorage = async () => {
+    async function initOfflineStorage() {
       try {
         await offlineStorage.init();
         setOfflineReady(true);
       } catch (error) {
         console.error("Error initializing offline storage:", error);
       }
-    };
+    }
 
     initOfflineStorage();
   }, []);
@@ -147,4 +151,4 @@ export const useOfflineData = () => {
     saveSetsOffline,
     getSetsOffline,
   };
-};
+}

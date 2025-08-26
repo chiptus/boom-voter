@@ -145,58 +145,54 @@ export function SetFormDialog({
       return; // Should not happen if user is authenticated
     }
 
-    try {
-      const submitData = {
-        name: data.name,
-        description: data.description || null,
-        festival_edition_id: editionId,
-        stage_id:
-          data.stage_id && data.stage_id !== "none" ? data.stage_id : null,
-        time_start: data.time_start ? toISOString(data.time_start) : null,
-        time_end: data.time_end ? toISOString(data.time_end) : null,
-        created_by: user.id,
-      };
+    const submitData = {
+      name: data.name,
+      description: data.description || null,
+      festival_edition_id: editionId,
+      stage_id:
+        data.stage_id && data.stage_id !== "none" ? data.stage_id : null,
+      time_start: data.time_start ? toISOString(data.time_start) : null,
+      time_end: data.time_end ? toISOString(data.time_end) : null,
+      created_by: user.id,
+    };
 
-      let setId: string;
-      if (editingSet) {
-        const updatedSet = await updateSetMutation.mutateAsync({
-          id: editingSet.id,
-          updates: submitData,
-        });
-        setId = updatedSet.id;
-      } else {
-        const newSet = await createSetMutation.mutateAsync(submitData);
-        setId = newSet.id;
-      }
-
-      // Update artist associations
-      const selectedArtistIds = data.artist_ids || [];
-      const existingArtistIds = editingSet?.artists?.map((a) => a.id) || [];
-
-      // Remove artists that are no longer selected
-      const artistsToRemove = existingArtistIds.filter(
-        (id) => !selectedArtistIds.includes(id),
-      );
-      for (const artistId of artistsToRemove) {
-        await removeArtistFromSetMutation.mutateAsync({
-          setId: editingSet!.id,
-          artistId,
-        });
-      }
-
-      // Add newly selected artists
-      const artistsToAdd = selectedArtistIds.filter(
-        (id) => !existingArtistIds.includes(id),
-      );
-      for (const artistId of artistsToAdd) {
-        await addArtistToSetMutation.mutateAsync({ setId, artistId });
-      }
-
-      form.reset();
-      onClose();
-    } catch (error) {
-      // Error handling is done in the mutation hooks
+    let setId: string;
+    if (editingSet) {
+      const updatedSet = await updateSetMutation.mutateAsync({
+        id: editingSet.id,
+        updates: submitData,
+      });
+      setId = updatedSet.id;
+    } else {
+      const newSet = await createSetMutation.mutateAsync(submitData);
+      setId = newSet.id;
     }
+
+    // Update artist associations
+    const selectedArtistIds = data.artist_ids || [];
+    const existingArtistIds = editingSet?.artists?.map((a) => a.id) || [];
+
+    // Remove artists that are no longer selected
+    const artistsToRemove = existingArtistIds.filter(
+      (id) => !selectedArtistIds.includes(id),
+    );
+    for (const artistId of artistsToRemove) {
+      await removeArtistFromSetMutation.mutateAsync({
+        setId: editingSet!.id,
+        artistId,
+      });
+    }
+
+    // Add newly selected artists
+    const artistsToAdd = selectedArtistIds.filter(
+      (id) => !existingArtistIds.includes(id),
+    );
+    for (const artistId of artistsToAdd) {
+      await addArtistToSetMutation.mutateAsync({ setId, artistId });
+    }
+
+    form.reset();
+    onClose();
   }
 
   return (

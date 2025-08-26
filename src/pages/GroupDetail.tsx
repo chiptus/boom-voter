@@ -270,8 +270,6 @@ function GroupDetail() {
           currentUserId: user.id,
         });
         // The mutation automatically invalidates queries and shows toast
-      } catch (error) {
-        // Error handling is done in the mutation
       } finally {
         setRemovingMember(null);
       }

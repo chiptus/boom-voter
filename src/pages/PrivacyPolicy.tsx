@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
 import { Link } from "react-router-dom";
 
-const PrivacyPolicy = () => {
+function PrivacyPolicy() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-background via-background/95 to-muted/20">
       <AppHeader />
@@ -224,6 +224,6 @@ const PrivacyPolicy = () => {
       </div>
     </div>
   );
-};
+}
 
 export default PrivacyPolicy;

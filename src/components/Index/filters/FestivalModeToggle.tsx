@@ -12,9 +12,7 @@ interface FestivalModeToggleProps {
   onModeChange: (isFestivalMode: boolean) => void;
 }
 
-export const FestivalModeToggle = ({
-  onModeChange,
-}: FestivalModeToggleProps) => {
+export function FestivalModeToggle({ onModeChange }: FestivalModeToggleProps) {
   const [isFestivalMode, setIsFestivalMode] = useState(() => {
     const saved = localStorage.getItem("festival-mode");
     if (saved !== null) return JSON.parse(saved);
@@ -31,9 +29,9 @@ export const FestivalModeToggle = ({
     onModeChange(isFestivalMode);
   }, [isFestivalMode, onModeChange]);
 
-  const toggleMode = () => {
+  function toggleMode() {
     setIsFestivalMode(!isFestivalMode);
-  };
+  }
 
   return (
     <div className="flex items-center gap-3">
@@ -87,4 +85,4 @@ export const FestivalModeToggle = ({
       </Tooltip>
     </div>
   );
-};
+}

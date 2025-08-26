@@ -6,12 +6,8 @@ interface UserAvatarProps {
   size?: "sm" | "md" | "lg";
 }
 
-export const UserAvatar = ({
-  username,
-  email,
-  size = "md",
-}: UserAvatarProps) => {
-  const getInitials = () => {
+export function UserAvatar({ username, email, size = "md" }: UserAvatarProps) {
+  function getInitials() {
     if (username) {
       return username.substring(0, 2).toUpperCase();
     }
@@ -19,7 +15,7 @@ export const UserAvatar = ({
       return email.substring(0, 2).toUpperCase();
     }
     return "U";
-  };
+  }
 
   const sizeClasses = {
     sm: "h-6 w-6 text-xs",
@@ -35,4 +31,4 @@ export const UserAvatar = ({
       </AvatarFallback>
     </Avatar>
   );
-};
+}

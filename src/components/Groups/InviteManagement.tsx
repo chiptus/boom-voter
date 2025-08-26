@@ -75,6 +75,7 @@ export function InviteManagement({
         description: "Failed to copy link",
         variant: "destructive",
       });
+      console.error("Failed to copy link", error);
     }
   }
 

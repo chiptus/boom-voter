@@ -14,10 +14,10 @@ interface GroupSelectorProps {
   onGroupChange: (groupId: string | undefined) => void;
 }
 
-export const GroupSelector = ({
+export function GroupSelector({
   selectedGroupId,
   onGroupChange,
-}: GroupSelectorProps) => {
+}: GroupSelectorProps) {
   const { user, loading: authLoading } = useAuth();
   const { data: groups = [], isLoading: groupsLoading } = useUserGroupsQuery(
     user?.id,
@@ -56,4 +56,4 @@ export const GroupSelector = ({
       </Select>
     </div>
   );
-};
+}

@@ -2,7 +2,7 @@ import { useCallback } from "react";
 import { useOnlineStatus } from "./useOffline";
 import { useToast } from "@/hooks/use-toast";
 
-export const useOfflineProfileToast = () => {
+export function useOfflineProfileToast() {
   const isOnline = useOnlineStatus();
   const { toast } = useToast();
 
@@ -20,4 +20,4 @@ export const useOfflineProfileToast = () => {
     showOfflineProfileToast,
     isOnline,
   };
-};
+}

@@ -7,22 +7,22 @@ interface ArtistImageLoaderProps {
   className?: string;
 }
 
-export const ArtistImageLoader = ({
+export function ArtistImageLoader({
   src,
   alt,
   className = "",
-}: ArtistImageLoaderProps) => {
+}: ArtistImageLoaderProps) {
   const [imageError, setImageError] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 
-  const handleImageError = () => {
+  function handleImageError() {
     setImageError(true);
     setIsLoading(false);
-  };
+  }
 
-  const handleImageLoad = () => {
+  function handleImageLoad() {
     setIsLoading(false);
-  };
+  }
 
   if (!src || imageError) {
     return (
@@ -50,4 +50,4 @@ export const ArtistImageLoader = ({
       />
     </div>
   );
-};
+}

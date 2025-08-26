@@ -15,10 +15,10 @@ interface CookiePreferencesDialogProps {
   onOpenChange: (open: boolean) => void;
 }
 
-export const CookiePreferencesDialog = ({
+export function CookiePreferencesDialog({
   open,
   onOpenChange,
-}: CookiePreferencesDialogProps) => {
+}: CookiePreferencesDialogProps) {
   const { consent, saveConsent } = useCookieConsent();
   const [preferences, setPreferences] = useState({
     essential: true,
@@ -38,10 +38,10 @@ export const CookiePreferencesDialog = ({
     }
   }, [consent]);
 
-  const handleSave = () => {
+  function handleSave() {
     saveConsent(preferences);
     onOpenChange(false);
-  };
+  }
 
   const cookieCategories = [
     {
@@ -126,4 +126,4 @@ export const CookiePreferencesDialog = ({
       </DialogContent>
     </Dialog>
   );
-};
+}

@@ -5,7 +5,7 @@ import { Settings } from "lucide-react";
 import { useState } from "react";
 import { CookiePreferencesDialog } from "./CookiePreferencesDialog";
 
-export const CookieConsentBanner = () => {
+export function CookieConsentBanner() {
   const { showBanner, acceptAll, acceptEssential } = useCookieConsent();
   const [showPreferences, setShowPreferences] = useState(false);
 
@@ -72,4 +72,4 @@ export const CookieConsentBanner = () => {
       />
     </>
   );
-};
+}

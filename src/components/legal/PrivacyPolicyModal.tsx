@@ -12,10 +12,10 @@ interface PrivacyPolicyModalProps {
   onOpenChange: (open: boolean) => void;
 }
 
-export const PrivacyPolicyModal = ({
+export function PrivacyPolicyModal({
   open,
   onOpenChange,
-}: PrivacyPolicyModalProps) => {
+}: PrivacyPolicyModalProps) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-4xl max-h-[80vh]">
@@ -218,4 +218,4 @@ export const PrivacyPolicyModal = ({
       </DialogContent>
     </Dialog>
   );
-};
+}

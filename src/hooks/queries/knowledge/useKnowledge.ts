@@ -151,6 +151,7 @@ export function useKnowledge() {
       });
       return { requiresAuth: false };
     } catch (error) {
+      console.error("failed toggling knowledge", error);
       return { requiresAuth: false };
     }
   }

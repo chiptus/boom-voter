@@ -8,7 +8,7 @@
         "react-hooks/rules-of-hooks": "error",
         "react-hooks/exhaustive-deps": "warn",
         "func-style": [
-          "warn",
+          "error",
           "declaration",
           {
             "allowArrowFunctions": false

@@ -8,11 +8,11 @@ interface AuthActionButtonsProps {
   onSignOut: () => void;
 }
 
-export const AuthActionButtons = ({
+export function AuthActionButtons({
   user,
   onSignIn,
   onSignOut,
-}: AuthActionButtonsProps) => {
+}: AuthActionButtonsProps) {
   return (
     <div className="flex justify-center gap-4 mb-8 flex-wrap">
       {user ? (
@@ -35,4 +35,4 @@ export const AuthActionButtons = ({
       )}
     </div>
   );
-};
+}

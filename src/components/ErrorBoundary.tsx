@@ -42,22 +42,27 @@ export class ErrorBoundary extends React.Component<
   }
 }
 
-const DefaultErrorFallback: React.FC<{ error?: Error; retry: () => void }> = ({
+function DefaultErrorFallback({
   error,
   retry,
-}) => (
-  <div className="text-center text-purple-300 py-12">
-    <h2 className="text-xl font-semibold mb-4">Something went wrong</h2>
-    <p className="text-purple-400 mb-6">
-      {error?.message || "An unexpected error occurred"}
-    </p>
-    <button
-      onClick={retry}
-      className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors"
-    >
-      Try Again
-    </button>
-  </div>
-);
+}: {
+  error?: Error;
+  retry: () => void;
+}) {
+  return (
+    <div className="text-center text-purple-300 py-12">
+      <h2 className="text-xl font-semibold mb-4">Something went wrong</h2>
+      <p className="text-purple-400 mb-6">
+        {error?.message || "An unexpected error occurred"}
+      </p>
+      <button
+        onClick={retry}
+        className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors"
+      >
+        Try Again
+      </button>
+    </div>
+  );
+}
 
 export default ErrorBoundary;

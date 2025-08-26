@@ -7,7 +7,7 @@ import { Settings } from "lucide-react";
 import { useCookieConsent } from "@/hooks/useCookieConsent";
 import { CookiePreferencesDialog } from "./CookiePreferencesDialog";
 
-export const AppFooter = () => {
+export function AppFooter() {
   const [showPrivacyModal, setShowPrivacyModal] = useState(false);
   const [showCookiePreferences, setShowCookiePreferences] = useState(false);
   const { revokeConsent } = useCookieConsent();
@@ -107,4 +107,4 @@ export const AppFooter = () => {
       />
     </>
   );
-};
+}
