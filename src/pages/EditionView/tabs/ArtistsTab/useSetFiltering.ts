@@ -61,6 +61,11 @@ export function useSetFiltering(
         };
       })
       .filter((set) => {
+        // Filter out sets without artists for voting tab
+        if (!set.artists || set.artists.length === 0) {
+          return false;
+        }
+
         // Stage filter - use set's stage_id directly
         if (filterSortState.stages.length > 0 && set.stage_id) {
           if (!filterSortState.stages.includes(set.stage_id)) return false;
