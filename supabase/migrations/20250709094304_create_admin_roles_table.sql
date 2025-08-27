@@ -62,44 +62,6 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER STABLE;
 
--- Migrate existing Core group members to admin roles
-DO $$
-DECLARE
-    core_group_id UUID;
-    member_record RECORD;
-    current_user_id UUID := '3083571a-84f8-4b74-bcc6-9a6f72cfe03c'; -- The authenticated user
-BEGIN
-    -- Get Core group ID
-    SELECT id INTO core_group_id FROM public.groups WHERE name = 'Core' LIMIT 1;
-    
-    IF core_group_id IS NOT NULL THEN
-        -- Migrate Core group members to admin roles
-        FOR member_record IN 
-            SELECT gm.user_id, g.created_by
-            FROM public.group_members gm
-            JOIN public.groups g ON gm.group_id = g.id
-            WHERE gm.group_id = core_group_id
-        LOOP
-            -- Assign role based on whether they're the group creator or current user
-            IF member_record.user_id = member_record.created_by OR member_record.user_id = current_user_id THEN
-                -- Group creator or current user gets super_admin
-                INSERT INTO public.admin_roles (user_id, role, created_by)
-                VALUES (member_record.user_id, 'super_admin', current_user_id)
-                ON CONFLICT (user_id, role) DO NOTHING;
-            ELSE
-                -- Other members get admin role
-                INSERT INTO public.admin_roles (user_id, role, created_by)
-                VALUES (member_record.user_id, 'admin', current_user_id)
-                ON CONFLICT (user_id, role) DO NOTHING;
-            END IF;
-        END LOOP;
-    END IF;
-    
-    -- Ensure current user has super_admin role even if not in Core group
-    INSERT INTO public.admin_roles (user_id, role, created_by)
-    VALUES (current_user_id, 'super_admin', current_user_id)
-    ON CONFLICT (user_id, role) DO NOTHING;
-END $$;
 
 -- Update RLS policies on artists table to use new admin system
 DROP POLICY IF EXISTS "Only Core group members can update artists" ON public.artists;

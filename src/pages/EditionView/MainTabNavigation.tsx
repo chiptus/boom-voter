@@ -22,19 +22,19 @@ const TAB_CONFIG = {
     icon: Map,
     label: "Map",
     shortLabel: "Map",
-    disabled: true,
+    disabled: false,
   },
   info: {
     icon: Info,
     label: "Info",
     shortLabel: "Info",
-    disabled: true,
+    disabled: false,
   },
   social: {
     icon: MessageSquare,
     label: "Social",
     shortLabel: "Social",
-    disabled: true,
+    disabled: false,
   },
 } as const;
 
