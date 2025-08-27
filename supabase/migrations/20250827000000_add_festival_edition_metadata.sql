@@ -56,3 +56,14 @@ CREATE TRIGGER create_festival_info_trigger
   AFTER INSERT ON public.festivals
   FOR EACH ROW
   EXECUTE FUNCTION create_festival_info();
+
+-- Create storage bucket for festival assets
+INSERT INTO storage.buckets (id, name, public)
+VALUES ('festival-assets', 'festival-assets', true)
+ON CONFLICT (id) DO NOTHING;
+
+-- Storage policies for festival assets
+CREATE POLICY "Anyone can view festival assets" ON storage.objects FOR SELECT USING (bucket_id = 'festival-assets');
+CREATE POLICY "Admins can upload festival assets" ON storage.objects FOR INSERT WITH CHECK (bucket_id = 'festival-assets' AND is_admin(auth.uid()));
+CREATE POLICY "Admins can update festival assets" ON storage.objects FOR UPDATE USING (bucket_id = 'festival-assets' AND is_admin(auth.uid()));
+CREATE POLICY "Admins can delete festival assets" ON storage.objects FOR DELETE USING (bucket_id = 'festival-assets' AND is_admin(auth.uid()));
