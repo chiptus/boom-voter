@@ -1,38 +1,22 @@
 import { useEffect, useState, useMemo, useCallback } from "react";
-import { supabase } from "@/integrations/supabase/client";
-import type { FilterSortState } from "../../../../hooks/useUrlState";
-import { useStagesByEditionQuery } from "@/hooks/queries/stages/useStagesByEdition";
+import type { FilterSortState } from "@/hooks/useUrlState";
 import { FestivalSet } from "@/hooks/queries/sets/useSets";
+import { useGroupMembersQuery } from "@/hooks/queries/groups/useGroupMembers";
 
 export function useSetFiltering(
   sets: FestivalSet[],
   filterSortState: FilterSortState,
-  editionId: string | undefined,
 ) {
   // todo - refactor to useGroupMembersQuery
-  const [groupMemberIds, setGroupMemberIds] = useState<string[]>([]);
-  const { data: _stages = [] } = useStagesByEditionQuery(editionId);
+  const groupMembersQuery = useGroupMembersQuery(
+    filterSortState?.groupId || "",
+  );
+  const groupMemberIds = useMemo(() => {
+    if (!groupMembersQuery.data) return new Set<string>();
+    return new Set(groupMembersQuery.data.map((member) => member.id));
+  }, [groupMembersQuery.data]);
+
   const [lockedOrder, setLockedOrder] = useState<FestivalSet[]>([]);
-
-  useEffect(() => {
-    async function fetchGroupMembers() {
-      if (!filterSortState?.groupId) {
-        setGroupMemberIds([]);
-        return;
-      }
-
-      const { data, error } = await supabase
-        .from("group_members")
-        .select("user_id")
-        .eq("group_id", filterSortState.groupId);
-
-      if (!error && data) {
-        setGroupMemberIds(data.map((member) => member.user_id));
-      }
-    }
-
-    fetchGroupMembers();
-  }, [filterSortState?.groupId]);
 
   // Calculate rating for a set based on vote weights
   function calculateRating(set: FestivalSet): number {
@@ -65,9 +49,9 @@ export function useSetFiltering(
       .map((set) => {
         // Filter votes by group if groupId is selected
         let filteredVotes = set.votes || [];
-        if (filterSortState.groupId && groupMemberIds.length > 0) {
+        if (filterSortState.groupId && groupMemberIds.size > 0) {
           filteredVotes = filteredVotes.filter((vote) =>
-            groupMemberIds.includes(vote.user_id),
+            groupMemberIds.has(vote.user_id),
           );
         }
 
@@ -105,63 +89,48 @@ export function useSetFiltering(
         return true;
       });
 
-    // Sort sets
-    filtered
-      // sort by soundcloud followers
-      .sort((setA, setB) => {
-        const aFollowers = Math.max(
-          ...setA.artists.map((artist) => artist.soundcloud_followers || 0),
-        );
-        const bFollowers = Math.max(
-          ...setB.artists.map((artist) => artist.soundcloud_followers || 0),
-        );
-        // console.log(
-        //   `Sorting by followers: ${setA.name} (${aFollowers}) vs ${setB.name} (${bFollowers})`,
-        // );
-        if (aFollowers && bFollowers) {
-          return bFollowers - aFollowers;
-        } else if (aFollowers) {
-          return 1; // a has followers, b does not
-        } else if (bFollowers) {
-          return -1; // b has followers, a does not
-        }
+    filtered.sort((a, b) => {
+      let primarySort = 0;
 
-        return 0;
-      })
-      // sort by state
-      .sort((a, b) => {
-        let primarySort = 0;
-
-        switch (filterSortState.sort) {
-          case "name-asc":
-            return a.name.localeCompare(b.name);
-          case "name-desc":
-            return b.name.localeCompare(a.name);
-          case "rating-desc":
-            primarySort = calculateRating(b) - calculateRating(a);
-            break;
-          case "popularity-desc":
-            primarySort =
-              getWeightedPopularityScore(b) - getWeightedPopularityScore(a);
-            break;
-          case "date-asc":
-            if (!a.time_start && !b.time_start) {
-              primarySort = 0;
-              break;
-            }
-            if (!a.time_start) return 1;
-            if (!b.time_start) return -1;
-            primarySort =
-              new Date(a.time_start).getTime() -
-              new Date(b.time_start).getTime();
-            break;
-          default:
+      switch (filterSortState.sort) {
+        case "name-asc":
+          return a.name.localeCompare(b.name);
+        case "name-desc":
+          return b.name.localeCompare(a.name);
+        case "rating-desc":
+          primarySort = calculateRating(b) - calculateRating(a);
+          break;
+        case "popularity-desc":
+          primarySort =
+            getWeightedPopularityScore(b) - getWeightedPopularityScore(a);
+          break;
+        case "date-asc":
+          if (!a.time_start && !b.time_start) {
             primarySort = 0;
-        }
+            break;
+          }
+          if (!a.time_start) return 1;
+          if (!b.time_start) return -1;
+          primarySort =
+            new Date(a.time_start).getTime() - new Date(b.time_start).getTime();
+          break;
+        default:
+          primarySort = 0;
+      }
 
-        // If primary sort values are equal, sort alphabetically
-        return primarySort !== 0 ? primarySort : a.name.localeCompare(b.name);
-      });
+      // If primary sort values are equal, sort by soundcloud followers
+      if (primarySort !== 0) {
+        return primarySort;
+      }
+
+      const secondarySort = calculateFollowersSort(a, b);
+      if (secondarySort !== 0) {
+        return secondarySort;
+      }
+
+      // Tertiary sort alphabetically
+      return a.name.localeCompare(b.name);
+    });
 
     // If sort is locked, use the locked order but with updated vote data
     if (filterSortState.sortLocked && lockedOrder.length > 0) {
@@ -200,4 +169,35 @@ export function useSetFiltering(
     filteredAndSortedSets,
     lockCurrentOrder,
   };
+}
+
+// Get max soundcloud followers for a set
+function getMaxSoundcloudFollowers(set: FestivalSet): number {
+  return Math.max(
+    ...set.artists.map((artist) => artist.soundcloud_followers || 0),
+  );
+}
+
+function calculateFollowersSort(a: FestivalSet, b: FestivalSet) {
+  // Secondary sort by soundcloud followers
+  const aFollowers = getMaxSoundcloudFollowers(a);
+  const bFollowers = getMaxSoundcloudFollowers(b);
+
+  if (aFollowers === bFollowers) {
+    return 0; // They are equal in followers
+  }
+
+  if (aFollowers && bFollowers) {
+    return bFollowers - aFollowers;
+  }
+
+  if (aFollowers) {
+    return -1; // a has followers, b does not
+  }
+
+  if (bFollowers) {
+    return 1; // b has followers, a does not
+  }
+
+  return 0;
 }

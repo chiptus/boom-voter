@@ -18,7 +18,6 @@ export function ArtistsTab() {
   const { filteredAndSortedSets, lockCurrentOrder } = useSetFiltering(
     sets || [],
     urlState,
-    edition?.id,
   );
 
   if (setsLoading) {
