@@ -45,3 +45,5 @@ export const TitleSection = forwardRef<HTMLDivElement, TitleSectionProps>(
     );
   },
 );
+
+TitleSection.displayName = "TitleSection";
