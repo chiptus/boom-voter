@@ -2,8 +2,13 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { FestivalSet, setsKeys } from "./useSets";
 
-// Business logic function
-async function fetchSetBySlug(slug: string): Promise<FestivalSet> {
+async function fetchSetBySlug({
+  slug,
+  editionId,
+}: {
+  slug: string;
+  editionId: string;
+}): Promise<FestivalSet> {
   const { data, error } = await supabase
     .from("sets")
     .select(
@@ -20,6 +25,7 @@ async function fetchSetBySlug(slug: string): Promise<FestivalSet> {
     `,
     )
     .eq("slug", slug)
+    .eq("festival_edition_id", editionId)
     .eq("archived", false)
     .single();
 
@@ -46,10 +52,13 @@ async function fetchSetBySlug(slug: string): Promise<FestivalSet> {
 }
 
 // Hook
-export function useSetBySlugQuery(slug: string) {
+export function useSetBySlugQuery({
+  slug,
+  editionId,
+}: { slug?: string; editionId?: string } = {}) {
   return useQuery({
-    queryKey: setsKeys.bySlug(slug),
-    queryFn: () => fetchSetBySlug(slug),
-    enabled: !!slug,
+    queryKey: setsKeys.bySlug({ slug, editionId }),
+    queryFn: () => fetchSetBySlug({ slug: slug!, editionId: editionId! }),
+    enabled: !!slug && !!editionId,
   });
 }

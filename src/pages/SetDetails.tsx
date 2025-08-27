@@ -10,29 +10,30 @@ import { SetGroupVoting } from "./SetDetails/SetGroupVoting";
 import { ArtistNotes } from "./SetDetails/SetNotes";
 import { useUrlState } from "@/hooks/useUrlState";
 import { useSetDetail } from "./SetDetails/useSetDetail";
+import { useSetBySlugQuery } from "@/hooks/queries/sets/useSetBySlug";
+import { useFestivalEdition } from "@/contexts/FestivalEditionContext";
+import { useAuth } from "@/contexts/AuthContext";
 
 export function SetDetails() {
+  const { user } = useAuth();
   const { setSlug } = useParams<{ setSlug: string }>();
-
+  const { edition } = useFestivalEdition();
   const { state: urlState } = useUrlState();
-  const {
-    currentSet,
-    user,
-    userVote,
-    loading,
-    handleVote,
-    getVoteCount,
-    netVoteScore,
-  } = useSetDetail(setSlug);
+  const setQuery = useSetBySlugQuery({
+    slug: setSlug,
+    editionId: edition?.id,
+  });
+  const { userVote, loading, handleVote, getVoteCount, netVoteScore } =
+    useSetDetail(setQuery.data?.id);
 
   if (loading) {
     return <ArtistLoadingState />;
   }
 
-  if (!currentSet) {
+  if (!setQuery.data) {
     return <ArtistNotFoundState />;
   }
-
+  const currentSet = setQuery.data;
   const isMultiArtistSet = currentSet.artists.length > 1;
   const primaryArtist = currentSet.artists[0];
 
