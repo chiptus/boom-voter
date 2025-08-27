@@ -269,6 +269,50 @@ export type Database = {
           },
         ];
       };
+      festival_info: {
+        Row: {
+          created_at: string;
+          custom_links: Json | null;
+          facebook_url: string | null;
+          festival_id: string;
+          id: string;
+          info_text: string | null;
+          instagram_url: string | null;
+          map_image_url: string | null;
+          updated_at: string;
+        };
+        Insert: {
+          created_at?: string;
+          custom_links?: Json | null;
+          facebook_url?: string | null;
+          festival_id: string;
+          id?: string;
+          info_text?: string | null;
+          instagram_url?: string | null;
+          map_image_url?: string | null;
+          updated_at?: string;
+        };
+        Update: {
+          created_at?: string;
+          custom_links?: Json | null;
+          facebook_url?: string | null;
+          festival_id?: string;
+          id?: string;
+          info_text?: string | null;
+          instagram_url?: string | null;
+          map_image_url?: string | null;
+          updated_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "festival_info_festival_id_fkey";
+            columns: ["festival_id"];
+            isOneToOne: true;
+            referencedRelation: "festivals";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
       festivals: {
         Row: {
           archived: boolean;
