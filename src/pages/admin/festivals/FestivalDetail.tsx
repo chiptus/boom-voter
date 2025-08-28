@@ -1,8 +1,9 @@
 import { useParams, useNavigate, Outlet } from "react-router-dom";
 import { FestivalEditionManagement } from "./FestivalEditionManagement";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import { useFestivalQuery } from "@/hooks/queries/festivals/useFestival";
-import { Loader2 } from "lucide-react";
+import { Loader2, Info } from "lucide-react";
 
 export default function FestivalDetail() {
   const { festivalId, editionId = "" } = useParams<{
@@ -52,6 +53,13 @@ export default function FestivalDetail() {
           <CardHeader>
             <CardTitle className="flex items-center justify-between">
               <span className="flex items-center gap-2">{festival.name}</span>
+              <Button
+                variant="outline"
+                onClick={() => navigate(`/admin/festivals/${festivalId}/info`)}
+              >
+                <Info className="h-4 w-4 mr-2" />
+                Festival Info
+              </Button>
             </CardTitle>
           </CardHeader>
         </Card>
