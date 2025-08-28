@@ -11,12 +11,13 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Edit2, Archive, Search, Music, Plus } from "lucide-react";
+import { Edit2, Archive, Search, Music, Plus, Copy } from "lucide-react";
 import { Artist, useArtistsQuery } from "@/hooks/queries/artists/useArtists";
 import { useArchiveArtistMutation } from "@/hooks/queries/artists/useArchiveArtist";
 import { AddArtistDialog } from "./AddArtistDialog";
 import { EditArtistDialog } from "./EditArtistDialog";
 import { GenreBadge } from "@/components/GenreBadge";
+import { Link } from "react-router-dom";
 
 export function ArtistsManagement() {
   const [addArtistOpen, setAddArtistOpen] = useState(false);
@@ -71,6 +72,16 @@ export function ArtistsManagement() {
                   className="pl-10 md:w-64"
                 />
               </div>
+
+              <Link to="/admin/artists/duplicates">
+                <Button
+                  variant="outline"
+                  className="flex gap-2 text-orange-600 hover:text-orange-700"
+                >
+                  <Copy className="h-4 w-4" />
+                  <span className="hidden md:block">Manage Duplicates</span>
+                </Button>
+              </Link>
 
               <Button
                 onClick={() => setAddArtistOpen(true)}
