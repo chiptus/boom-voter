@@ -13,6 +13,13 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Progress } from "@/components/ui/progress";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Upload, FileText, Loader2 } from "lucide-react";
 import {
   importStages,
@@ -38,6 +45,7 @@ export function CSVImportDialog({
   const [isImporting, setIsImporting] = useState(false);
   const [stagesFile, setStagesFile] = useState<File | null>(null);
   const [setsFile, setSetsFile] = useState<File | null>(null);
+  const [timezone, setTimezone] = useState("Europe/Lisbon");
   const [progress, setProgress] = useState({ current: 0, total: 0, label: "" });
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -114,6 +122,7 @@ export function CSVImportDialog({
         const setsResult = await importSets(
           setsData,
           editionId,
+          timezone,
           (current, total) => {
             setProgress({
               current,
@@ -222,6 +231,29 @@ export function CSVImportDialog({
                     {setsFile.name}
                   </div>
                 )}
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="timezone-select">Timezone</Label>
+                <Select value={timezone} onValueChange={setTimezone}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select timezone" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="Europe/Lisbon">Europe/Lisbon</SelectItem>
+                    <SelectItem value="Europe/Madrid">Europe/Madrid</SelectItem>
+                    <SelectItem value="Europe/London">Europe/London</SelectItem>
+                    <SelectItem value="America/New_York">
+                      America/New_York
+                    </SelectItem>
+                    <SelectItem value="America/Los_Angeles">
+                      America/Los_Angeles
+                    </SelectItem>
+                    <SelectItem value="UTC">UTC</SelectItem>
+                  </SelectContent>
+                </Select>
+                <p className="text-xs text-muted-foreground">
+                  Select the timezone that the CSV times are in
+                </p>
               </div>
               <p className="text-sm text-muted-foreground">
                 Expected columns: artist_names, stage_name, name (optional),

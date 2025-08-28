@@ -1,5 +1,6 @@
 import { supabase } from "@/integrations/supabase/client";
 import { generateSlug } from "@/lib/slug";
+import { fromZonedTime } from "date-fns-tz";
 
 export interface StageImportData {
   name: string;
@@ -12,6 +13,20 @@ export interface SetImportData {
   time_start?: string;
   time_end?: string;
   description?: string;
+}
+
+// Helper function to convert local time string to UTC for database storage
+function convertLocalTimeToUTC(
+  timeString: string | undefined,
+  timezone: string,
+): string | null {
+  if (!timeString) return null;
+
+  // Parse the time string and interpret it as being in the specified timezone
+  // First create a date object assuming the time is in the target timezone
+  const utcDate = fromZonedTime(timeString, timezone);
+
+  return utcDate.toISOString();
 }
 
 export interface ImportResult {
@@ -137,6 +152,7 @@ export async function importStages(
 export async function importSets(
   sets: SetImportData[],
   editionId: string,
+  timezone: string = "UTC",
   onProgress?: (completed: number, total: number) => void,
 ): Promise<ImportResult> {
   try {
@@ -227,6 +243,10 @@ export async function importSets(
           .eq("festival_edition_id", editionId)
           .limit(1);
 
+        // Convert times to UTC for database storage
+        const utcTimeStart = convertLocalTimeToUTC(set.time_start, timezone);
+        const utcTimeEnd = convertLocalTimeToUTC(set.time_end, timezone);
+
         let createdSetId = "";
         let setError;
 
@@ -236,8 +256,8 @@ export async function importSets(
           const { error } = await supabase
             .from("sets")
             .update({
-              time_start: set.time_start || null,
-              time_end: set.time_end || null,
+              time_start: utcTimeStart,
+              time_end: utcTimeEnd,
               description: set.description || null,
               archived: false,
             })
@@ -255,8 +275,8 @@ export async function importSets(
               slug: generateSlug(setName),
               stage_id: stage.id,
               festival_edition_id: editionId,
-              time_start: set.time_start || null,
-              time_end: set.time_end || null,
+              time_start: utcTimeStart,
+              time_end: utcTimeEnd,
               description: set.description || null,
               archived: false,
               created_by: userId,
