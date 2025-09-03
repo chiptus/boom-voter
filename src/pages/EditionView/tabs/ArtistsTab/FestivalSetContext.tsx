@@ -1,22 +1,10 @@
-import { createContext, useContext, ReactNode, useMemo } from "react";
+import { createContext, useContext, ReactNode } from "react";
 import { FestivalSet } from "@/hooks/queries/sets/useSets";
 
 interface FestivalSetContextValue {
   set: FestivalSet;
-  userVote?: number;
-  userKnowledge?: boolean;
-  votingLoading?: boolean;
-  onVote: (
-    setId: string,
-    voteType: number,
-  ) => Promise<{ requiresAuth: boolean }>;
-  onKnowledgeToggle: (setId: string) => Promise<{ requiresAuth: boolean }>;
-  onAuthRequired: () => void;
+  onLockSort(): void;
   use24Hour?: boolean;
-
-  // Computed helpers
-  isMultiArtist: boolean;
-  getVoteCount: (voteType: number) => number;
 }
 
 const FestivalSetContext = createContext<FestivalSetContextValue | null>(null);
@@ -24,54 +12,20 @@ const FestivalSetContext = createContext<FestivalSetContextValue | null>(null);
 interface FestivalSetProviderProps {
   children: ReactNode;
   set: FestivalSet;
-  userVote?: number;
-  userKnowledge?: boolean;
-  votingLoading?: boolean;
-  onVote: (
-    setId: string,
-    voteType: number,
-  ) => Promise<{ requiresAuth: boolean }>;
-  onKnowledgeToggle: (setId: string) => Promise<{ requiresAuth: boolean }>;
-  onAuthRequired: () => void;
+  onLockSort(): void;
   use24Hour?: boolean;
 }
 
 export function FestivalSetProvider({
   children,
   set,
-  userVote,
-  userKnowledge,
-  votingLoading,
-  onVote,
-  onKnowledgeToggle,
-  onAuthRequired,
+  onLockSort,
   use24Hour = false,
 }: FestivalSetProviderProps) {
-  const isMultiArtist = set.artists.length > 1;
-
-  const voteCounts = useMemo(() => {
-    const counts: Record<number, number> = {};
-    for (const vc of set.votes) {
-      counts[vc.vote_type] = (counts[vc.vote_type] || 0) + 1;
-    }
-    return counts;
-  }, [set.votes]);
-
-  function getVoteCount(voteType: number) {
-    return voteCounts[voteType] || 0;
-  }
-
   const contextValue: FestivalSetContextValue = {
     set,
-    userVote,
-    userKnowledge,
-    votingLoading,
-    onVote,
-    onKnowledgeToggle,
-    onAuthRequired,
+    onLockSort,
     use24Hour,
-    isMultiArtist,
-    getVoteCount,
   };
 
   return (

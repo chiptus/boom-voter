@@ -1,7 +1,7 @@
 import { useState } from "react";
-import { DayFilterSelect } from "./DayFilterSelect";
-import { TimeFilterSelect } from "./TimeFilterSelect";
-import { StageFilterButtons } from "./StageFilterButtons";
+import { DayFilterSelect } from "../DayFilterSelect";
+import { TimeFilterSelect } from "../TimeFilterSelect";
+import { StageFilterButtons } from "../StageFilterButtons";
 import { useTimelineUrlState } from "@/hooks/useTimelineUrlState";
 import { FilterToggle } from "@/components/filters/FilterToggle";
 import { FilterContainer } from "@/components/filters/FilterContainer";

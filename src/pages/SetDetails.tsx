@@ -23,8 +23,7 @@ export function SetDetails() {
     slug: setSlug,
     editionId: edition?.id,
   });
-  const { userVote, loading, handleVote, getVoteCount, netVoteScore } =
-    useSetDetail(setQuery.data?.id);
+  const { loading, netVoteScore } = useSetDetail(setQuery.data?.id);
 
   if (loading) {
     return <ArtistLoadingState />;
@@ -54,16 +53,12 @@ export function SetDetails() {
 
             <MultiArtistSetInfoCard
               set={currentSet}
-              userVote={userVote}
               netVoteScore={netVoteScore}
-              onVote={handleVote}
-              getVoteCount={getVoteCount}
               use24Hour={urlState.use24Hour}
             />
           </div>
         ) : (
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
-            {/* Single Artist Image */}
             <ArtistImageCard
               imageUrl={primaryArtist.image_url}
               artistName={currentSet.name}
@@ -71,10 +66,7 @@ export function SetDetails() {
 
             <SetInfoCard
               set={currentSet}
-              userVote={userVote}
               netVoteScore={netVoteScore}
-              onVote={handleVote}
-              getVoteCount={getVoteCount}
               use24Hour={urlState.use24Hour}
             />
           </div>

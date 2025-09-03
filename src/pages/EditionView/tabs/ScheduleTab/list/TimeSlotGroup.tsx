@@ -11,15 +11,11 @@ interface TimeSlot {
 interface TimeSlotGroupProps {
   timeSlot: TimeSlot;
   showDateHeader: boolean;
-  userVotes: Record<string, number>;
-  onVote: (artistId: string, voteType: number) => void;
 }
 
 export function TimeSlotGroup({
   timeSlot,
   showDateHeader,
-  userVotes,
-  onVote,
 }: TimeSlotGroupProps) {
   return (
     <div>
@@ -44,40 +40,22 @@ export function TimeSlotGroup({
           <div className="flex-1 h-px bg-purple-400/20"></div>
         </div>
 
-        {/* Sets for this time slot */}
         <div className="space-y-3">
           {/* Mobile: Stack all sets vertically */}
           <div className="block md:hidden space-y-3">
             {timeSlot.sets.map((set) => (
-              <MobileSetCard
-                key={set.id}
-                set={set}
-                userVote={userVotes[set.id]}
-                onVote={onVote}
-              />
+              <MobileSetCard key={set.id} set={set} />
             ))}
           </div>
 
           {/* Desktop: Show sets side by side when space allows */}
           <div className="hidden md:block">
             {timeSlot.sets.length === 1 ? (
-              // Single set - take full width
-              <MobileSetCard
-                key={timeSlot.sets[0].id}
-                set={timeSlot.sets[0]}
-                userVote={userVotes[timeSlot.sets[0].id]}
-                onVote={onVote}
-              />
+              <MobileSetCard key={timeSlot.sets[0].id} set={timeSlot.sets[0]} />
             ) : (
-              // Multiple sets - grid layout
               <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-3">
                 {timeSlot.sets.map((set) => (
-                  <MobileSetCard
-                    key={set.id}
-                    set={set}
-                    userVote={userVotes[set.id]}
-                    onVote={onVote}
-                  />
+                  <MobileSetCard key={set.id} set={set} />
                 ))}
               </div>
             )}

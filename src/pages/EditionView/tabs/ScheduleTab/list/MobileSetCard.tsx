@@ -7,11 +7,9 @@ import type { ScheduleSet } from "@/hooks/useScheduleData";
 
 interface MobileSetCardProps {
   set: ScheduleSet & { stageName: string };
-  userVote?: number;
-  onVote?: (setId: string, voteType: number) => void;
 }
 
-export function MobileSetCard({ set, userVote, onVote }: MobileSetCardProps) {
+export function MobileSetCard({ set }: MobileSetCardProps) {
   const duration =
     set.startTime && set.endTime
       ? differenceInMinutes(set.endTime, set.startTime)
@@ -54,8 +52,7 @@ export function MobileSetCard({ set, userVote, onVote }: MobileSetCardProps) {
           )}
         </div>
 
-        {/* Vote buttons */}
-        <VoteButtons set={set} userVote={userVote} onVote={onVote} />
+        <VoteButtons set={set} />
       </CardContent>
     </Card>
   );

@@ -8,7 +8,7 @@ import { MapTab } from "@/pages/EditionView/tabs/MapTab";
 import { InfoTab } from "@/pages/EditionView/tabs/InfoTab";
 import { SocialTab } from "@/pages/EditionView/tabs/SocialTab";
 import { ScheduleTabTimeline } from "@/pages/EditionView/tabs/ScheduleTab/TimelineTab";
-import { ScheduleTabList } from "@/pages/EditionView/tabs/ScheduleTab/ListTab";
+import { ScheduleTabList } from "@/pages/EditionView/tabs/ScheduleTab/list/ListTab";
 import { ScheduleTab } from "@/pages/EditionView/tabs/ScheduleTab";
 
 interface EditionRoutesProps {

@@ -1,4 +1,3 @@
-import { useAuth } from "@/contexts/AuthContext";
 import { FilterSortControls } from "./filters/FilterSortControls";
 import { useSetFiltering } from "./useSetFiltering";
 import { useUrlState } from "@/hooks/useUrlState";
@@ -7,7 +6,6 @@ import { useSetsByEditionQuery } from "@/hooks/queries/sets/useSetsByEdition";
 import { useFestivalEdition } from "@/contexts/FestivalEditionContext";
 
 export function ArtistsTab() {
-  const { user, showAuthDialog } = useAuth();
   const { state: urlState, updateUrlState, clearFilters } = useUrlState();
   const { edition } = useFestivalEdition();
 
@@ -40,9 +38,7 @@ export function ArtistsTab() {
       <div className="mt-8">
         <SetsPanel
           sets={filteredAndSortedSets}
-          user={user}
           use24Hour={urlState.use24Hour}
-          openAuthDialog={() => showAuthDialog()}
           onLockSort={() => lockCurrentOrder(updateUrlState)}
         />
       </div>

@@ -8,7 +8,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Clock, ExternalLink, Music, Play } from "lucide-react";
-import { ArtistVotingButtons } from "./SetVotingButtons";
+import { SetVotingButtons } from "./SetVotingButtons";
 import { FestivalSet } from "@/hooks/queries/sets/useSets";
 import { formatTimeRange } from "@/lib/timeUtils";
 import { GenreBadge } from "@/components/GenreBadge";
@@ -16,19 +16,13 @@ import { StagePin } from "@/components/StagePin";
 
 interface SetInfoCardProps {
   set: FestivalSet;
-  userVote: number | null;
   netVoteScore: number;
-  onVote: (voteType: number) => void;
-  getVoteCount: (voteType: number) => number;
   use24Hour?: boolean;
 }
 
 export function SetInfoCard({
   set,
-  userVote,
   netVoteScore,
-  onVote,
-  getVoteCount,
   use24Hour = false,
 }: SetInfoCardProps) {
   const artist = set.artists[0];
@@ -84,12 +78,7 @@ export function SetInfoCard({
           )}
         </CardHeader>
         <CardContent>
-          {/* Voting System */}
-          <ArtistVotingButtons
-            userVote={userVote}
-            onVote={onVote}
-            getVoteCount={getVoteCount}
-          />
+          <SetVotingButtons set={set} />
 
           {/* External Links */}
           {(artist.spotify_url || artist.soundcloud_url) && (

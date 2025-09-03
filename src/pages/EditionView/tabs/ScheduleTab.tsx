@@ -1,4 +1,4 @@
-import { ScheduleNavigation } from "@/pages/EditionView/tabs/ScheduleTab/ScheduleNavigation";
+import { ScheduleNavigation } from "./ScheduleTab/ScheduleNavigation";
 import { Outlet } from "react-router-dom";
 
 export function ScheduleTab() {

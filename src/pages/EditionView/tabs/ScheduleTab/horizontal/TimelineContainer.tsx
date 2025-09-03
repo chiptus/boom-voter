@@ -5,15 +5,9 @@ import type { TimelineData } from "@/lib/timelineCalculator";
 
 interface TimelineContainerProps {
   timelineData: TimelineData;
-  userVotes: Record<string, number>;
-  onVote: (artistId: string, voteType: number) => void;
 }
 
-export function TimelineContainer({
-  timelineData,
-  userVotes,
-  onVote,
-}: TimelineContainerProps) {
+export function TimelineContainer({ timelineData }: TimelineContainerProps) {
   const scrollContainerRef = useRef<HTMLDivElement>(null);
 
   return (
@@ -35,8 +29,6 @@ export function TimelineContainer({
             key={stage.name}
             stage={stage}
             totalWidth={timelineData.totalWidth}
-            userVotes={userVotes}
-            onVote={onVote}
           />
         ))}
       </div>

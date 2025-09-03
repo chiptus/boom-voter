@@ -1,5 +1,62 @@
 import { Button } from "@/components/ui/button";
+import { useAuth } from "@/contexts/AuthContext";
+import { FestivalSet } from "@/hooks/queries/sets/useSets";
+import { useUserVotes } from "@/hooks/queries/voting/useUserVotes";
+import { useVote } from "@/hooks/queries/voting/useVote";
+import { useVoteCount } from "@/hooks/useVoteCount";
 import { VOTE_CONFIG, getVoteConfig } from "@/lib/voteConfig";
+
+interface SetVotingButtonsProps {
+  set: FestivalSet;
+}
+
+export function SetVotingButtons({ set }: SetVotingButtonsProps) {
+  const { user, showAuthDialog } = useAuth();
+  const { getVoteCount } = useVoteCount(set);
+  const userVotesQuery = useUserVotes(user?.id);
+  const voteMutation = useVote();
+
+  const setId = set.id;
+  const userVoteForSet = userVotesQuery.data?.[setId];
+
+  return (
+    <div className="flex items-center gap-4 mb-6">
+      <VoteButton
+        voteType={2}
+        isActive={userVoteForSet === 2}
+        onClick={() => handleVote(2)}
+        count={getVoteCount(2)}
+      />
+      <VoteButton
+        voteType={1}
+        isActive={userVoteForSet === 1}
+        onClick={() => handleVote(1)}
+        count={getVoteCount(1)}
+      />
+      <VoteButton
+        voteType={-1}
+        isActive={userVoteForSet === -1}
+        onClick={() => handleVote(-1)}
+        count={getVoteCount(-1)}
+      />
+    </div>
+  );
+
+  function handleVote(voteType: number) {
+    if (!user?.id) {
+      showAuthDialog();
+
+      return;
+    }
+
+    voteMutation.mutate({
+      setId,
+      voteType,
+      userId: user?.id,
+      existingVote: userVoteForSet,
+    });
+  }
+}
 
 interface VoteButtonProps {
   voteType: number;
@@ -28,40 +85,5 @@ function VoteButton({ voteType, isActive, onClick, count }: VoteButtonProps) {
       </span>
       <span className="sm:hidden">{count}</span>
     </Button>
-  );
-}
-
-interface ArtistVotingButtonsProps {
-  userVote: number | null;
-  onVote: (voteType: number) => void;
-  getVoteCount: (voteType: number) => number;
-}
-
-export function ArtistVotingButtons({
-  userVote,
-  onVote,
-  getVoteCount,
-}: ArtistVotingButtonsProps) {
-  return (
-    <div className="flex items-center gap-4 mb-6">
-      <VoteButton
-        voteType={2}
-        isActive={userVote === 2}
-        onClick={() => onVote(2)}
-        count={getVoteCount(2)}
-      />
-      <VoteButton
-        voteType={1}
-        isActive={userVote === 1}
-        onClick={() => onVote(1)}
-        count={getVoteCount(1)}
-      />
-      <VoteButton
-        voteType={-1}
-        isActive={userVote === -1}
-        onClick={() => onVote(-1)}
-        count={getVoteCount(-1)}
-      />
-    </div>
   );
 }
