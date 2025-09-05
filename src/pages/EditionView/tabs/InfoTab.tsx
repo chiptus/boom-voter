@@ -6,7 +6,6 @@ import { CustomLinks } from "./InfoTab/CustomLinks";
 import { NoInfo } from "./InfoTab/NoInfo";
 import { LoadingInfo } from "./InfoTab/LoadingInfo";
 import { SocialLinkItem } from "./InfoTab/SocialLinkItem";
-import { TitleSection } from "@/components/layout/AppHeader/TitleSection";
 import { useCustomLinksQuery } from "@/hooks/queries/custom-links/useCustomLinks";
 
 export function InfoTab() {
@@ -26,7 +25,6 @@ export function InfoTab() {
 
   return (
     <div className="space-y-8">
-      <TitleSection logoUrl={festival?.logo_url} title={festival?.name} />
       <EditionTitle name={edition?.name} />
 
       {festivalInfo?.info_text && (
