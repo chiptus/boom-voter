@@ -66,6 +66,15 @@ export default defineConfig(({ mode }) => ({
         dir: "ltr",
         categories: ["entertainment", "music"],
         prefer_related_applications: false,
+        related_applications: [],
+        scope_extensions: [
+          {
+            origin: "https://getupline.com",
+          },
+          {
+            origin: "https://*.getupline.com",
+          },
+        ],
         launch_handler: {
           client_mode: "focus-existing",
         },
