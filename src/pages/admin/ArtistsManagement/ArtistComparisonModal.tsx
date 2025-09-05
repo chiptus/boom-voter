@@ -45,7 +45,7 @@ export function ArtistComparisonModal({
   const mergeMutation = useMergeArtistsMutation();
   const { toast } = useToast();
 
-  function handleFieldChange(field: keyof MergeChoices, value: any) {
+  function handleFieldChange(field: keyof MergeChoices, value: unknown) {
     setMergeChoices((prev) => ({
       ...prev,
       [field]: value,

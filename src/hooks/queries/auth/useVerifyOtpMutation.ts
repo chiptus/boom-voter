@@ -30,7 +30,7 @@ export function useVerifyOtpMutation() {
         description: "Welcome! You're now signed in.",
       });
     },
-    onError: (error: any) => {
+    onError: (error) => {
       toast({
         title: "Error",
         description: error.message,

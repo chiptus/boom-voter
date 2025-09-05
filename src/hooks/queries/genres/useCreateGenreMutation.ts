@@ -37,8 +37,8 @@ export function useCreateGenreMutation() {
         description: "Music genre added successfully!",
       });
     },
-    onError: (error: any) => {
-      if (error.code === "23505") {
+    onError: (error) => {
+      if ("code" in error && error.code === "23505") {
         toast({
           title: "Error",
           description: "This genre already exists",

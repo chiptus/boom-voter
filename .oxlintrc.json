@@ -13,7 +13,8 @@
           {
             "allowArrowFunctions": false
           }
-        ]
+        ],
+        "typescript/no-explicit-any": "error"
       },
       "env": {
         "es2024": true

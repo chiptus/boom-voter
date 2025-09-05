@@ -1,6 +1,6 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { artistsKeys } from "./useArtists";
+import { Artist, artistsKeys } from "./useArtists";
 import {
   duplicateArtistsKeys,
   type DuplicateGroup,
@@ -108,18 +108,18 @@ function getSmartMergeData(
   return { primaryArtist, mergeData };
 }
 
-function getCompletenessScore(artist: any): number {
+function getCompletenessScore(artist: Artist): number {
   let score = 0;
   if (artist.description) score += 3;
   if (artist.spotify_url) score += 2;
   if (artist.soundcloud_url) score += 2;
-  if (artist.artist_music_genres?.length > 0) score += 1;
+  if (artist.artist_music_genres?.length) score += 1;
   return score;
 }
 
 function smartMergeDescription(
-  primaryArtist: any,
-  allArtists: any[],
+  primaryArtist: Artist,
+  allArtists: Artist[],
 ): string | null {
   // If primary artist has description, use it (it was chosen for having most complete data)
   if (primaryArtist.description) {
@@ -130,15 +130,15 @@ function smartMergeDescription(
   return (
     allArtists
       .map((a) => a.description)
-      .filter(Boolean)
+      .filter((a): a is string => Boolean(a))
       .sort((a, b) => b.length - a.length)[0] || null
   );
 }
 
 function smartMergeUrl(
-  primaryArtist: any,
-  allArtists: any[],
-  field: string,
+  primaryArtist: Artist,
+  allArtists: Artist[],
+  field: keyof Pick<Artist, "spotify_url" | "soundcloud_url">,
 ): string | null {
   // If primary artist has this URL, use it
   if (primaryArtist[field]) {
@@ -149,11 +149,11 @@ function smartMergeUrl(
   return allArtists.map((a) => a[field]).filter(Boolean)[0] || null;
 }
 
-function getAllGenres(artists: any[]): string[] {
+function getAllGenres(artists: Artist[]): string[] {
   const allGenres = new Set<string>();
   artists.forEach((artist) => {
     if (artist.artist_music_genres) {
-      artist.artist_music_genres.forEach((genre: any) => {
+      artist.artist_music_genres.forEach((genre) => {
         allGenres.add(genre.music_genre_id);
       });
     }
@@ -164,7 +164,13 @@ function getAllGenres(artists: any[]): string[] {
 async function performSingleMerge(
   primaryArtistId: string,
   duplicateArtistIds: string[],
-  mergeData: any,
+  mergeData: {
+    name: string;
+    description: string | null;
+    spotify_url: string | null;
+    soundcloud_url: string | null;
+    genreIds: string[];
+  },
 ) {
   // Update the primary artist with merged data
   const { error: updateError } = await supabase

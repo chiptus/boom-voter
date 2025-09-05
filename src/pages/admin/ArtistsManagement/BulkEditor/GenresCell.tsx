@@ -16,7 +16,7 @@ export function GenresCell({ value, onSave }: GenresCellProps) {
   const { data: genres = [] } = useGenresQuery();
 
   function handleEdit() {
-    const currentGenreIds = value?.map((g: any) => g.music_genre_id) || [];
+    const currentGenreIds = value?.map((g) => g.music_genre_id) || [];
     setGenreIds(currentGenreIds);
     setIsEditing(true);
   }
@@ -62,7 +62,7 @@ export function GenresCell({ value, onSave }: GenresCellProps) {
 
   const artistGenres = value || [];
   const genreNames = artistGenres
-    .map((ag: any) => {
+    .map((ag) => {
       const genre = genres.find((g) => g.id === ag.music_genre_id);
       return genre?.name;
     })

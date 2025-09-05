@@ -8,7 +8,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Save, X } from "lucide-react";
-import type { ArtistChange } from "../ArtistBulkEditor";
+import type { ArtistChange } from "../hooks/useArtistChangeTracking";
 import type { Artist } from "@/hooks/queries/artists/useArtists";
 
 interface ChangePreviewDialogProps {
@@ -64,14 +64,14 @@ export function ChangePreviewDialog({
                           Old
                         </Badge>
                         <span className="text-muted-foreground">
-                          {change.oldValue || "(empty)"}
+                          {String(change.oldValue) || "(empty)"}
                         </span>
                       </div>
                       <div>
                         <Badge variant="default" className="mr-1">
                           New
                         </Badge>
-                        <span>{change.newValue || "(empty)"}</span>
+                        <span>{String(change.newValue) || "(empty)"}</span>
                       </div>
                     </div>
                   </div>

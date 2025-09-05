@@ -7,6 +7,7 @@ import { Eye, Merge, Trash2, Calendar, Link as LinkIcon } from "lucide-react";
 import type { DuplicateGroup } from "@/hooks/queries/artists/useDuplicateArtists";
 import { ArtistComparisonModal } from "./ArtistComparisonModal";
 import { GenreBadge } from "@/components/GenreBadge";
+import { Artist } from "@/hooks/queries/artists/useArtists";
 
 interface DuplicateGroupCardProps {
   group: DuplicateGroup;
@@ -25,7 +26,7 @@ export function DuplicateGroupCard({
     return new Date(date).toLocaleDateString();
   }
 
-  function getArtistLinks(artist: any) {
+  function getArtistLinks(artist: Artist) {
     const links = [];
     if (artist.spotify_url) links.push("Spotify");
     if (artist.soundcloud_url) links.push("SoundCloud");
