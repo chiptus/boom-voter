@@ -7,7 +7,6 @@ export function useSetFiltering(
   sets: FestivalSet[],
   filterSortState: FilterSortState,
 ) {
-  // todo - refactor to useGroupMembersQuery
   const groupMembersQuery = useGroupMembersQuery(
     filterSortState?.groupId || "",
   );
