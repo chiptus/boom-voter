@@ -5,8 +5,8 @@ import { useGenresQuery } from "@/hooks/queries/genres/useGenres";
 import { Check, X } from "lucide-react";
 
 interface GenresCellProps {
-  value: Array<{ music_genre_id: string }> | null;
-  onSave: (value: Array<{ music_genre_id: string }>) => void;
+  value: string[];
+  onSave: (genreIds: string[]) => void;
 }
 
 export function GenresCell({ value, onSave }: GenresCellProps) {
@@ -16,15 +16,28 @@ export function GenresCell({ value, onSave }: GenresCellProps) {
   const { data: genres = [] } = useGenresQuery();
 
   function handleEdit() {
-    const currentGenreIds = value?.map((g) => g.music_genre_id) || [];
+    const currentGenreIds = value || [];
     setGenreIds(currentGenreIds);
     setIsEditing(true);
   }
 
-  function handleSave() {
-    const genreObjects = genreIds.map((id) => ({ music_genre_id: id }));
-    onSave(genreObjects);
-    setIsEditing(false);
+  async function handleSave() {
+    const currentGenreIds = value || [];
+
+    // Only save if genres actually changed
+    if (
+      JSON.stringify(currentGenreIds.sort()) === JSON.stringify(genreIds.sort())
+    ) {
+      setIsEditing(false);
+      return;
+    }
+
+    try {
+      await onSave(genreIds);
+      setIsEditing(false);
+    } catch (error) {
+      console.error("Failed to save genres:", error);
+    }
   }
 
   function handleCancel() {
@@ -60,13 +73,9 @@ export function GenresCell({ value, onSave }: GenresCellProps) {
     );
   }
 
-  const artistGenres = value || [];
-  const genreNames = artistGenres
-    .map((ag) => {
-      const genre = genres.find((g) => g.id === ag.music_genre_id);
-      return genre?.name;
-    })
-    .filter(Boolean);
+  const genreNames = value
+    .map((id) => genres.find((g) => g.id === id)?.name)
+    .filter((i): i is NonNullable<typeof i> => !!i);
 
   return (
     <div

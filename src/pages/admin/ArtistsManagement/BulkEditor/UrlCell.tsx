@@ -16,9 +16,36 @@ export function UrlCell({ value, placeholder, onSave }: UrlCellProps) {
     setIsEditing(true);
   }
 
-  function handleSave() {
-    onSave(editValue.trim() || null);
-    setIsEditing(false);
+  async function handleSave() {
+    const newValue = editValue.trim() || null;
+
+    // Only save if value actually changed
+    if (newValue === value) {
+      setIsEditing(false);
+      return;
+    }
+
+    // Validate URL if not empty
+    if (newValue && !isValidUrl(newValue)) {
+      console.error("Invalid URL format");
+      return;
+    }
+
+    try {
+      onSave(newValue);
+      setIsEditing(false);
+    } catch (error) {
+      console.error("Failed to save:", error);
+    }
+  }
+
+  function isValidUrl(string: string): boolean {
+    try {
+      new URL(string);
+      return true;
+    } catch {
+      return false;
+    }
   }
 
   function handleCancel() {

@@ -5,28 +5,37 @@ import { TextCell } from "../BulkEditor/TextCell";
 import { TextareaCell } from "../BulkEditor/TextareaCell";
 import { UrlCell } from "../BulkEditor/UrlCell";
 import { GenresCell } from "../BulkEditor/GenresCell";
+import {
+  UpdateArtistUpdates,
+  useUpdateArtistMutation,
+} from "@/hooks/queries/artists/useUpdateArtist";
 
 interface BulkEditorTableRowProps {
   artist: Artist;
-  artistWithChanges: Artist;
-  hasChanges: boolean;
   isSelected: boolean;
   onSelectChange: (isSelected: boolean) => void;
-  onCellChange: <T extends keyof Artist>(field: T, newValue: Artist[T]) => void;
 }
 
 export function BulkEditorTableRow({
   artist,
-  artistWithChanges,
-  hasChanges,
   isSelected,
   onSelectChange,
-  onCellChange,
 }: BulkEditorTableRowProps) {
+  // Centralized mutation hooks
+  const updateArtistMutation = useUpdateArtistMutation();
+  // Centralized cell change handler with mutation
+  function onSave<T extends keyof UpdateArtistUpdates>(
+    field: T,
+    newValue: UpdateArtistUpdates[T],
+  ) {
+    updateArtistMutation.mutate({
+      id: artist.id,
+      updates: { [field]: newValue },
+    });
+  }
+
   return (
-    <TableRow
-      className={`${hasChanges ? "bg-orange-50 border-l-4 border-l-orange-400" : ""}`}
-    >
+    <TableRow>
       <TableCell>
         <Checkbox
           checked={isSelected}
@@ -35,35 +44,35 @@ export function BulkEditorTableRow({
       </TableCell>
       <TableCell>
         <TextCell
-          value={artistWithChanges.name}
-          onSave={(value) => onCellChange("name", value || "")}
+          value={artist.name}
           required
+          onSave={() => onSave("name", artist.name)}
         />
       </TableCell>
       <TableCell>
         <TextareaCell
-          value={artistWithChanges.description}
-          onSave={(value) => onCellChange("description", value)}
+          value={artist.description}
+          onSave={() => onSave("description", artist.description)}
         />
       </TableCell>
       <TableCell>
         <GenresCell
-          value={artistWithChanges.artist_music_genres}
-          onSave={(value) => onCellChange("artist_music_genres", value)}
+          value={artist.artist_music_genres?.map((g) => g.music_genre_id) || []}
+          onSave={(value) => onSave("genre_ids", value)}
         />
       </TableCell>
       <TableCell>
         <UrlCell
-          value={artistWithChanges.spotify_url}
+          value={artist.spotify_url}
           placeholder="https://open.spotify.com/artist/..."
-          onSave={(value) => onCellChange("spotify_url", value)}
+          onSave={(value) => onSave("spotify_url", value)}
         />
       </TableCell>
       <TableCell>
         <UrlCell
-          value={artistWithChanges.soundcloud_url}
+          value={artist.soundcloud_url}
           placeholder="https://soundcloud.com/..."
-          onSave={(value) => onCellChange("soundcloud_url", value)}
+          onSave={(value) => onSave("soundcloud_url", value)}
         />
       </TableCell>
       <TableCell>

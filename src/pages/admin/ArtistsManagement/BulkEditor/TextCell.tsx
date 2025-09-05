@@ -22,13 +22,25 @@ export function TextCell({
     setIsEditing(true);
   }
 
-  function handleSave() {
+  async function handleSave() {
     if (required && !editValue.trim()) {
       return;
     }
 
-    onSave(editValue.trim() || null);
-    setIsEditing(false);
+    const newValue = editValue.trim() || null;
+
+    // Only save if value actually changed
+    if (newValue === value) {
+      setIsEditing(false);
+      return;
+    }
+
+    try {
+      await onSave(newValue);
+      setIsEditing(false);
+    } catch (error) {
+      console.error("Failed to save:", error);
+    }
   }
 
   function handleCancel() {

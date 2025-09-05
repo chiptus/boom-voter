@@ -119,9 +119,10 @@ async function updateArtist(variables: {
 }
 
 // Hook
-export function useUpdateArtistMutation() {
+export function useUpdateArtistMutation(options?: { silent?: boolean }) {
   const queryClient = useQueryClient();
   const { toast } = useToast();
+  const silent = options?.silent ?? false;
 
   return useMutation({
     mutationFn: updateArtist,
@@ -132,17 +133,21 @@ export function useUpdateArtistMutation() {
       queryClient.invalidateQueries({
         queryKey: artistsKeys.detail(data.id),
       });
-      toast({
-        title: "Success",
-        description: "Artist updated successfully",
-      });
+      if (!silent) {
+        toast({
+          title: "Success",
+          description: "Artist updated successfully",
+        });
+      }
     },
     onError: (error) => {
-      toast({
-        title: "Error",
-        description: error?.message || "Failed to update artist",
-        variant: "destructive",
-      });
+      if (!silent) {
+        toast({
+          title: "Error",
+          description: error?.message || "Failed to update artist",
+          variant: "destructive",
+        });
+      }
     },
   });
 }

@@ -1,7 +1,6 @@
 import { useState, useMemo } from "react";
 import { Card, CardContent } from "@/components/ui/card";
-import { Artist, useArtistsQuery } from "@/hooks/queries/artists/useArtists";
-import { ChangePreviewDialog } from "./BulkEditor/ChangePreviewDialog";
+import { useArtistsQuery } from "@/hooks/queries/artists/useArtists";
 import { AddArtistDialog } from "./AddArtistDialog";
 import { BulkEditorHeader } from "./components/BulkEditorHeader";
 import { BulkEditorSearchAndActions } from "./components/BulkEditorSearchAndActions";
@@ -11,14 +10,11 @@ import { BulkEditorLoadingState } from "./components/BulkEditorLoadingState";
 import { useArtistSorting } from "./hooks/useArtistSorting";
 import { useArtistFiltering } from "./hooks/useArtistFiltering";
 import { useArtistSelection } from "./hooks/useArtistSelection";
-import { useArtistMutations } from "./hooks/useArtistMutations";
 
 // Re-export types from hooks for external use
-export type { ArtistChange } from "./hooks/useArtistChangeTracking";
 export type { SortConfig } from "./hooks/useArtistSorting";
 
 export function ArtistBulkEditor() {
-  const [showChangePreview, setShowChangePreview] = useState(false);
   const [addArtistOpen, setAddArtistOpen] = useState(false);
 
   const artistsQuery = useArtistsQuery();
@@ -29,13 +25,6 @@ export function ArtistBulkEditor() {
   const { searchTerm, setSearchTerm, filterArtists } = useArtistFiltering();
   const { selectedIds, handleSelectAll, handleSelectArtist, clearSelection } =
     useArtistSelection();
-  const {
-    changes,
-    handleFieldChange,
-    getArtistWithChanges,
-    resetChanges,
-    totalChanges,
-  } = useArtistMutations(artists);
 
   // Apply filtering and sorting
   const filteredAndSortedArtists = useMemo(() => {
@@ -43,17 +32,9 @@ export function ArtistBulkEditor() {
     return sortArtists(filtered);
   }, [artists, filterArtists, sortArtists]);
 
-  // Wrapper functions to match component interfaces
+  // Wrapper function for select all
   function handleSelectAllWrapper() {
     handleSelectAll(filteredAndSortedArtists.map((a) => a.id));
-  }
-
-  function handleCellChangeWrapper<T extends keyof Artist>(
-    artistId: string,
-    field: T,
-    newValue: Artist[T],
-  ) {
-    handleFieldChange(artistId, field, newValue);
   }
 
   if (artistsQuery.isLoading) {
@@ -63,12 +44,7 @@ export function ArtistBulkEditor() {
   return (
     <div className="space-y-6">
       <Card>
-        <BulkEditorHeader
-          totalChanges={totalChanges}
-          onAddArtist={() => setAddArtistOpen(true)}
-          onResetChanges={resetChanges}
-          onSaveChanges={() => setShowChangePreview(true)}
-        />
+        <BulkEditorHeader onAddArtist={() => setAddArtistOpen(true)} />
 
         <CardContent className="space-y-4">
           <BulkEditorSearchAndActions
@@ -83,15 +59,12 @@ export function ArtistBulkEditor() {
 
           <BulkEditorTable
             artists={filteredAndSortedArtists}
-            changes={changes}
             selectedIds={selectedIds}
             sortConfig={sortConfig}
             searchTerm={searchTerm}
             onSort={handleSort}
             onSelectAll={handleSelectAllWrapper}
             onSelectArtist={handleSelectArtist}
-            onCellChange={handleCellChangeWrapper}
-            getArtistWithChanges={getArtistWithChanges}
           />
 
           <BulkEditorFooter
@@ -101,20 +74,6 @@ export function ArtistBulkEditor() {
           />
         </CardContent>
       </Card>
-
-      {showChangePreview && (
-        <ChangePreviewDialog
-          changes={changes}
-          artists={artists}
-          onClose={() => setShowChangePreview(false)}
-          onConfirm={() => {
-            // TODO: Implement bulk save
-            console.log("Saving changes:", changes);
-            resetChanges();
-            setShowChangePreview(false);
-          }}
-        />
-      )}
 
       <AddArtistDialog
         open={addArtistOpen}

@@ -20,9 +20,21 @@ export function TextareaCell({
     setIsEditing(true);
   }
 
-  function handleSave() {
-    onSave(editValue.trim() || null);
-    setIsEditing(false);
+  async function handleSave() {
+    const newValue = editValue.trim() || null;
+
+    // Only save if value actually changed
+    if (newValue === value) {
+      setIsEditing(false);
+      return;
+    }
+
+    try {
+      await onSave(newValue);
+      setIsEditing(false);
+    } catch (error) {
+      console.error("Failed to save:", error);
+    }
   }
 
   function handleCancel() {
