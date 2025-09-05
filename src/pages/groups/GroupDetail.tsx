@@ -15,15 +15,14 @@ import { useToast } from "@/components/ui/use-toast";
 import { InviteManagement } from "./GroupDetail/InviteManagement";
 import { AddMemberForm } from "./GroupDetail/AddMemberForm";
 import { Button } from "@/components/ui/button";
-import { useGroupDetailQuery } from "@/hooks/queries/groups/useGroupDetail";
+import { useGroupBySlugQuery } from "@/hooks/queries/groups/useGroupBySlug";
 import { useGroupMembersQuery } from "@/hooks/queries/groups/useGroupMembers";
 import { useRemoveMemberMutation } from "@/hooks/queries/groups/useRemoveMember";
 
 function GroupDetail() {
-  const { groupId } = useParams<{ groupId: string }>();
+  const { groupSlug } = useParams<{ groupSlug: string }>();
   const navigate = useNavigate();
   const { user, loading: authLoading } = useAuth();
-  const removeMemberMutation = useRemoveMemberMutation(groupId || "");
   const { toast } = useToast();
   const [removingMember, setRemovingMember] = useState<string | null>(null);
 
@@ -32,16 +31,17 @@ function GroupDetail() {
     data: group,
     isLoading: groupLoading,
     error: groupError,
-  } = useGroupDetailQuery(groupId || "");
+  } = useGroupBySlugQuery({ slug: groupSlug, userId: user?.id });
   const { data: members = [], isLoading: membersLoading } =
-    useGroupMembersQuery(groupId || "");
+    useGroupMembersQuery(group?.id || "");
+  const removeMemberMutation = useRemoveMemberMutation(group?.id || "");
 
   const loading = groupLoading || membersLoading;
 
   useEffect(() => {
     if (authLoading) return; // Wait for auth to load
 
-    if (!groupId) {
+    if (!groupSlug) {
       navigate("/groups");
       return;
     }
@@ -60,7 +60,7 @@ function GroupDetail() {
       });
       navigate("/groups");
     }
-  }, [groupId, user, authLoading, groupError, navigate, toast]);
+  }, [groupSlug, user, authLoading, groupError, navigate, toast]);
 
   // Show loading while checking authentication
   if (authLoading) {
@@ -161,7 +161,7 @@ function GroupDetail() {
 
           <TabsContent value="members" className="space-y-4">
             {/* Member Invitation Form - Only show for creators */}
-            {isCreator && <AddMemberForm groupId={groupId!} />}
+            {isCreator && <AddMemberForm groupId={group.id} />}
 
             <Card className="bg-white/10 border-purple-400/30">
               <CardHeader>
@@ -247,7 +247,7 @@ function GroupDetail() {
 
           {isCreator && (
             <TabsContent value="invites" className="space-y-4">
-              <InviteManagement groupId={groupId!} groupName={group.name} />
+              <InviteManagement groupId={group.id} groupName={group.name} />
             </TabsContent>
           )}
         </Tabs>
@@ -256,7 +256,7 @@ function GroupDetail() {
   );
 
   async function handleRemoveMember(memberId: string, memberUserId: string) {
-    if (!groupId || !user) return;
+    if (!group?.id || !user) return;
 
     if (
       window.confirm(

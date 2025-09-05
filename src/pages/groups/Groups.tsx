@@ -95,8 +95,8 @@ function Groups() {
         <CreateGroupDialog
           isOpen={createDialogOpen}
           onOpenChange={setCreateDialogOpen}
-          onGroupCreated={(groupId) => {
-            navigate(`/groups/${groupId}`);
+          onGroupCreated={(groupSlug) => {
+            navigate(`/groups/${groupSlug}`);
             setCreateDialogOpen(false);
           }}
         />

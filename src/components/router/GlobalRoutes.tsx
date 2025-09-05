@@ -21,7 +21,7 @@ export function GlobalRoutes() {
     <Routes>
       {/* Global routes (not scoped to festival/edition) */}
       <Route path="/groups" element={<Groups />} />
-      <Route path="/groups/:groupId" element={<GroupDetail />} />
+      <Route path="/groups/:groupSlug" element={<GroupDetail />} />
 
       {/* Admin routes */}
       <Route path="/admin" element={<AdminLayout />}>
