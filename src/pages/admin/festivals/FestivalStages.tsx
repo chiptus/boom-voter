@@ -2,11 +2,16 @@ import { useParams } from "react-router-dom";
 import { StageManagement } from "./StageManagement";
 
 export default function FestivalStages() {
-  const { editionId } = useParams<{ editionId: string }>();
+  const { editionSlug, festivalSlug } = useParams<{
+    editionSlug: string;
+    festivalSlug: string;
+  }>();
 
-  if (!editionId) {
+  if (!editionSlug || !festivalSlug) {
     return <div>Edition not found</div>;
   }
 
-  return <StageManagement editionId={editionId} />;
+  return (
+    <StageManagement editionSlug={editionSlug} festivalSlug={festivalSlug} />
+  );
 }

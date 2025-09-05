@@ -30,8 +30,8 @@ export function GlobalRoutes() {
         <Route path="analytics" element={<AdminAnalytics />} />
         <Route path="admins" element={<AdminRolesTable />} />
         <Route path="festivals" element={<AdminFestivals />}>
-          <Route path=":festivalId" element={<FestivalDetail />}>
-            <Route path="editions/:editionId" element={<FestivalEdition />}>
+          <Route path=":festivalSlug" element={<FestivalDetail />}>
+            <Route path="editions/:editionSlug" element={<FestivalEdition />}>
               <Route index element={<FestivalStages />} />
               <Route path="stages" element={<FestivalStages />} />
               <Route path="sets" element={<FestivalSets />} />

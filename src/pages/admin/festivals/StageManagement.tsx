@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useStagesByEditionQuery } from "@/hooks/queries/stages/useStagesByEdition";
+import { useFestivalEditionBySlugQuery } from "@/hooks/queries/festivals/editions/useFestivalEditionBySlug";
 import { useCreateStageMutation } from "@/hooks/queries/stages/useCreateStage";
 import { useUpdateStageMutation } from "@/hooks/queries/stages/useUpdateStage";
 import { useDeleteStageMutation } from "@/hooks/queries/stages/useDeleteStage";
@@ -33,11 +34,22 @@ interface StageFormData {
 }
 
 interface StageManagementProps {
-  editionId: string;
+  editionSlug: string;
+  festivalSlug: string;
 }
 
-export function StageManagement({ editionId }: StageManagementProps) {
-  const { data: stages = [], isLoading } = useStagesByEditionQuery(editionId);
+export function StageManagement({
+  editionSlug,
+  festivalSlug,
+}: StageManagementProps) {
+  // All hooks must be at the top level
+  const editionQuery = useFestivalEditionBySlugQuery({
+    editionSlug,
+    festivalSlug,
+  });
+  const { data: stages = [], isLoading } = useStagesByEditionQuery(
+    editionQuery.data?.id,
+  );
   const createStageMutation = useCreateStageMutation();
   const updateStageMutation = useUpdateStageMutation();
   const deleteStageMutation = useDeleteStageMutation();
@@ -49,6 +61,27 @@ export function StageManagement({ editionId }: StageManagementProps) {
     name: "",
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  if (editionQuery.isLoading) {
+    return (
+      <Card>
+        <CardContent className="flex items-center justify-center p-8">
+          <Loader2 className="h-6 w-6 animate-spin mr-2" />
+          <span>Loading edition...</span>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  if (!editionQuery.data) {
+    return (
+      <Card>
+        <CardContent className="flex items-center justify-center p-8">
+          <span>Edition not found</span>
+        </CardContent>
+      </Card>
+    );
+  }
 
   function resetForm() {
     setFormData({
@@ -91,7 +124,7 @@ export function StageManagement({ editionId }: StageManagementProps) {
       } else {
         await createStageMutation.mutateAsync({
           ...formData,
-          festival_edition_id: editionId,
+          festival_edition_id: editionQuery.data!.id,
         });
       }
 
@@ -116,7 +149,7 @@ export function StageManagement({ editionId }: StageManagementProps) {
 
   // Filter stages by selected edition
   const filteredStages = stages.filter(
-    (stage) => stage.festival_edition_id === editionId,
+    (stage) => stage.festival_edition_id === editionQuery.data.id,
   );
 
   if (isLoading) {
@@ -139,7 +172,7 @@ export function StageManagement({ editionId }: StageManagementProps) {
             Stage Management
           </span>
           <div className="flex gap-2">
-            <CSVImportDialog editionId={editionId}>
+            <CSVImportDialog editionId={editionQuery.data.id}>
               <Button variant="outline">
                 <Upload className="h-4 w-4 mr-2" />
                 Import CSV
