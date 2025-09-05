@@ -46,8 +46,14 @@ export default defineConfig(({ mode }) => ({
           },
         ],
       },
-      includeAssets: ["favicon.svg", "icon-512.png", "robots.txt"],
+      includeAssets: [
+        "favicon.svg",
+        "icon-512.png",
+        "timeline-screenshot.png",
+        "robots.txt",
+      ],
       manifest: {
+        id: "/",
         name: "UpLine",
         short_name: "UpLine",
         description: "UpLine - Your Festival companion",
@@ -57,7 +63,20 @@ export default defineConfig(({ mode }) => ({
         orientation: "portrait",
         scope: "/",
         start_url: "/",
+        dir: "ltr",
         categories: ["entertainment", "music"],
+        prefer_related_applications: false,
+        launch_handler: {
+          client_mode: "focus-existing",
+        },
+        screenshots: [
+          {
+            src: "timeline-screenshot.png",
+            sizes: "1920x1080",
+            type: "image/png",
+            form_factor: "wide",
+          },
+        ],
         icons: [
           {
             src: "favicon.svg",
@@ -69,7 +88,13 @@ export default defineConfig(({ mode }) => ({
             src: "icon-512.png",
             sizes: "512x512",
             type: "image/png",
-            purpose: "any maskable",
+            purpose: "any",
+          },
+          {
+            src: "icon-512.png",
+            sizes: "512x512",
+            type: "image/png",
+            purpose: "maskable",
           },
         ],
       },
