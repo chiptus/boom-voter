@@ -114,6 +114,10 @@ src/
 - **Forms**: ALL forms must use react-hook-form with proper validation. Never use plain HTML forms or manual state management for form inputs. Use @hookform/resolvers for validation schemas when needed.
 - **Long Components**: Break long components (>150 lines) into smaller focused pieces. Follow the FilterSortControls pattern of primary controls + expandable sections.
 
+#### Function Definitions After Return in React Components
+
+In this codebase, it is acceptable and preferred to define helper functions (such as event handlers) after the main component’s return statement. This style improves readability by keeping the primary component logic at the top and allowing additional details to be found below. JavaScript and TypeScript support function hoisting for function declarations, so this pattern is safe and intentional. Please do not flag this as a style issue in reviews.
+
 ### Important Notes
 
 - Server runs on port 8080 (not standard 3000)
