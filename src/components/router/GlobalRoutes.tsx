@@ -6,7 +6,6 @@ import FestivalDetail from "@/pages/admin/festivals/FestivalDetail";
 import FestivalEdition from "@/pages/admin/festivals/FestivalEdition";
 import FestivalSets from "@/pages/admin/festivals/FestivalSets";
 import FestivalStages from "@/pages/admin/festivals/FestivalStages";
-import FestivalInfo from "@/pages/admin/festivals/FestivalInfo";
 import AdminLayout from "@/pages/admin/AdminLayout";
 import CookiePolicy from "@/pages/legal/CookiePolicy";
 import GroupDetail from "@/pages/groups/GroupDetail";
@@ -32,7 +31,6 @@ export function GlobalRoutes() {
         <Route path="admins" element={<AdminRolesTable />} />
         <Route path="festivals" element={<AdminFestivals />}>
           <Route path=":festivalSlug" element={<FestivalDetail />}>
-            <Route path="info" element={<FestivalInfo />} />
             <Route path="editions/:editionSlug" element={<FestivalEdition />}>
               <Route index element={<FestivalStages />} />
               <Route path="stages" element={<FestivalStages />} />
