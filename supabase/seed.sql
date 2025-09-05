@@ -36,9 +36,9 @@ INSERT INTO public.admin_roles (user_id, role, created_by, created_at) VALUES
 -- (The genres were already seeded in the initial migration)
 
 -- Create test groups
-INSERT INTO public.groups (id, name, description, created_by, created_at, updated_at) VALUES 
-  ('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', 'Festival Friends', 'Main group for our festival crew', '22222222-2222-2222-2222-222222222222', now(), now()),
-  ('bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb', 'Electronic Music Lovers', 'For serious electronic music enthusiasts', '33333333-3333-3333-3333-333333333333', now(), now());
+INSERT INTO public.groups (id, name, slug, description, created_by, created_at, updated_at) VALUES 
+  ('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', 'Festival Friends', 'festival-friends', 'Main group for our festival crew', '22222222-2222-2222-2222-222222222222', now(), now()),
+  ('bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb', 'Electronic Music Lovers', 'electronic-music-lovers', 'For serious electronic music enthusiasts', '33333333-3333-3333-3333-333333333333', now(), now());
 
 -- Add members to groups
 INSERT INTO public.group_members (group_id, user_id, role, joined_at) VALUES 
@@ -158,10 +158,10 @@ INSERT INTO public.festival_editions (id, festival_id, year, slug, name, descrip
   ('e1111111-1111-1111-1111-111111111111', 'f1111111-1111-1111-1111-111111111111', 2025, '2025', 'Boom Festival 2025', 'The 2025 edition of Boom Festival', 'Idanha-a-Nova, Portugal', '2025-07-12', '2025-07-14', true, now(), now());
 
 -- Insert stages
-INSERT INTO public.stages (id, name, festival_edition_id, created_at, updated_at) VALUES 
-  ('11111111-1111-1111-1111-11111111111a', 'Main Stage', 'e1111111-1111-1111-1111-111111111111', now(), now()),
-  ('22222222-2222-2222-2222-22222222222b', 'Club Stage', 'e1111111-1111-1111-1111-111111111111', now(), now()),
-  ('33333333-3333-3333-3333-33333333333c', 'Ambient Garden', 'e1111111-1111-1111-1111-111111111111', now(), now());
+INSERT INTO public.stages (id, name, slug, festival_edition_id, created_at, updated_at) VALUES 
+  ('11111111-1111-1111-1111-11111111111a', 'Main Stage', 'main-stage', 'e1111111-1111-1111-1111-111111111111', now(), now()),
+  ('22222222-2222-2222-2222-22222222222b', 'Club Stage', 'club-stage', 'e1111111-1111-1111-1111-111111111111', now(), now()),
+  ('33333333-3333-3333-3333-33333333333c', 'Ambient Garden', 'ambient-garden', 'e1111111-1111-1111-1111-111111111111', now(), now());
 
 -- Insert sets (one for each artist, using their name and schedule)
 INSERT INTO public.sets (id, name, slug, festival_edition_id, stage_id, time_start, time_end, description, created_by, created_at, updated_at) VALUES 

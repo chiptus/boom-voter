@@ -18,7 +18,7 @@ import { Users } from "lucide-react";
 interface CreateGroupDialogProps {
   isOpen: boolean;
   onOpenChange: (open: boolean) => void;
-  onGroupCreated: (groupId: string) => void;
+  onGroupCreated: (groupSlug: string) => void;
 }
 
 interface FormData {
@@ -50,10 +50,10 @@ export function CreateGroupDialog({
       },
       {
         onSuccess: (group) => {
-          if (group && group.id) {
+          if (group && group.slug) {
             reset();
             onOpenChange(false);
-            onGroupCreated(group.id);
+            onGroupCreated(group.slug);
           }
         },
       },

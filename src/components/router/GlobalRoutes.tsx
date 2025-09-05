@@ -21,7 +21,7 @@ export function GlobalRoutes() {
     <Routes>
       {/* Global routes (not scoped to festival/edition) */}
       <Route path="/groups" element={<Groups />} />
-      <Route path="/groups/:groupId" element={<GroupDetail />} />
+      <Route path="/groups/:groupSlug" element={<GroupDetail />} />
 
       {/* Admin routes */}
       <Route path="/admin" element={<AdminLayout />}>
@@ -30,8 +30,8 @@ export function GlobalRoutes() {
         <Route path="analytics" element={<AdminAnalytics />} />
         <Route path="admins" element={<AdminRolesTable />} />
         <Route path="festivals" element={<AdminFestivals />}>
-          <Route path=":festivalId" element={<FestivalDetail />}>
-            <Route path="editions/:editionId" element={<FestivalEdition />}>
+          <Route path=":festivalSlug" element={<FestivalDetail />}>
+            <Route path="editions/:editionSlug" element={<FestivalEdition />}>
               <Route index element={<FestivalStages />} />
               <Route path="stages" element={<FestivalStages />} />
               <Route path="sets" element={<FestivalSets />} />

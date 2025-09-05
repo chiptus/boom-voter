@@ -2,6 +2,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { stagesKeys } from "./types";
+import { generateSlug } from "@/lib/slug";
 
 async function createStage(stageData: {
   name: string;
@@ -9,7 +10,10 @@ async function createStage(stageData: {
 }) {
   const { data, error } = await supabase
     .from("stages")
-    .insert(stageData)
+    .insert({
+      ...stageData,
+      slug: generateSlug(stageData.name),
+    })
     .select()
     .single();
 

@@ -96,6 +96,7 @@ export async function importStages(
   try {
     const stageInserts = stages.map((stage) => ({
       name: stage.name,
+      slug: generateSlug(stage.name),
       festival_edition_id: editionId,
       archived: false,
     }));

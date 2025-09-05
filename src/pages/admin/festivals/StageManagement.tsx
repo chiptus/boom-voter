@@ -1,5 +1,7 @@
 import { useState } from "react";
+import { useOutletContext } from "react-router-dom";
 import { useStagesByEditionQuery } from "@/hooks/queries/stages/useStagesByEdition";
+import { FestivalEdition } from "@/hooks/queries/festivals/editions/types";
 import { useCreateStageMutation } from "@/hooks/queries/stages/useCreateStage";
 import { useUpdateStageMutation } from "@/hooks/queries/stages/useUpdateStage";
 import { useDeleteStageMutation } from "@/hooks/queries/stages/useDeleteStage";
@@ -32,12 +34,12 @@ interface StageFormData {
   name: string;
 }
 
-interface StageManagementProps {
-  editionId: string;
-}
+interface StageManagementProps {}
 
-export function StageManagement({ editionId }: StageManagementProps) {
-  const { data: stages = [], isLoading } = useStagesByEditionQuery(editionId);
+export function StageManagement(_props: StageManagementProps) {
+  // All hooks must be at the top level
+  const { edition } = useOutletContext<{ edition: FestivalEdition }>();
+  const { data: stages = [], isLoading } = useStagesByEditionQuery(edition.id);
   const createStageMutation = useCreateStageMutation();
   const updateStageMutation = useUpdateStageMutation();
   const deleteStageMutation = useDeleteStageMutation();
@@ -91,7 +93,7 @@ export function StageManagement({ editionId }: StageManagementProps) {
       } else {
         await createStageMutation.mutateAsync({
           ...formData,
-          festival_edition_id: editionId,
+          festival_edition_id: edition.id,
         });
       }
 
@@ -116,7 +118,7 @@ export function StageManagement({ editionId }: StageManagementProps) {
 
   // Filter stages by selected edition
   const filteredStages = stages.filter(
-    (stage) => stage.festival_edition_id === editionId,
+    (stage) => stage.festival_edition_id === edition.id,
   );
 
   if (isLoading) {
@@ -139,7 +141,7 @@ export function StageManagement({ editionId }: StageManagementProps) {
             Stage Management
           </span>
           <div className="flex gap-2">
-            <CSVImportDialog editionId={editionId}>
+            <CSVImportDialog editionId={edition.id}>
               <Button variant="outline">
                 <Upload className="h-4 w-4 mr-2" />
                 Import CSV

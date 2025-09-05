@@ -16,10 +16,10 @@ interface SubdomainRedirectProps {
 export function SubdomainRedirect({
   component: Component,
 }: SubdomainRedirectProps) {
-  const { festivalSlug, editionSlug, setId } = useParams<{
+  const { festivalSlug, editionSlug, setSlug } = useParams<{
     festivalSlug?: string;
     editionSlug?: string;
-    setId?: string;
+    setSlug?: string;
   }>();
 
   const shouldNotRedirect = !isMainGetuplineDomain();
@@ -32,8 +32,8 @@ export function SubdomainRedirect({
     // Build the target path based on current route
     let targetPath = "/";
 
-    if (editionSlug && setId) {
-      targetPath = `/editions/${editionSlug}/sets/${setId}`;
+    if (editionSlug && setSlug) {
+      targetPath = `/editions/${editionSlug}/sets/${setSlug}`;
     } else if (editionSlug && window.location.pathname.includes("schedule")) {
       targetPath = `/editions/${editionSlug}/schedule`;
     } else if (editionSlug) {
@@ -43,7 +43,7 @@ export function SubdomainRedirect({
     // Redirect to subdomain
     const subdomainUrl = createFestivalSubdomainUrl(festivalSlug, targetPath);
     window.location.href = subdomainUrl;
-  }, [festivalSlug, editionSlug, setId, shouldNotRedirect]);
+  }, [festivalSlug, editionSlug, setSlug, shouldNotRedirect]);
 
   if (shouldNotRedirect) {
     return <Component />;

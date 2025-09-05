@@ -12,15 +12,15 @@ export default function AdminFestivals() {
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
 
   const navigate = useNavigate();
-  const { festivalId = "" } = useParams<{
-    festivalId?: string;
+  const { festivalSlug = "" } = useParams<{
+    festivalSlug?: string;
   }>();
 
-  function handleFestivalChange(festivalId: string) {
-    if (festivalId === "none") {
+  function handleFestivalChange(festivalSlug: string) {
+    if (festivalSlug === "none") {
       navigate("/admin/festivals");
     } else {
-      navigate(`/admin/festivals/${festivalId}`);
+      navigate(`/admin/festivals/${festivalSlug}`);
     }
   }
 
@@ -50,9 +50,9 @@ export default function AdminFestivals() {
               setIsEditDialogOpen(true);
             }}
             onSelect={(festival) => {
-              handleFestivalChange(festival.id);
+              handleFestivalChange(festival.slug);
             }}
-            selected={festivalId}
+            selected={festivalSlug}
           />
         </CardContent>
       </Card>

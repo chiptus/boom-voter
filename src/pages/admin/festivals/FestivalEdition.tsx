@@ -3,12 +3,12 @@ import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Loader2, MapPin, Music } from "lucide-react";
 import { useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { useFestivalEditionsForFestivalQuery } from "@/hooks/queries/festivals/editions/useFestivalEditionsForFestival";
+import { useFestivalEditionBySlugQuery } from "@/hooks/queries/festivals/editions/useFestivalEditionBySlug";
 
 export default function FestivalEdition() {
-  const { festivalId, editionId } = useParams<{
-    festivalId: string;
-    editionId: string;
+  const { festivalSlug, editionSlug } = useParams<{
+    festivalSlug: string;
+    editionSlug: string;
   }>();
   const location = useLocation();
   const navigate = useNavigate();
@@ -16,26 +16,27 @@ export default function FestivalEdition() {
   // Redirect to stages if we're at the index route
   useEffect(() => {
     if (
-      festivalId &&
-      editionId &&
+      festivalSlug &&
+      editionSlug &&
       location.pathname ===
-        `/admin/festivals/${festivalId}/editions/${editionId}`
+        `/admin/festivals/${festivalSlug}/editions/${editionSlug}`
     ) {
-      navigate(`/admin/festivals/${festivalId}/editions/${editionId}/stages`);
+      navigate(
+        `/admin/festivals/${festivalSlug}/editions/${editionSlug}/stages`,
+      );
     }
-  }, [location.pathname, festivalId, editionId, navigate]);
+  }, [location.pathname, festivalSlug, editionSlug, navigate]);
 
-  const editionsQuery = useFestivalEditionsForFestivalQuery(festivalId);
+  const editionQuery = useFestivalEditionBySlugQuery({
+    festivalSlug,
+    editionSlug,
+  });
 
-  if (!festivalId || !editionId) {
+  if (!festivalSlug || !editionSlug) {
     return <div>Festival or edition not found</div>;
   }
 
-  if (editionsQuery.isLoading) {
-    return <Card>Loading edition data</Card>;
-  }
-
-  if (editionsQuery.isLoading) {
+  if (editionQuery.isLoading) {
     return (
       <Card>
         <CardContent className="flex items-center justify-center p-8">
@@ -46,7 +47,7 @@ export default function FestivalEdition() {
     );
   }
 
-  const currentEdition = editionsQuery.data?.find((f) => f.id === editionId);
+  const currentEdition = editionQuery.data;
 
   if (!currentEdition) {
     return (
@@ -68,7 +69,9 @@ export default function FestivalEdition() {
   const currentSubTab = getCurrentSubTab();
 
   function handleSubTabChange(value: string) {
-    navigate(`/admin/festivals/${festivalId}/editions/${editionId}/${value}`);
+    navigate(
+      `/admin/festivals/${festivalSlug}/editions/${editionSlug}/${value}`,
+    );
   }
 
   return (
@@ -105,7 +108,7 @@ export default function FestivalEdition() {
         </TabsList>
 
         <div className="mt-6">
-          <Outlet />
+          <Outlet context={{ edition: currentEdition }} />
         </div>
       </Tabs>
     </div>

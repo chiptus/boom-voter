@@ -1,21 +1,21 @@
 import { useParams, useNavigate, Outlet } from "react-router-dom";
 import { FestivalEditionManagement } from "./FestivalEditionManagement";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
-import { useFestivalQuery } from "@/hooks/queries/festivals/useFestival";
+import { useFestivalBySlugQuery } from "@/hooks/queries/festivals/useFestivalBySlug";
 import { Loader2 } from "lucide-react";
 
 export default function FestivalDetail() {
-  const { festivalId, editionId = "" } = useParams<{
-    festivalId: string;
-    editionId?: string;
+  const { festivalSlug, editionSlug = "" } = useParams<{
+    festivalSlug: string;
+    editionSlug?: string;
   }>();
   // const [selectedEditionId, setSelectedEditionId] = useState("");
   const navigate = useNavigate();
 
-  const festivalQuery = useFestivalQuery(festivalId);
+  const festivalQuery = useFestivalBySlugQuery(festivalSlug);
 
-  if (!festivalId) {
-    return <div>festivalId param is missing</div>;
+  if (!festivalSlug) {
+    return <div>festivalSlug param is missing</div>;
   }
 
   if (festivalQuery.isLoading) {
@@ -39,8 +39,8 @@ export default function FestivalDetail() {
     );
   }
 
-  function handleEditionSelect(editionId: string) {
-    navigate(`/admin/festivals/${festivalId}/editions/${editionId}/stages`);
+  function handleEditionSelect(editionSlug: string) {
+    navigate(`/admin/festivals/${festivalSlug}/editions/${editionSlug}/stages`);
   }
 
   const festival = festivalQuery.data;
@@ -58,11 +58,11 @@ export default function FestivalDetail() {
 
         <div className="mt-6">
           <FestivalEditionManagement
-            festivalId={festivalId}
-            onSelect={(editionId) => {
-              handleEditionSelect(editionId);
+            festivalSlug={festivalSlug}
+            onSelect={(editionSlug) => {
+              handleEditionSelect(editionSlug);
             }}
-            selected={editionId}
+            selected={editionSlug}
           />
         </div>
       </>

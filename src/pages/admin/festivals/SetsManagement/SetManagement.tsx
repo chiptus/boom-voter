@@ -1,24 +1,24 @@
 import { useState } from "react";
+import { useOutletContext } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Loader2, Plus, Music, Upload } from "lucide-react";
 import { CSVImportDialog } from "../CSVImportDialog";
 import { FestivalSet } from "@/hooks/queries/sets/useSets";
 import { useSetsQuery } from "@/hooks/queries/sets/useSets";
+import { FestivalEdition } from "@/hooks/queries/festivals/editions/types";
 import { useDeleteSetMutation } from "@/hooks/queries/sets/useDeleteSet";
 import { SetFormDialog } from "../SetFormDialog";
 import { SetsTable } from "../SetsTable";
 
-interface SetManagementProps {
-  editionId: string;
-}
+interface SetManagementProps {}
 
-export function SetManagement({ editionId }: SetManagementProps) {
+export function SetManagement(_props: SetManagementProps) {
+  // All hooks must be at the top level
+  const { edition } = useOutletContext<{ edition: FestivalEdition }>();
   const { data: sets = [], isLoading } = useSetsQuery();
-
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingSet, setEditingSet] = useState<FestivalSet | null>(null);
-
   const deleteSetMutation = useDeleteSetMutation();
 
   function handleCreate() {
@@ -50,7 +50,7 @@ export function SetManagement({ editionId }: SetManagementProps) {
 
   // Filter sets by selected edition
   const filteredSets = sets.filter(
-    (set) => set.festival_edition_id === editionId,
+    (set) => set.festival_edition_id === edition.id,
   );
 
   if (isLoading) {
@@ -73,7 +73,7 @@ export function SetManagement({ editionId }: SetManagementProps) {
             Set Management
           </span>
           <div className="flex gap-2">
-            <CSVImportDialog editionId={editionId} defaultTab="sets">
+            <CSVImportDialog editionId={edition.id} defaultTab="sets">
               <Button variant="outline">
                 <Upload className="h-4 w-4 mr-2" />
                 Import CSV
@@ -94,7 +94,7 @@ export function SetManagement({ editionId }: SetManagementProps) {
           sets={filteredSets}
           onEdit={handleEdit}
           onDelete={handleDelete}
-          editionId={editionId}
+          editionId={edition.id}
         />
       </CardContent>
 
@@ -102,7 +102,7 @@ export function SetManagement({ editionId }: SetManagementProps) {
         isOpen={isDialogOpen}
         onClose={handleCloseDialog}
         editingSet={editingSet}
-        editionId={editionId}
+        editionId={edition.id}
       />
     </Card>
   );

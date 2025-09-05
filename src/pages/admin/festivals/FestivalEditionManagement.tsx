@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useFestivalEditionsForFestivalQuery } from "@/hooks/queries/festivals/editions/useFestivalEditionsForFestival";
+import { useFestivalBySlugQuery } from "@/hooks/queries/festivals/useFestivalBySlug";
 import { useCreateFestivalEditionMutation } from "@/hooks/queries/festivals/editions/useCreateFestivalEdition";
 import { useUpdateFestivalEditionMutation } from "@/hooks/queries/festivals/editions/useUpdateFestivalEdition";
 import { useDeleteFestivalEditionMutation } from "@/hooks/queries/festivals/editions/useDeleteFestivalEdition";
@@ -40,16 +41,18 @@ interface EditionFormData {
 }
 
 export function FestivalEditionManagement({
-  festivalId,
+  festivalSlug,
   onSelect,
   selected,
 }: {
-  festivalId: string;
-  onSelect: (editionId: string) => void;
+  festivalSlug: string;
+  onSelect: (editionSlug: string) => void;
   selected: string;
 }) {
+  // All hooks must be at the top level
+  const festivalQuery = useFestivalBySlugQuery(festivalSlug);
   const { data: editions = [], isLoading } =
-    useFestivalEditionsForFestivalQuery(festivalId, { all: true });
+    useFestivalEditionsForFestivalQuery(festivalQuery.data?.id, { all: true });
   const createEditionMutation = useCreateFestivalEditionMutation();
   const updateEditionMutation = useUpdateFestivalEditionMutation();
   const deleteEditionMutation = useDeleteFestivalEditionMutation();
@@ -69,6 +72,27 @@ export function FestivalEditionManagement({
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [slugError, setSlugError] = useState("");
+
+  if (festivalQuery.isLoading) {
+    return (
+      <Card>
+        <CardContent className="flex items-center justify-center p-8">
+          <Loader2 className="h-6 w-6 animate-spin mr-2" />
+          <span>Loading festival...</span>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  if (!festivalQuery.data) {
+    return (
+      <Card>
+        <CardContent className="flex items-center justify-center p-8">
+          <span>Festival not found</span>
+        </CardContent>
+      </Card>
+    );
+  }
 
   function resetForm() {
     setFormData({
@@ -164,7 +188,7 @@ export function FestivalEditionManagement({
         ...formData,
         start_date: formData.start_date || null,
         end_date: formData.end_date || null,
-        festival_id: festivalId,
+        festival_id: festivalQuery.data!.id,
       };
 
       if (editingEdition) {
@@ -365,9 +389,9 @@ export function FestivalEditionManagement({
               {editions.map((edition) => (
                 <TableRow
                   key={edition.id}
-                  onClick={() => onSelect(edition.id)}
+                  onClick={() => onSelect(edition.slug)}
                   className={cn(
-                    selected === edition.id ? "bg-slate-200 selected" : "",
+                    selected === edition.slug ? "bg-slate-200 selected" : "",
                   )}
                 >
                   <TableCell>{edition.name}</TableCell>
