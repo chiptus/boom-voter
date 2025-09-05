@@ -42,7 +42,7 @@ async function getUserGroupIds(userId: string): Promise<string[]> {
 
 // Helper function to add member counts to groups
 async function addMemberCounts(
-  groups: any[],
+  groups: Group[],
   userId: string,
   userGroupIds: string[],
   isUserGroupsOnly: boolean = false,
@@ -68,7 +68,7 @@ async function addMemberCounts(
 async function fetchGroupsFromDb(
   shouldFetchAll: boolean,
   userGroupIds: string[],
-): Promise<any[]> {
+) {
   let groupsQuery = supabase
     .from("groups")
     .select("*")

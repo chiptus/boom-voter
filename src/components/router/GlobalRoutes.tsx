@@ -14,7 +14,8 @@ import PrivacyPolicy from "@/pages/legal/PrivacyPolicy";
 import TermsOfService from "@/pages/legal/TermsOfService";
 import NotFound from "@/pages/NotFound";
 import { AdminRolesTable } from "@/pages/admin/Roles/AdminRolesTable";
-import { ArtistsManagement } from "@/pages/admin/ArtistsManagement/ArtistsManagement";
+import { DuplicateArtistsPage } from "@/pages/admin/ArtistsManagement/DuplicateArtistsPage";
+import { ArtistBulkEditor } from "@/pages/admin/ArtistsManagement/ArtistBulkEditor";
 
 export function GlobalRoutes() {
   return (
@@ -26,7 +27,8 @@ export function GlobalRoutes() {
       {/* Admin routes */}
       <Route path="/admin" element={<AdminLayout />}>
         <Route index element={<Navigate to="artists" />} />
-        <Route path="artists" element={<ArtistsManagement />} />
+        <Route path="artists" element={<ArtistBulkEditor />} />
+        <Route path="artists/duplicates" element={<DuplicateArtistsPage />} />
         <Route path="analytics" element={<AdminAnalytics />} />
         <Route path="admins" element={<AdminRolesTable />} />
         <Route path="festivals" element={<AdminFestivals />}>

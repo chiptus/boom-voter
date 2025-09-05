@@ -132,6 +132,7 @@ export function useUpdateArtistMutation() {
       queryClient.invalidateQueries({
         queryKey: artistsKeys.detail(data.id),
       });
+
       toast({
         title: "Success",
         description: "Artist updated successfully",

@@ -38,7 +38,7 @@ export function useSignInWithOtpMutation() {
           "We've sent you a magic link and a 6-digit code. Click the link or enter the code below.",
       });
     },
-    onError: (error: any) => {
+    onError: (error) => {
       toast({
         title: "Error",
         description: error.message,

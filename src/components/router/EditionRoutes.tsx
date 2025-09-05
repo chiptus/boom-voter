@@ -13,7 +13,7 @@ import { ScheduleTab } from "@/pages/EditionView/tabs/ScheduleTab";
 
 interface EditionRoutesProps {
   basePath: string;
-  WrapperComponent?: React.ComponentType<any>;
+  WrapperComponent?: React.ComponentType<{ component: React.ComponentType }>;
 }
 
 export function createEditionRoutes({
