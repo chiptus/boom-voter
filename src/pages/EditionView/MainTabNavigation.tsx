@@ -1,5 +1,5 @@
 import { cn } from "@/lib/utils";
-import { Calendar, List, Map, Info, MessageSquare } from "lucide-react";
+import { Calendar, List, Map, Info } from "lucide-react";
 import { NavLink } from "react-router-dom";
 import { useFestivalEdition } from "@/contexts/FestivalEditionContext";
 
@@ -22,20 +22,20 @@ const TAB_CONFIG = {
     icon: Map,
     label: "Map",
     shortLabel: "Map",
-    disabled: true,
+    disabled: false,
   },
   info: {
     icon: Info,
     label: "Info",
     shortLabel: "Info",
-    disabled: true,
+    disabled: false,
   },
-  social: {
-    icon: MessageSquare,
-    label: "Social",
-    shortLabel: "Social",
-    disabled: true,
-  },
+  // social: {
+  //   icon: MessageSquare,
+  //   label: "Social",
+  //   shortLabel: "Social",
+  //   disabled: true,
+  // },
 } as const;
 
 export function MainTabNavigation() {

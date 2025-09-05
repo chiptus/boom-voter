@@ -5,12 +5,13 @@ import { festivalsKeys } from "./types";
 
 async function updateFestival(
   festivalId: string,
-  festivalData: {
+  festivalData: Partial<{
     name: string;
     slug: string;
     description?: string;
+    published?: boolean;
     logo_url?: string | null;
-  },
+  }>,
 ) {
   const { data, error } = await supabase
     .from("festivals")
@@ -33,12 +34,13 @@ export function useUpdateFestivalMutation() {
       festivalData,
     }: {
       festivalId: string;
-      festivalData: {
+      festivalData: Partial<{
         name: string;
         slug: string;
         description?: string;
+        published?: boolean;
         logo_url?: string | null;
-      };
+      }>;
     }) => updateFestival(festivalId, festivalData),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: festivalsKeys.all() });

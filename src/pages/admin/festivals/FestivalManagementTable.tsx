@@ -67,8 +67,7 @@ export function FestivalManagementTable({
           <TableRow>
             <TableHead>Logo</TableHead>
             <TableHead>Name</TableHead>
-            <TableHead>Description</TableHead>
-            <TableHead>Website</TableHead>
+
             <TableHead className="w-32">Actions</TableHead>
           </TableRow>
         </TableHeader>
@@ -95,21 +94,7 @@ export function FestivalManagementTable({
                 )}
               </TableCell>
               <TableCell className="font-medium">{festival.name}</TableCell>
-              <TableCell>{festival.description || "—"}</TableCell>
-              <TableCell>
-                {festival.website_url ? (
-                  <a
-                    href={festival.website_url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-purple-600 hover:underline"
-                  >
-                    Visit
-                  </a>
-                ) : (
-                  "—"
-                )}
-              </TableCell>
+
               <TableCell>
                 <div className="flex gap-1">
                   <Button

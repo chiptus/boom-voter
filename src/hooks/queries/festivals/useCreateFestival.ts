@@ -7,6 +7,7 @@ async function createFestival(festivalData: {
   name: string;
   slug: string;
   description?: string;
+  published?: boolean;
   logo_url?: string | null;
 }) {
   const { data, error } = await supabase

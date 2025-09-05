@@ -1,15 +1,18 @@
+import { useState } from "react";
 import { useParams, useNavigate, Outlet } from "react-router-dom";
 import { FestivalEditionManagement } from "./FestivalEditionManagement";
+import { FestivalInfoDetails } from "@/pages/admin/festivals/info/FestivalInfoDetails";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import { useFestivalBySlugQuery } from "@/hooks/queries/festivals/useFestivalBySlug";
-import { Loader2 } from "lucide-react";
+import { Loader2, Info, ChevronDown, ChevronUp } from "lucide-react";
 
 export default function FestivalDetail() {
   const { festivalSlug, editionSlug = "" } = useParams<{
     festivalSlug: string;
     editionSlug?: string;
   }>();
-  // const [selectedEditionId, setSelectedEditionId] = useState("");
+  const [showFestivalInfo, setShowFestivalInfo] = useState(false);
   const navigate = useNavigate();
 
   const festivalQuery = useFestivalBySlugQuery(festivalSlug);
@@ -33,7 +36,7 @@ export default function FestivalDetail() {
     return (
       <Card>
         <CardContent className="flex items-center justify-center p-8">
-          <span>Fesitval not found</span>
+          <span>Festival not found</span>
         </CardContent>
       </Card>
     );
@@ -52,8 +55,25 @@ export default function FestivalDetail() {
           <CardHeader>
             <CardTitle className="flex items-center justify-between">
               <span className="flex items-center gap-2">{festival.name}</span>
+              <Button
+                variant="outline"
+                onClick={() => setShowFestivalInfo(!showFestivalInfo)}
+              >
+                <Info className="h-4 w-4 mr-2" />
+                Festival Info
+                {showFestivalInfo ? (
+                  <ChevronUp className="h-4 w-4 ml-2" />
+                ) : (
+                  <ChevronDown className="h-4 w-4 ml-2" />
+                )}
+              </Button>
             </CardTitle>
           </CardHeader>
+          {showFestivalInfo && (
+            <CardContent>
+              <FestivalInfoDetails festivalId={festival.id} />
+            </CardContent>
+          )}
         </Card>
 
         <div className="mt-6">

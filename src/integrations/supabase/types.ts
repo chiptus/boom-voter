@@ -210,6 +210,44 @@ export type Database = {
         };
         Relationships: [];
       };
+      custom_links: {
+        Row: {
+          created_at: string | null;
+          display_order: number | null;
+          festival_id: string;
+          id: string;
+          title: string;
+          updated_at: string | null;
+          url: string;
+        };
+        Insert: {
+          created_at?: string | null;
+          display_order?: number | null;
+          festival_id: string;
+          id?: string;
+          title: string;
+          updated_at?: string | null;
+          url: string;
+        };
+        Update: {
+          created_at?: string | null;
+          display_order?: number | null;
+          festival_id?: string;
+          id?: string;
+          title?: string;
+          updated_at?: string | null;
+          url?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "custom_links_festival_id_fkey";
+            columns: ["festival_id"];
+            isOneToOne: false;
+            referencedRelation: "festivals";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
       festival_editions: {
         Row: {
           archived: boolean;
@@ -269,6 +307,47 @@ export type Database = {
           },
         ];
       };
+      festival_info: {
+        Row: {
+          created_at: string;
+          facebook_url: string | null;
+          festival_id: string;
+          id: string;
+          info_text: string | null;
+          instagram_url: string | null;
+          map_image_url: string | null;
+          updated_at: string;
+        };
+        Insert: {
+          created_at?: string;
+          facebook_url?: string | null;
+          festival_id: string;
+          id?: string;
+          info_text?: string | null;
+          instagram_url?: string | null;
+          map_image_url?: string | null;
+          updated_at?: string;
+        };
+        Update: {
+          created_at?: string;
+          facebook_url?: string | null;
+          festival_id?: string;
+          id?: string;
+          info_text?: string | null;
+          instagram_url?: string | null;
+          map_image_url?: string | null;
+          updated_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "festival_info_festival_id_fkey";
+            columns: ["festival_id"];
+            isOneToOne: true;
+            referencedRelation: "festivals";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
       festivals: {
         Row: {
           archived: boolean;
@@ -280,7 +359,6 @@ export type Database = {
           published: boolean | null;
           slug: string;
           updated_at: string;
-          website_url: string | null;
         };
         Insert: {
           archived?: boolean;
@@ -292,7 +370,6 @@ export type Database = {
           published?: boolean | null;
           slug: string;
           updated_at?: string;
-          website_url?: string | null;
         };
         Update: {
           archived?: boolean;
@@ -304,7 +381,6 @@ export type Database = {
           published?: boolean | null;
           slug?: string;
           updated_at?: string;
-          website_url?: string | null;
         };
         Relationships: [];
       };
@@ -631,6 +707,10 @@ export type Database = {
       [_ in never]: never;
     };
     Functions: {
+      bootstrap_super_admin: {
+        Args: { user_email: string };
+        Returns: boolean;
+      };
       can_edit_artists: {
         Args: { check_user_id: string };
         Returns: boolean;
