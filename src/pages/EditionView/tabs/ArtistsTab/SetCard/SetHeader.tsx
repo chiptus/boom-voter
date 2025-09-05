@@ -31,8 +31,7 @@ export function SetHeader({ size = "lg" }: SetHeaderProps) {
         </Badge>
       )}
 
-      {/* Social Platform Links */}
-      {!isMultiArtist && set.artists.length > 0 && (
+      {set.artists.length === 1 && (
         <SocialPlatformLinkList
           artist={set.artists[0]}
           size={size === "sm" ? "sm" : "md"}
