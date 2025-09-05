@@ -10,7 +10,7 @@ interface SetImageProps {
 
 export function SetImage({ className = "", size = "lg" }: SetImageProps) {
   const { set } = useFestivalSet();
-  const isMultiArtist = set.artists.length > 0;
+  const isMultiArtist = set.artists.length > 1;
 
   const sizeClasses = {
     sm: "w-12 h-12",

@@ -10,7 +10,7 @@ export function SetDescription({
   className = "text-purple-200 text-sm leading-relaxed",
 }: SetDescriptionProps) {
   const { set } = useFestivalSet();
-  const isMultiArtist = set.artists.length > 0;
+  const isMultiArtist = set.artists.length > 1;
 
   if (isMultiArtist) {
     return (

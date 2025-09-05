@@ -10,7 +10,7 @@ interface SetHeaderProps {
 
 export function SetHeader({ size = "lg" }: SetHeaderProps) {
   const { set } = useFestivalSet();
-  const isMultiArtist = set.artists.length > 0;
+  const isMultiArtist = set.artists.length > 1;
 
   const titleClass =
     size === "sm"
