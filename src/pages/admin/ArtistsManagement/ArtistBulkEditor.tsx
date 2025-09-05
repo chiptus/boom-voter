@@ -76,6 +76,7 @@ export function ArtistBulkEditor() {
             onSearchChange={setSearchTerm}
             selectedCount={selectedIds.size}
             totalCount={filteredAndSortedArtists.length}
+            selectedIds={selectedIds}
             onSelectAll={handleSelectAllWrapper}
             onClearSelection={clearSelection}
           />

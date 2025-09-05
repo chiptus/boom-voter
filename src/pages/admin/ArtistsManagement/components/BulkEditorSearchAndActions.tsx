@@ -7,6 +7,7 @@ interface BulkEditorSearchAndActionsProps {
   onSearchChange: (value: string) => void;
   selectedCount: number;
   totalCount: number;
+  selectedIds: Set<string>;
   onSelectAll: () => void;
   onClearSelection: () => void;
 }
@@ -16,6 +17,7 @@ export function BulkEditorSearchAndActions({
   onSearchChange,
   selectedCount,
   totalCount,
+  selectedIds,
   onSelectAll,
   onClearSelection,
 }: BulkEditorSearchAndActionsProps) {
@@ -34,6 +36,7 @@ export function BulkEditorSearchAndActions({
       <BulkActionsToolbar
         selectedCount={selectedCount}
         totalCount={totalCount}
+        selectedIds={selectedIds}
         onSelectAll={onSelectAll}
         onClearSelection={onClearSelection}
       />

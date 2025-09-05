@@ -1,10 +1,12 @@
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { CheckSquare, Square, Archive, Download } from "lucide-react";
+import { CheckSquare, Square } from "lucide-react";
+import { ArchiveButton } from "../components/ArchiveButton";
 
 interface BulkActionsToolbarProps {
   selectedCount: number;
   totalCount: number;
+  selectedIds: Set<string>;
   onSelectAll: () => void;
   onClearSelection: () => void;
 }
@@ -12,6 +14,7 @@ interface BulkActionsToolbarProps {
 export function BulkActionsToolbar({
   selectedCount,
   totalCount,
+  selectedIds,
   onSelectAll,
   onClearSelection,
 }: BulkActionsToolbarProps) {
@@ -24,29 +27,11 @@ export function BulkActionsToolbar({
         <>
           <Badge variant="secondary">{selectedCount} selected</Badge>
 
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => {
-              // TODO: Implement bulk archive
-              console.log("Bulk archive:", selectedCount);
-            }}
-          >
-            <Archive className="h-3 w-3 mr-1" />
-            Archive
-          </Button>
-
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => {
-              // TODO: Implement bulk export
-              console.log("Bulk export:", selectedCount);
-            }}
-          >
-            <Download className="h-3 w-3 mr-1" />
-            Export
-          </Button>
+          <ArchiveButton
+            selectedIds={selectedIds}
+            selectedCount={selectedCount}
+            onSuccess={onClearSelection}
+          />
 
           <Button variant="outline" size="sm" onClick={onClearSelection}>
             Clear
