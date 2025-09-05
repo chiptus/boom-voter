@@ -9,12 +9,7 @@ import { useTimelineUrlState } from "@/hooks/useTimelineUrlState";
 import { format } from "date-fns";
 import { useStagesByEditionQuery } from "@/hooks/queries/stages/useStagesByEdition";
 
-interface TimelineProps {
-  userVotes: Record<string, number>;
-  onVote: (artistId: string, voteType: number) => void;
-}
-
-export function Timeline({ userVotes, onVote }: TimelineProps) {
+export function Timeline() {
   const { edition } = useFestivalEdition();
   const { data: editionSets = [], isLoading: setsLoading } =
     useEditionSetsQuery(edition?.id);
@@ -117,17 +112,9 @@ export function Timeline({ userVotes, onVote }: TimelineProps) {
 
   return (
     <div className="space-y-8">
-      {/* Unified Timeline Container */}
       <div className="relative bg-white/5 rounded-lg p-4">
-        {/* Fixed Stage Labels Column */}
         <StageLabels stages={timelineData.stages} />
-
-        {/* Scrollable Timeline Content */}
-        <TimelineContainer
-          timelineData={timelineData}
-          userVotes={userVotes}
-          onVote={onVote}
-        />
+        <TimelineContainer timelineData={timelineData} />
       </div>
     </div>
   );

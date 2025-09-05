@@ -8,14 +8,20 @@ import {
 import { cn } from "@/lib/utils";
 import type { ScheduleSet } from "@/hooks/useScheduleData";
 import { useMemo } from "react";
+import { useAuth } from "@/contexts/AuthContext";
+import { useUserVotes } from "@/hooks/queries/voting/useUserVotes";
+import { useVote } from "@/hooks/queries/voting/useVote";
 
 interface VoteButtonsProps {
   set: ScheduleSet;
-  userVote?: number;
-  onVote?: (setId: string, voteType: number) => void;
 }
 
-export function VoteButtons({ set, userVote, onVote }: VoteButtonsProps) {
+export function VoteButtons({ set }: VoteButtonsProps) {
+  const { user, showAuthDialog } = useAuth();
+  const userVotesQuery = useUserVotes(user?.id);
+  const voteMutation = useVote();
+
+  const userVote = userVotesQuery.data?.[set.id];
   const userVoteType = useMemo(() => {
     return userVote ? getVoteConfig(userVote) : undefined;
   }, [userVote]);
@@ -47,7 +53,7 @@ export function VoteButtons({ set, userVote, onVote }: VoteButtonsProps) {
           <VoteButton
             voteType={voteType}
             key={voteType}
-            onVote={() => handleVote(voteType)}
+            onVote={() => handleVote(getVoteValue(voteType))}
             count={votesMap[voteType]}
             value={userVoteType}
           />
@@ -56,11 +62,18 @@ export function VoteButtons({ set, userVote, onVote }: VoteButtonsProps) {
     </div>
   );
 
-  function handleVote(voteType: VoteType) {
-    const value = getVoteValue(voteType);
-    if (onVote && value) {
-      onVote(set.id, value);
+  async function handleVote(voteType: number) {
+    if (!user) {
+      showAuthDialog();
+      return;
     }
+
+    voteMutation.mutate({
+      setId: set.id,
+      voteType,
+      userId: user.id,
+      existingVote: userVote,
+    });
   }
 }
 

@@ -1,6 +1,3 @@
-import { User } from "@supabase/supabase-js";
-
-import { useOfflineVoting } from "@/hooks/useOfflineVoting";
 import { FestivalSet } from "@/hooks/queries/sets/useSets";
 
 import { EmptyArtistsState } from "./EmptyArtistsState";
@@ -9,30 +6,13 @@ import { SetListItem } from "./SetListItem";
 
 export function SetsPanel({
   sets,
-  user,
   use24Hour,
-  openAuthDialog,
   onLockSort,
 }: {
   sets: Array<FestivalSet>;
-  user: User | null;
   use24Hour: boolean;
-  openAuthDialog(): void;
   onLockSort: () => void;
 }) {
-  async function handleVoteWithLock(setId: string, voteType: number) {
-    const result = await handleVote(setId, voteType);
-    if (!result.requiresAuth) {
-      onLockSort();
-    }
-    return result;
-  }
-
-  const { userVotes, votingLoading, handleVote } = useOfflineVoting(
-    user,
-    undefined, // Remove the refresh callback to prevent auto re-sorting
-  );
-
   if (sets.length === 0) {
     return <EmptyArtistsState />;
   }
@@ -43,14 +23,7 @@ export function SetsPanel({
         <FestivalSetProvider
           key={set.id}
           set={set}
-          userVote={userVotes[set.id]}
-          userKnowledge={false}
-          votingLoading={votingLoading[set.id]}
-          onVote={handleVoteWithLock}
-          onKnowledgeToggle={async (_: string) => ({
-            requiresAuth: !user,
-          })}
-          onAuthRequired={openAuthDialog}
+          onLockSort={onLockSort}
           use24Hour={use24Hour}
         >
           <SetListItem />

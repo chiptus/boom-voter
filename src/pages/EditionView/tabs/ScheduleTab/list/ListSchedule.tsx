@@ -8,17 +8,12 @@ import type { ScheduleSet } from "@/hooks/useScheduleData";
 import { useTimelineUrlState } from "@/hooks/useTimelineUrlState";
 import { useStagesByEditionQuery } from "@/hooks/queries/stages/useStagesByEdition";
 
-interface ListScheduleProps {
-  userVotes: Record<string, number>;
-  onVote: (artistId: string, voteType: number) => void;
-}
-
 interface TimeSlot {
   time: Date;
   sets: (ScheduleSet & { stageName: string })[];
 }
 
-export function ListSchedule({ userVotes, onVote }: ListScheduleProps) {
+export function ListSchedule() {
   const { edition } = useFestivalEdition();
   const { data: editionSets = [], isLoading: setsLoading } =
     useEditionSetsQuery(edition?.id);
@@ -158,8 +153,6 @@ export function ListSchedule({ userVotes, onVote }: ListScheduleProps) {
             key={slot.time.toISOString()}
             timeSlot={slot}
             showDateHeader={showDateHeader}
-            userVotes={userVotes}
-            onVote={onVote}
           />
         );
       })}

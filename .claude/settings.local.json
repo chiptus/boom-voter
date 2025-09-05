@@ -16,7 +16,10 @@
       "mcp__ide__getDiagnostics",
       "Bash(git checkout:*)",
       "Bash(mkdir:*)",
-      "Bash(npx oxlint:*)"
+      "Bash(npx oxlint:*)",
+      "WebSearch",
+      "WebFetch(domain:tanstack.com)",
+      "Bash(node:*)"
     ],
     "deny": []
   }

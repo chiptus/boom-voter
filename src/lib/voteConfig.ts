@@ -51,12 +51,27 @@ export const VOTE_CONFIG = {
   },
 } as const;
 
+export type VoteConfig = {
+  value: -1 | 1 | 2;
+  label: string;
+  icon: typeof Star;
+  bgColor: string;
+  iconColor: string;
+  textColor: string;
+  descColor: string;
+  circleColor: string;
+  buttonSelected: string;
+  buttonUnselected: string;
+  spinnerColor: string;
+  description: string;
+};
+
 export function getVoteConfig(voteValue: number): VoteType | undefined {
   return (
     VOTES_TYPES.find((key) => VOTE_CONFIG[key].value === voteValue) || undefined
   );
 }
 
-export function getVoteValue(voteType: VoteType): -1 | 1 | 2 | undefined {
+export function getVoteValue(voteType: VoteType): -1 | 1 | 2 {
   return VOTE_CONFIG[voteType].value;
 }

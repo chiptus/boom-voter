@@ -7,22 +7,22 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Textarea } from "@/components/ui/textarea";
-import { Trash2, Edit3, Save, X, StickyNote } from "lucide-react";
-import { useOfflineNotes } from "@/hooks/useOfflineNotes";
+import { Edit3, StickyNote } from "lucide-react";
+import { useArtistNotesQuery } from "@/hooks/queries/artists/notes/useArtistNotes";
+import { SetNoteItem } from "./notes/SetNoteItem";
+import { CreateNoteForm } from "./notes/CreateNoteForm";
 
-interface ArtistNotesProps {
-  artistId: string;
+interface SetNotesProps {
+  setId: string;
   userId: string | null;
 }
 
-export function ArtistNotes({ artistId, userId }: ArtistNotesProps) {
-  const { notes, loading, saving, saveNote, deleteNote } = useOfflineNotes(
-    artistId,
-    userId,
-  );
+export function SetNotes({ setId, userId }: SetNotesProps) {
+  const notesQuery = useArtistNotesQuery(setId);
+
   const [isEditing, setIsEditing] = useState(false);
-  const [noteContent, setNoteContent] = useState("");
+
+  const notes = notesQuery.data;
 
   if (!userId) {
     return (
@@ -40,29 +40,7 @@ export function ArtistNotes({ artistId, userId }: ArtistNotesProps) {
     );
   }
 
-  async function handleSave() {
-    const success = await saveNote(noteContent.trim());
-    if (success) {
-      setIsEditing(false);
-    }
-  }
-
-  async function handleDelete(noteId: string) {
-    if (window.confirm("Are you sure you want to delete this note?")) {
-      const success = await deleteNote(noteId);
-      if (success) {
-        setNoteContent("");
-        setIsEditing(false);
-      }
-    }
-  }
-
-  function handleCancel() {
-    setNoteContent("");
-    setIsEditing(false);
-  }
-
-  if (loading) {
+  if (notesQuery.isLoading) {
     return (
       <Card className="bg-white/10 backdrop-blur-md border-purple-400/30">
         <CardHeader>
@@ -95,88 +73,36 @@ export function ArtistNotes({ artistId, userId }: ArtistNotesProps) {
       </CardHeader>
       <CardContent>
         {isEditing ? (
-          <div className="space-y-4">
-            <Textarea
-              value={noteContent}
-              onChange={(e) => setNoteContent(e.target.value)}
-              placeholder="Add your thoughts about this artist..."
-              className="min-h-[120px] bg-white/5 border-purple-400/30 text-white placeholder:text-purple-300"
-            />
-            <div className="flex items-center space-x-2">
-              <Button
-                onClick={handleSave}
-                disabled={saving || !noteContent.trim()}
-                className="bg-purple-600 hover:bg-purple-700"
-              >
-                <Save className="h-4 w-4 mr-2" />
-                {saving ? "Saving..." : "Save Note"}
-              </Button>
-              <Button
-                variant="outline"
-                onClick={handleCancel}
-                disabled={saving}
-                className="border-purple-400 text-purple-400 hover:bg-purple-400 hover:text-white"
-              >
-                <X className="h-4 w-4 mr-2" />
-                Cancel
-              </Button>
-            </div>
-          </div>
+          <CreateNoteForm
+            userId={userId}
+            setId={setId}
+            onSuccess={() => setIsEditing(false)}
+          />
         ) : (
           <div className="space-y-6">
-            {/* Existing Notes */}
-            {notes.length > 0 && (
+            {!!notes?.length && (
               <div className="space-y-4">
                 {notes.map((note) => {
-                  const isOwnNote = note.user_id === userId;
                   return (
-                    <div
+                    <SetNoteItem
+                      isOwn={note.user_id === userId}
                       key={note.id}
-                      className="bg-white/5 rounded-lg p-4 border border-purple-400/20"
-                    >
-                      <div className="flex items-start justify-between mb-2">
-                        <div className="text-sm text-purple-300">
-                          By:{" "}
-                          {note.author_username ||
-                            note.author_email ||
-                            "Unknown User"}
-                        </div>
-                        {isOwnNote && (
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => handleDelete(note.id)}
-                            className="border-red-400/50 text-red-400 hover:bg-red-400 hover:text-white"
-                            disabled={saving}
-                          >
-                            <Trash2 className="h-4 w-4" />
-                          </Button>
-                        )}
-                      </div>
-                      <div className="text-white whitespace-pre-wrap break-words mb-2">
-                        {note.note_content}
-                      </div>
-                      <div className="text-xs text-purple-400">
-                        {new Date(note.updated_at).toLocaleDateString()}
-                      </div>
-                    </div>
+                      note={note}
+                    />
                   );
                 })}
               </div>
             )}
 
-            {/* Add New Note Button */}
-            {!isEditing && (
-              <div className="text-center py-4 border-t border-purple-400/20">
-                <Button
-                  onClick={() => setIsEditing(true)}
-                  className="bg-purple-600 hover:bg-purple-700"
-                >
-                  <Edit3 className="h-4 w-4 mr-2" />
-                  Add Note
-                </Button>
-              </div>
-            )}
+            <div className="text-center py-4 border-t border-purple-400/20">
+              <Button
+                onClick={() => setIsEditing(true)}
+                className="bg-purple-600 hover:bg-purple-700"
+              >
+                <Edit3 className="h-4 w-4 mr-2" />
+                Add Note
+              </Button>
+            </div>
           </div>
         )}
       </CardContent>

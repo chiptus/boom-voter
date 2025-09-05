@@ -9,7 +9,6 @@ import {
 import { User } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
 import { useProfileQuery } from "@/hooks/queries/auth/useProfile";
-import { profileOfflineService } from "@/services/profileOfflineService";
 import { useToast } from "@/hooks/use-toast";
 import { AuthDialog } from "@/components/AuthDialog/AuthDialog";
 import { Profile } from "@/hooks/queries/auth/useProfile";
@@ -60,7 +59,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
       if (event === "SIGNED_OUT") {
         // For sign out, use the current user state from closure
         if (user?.id) {
-          await profileOfflineService.clearCachedProfile(user.id);
+          // await profileOfflineService.clearCachedProfile(user.id);
         }
       }
 
@@ -127,7 +126,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
   async function signOut() {
     // Clear cached profile before signing out
     if (user?.id) {
-      await profileOfflineService.clearCachedProfile(user.id);
+      // await profileOfflineService.clearCachedProfile(user.id);
     }
     await supabase.auth.signOut();
   }

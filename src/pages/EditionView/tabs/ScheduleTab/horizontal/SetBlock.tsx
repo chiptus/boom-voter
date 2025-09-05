@@ -6,11 +6,9 @@ import { VoteButtons } from "../VoteButtons";
 
 interface SetBlockProps {
   set: ScheduleSet;
-  userVote?: number;
-  onVote?: (setId: string, voteType: number) => void;
 }
 
-export function SetBlock({ set, userVote, onVote }: SetBlockProps) {
+export function SetBlock({ set }: SetBlockProps) {
   return (
     <Card className="bg-white/10 backdrop-blur-md border-purple-400/30 hover:border-purple-400/50 transition-colors">
       <CardContent className="p-3">
@@ -22,7 +20,7 @@ export function SetBlock({ set, userVote, onVote }: SetBlockProps) {
           )}
         </div>
 
-        <VoteButtons set={set} userVote={userVote} onVote={onVote} />
+        <VoteButtons set={set} />
       </CardContent>
     </Card>
   );

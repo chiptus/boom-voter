@@ -7,7 +7,7 @@ import {
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Clock, Users } from "lucide-react";
-import { ArtistVotingButtons } from "./SetVotingButtons";
+import { SetVotingButtons } from "./SetVotingButtons";
 import { FestivalSet } from "@/hooks/queries/sets/useSets";
 import { formatTimeRange } from "@/lib/timeUtils";
 import { GenreBadge } from "@/components/GenreBadge";
@@ -16,19 +16,13 @@ import { StagePin } from "@/components/StagePin";
 
 interface MultiArtistSetInfoCardProps {
   set: FestivalSet;
-  userVote: number | null;
   netVoteScore: number;
-  onVote: (voteType: number) => void;
-  getVoteCount: (voteType: number) => number;
   use24Hour?: boolean;
 }
 
 export function MultiArtistSetInfoCard({
   set,
-  userVote,
   netVoteScore,
-  onVote,
-  getVoteCount,
   use24Hour = false,
 }: MultiArtistSetInfoCardProps) {
   const allGenres = set.artists.flatMap(
@@ -105,12 +99,7 @@ export function MultiArtistSetInfoCard({
           )}
         </CardHeader>
         <CardContent>
-          {/* Voting System */}
-          <ArtistVotingButtons
-            userVote={userVote}
-            onVote={onVote}
-            getVoteCount={getVoteCount}
-          />
+          <SetVotingButtons set={set} />
         </CardContent>
       </Card>
 

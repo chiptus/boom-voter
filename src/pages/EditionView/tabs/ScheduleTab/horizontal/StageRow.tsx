@@ -7,16 +7,9 @@ interface StageRowProps {
     sets: HorizontalTimelineSet[];
   };
   totalWidth: number;
-  userVotes: Record<string, number>;
-  onVote: (artistId: string, voteType: number) => void;
 }
 
-export function StageRow({
-  stage,
-  totalWidth,
-  userVotes,
-  onVote,
-}: StageRowProps) {
+export function StageRow({ stage, totalWidth }: StageRowProps) {
   return (
     <div key={stage.name} className="flex items-start">
       {/* Timeline Track */}
@@ -37,11 +30,7 @@ export function StageRow({
               }}
             >
               <div className="h-full pr-1">
-                <SetBlock
-                  set={set}
-                  userVote={userVotes[set.id]}
-                  onVote={onVote}
-                />
+                <SetBlock set={set} />
               </div>
             </div>
           );

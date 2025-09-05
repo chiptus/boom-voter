@@ -9,7 +9,8 @@ interface SetDescriptionProps {
 export function SetDescription({
   className = "text-purple-200 text-sm leading-relaxed",
 }: SetDescriptionProps) {
-  const { set, isMultiArtist } = useFestivalSet();
+  const { set } = useFestivalSet();
+  const isMultiArtist = set.artists.length > 1;
 
   if (isMultiArtist) {
     return (

@@ -3,17 +3,19 @@ import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { artistNotesKeys } from "./types";
 
-async function saveArtistNote(variables: {
-  artistId: string;
+async function createNote({
+  setId,
+  userId,
+  noteContent,
+}: {
+  setId: string;
   userId: string;
   noteContent: string;
 }) {
-  const { artistId, userId, noteContent } = variables;
-
   const { data, error } = await supabase
     .from("artist_notes")
     .upsert({
-      artist_id: artistId,
+      artist_id: setId,
       user_id: userId,
       note_content: noteContent,
     })
@@ -24,16 +26,16 @@ async function saveArtistNote(variables: {
   return data;
 }
 
-export function useSaveNoteMutation() {
+export function useCreateNoteMutation() {
   const queryClient = useQueryClient();
   const { toast } = useToast();
 
   return useMutation({
-    mutationFn: saveArtistNote,
+    mutationFn: createNote,
     onSuccess: (_, variables) => {
       // Invalidate and refetch notes for this artist
       queryClient.invalidateQueries({
-        queryKey: artistNotesKeys.notes(variables.artistId),
+        queryKey: artistNotesKeys.notes(variables.setId),
       });
       toast({
         title: "Success",

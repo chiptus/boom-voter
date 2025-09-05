@@ -7,12 +7,12 @@ import { MultiArtistSetInfoCard } from "./SetDetails/MultiArtistSetInfoCard";
 import { ArtistNotFoundState } from "./SetDetails/SetNotFoundState";
 import { ArtistLoadingState } from "./SetDetails/SetLoadingState";
 import { SetGroupVoting } from "./SetDetails/SetGroupVoting";
-import { ArtistNotes } from "./SetDetails/SetNotes";
+import { SetNotes } from "./SetDetails/SetNotes";
 import { useUrlState } from "@/hooks/useUrlState";
-import { useSetDetail } from "./SetDetails/useSetDetail";
 import { useSetBySlugQuery } from "@/hooks/queries/sets/useSetBySlug";
 import { useFestivalEdition } from "@/contexts/FestivalEditionContext";
 import { useAuth } from "@/contexts/AuthContext";
+import { useVoteCount } from "@/hooks/useVoteCount";
 
 export function SetDetails() {
   const { user } = useAuth();
@@ -23,10 +23,12 @@ export function SetDetails() {
     slug: setSlug,
     editionId: edition?.id,
   });
-  const { userVote, loading, handleVote, getVoteCount, netVoteScore } =
-    useSetDetail(setQuery.data?.id);
 
-  if (loading) {
+  const { getVoteCount } = useVoteCount(setQuery.data);
+
+  const netVoteScore = 2 * getVoteCount(2) + getVoteCount(1) - getVoteCount(-1);
+
+  if (setQuery.isLoading) {
     return <ArtistLoadingState />;
   }
 
@@ -54,16 +56,12 @@ export function SetDetails() {
 
             <MultiArtistSetInfoCard
               set={currentSet}
-              userVote={userVote}
               netVoteScore={netVoteScore}
-              onVote={handleVote}
-              getVoteCount={getVoteCount}
               use24Hour={urlState.use24Hour}
             />
           </div>
         ) : (
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
-            {/* Single Artist Image */}
             <ArtistImageCard
               imageUrl={primaryArtist.image_url}
               artistName={currentSet.name}
@@ -71,10 +69,7 @@ export function SetDetails() {
 
             <SetInfoCard
               set={currentSet}
-              userVote={userVote}
               netVoteScore={netVoteScore}
-              onVote={handleVote}
-              getVoteCount={getVoteCount}
               use24Hour={urlState.use24Hour}
             />
           </div>
@@ -87,7 +82,7 @@ export function SetDetails() {
 
         {/* Set Notes Section */}
         <div className="mb-8">
-          <ArtistNotes artistId={currentSet.id} userId={user?.id || null} />
+          <SetNotes setId={currentSet.id} userId={user?.id || null} />
         </div>
       </div>
     </div>
