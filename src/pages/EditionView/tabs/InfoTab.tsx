@@ -1,8 +1,5 @@
 import { useFestivalEdition } from "@/contexts/FestivalEditionContext";
-import {
-  useFestivalInfoQuery,
-  CustomLink,
-} from "@/hooks/queries/festival-info/useFestivalInfo";
+import { useFestivalInfoQuery } from "@/hooks/queries/festival-info/useFestivalInfo";
 import { EditionTitle } from "./InfoTab/EditionTitle";
 import { InfoText } from "./InfoTab/InfoText";
 import { CustomLinks } from "./InfoTab/CustomLinks";
@@ -10,16 +7,17 @@ import { NoInfo } from "./InfoTab/NoInfo";
 import { LoadingInfo } from "./InfoTab/LoadingInfo";
 import { SocialLinkItem } from "./InfoTab/SocialLinkItem";
 import { TitleSection } from "@/components/layout/AppHeader/TitleSection";
+import { useCustomLinksQuery } from "@/hooks/queries/custom-links/useCustomLinks";
 
 export function InfoTab() {
   const { edition, festival } = useFestivalEdition();
   const { data: festivalInfo, isLoading } = useFestivalInfoQuery(festival?.id);
-
+  const customLinksQuery = useCustomLinksQuery(festival?.id || "");
   if (isLoading) {
     return <LoadingInfo />;
   }
 
-  const customLinks = (festivalInfo?.custom_links as CustomLink[]) || [];
+  const customLinks = customLinksQuery.data || [];
   const noInfoAvailable =
     !festivalInfo?.info_text &&
     !festivalInfo?.facebook_url &&

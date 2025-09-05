@@ -22,7 +22,6 @@ interface FestivalFormData {
   name: string;
   slug: string;
   description?: string;
-  website_url?: string;
   published: boolean;
 }
 
@@ -45,7 +44,6 @@ export function FestivalDialog({
     name: "",
     slug: "",
     description: "",
-    website_url: "",
     published: false,
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -59,7 +57,6 @@ export function FestivalDialog({
           name: editingFestival.name,
           slug: editingFestival.slug || generateSlug(editingFestival.name),
           description: editingFestival.description || "",
-          website_url: editingFestival.website_url || "",
           published: editingFestival.published || false,
         });
       } else {
@@ -67,7 +64,6 @@ export function FestivalDialog({
           name: "",
           slug: "",
           description: "",
-          website_url: "",
           published: false,
         });
       }
@@ -133,22 +129,13 @@ export function FestivalDialog({
 
     setIsSubmitting(true);
     try {
-      const festivalData = {
-        ...formData,
-        description: formData.description,
-        website_url: formData.website_url || null,
-      };
-
       if (editingFestival) {
         await updateFestivalMutation.mutateAsync({
           festivalId: editingFestival.id,
-          festivalData: festivalData,
+          festivalData: formData,
         });
       } else {
-        await createFestivalMutation.mutateAsync({
-          ...festivalData,
-          logo_url: null,
-        });
+        await createFestivalMutation.mutateAsync(formData);
       }
       onOpenChange(false);
     } catch (error) {
@@ -212,20 +199,8 @@ export function FestivalDialog({
               onChange={(e) =>
                 setFormData({ ...formData, description: e.target.value })
               }
-              placeholder="Festival description..."
+              placeholder="Short description for festival listings..."
               rows={3}
-            />
-          </div>
-          <div>
-            <Label htmlFor="website">Website URL</Label>
-            <Input
-              id="website"
-              type="url"
-              value={formData.website_url}
-              onChange={(e) =>
-                setFormData({ ...formData, website_url: e.target.value })
-              }
-              placeholder="https://example.com"
             />
           </div>
           <div className="flex items-center space-x-2">

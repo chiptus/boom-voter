@@ -4,8 +4,8 @@ import { Input } from "@/components/ui/input";
 import { ExternalLink, Plus, Trash2 } from "lucide-react";
 import { EditableField } from "./shared/EditableField";
 import { EditContainer } from "./shared/EditContainer";
-import { CustomLink } from "@/hooks/queries/festival-info/useFestivalInfo";
-import { useFestivalInfoMutation } from "@/hooks/queries/festival-info/useFestivalInfoMutation";
+import { CustomLink } from "@/hooks/queries/custom-links/useCustomLinks";
+import { useBulkUpdateCustomLinksMutation } from "@/hooks/queries/custom-links/useCustomLinksMutation";
 
 interface FestivalLinksFieldProps {
   festivalId: string;
@@ -30,8 +30,8 @@ export function FestivalLinksField({
     >
       {customLinks.length > 0 ? (
         <div className="flex flex-wrap gap-2">
-          {customLinks.map((link, index) => (
-            <Button key={index} variant="outline" size="sm" asChild>
+          {customLinks.map((link) => (
+            <Button key={link.id} variant="outline" size="sm" asChild>
               <a href={link.url} target="_blank" rel="noopener noreferrer">
                 {link.title}
                 <ExternalLink className="h-3 w-3 ml-1" />
@@ -46,6 +46,13 @@ export function FestivalLinksField({
   );
 }
 
+interface EditingLink {
+  id?: string;
+  title: string;
+  url: string;
+  display_order?: number;
+}
+
 function LinksFieldForm({
   customLinks,
   festivalId,
@@ -57,17 +64,27 @@ function LinksFieldForm({
   onCancel: () => void;
   onSave: () => void;
 }) {
-  const [editingLinks, setEditingLinks] = useState<CustomLink[]>([]);
-  const mutation = useFestivalInfoMutation(festivalId);
+  const [editingLinks, setEditingLinks] = useState<EditingLink[]>([]);
+  const mutation = useBulkUpdateCustomLinksMutation();
 
   function handleEdit() {
     setEditingLinks(
-      customLinks.length > 0 ? [...customLinks] : [{ title: "", url: "" }],
+      customLinks.length > 0
+        ? customLinks.map((link) => ({
+            id: link.id,
+            title: link.title,
+            url: link.url,
+            display_order: link.display_order || undefined,
+          }))
+        : [{ title: "", url: "", display_order: 0 }],
     );
   }
 
   function addCustomLink() {
-    setEditingLinks([...editingLinks, { title: "", url: "" }]);
+    setEditingLinks([
+      ...editingLinks,
+      { title: "", url: "", display_order: editingLinks.length },
+    ]);
   }
 
   function removeCustomLink(index: number) {
@@ -85,10 +102,14 @@ function LinksFieldForm({
   }
 
   function handleSave() {
-    const validLinks = editingLinks.filter(
-      (link) => link.title.trim() && link.url.trim(),
-    );
-    mutation.mutate({ custom_links: validLinks }, { onSuccess: onSave });
+    const validLinks = editingLinks
+      .filter((link) => link.title.trim() && link.url.trim())
+      .map((link, index) => ({
+        ...link,
+        display_order: index,
+      }));
+
+    mutation.mutate({ festivalId, links: validLinks }, { onSuccess: onSave });
   }
 
   if (editingLinks.length === 0) {
@@ -105,7 +126,7 @@ function LinksFieldForm({
       <div className="space-y-4">
         {editingLinks.map((link, index) => (
           <div
-            key={index}
+            key={link.id || `new-${index}`}
             className="flex items-center gap-2 p-3 border rounded-lg bg-background"
           >
             <div className="grid grid-cols-2 gap-2 flex-1">

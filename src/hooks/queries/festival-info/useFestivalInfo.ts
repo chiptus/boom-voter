@@ -3,10 +3,6 @@ import { supabase } from "@/integrations/supabase/client";
 import { Tables } from "@/integrations/supabase/types";
 
 export type FestivalInfo = Tables<"festival_info">;
-export type CustomLink = {
-  title: string;
-  url: string;
-};
 
 export const festivalInfoKeys = {
   all: ["festivalInfo"] as const,

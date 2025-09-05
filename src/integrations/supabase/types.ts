@@ -210,6 +210,44 @@ export type Database = {
         };
         Relationships: [];
       };
+      custom_links: {
+        Row: {
+          created_at: string | null;
+          display_order: number | null;
+          festival_id: string;
+          id: string;
+          title: string;
+          updated_at: string | null;
+          url: string;
+        };
+        Insert: {
+          created_at?: string | null;
+          display_order?: number | null;
+          festival_id: string;
+          id?: string;
+          title: string;
+          updated_at?: string | null;
+          url: string;
+        };
+        Update: {
+          created_at?: string | null;
+          display_order?: number | null;
+          festival_id?: string;
+          id?: string;
+          title?: string;
+          updated_at?: string | null;
+          url?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "custom_links_festival_id_fkey";
+            columns: ["festival_id"];
+            isOneToOne: false;
+            referencedRelation: "festivals";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
       festival_editions: {
         Row: {
           archived: boolean;
@@ -272,7 +310,6 @@ export type Database = {
       festival_info: {
         Row: {
           created_at: string;
-          custom_links: Json | null;
           facebook_url: string | null;
           festival_id: string;
           id: string;
@@ -283,7 +320,6 @@ export type Database = {
         };
         Insert: {
           created_at?: string;
-          custom_links?: Json | null;
           facebook_url?: string | null;
           festival_id: string;
           id?: string;
@@ -294,7 +330,6 @@ export type Database = {
         };
         Update: {
           created_at?: string;
-          custom_links?: Json | null;
           facebook_url?: string | null;
           festival_id?: string;
           id?: string;
@@ -324,7 +359,6 @@ export type Database = {
           published: boolean | null;
           slug: string;
           updated_at: string;
-          website_url: string | null;
         };
         Insert: {
           archived?: boolean;
@@ -336,7 +370,6 @@ export type Database = {
           published?: boolean | null;
           slug: string;
           updated_at?: string;
-          website_url?: string | null;
         };
         Update: {
           archived?: boolean;
@@ -348,7 +381,6 @@ export type Database = {
           published?: boolean | null;
           slug?: string;
           updated_at?: string;
-          website_url?: string | null;
         };
         Relationships: [];
       };
@@ -675,6 +707,10 @@ export type Database = {
       [_ in never]: never;
     };
     Functions: {
+      bootstrap_super_admin: {
+        Args: { user_email: string };
+        Returns: boolean;
+      };
       can_edit_artists: {
         Args: { check_user_id: string };
         Returns: boolean;

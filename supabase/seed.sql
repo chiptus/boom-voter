@@ -125,7 +125,21 @@ INSERT INTO public.artist_music_genres (artist_id, music_genre_id) VALUES
 
 -- Insert festival (with unique slug to avoid conflicts)
 INSERT INTO public.festivals (id, name, slug, description, published, created_at, updated_at) VALUES 
-  ('f1111111-1111-1111-1111-111111111111', 'Test festival', 'test', 'Psychedelic music festival in Portugal', true, now(), now());
+  ('f1111111-1111-1111-1111-111111111111', 'Test festival', 'test', 'Electronic music festival in beautiful Portuguese countryside', true, now(), now());
+
+-- Update festival info with description and sample data (festival_info record already created by migration trigger)
+UPDATE public.festival_info 
+SET info_text = '<p>Psychedelic music festival in Portugal</p><p>Experience three days of electronic music in the beautiful Portuguese countryside. From techno to ambient, house to drum & bass, this festival celebrates the diverse spectrum of electronic music culture.</p>',
+    facebook_url = 'https://facebook.com/testfestival',
+    instagram_url = 'https://instagram.com/testfestival',
+    updated_at = now()
+WHERE festival_id = 'f1111111-1111-1111-1111-111111111111';
+
+-- Insert sample custom links for the festival
+INSERT INTO public.custom_links (festival_id, title, url, display_order, created_at, updated_at) VALUES 
+  ('f1111111-1111-1111-1111-111111111111', 'Website', 'https://testfestival.com', 0, now(), now()),
+  ('f1111111-1111-1111-1111-111111111111', 'Tickets', 'https://testfestival.com/tickets', 1, now(), now()),
+  ('f1111111-1111-1111-1111-111111111111', 'Transport', 'https://testfestival.com/travel', 2, now(), now());
 
 -- Insert festival edition
 INSERT INTO public.festival_editions (id, festival_id, year, slug, name, description, location, start_date, end_date, published, created_at, updated_at) VALUES 

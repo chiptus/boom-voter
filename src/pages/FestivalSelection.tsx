@@ -1,4 +1,4 @@
-import { Music, Calendar, Users, ExternalLink } from "lucide-react";
+import { Music, GlobeIcon } from "lucide-react";
 import {
   Card,
   CardContent,
@@ -6,7 +6,6 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { useFestivalsQuery } from "@/hooks/queries/festivals/useFestivals";
 import { Festival } from "@/hooks/queries/festivals/types";
 import { AppHeader } from "@/components/layout/AppHeader";
@@ -15,6 +14,9 @@ import {
   createFestivalSubdomainUrl,
   isMainGetuplineDomain,
 } from "@/lib/subdomain";
+import { Link } from "react-router-dom";
+import { useCustomLinksQuery } from "@/hooks/queries/custom-links/useCustomLinks";
+
 export default function FestivalSelection() {
   const { data: availableFestivals = [], isLoading: festivalsLoading } =
     useFestivalsQuery();
@@ -84,58 +86,7 @@ export default function FestivalSelection() {
 
         <div className="mt-12 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
           {availableFestivals.map((festival: Festival) => (
-            <div
-              key={festival.id}
-              className="block cursor-pointer"
-              onClick={() => handleFestivalClick(festival)}
-            >
-              <Card className="bg-white/10 border-purple-400/30 hover:bg-white/15 transition-all duration-300 cursor-pointer group">
-                <CardHeader>
-                  <div className="flex items-start justify-between">
-                    <div className="flex-1">
-                      <CardTitle className="text-white text-xl mb-2 group-hover:text-purple-200 transition-colors">
-                        {festival.name}
-                      </CardTitle>
-                      {festival.description && (
-                        <CardDescription className="text-purple-200 text-sm">
-                          {festival.description}
-                        </CardDescription>
-                      )}
-                    </div>
-                    <Music className="h-6 w-6 text-purple-400 ml-4" />
-                  </div>
-                </CardHeader>
-
-                <CardContent className="space-y-4">
-                  {festival.website_url && (
-                    <div className="flex items-center gap-2 text-sm text-purple-200">
-                      <ExternalLink className="h-4 w-4" />
-                      <span className="truncate">
-                        {festival.website_url.replace(/^https?:\/\//, "")}
-                      </span>
-                    </div>
-                  )}
-
-                  <div className="flex flex-wrap gap-2">
-                    <Badge
-                      variant="secondary"
-                      className="bg-purple-600/50 text-purple-100 border-purple-500/50"
-                    >
-                      <Calendar className="h-3 w-3 mr-1" />
-                      Music Festival
-                    </Badge>
-
-                    <Badge
-                      variant="secondary"
-                      className="bg-green-600/50 text-green-100 border-green-500/50"
-                    >
-                      <Users className="h-3 w-3 mr-1" />
-                      Community Voting
-                    </Badge>
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
+            <FestivalCard key={festival.id} festival={festival} />
           ))}
         </div>
 
@@ -146,5 +97,43 @@ export default function FestivalSelection() {
         </div>
       </div>
     </div>
+  );
+}
+
+function FestivalCard({ festival }: { festival: Festival }) {
+  const customLinksQuery = useCustomLinksQuery(festival.id);
+  const websiteUrl = customLinksQuery.data?.[0]?.url;
+
+  return (
+    <Link className="block cursor-pointer" to={`/festivals/${festival.slug}`}>
+      <Card className="bg-white/10 border-purple-400/30 hover:bg-white/15 transition-all duration-300 cursor-pointer group">
+        <CardHeader>
+          <div className="flex items-start justify-between">
+            <div className="flex-1">
+              <CardTitle className="text-white text-xl mb-2 group-hover:text-purple-200 transition-colors">
+                {festival.name}
+              </CardTitle>
+              {festival.description && (
+                <CardDescription className="text-purple-200 text-sm">
+                  {festival.description}
+                </CardDescription>
+              )}
+            </div>
+            <Music className="h-6 w-6 text-purple-400 ml-4" />
+          </div>
+        </CardHeader>
+
+        <CardContent className="space-y-4">
+          {websiteUrl && (
+            <div className="flex items-center gap-2 text-sm text-purple-200">
+              <GlobeIcon className="h-4 w-4" />
+              <span className="truncate">
+                {websiteUrl.replace(/^https?:\/\//, "")}
+              </span>
+            </div>
+          )}
+        </CardContent>
+      </Card>
+    </Link>
   );
 }

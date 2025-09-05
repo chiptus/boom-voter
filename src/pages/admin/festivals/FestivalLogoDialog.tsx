@@ -45,9 +45,6 @@ export function FestivalLogoDialog({
       await updateFestivalMutation.mutateAsync({
         festivalId: festival.id,
         festivalData: {
-          name: festival.name,
-          slug: festival.slug,
-          description: festival.description || undefined,
           logo_url: uploadResult.url,
         },
       });
@@ -78,9 +75,6 @@ export function FestivalLogoDialog({
       await updateFestivalMutation.mutateAsync({
         festivalId: festival.id,
         festivalData: {
-          name: festival.name,
-          slug: festival.slug,
-          description: festival.description || undefined,
           logo_url: null,
         },
       });

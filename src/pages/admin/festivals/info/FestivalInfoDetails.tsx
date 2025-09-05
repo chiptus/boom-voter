@@ -1,9 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Loader2, Edit } from "lucide-react";
-import {
-  useFestivalInfoQuery,
-  CustomLink,
-} from "@/hooks/queries/festival-info/useFestivalInfo";
+import { useFestivalInfoQuery } from "@/hooks/queries/festival-info/useFestivalInfo";
+import { useCustomLinksQuery } from "@/hooks/queries/custom-links/useCustomLinks";
 import { FestivalMapField } from "./FestivalFields/FestivalMapField";
 import { FestivalInfoField } from "./FestivalFields/FestivalInfoField";
 import { FestivalSocialField } from "./FestivalFields/FestivalSocialField";
@@ -15,8 +13,9 @@ interface FestivalInfoDetailsProps {
 
 export function FestivalInfoDetails({ festivalId }: FestivalInfoDetailsProps) {
   const festivalInfoQuery = useFestivalInfoQuery(festivalId);
+  const customLinksQuery = useCustomLinksQuery(festivalId);
 
-  if (festivalInfoQuery.isLoading) {
+  if (festivalInfoQuery.isLoading || customLinksQuery.isLoading) {
     return (
       <div className="flex items-center justify-center p-8">
         <Loader2 className="h-6 w-6 animate-spin mr-2" />
@@ -26,7 +25,7 @@ export function FestivalInfoDetails({ festivalId }: FestivalInfoDetailsProps) {
   }
 
   const festivalInfo = festivalInfoQuery.data;
-  const customLinks = (festivalInfo?.custom_links as CustomLink[]) || [];
+  const customLinks = customLinksQuery.data || [];
 
   if (!festivalInfo) {
     return (
