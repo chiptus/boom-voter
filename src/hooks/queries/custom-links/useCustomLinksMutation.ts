@@ -3,19 +3,6 @@ import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { customLinksKeys } from "./useCustomLinks";
 
-interface CreateCustomLinkData {
-  festival_id: string;
-  title: string;
-  url: string;
-  display_order?: number;
-}
-
-interface UpdateCustomLinkData {
-  title: string;
-  url: string;
-  display_order?: number;
-}
-
 interface BulkUpdateCustomLinksData {
   festivalId: string;
   links: Array<{
@@ -24,35 +11,6 @@ interface BulkUpdateCustomLinksData {
     url: string;
     display_order: number;
   }>;
-}
-
-async function createCustomLink(data: CreateCustomLinkData) {
-  const { data: result, error } = await supabase
-    .from("custom_links")
-    .insert(data)
-    .select()
-    .single();
-
-  if (error) throw error;
-  return result;
-}
-
-async function updateCustomLink(id: string, data: UpdateCustomLinkData) {
-  const { data: result, error } = await supabase
-    .from("custom_links")
-    .update(data)
-    .eq("id", id)
-    .select()
-    .single();
-
-  if (error) throw error;
-  return result;
-}
-
-async function deleteCustomLink(id: string) {
-  const { error } = await supabase.from("custom_links").delete().eq("id", id);
-
-  if (error) throw error;
 }
 
 async function bulkUpdateCustomLinks({
@@ -112,83 +70,6 @@ async function bulkUpdateCustomLinks({
   });
 
   await Promise.all(promises);
-}
-
-export function useCreateCustomLinkMutation() {
-  const queryClient = useQueryClient();
-  const { toast } = useToast();
-
-  return useMutation({
-    mutationFn: createCustomLink,
-    onSuccess: (data) => {
-      queryClient.invalidateQueries({
-        queryKey: customLinksKeys.byFestival(data.festival_id),
-      });
-      toast({
-        title: "Success",
-        description: "Custom link created successfully",
-      });
-    },
-    onError: (error) => {
-      console.error("Error creating custom link:", error);
-      toast({
-        title: "Error",
-        description: "Failed to create custom link",
-        variant: "destructive",
-      });
-    },
-  });
-}
-
-export function useUpdateCustomLinkMutation() {
-  const queryClient = useQueryClient();
-  const { toast } = useToast();
-
-  return useMutation({
-    mutationFn: ({ id, data }: { id: string; data: UpdateCustomLinkData }) =>
-      updateCustomLink(id, data),
-    onSuccess: (data) => {
-      queryClient.invalidateQueries({
-        queryKey: customLinksKeys.byFestival(data.festival_id),
-      });
-      toast({
-        title: "Success",
-        description: "Custom link updated successfully",
-      });
-    },
-    onError: (error) => {
-      console.error("Error updating custom link:", error);
-      toast({
-        title: "Error",
-        description: "Failed to update custom link",
-        variant: "destructive",
-      });
-    },
-  });
-}
-
-export function useDeleteCustomLinkMutation() {
-  const queryClient = useQueryClient();
-  const { toast } = useToast();
-
-  return useMutation({
-    mutationFn: deleteCustomLink,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: customLinksKeys.all });
-      toast({
-        title: "Success",
-        description: "Custom link deleted successfully",
-      });
-    },
-    onError: (error) => {
-      console.error("Error deleting custom link:", error);
-      toast({
-        title: "Error",
-        description: "Failed to delete custom link",
-        variant: "destructive",
-      });
-    },
-  });
 }
 
 export function useBulkUpdateCustomLinksMutation() {
