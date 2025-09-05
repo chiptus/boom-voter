@@ -1,54 +1,25 @@
 import { useState } from "react";
+import { useOutletContext } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Loader2, Plus, Music, Upload } from "lucide-react";
 import { CSVImportDialog } from "../CSVImportDialog";
 import { FestivalSet } from "@/hooks/queries/sets/useSets";
 import { useSetsQuery } from "@/hooks/queries/sets/useSets";
-import { useFestivalEditionBySlugQuery } from "@/hooks/queries/festivals/editions/useFestivalEditionBySlug";
+import { FestivalEdition } from "@/hooks/queries/festivals/editions/types";
 import { useDeleteSetMutation } from "@/hooks/queries/sets/useDeleteSet";
 import { SetFormDialog } from "../SetFormDialog";
 import { SetsTable } from "../SetsTable";
 
-interface SetManagementProps {
-  editionSlug: string;
-  festivalSlug: string;
-}
+interface SetManagementProps {}
 
-export function SetManagement({
-  editionSlug,
-  festivalSlug,
-}: SetManagementProps) {
+export function SetManagement(_props: SetManagementProps) {
   // All hooks must be at the top level
-  const editionQuery = useFestivalEditionBySlugQuery({
-    editionSlug,
-    festivalSlug,
-  });
+  const { edition } = useOutletContext<{ edition: FestivalEdition }>();
   const { data: sets = [], isLoading } = useSetsQuery();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingSet, setEditingSet] = useState<FestivalSet | null>(null);
   const deleteSetMutation = useDeleteSetMutation();
-
-  if (editionQuery.isLoading) {
-    return (
-      <Card>
-        <CardContent className="flex items-center justify-center p-8">
-          <Loader2 className="h-6 w-6 animate-spin mr-2" />
-          <span>Loading edition...</span>
-        </CardContent>
-      </Card>
-    );
-  }
-
-  if (!editionQuery.data) {
-    return (
-      <Card>
-        <CardContent className="flex items-center justify-center p-8">
-          <span>Edition not found</span>
-        </CardContent>
-      </Card>
-    );
-  }
 
   function handleCreate() {
     setEditingSet(null);
@@ -79,7 +50,7 @@ export function SetManagement({
 
   // Filter sets by selected edition
   const filteredSets = sets.filter(
-    (set) => set.festival_edition_id === editionQuery.data.id,
+    (set) => set.festival_edition_id === edition.id,
   );
 
   if (isLoading) {
@@ -102,7 +73,7 @@ export function SetManagement({
             Set Management
           </span>
           <div className="flex gap-2">
-            <CSVImportDialog editionId={editionQuery.data.id} defaultTab="sets">
+            <CSVImportDialog editionId={edition.id} defaultTab="sets">
               <Button variant="outline">
                 <Upload className="h-4 w-4 mr-2" />
                 Import CSV
@@ -123,7 +94,7 @@ export function SetManagement({
           sets={filteredSets}
           onEdit={handleEdit}
           onDelete={handleDelete}
-          editionId={editionQuery.data.id}
+          editionId={edition.id}
         />
       </CardContent>
 
@@ -131,7 +102,7 @@ export function SetManagement({
         isOpen={isDialogOpen}
         onClose={handleCloseDialog}
         editingSet={editingSet}
-        editionId={editionQuery.data.id}
+        editionId={edition.id}
       />
     </Card>
   );

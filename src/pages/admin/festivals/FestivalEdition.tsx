@@ -108,7 +108,7 @@ export default function FestivalEdition() {
         </TabsList>
 
         <div className="mt-6">
-          <Outlet />
+          <Outlet context={{ edition: currentEdition }} />
         </div>
       </Tabs>
     </div>
