@@ -141,11 +141,21 @@ export function useScheduleData(
           stages: scheduleStages.sort((a, b) => {
             const stageA = stages.find((s) => s.id === a.id);
             const stageB = stages.find((s) => s.id === b.id);
-            const orderA = stageA?.stage_order ?? 999;
-            const orderB = stageB?.stage_order ?? 999;
-            if (orderA !== orderB) {
+            const orderA = stageA?.stage_order ?? 0;
+            const orderB = stageB?.stage_order ?? 0;
+
+            // Stages with order > 0 come first, sorted by order
+            // Stages with order 0 come last, sorted by name
+            if (orderA > 0 && orderB > 0) {
               return orderA - orderB;
             }
+            if (orderA > 0 && orderB === 0) {
+              return -1; // A comes before B
+            }
+            if (orderA === 0 && orderB > 0) {
+              return 1; // B comes before A
+            }
+            // Both are 0, sort by name
             return a.name.localeCompare(b.name);
           }),
         };
