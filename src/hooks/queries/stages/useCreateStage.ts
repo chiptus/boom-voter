@@ -7,6 +7,8 @@ import { generateSlug } from "@/lib/slug";
 async function createStage(stageData: {
   name: string;
   festival_edition_id: string;
+  stage_order?: number;
+  color?: string;
 }) {
   const { data, error } = await supabase
     .from("stages")

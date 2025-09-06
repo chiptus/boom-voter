@@ -32,6 +32,8 @@ import { CSVImportDialog } from "./CSVImportDialog";
 
 interface StageFormData {
   name: string;
+  stage_order: number;
+  color: string;
 }
 
 interface StageManagementProps {}
@@ -49,12 +51,16 @@ export function StageManagement(_props: StageManagementProps) {
   const [editingStage, setEditingStage] = useState<Stage | null>(null);
   const [formData, setFormData] = useState<StageFormData>({
     name: "",
+    stage_order: 0,
+    color: "#6b7280",
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   function resetForm() {
     setFormData({
       name: "",
+      stage_order: 0,
+      color: "#6b7280",
     });
     setEditingStage(null);
   }
@@ -67,6 +73,8 @@ export function StageManagement(_props: StageManagementProps) {
   function handleEdit(stage: Stage) {
     setFormData({
       name: stage.name,
+      stage_order: stage.stage_order || 0,
+      color: stage.color || "#6b7280",
     });
     setEditingStage(stage);
     setIsDialogOpen(true);
@@ -88,7 +96,11 @@ export function StageManagement(_props: StageManagementProps) {
       if (editingStage) {
         await updateStageMutation.mutateAsync({
           stageId: editingStage.id,
-          stageData: formData,
+          stageData: {
+            name: formData.name,
+            stage_order: formData.stage_order,
+            color: formData.color,
+          },
         });
       } else {
         await createStageMutation.mutateAsync({
@@ -181,6 +193,45 @@ export function StageManagement(_props: StageManagementProps) {
                       required
                     />
                   </div>
+                  <div>
+                    <Label htmlFor="stage_order">Order</Label>
+                    <Input
+                      id="stage_order"
+                      type="number"
+                      min="0"
+                      value={formData.stage_order}
+                      onChange={(e) =>
+                        setFormData({
+                          ...formData,
+                          stage_order: parseInt(e.target.value) || 0,
+                        })
+                      }
+                      placeholder="0"
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="color">Stage Color</Label>
+                    <div className="flex items-center gap-2">
+                      <input
+                        id="color"
+                        type="color"
+                        value={formData.color}
+                        onChange={(e) =>
+                          setFormData({ ...formData, color: e.target.value })
+                        }
+                        className="w-12 h-10 border border-gray-300 rounded cursor-pointer"
+                      />
+                      <Input
+                        value={formData.color}
+                        onChange={(e) =>
+                          setFormData({ ...formData, color: e.target.value })
+                        }
+                        placeholder="#6b7280"
+                        pattern="^#[0-9A-Fa-f]{6}$"
+                        className="flex-1"
+                      />
+                    </div>
+                  </div>
                   <div className="flex justify-end gap-2">
                     <Button
                       type="button"
@@ -209,7 +260,8 @@ export function StageManagement(_props: StageManagementProps) {
             <TableHeader>
               <TableRow>
                 <TableHead>Stage Name</TableHead>
-
+                <TableHead>Order</TableHead>
+                <TableHead>Color</TableHead>
                 <TableHead>Created</TableHead>
                 <TableHead className="w-20">Actions</TableHead>
               </TableRow>
@@ -218,7 +270,16 @@ export function StageManagement(_props: StageManagementProps) {
               {filteredStages.map((stage) => (
                 <TableRow key={stage.id}>
                   <TableCell className="font-medium">{stage.name}</TableCell>
-
+                  <TableCell>{stage.stage_order || 0}</TableCell>
+                  <TableCell>
+                    <div className="flex items-center gap-2">
+                      <div
+                        className="w-4 h-4 rounded border"
+                        style={{ backgroundColor: stage.color || "#6b7280" }}
+                      />
+                      {stage.color || "#6b7280"}
+                    </div>
+                  </TableCell>
                   <TableCell>
                     {new Date(stage.created_at).toLocaleDateString()}
                   </TableCell>
