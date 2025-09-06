@@ -23,3 +23,7 @@ END $$;
 
 -- Create index for efficient ordering
 CREATE INDEX idx_stages_order ON public.stages (stage_order);
+
+-- Add color column to stages table
+ALTER TABLE public.stages 
+ADD COLUMN color VARCHAR(7);

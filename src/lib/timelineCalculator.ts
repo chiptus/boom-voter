@@ -1,5 +1,6 @@
 import { differenceInMinutes } from "date-fns";
 import type { ScheduleSet, ScheduleDay } from "@/hooks/useScheduleData";
+import type { Stage } from "@/hooks/queries/stages/types";
 
 export interface HorizontalTimelineSet extends ScheduleSet {
   horizontalPosition?: {
@@ -19,6 +20,7 @@ export interface TimelineData {
   timeSlots: Date[];
   stages: Array<{
     name: string;
+    color?: string;
     sets: HorizontalTimelineSet[];
   }>;
   totalWidth: number;
@@ -30,6 +32,7 @@ export interface VerticalTimelineData {
   timeSlots: Date[];
   stages: Array<{
     name: string;
+    color?: string;
     sets: VerticalTimelineSet[];
   }>;
   totalHeight: number;
@@ -41,6 +44,7 @@ export function calculateTimelineData(
   festivalStartDate: Date,
   festivalEndDate: Date,
   scheduleDays: ScheduleDay[],
+  stages: Stage[],
 ): TimelineData | null {
   if (!scheduleDays || scheduleDays.length === 0) return null;
 
@@ -99,16 +103,29 @@ export function calculateTimelineData(
     });
   });
 
-  // Create unified stages array - stages will be sorted alphabetically by default
+  // Create unified stages array - stages will be sorted by stage_order then by name
   const unifiedStages = Object.entries(allStageGroups)
-    .map(([stageName, sets]) => ({
-      name: stageName,
-      sets: sets.sort((a, b) => {
-        if (!a.startTime || !b.startTime) return 0;
-        return a.startTime.getTime() - b.startTime.getTime();
-      }),
-    }))
-    .sort((a, b) => a.name.localeCompare(b.name));
+    .map(([stageName, sets]) => {
+      const stage = stages.find((s) => s.name === stageName);
+      return {
+        name: stageName,
+        color: stage?.color || undefined,
+        sets: sets.sort((a, b) => {
+          if (!a.startTime || !b.startTime) return 0;
+          return a.startTime.getTime() - b.startTime.getTime();
+        }),
+      };
+    })
+    .sort((a, b) => {
+      const stageA = stages.find((s) => s.name === a.name);
+      const stageB = stages.find((s) => s.name === b.name);
+      const orderA = stageA?.stage_order ?? 999;
+      const orderB = stageB?.stage_order ?? 999;
+      if (orderA !== orderB) {
+        return orderA - orderB;
+      }
+      return a.name.localeCompare(b.name);
+    });
 
   return {
     timeSlots,
@@ -170,6 +187,7 @@ export function calculateVerticalTimelineData(
   festivalStartDate: Date,
   festivalEndDate: Date,
   scheduleDays: ScheduleDay[],
+  stages: Stage[],
 ): VerticalTimelineData | null {
   if (!scheduleDays || scheduleDays.length === 0) return null;
 
@@ -224,14 +242,27 @@ export function calculateVerticalTimelineData(
   });
 
   const unifiedStages = Object.entries(allStageGroups)
-    .map(([stageName, sets]) => ({
-      name: stageName,
-      sets: sets.sort((a, b) => {
-        if (!a.startTime || !b.startTime) return 0;
-        return a.startTime.getTime() - b.startTime.getTime();
-      }),
-    }))
-    .sort((a, b) => a.name.localeCompare(b.name));
+    .map(([stageName, sets]) => {
+      const stage = stages.find((s) => s.name === stageName);
+      return {
+        name: stageName,
+        color: stage?.color || undefined,
+        sets: sets.sort((a, b) => {
+          if (!a.startTime || !b.startTime) return 0;
+          return a.startTime.getTime() - b.startTime.getTime();
+        }),
+      };
+    })
+    .sort((a, b) => {
+      const stageA = stages.find((s) => s.name === a.name);
+      const stageB = stages.find((s) => s.name === b.name);
+      const orderA = stageA?.stage_order ?? 999;
+      const orderB = stageB?.stage_order ?? 999;
+      if (orderA !== orderB) {
+        return orderA - orderB;
+      }
+      return a.name.localeCompare(b.name);
+    });
 
   return {
     timeSlots,

@@ -640,29 +640,35 @@ export type Database = {
       stages: {
         Row: {
           archived: boolean;
+          color: string | null;
           created_at: string;
           festival_edition_id: string;
           id: string;
           name: string;
           slug: string;
+          stage_order: number;
           updated_at: string;
         };
         Insert: {
           archived?: boolean;
+          color?: string | null;
           created_at?: string;
           festival_edition_id: string;
           id?: string;
           name: string;
           slug: string;
+          stage_order?: number;
           updated_at?: string;
         };
         Update: {
           archived?: boolean;
+          color?: string | null;
           created_at?: string;
           festival_edition_id?: string;
           id?: string;
           name?: string;
           slug?: string;
+          stage_order?: number;
           updated_at?: string;
         };
         Relationships: [];

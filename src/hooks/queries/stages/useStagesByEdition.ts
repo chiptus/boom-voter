@@ -8,6 +8,7 @@ async function fetchStagesByEdition(editionId: string): Promise<Stage[]> {
     .select("*")
     .eq("festival_edition_id", editionId)
     .eq("archived", false)
+    .order("stage_order")
     .order("name");
 
   if (error) {

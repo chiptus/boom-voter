@@ -4,6 +4,7 @@ import type { HorizontalTimelineSet } from "@/lib/timelineCalculator";
 interface StageRowProps {
   stage: {
     name: string;
+    color?: string;
     sets: HorizontalTimelineSet[];
   };
   totalWidth: number;
@@ -14,8 +15,11 @@ export function StageRow({ stage, totalWidth }: StageRowProps) {
     <div key={stage.name} className="flex items-start">
       {/* Timeline Track */}
       <div
-        className="relative h-24 bg-white/5 rounded-lg border border-purple-400/20"
-        style={{ minWidth: totalWidth }}
+        className="relative h-24 bg-white/5 rounded-lg border-2"
+        style={{
+          minWidth: totalWidth,
+          borderColor: stage.color ? `${stage.color}40` : "#7c3aed33",
+        }}
       >
         {stage.sets.map((set) => {
           if (!set.horizontalPosition) return null;

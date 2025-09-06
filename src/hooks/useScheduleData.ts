@@ -138,7 +138,16 @@ export function useScheduleData(
         return {
           date: dateKey,
           displayDate: format(date, "EEEE, MMM d"),
-          stages: scheduleStages.sort((a, b) => a.name.localeCompare(b.name)),
+          stages: scheduleStages.sort((a, b) => {
+            const stageA = stages.find((s) => s.id === a.id);
+            const stageB = stages.find((s) => s.id === b.id);
+            const orderA = stageA?.stage_order ?? 999;
+            const orderB = stageB?.stage_order ?? 999;
+            if (orderA !== orderB) {
+              return orderA - orderB;
+            }
+            return a.name.localeCompare(b.name);
+          }),
         };
       });
 
