@@ -74,8 +74,16 @@ export function Timeline() {
       new Date(edition.start_date),
       new Date(edition.end_date),
       filteredScheduleDays,
+      stagesQuery.data || [],
     );
-  }, [edition, scheduleDays, selectedDay, selectedTime, selectedStages]);
+  }, [
+    edition,
+    scheduleDays,
+    selectedDay,
+    selectedTime,
+    selectedStages,
+    stagesQuery.data,
+  ]);
 
   if (loading || setsLoading) {
     return (

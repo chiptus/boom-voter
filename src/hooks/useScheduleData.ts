@@ -3,6 +3,7 @@ import { formatDateTime } from "@/lib/timeUtils";
 import { format, startOfDay } from "date-fns";
 import type { FestivalSet } from "@/hooks/queries/sets/useSets";
 import { Stage } from "./queries/stages/types";
+import { sortStagesByOrder } from "@/lib/stageUtils";
 
 export interface ScheduleDay {
   date: string;
@@ -138,7 +139,11 @@ export function useScheduleData(
         return {
           date: dateKey,
           displayDate: format(date, "EEEE, MMM d"),
-          stages: scheduleStages.sort((a, b) => a.name.localeCompare(b.name)),
+          stages: sortStagesByOrder(scheduleStages, stages, (stage) => {
+            // Find the matching stage by id to get the name
+            const stageData = stages.find((s) => s.id === stage.id);
+            return stageData?.name || stage.name;
+          }),
         };
       });
 

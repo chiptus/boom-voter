@@ -10,7 +10,7 @@ import { useStagesByEditionQuery } from "@/hooks/queries/stages/useStagesByEditi
 
 interface TimeSlot {
   time: Date;
-  sets: (ScheduleSet & { stageName: string })[];
+  sets: (ScheduleSet & { stageName: string; stageColor?: string })[];
 }
 
 export function ListSchedule() {
@@ -62,7 +62,10 @@ export function ListSchedule() {
     }
 
     // Collect all unique start times with filtering
-    const allSets: (ScheduleSet & { stageName: string })[] = [];
+    const allSets: (ScheduleSet & {
+      stageName: string;
+      stageColor?: string;
+    })[] = [];
 
     scheduleDays.forEach((day) => {
       day.stages.forEach((stage) => {
@@ -71,11 +74,15 @@ export function ListSchedule() {
           return;
         }
 
+        // Find the stage data to get color information
+        const stageData = stagesQuery.data?.find((s) => s.id === stage.id);
+
         stage.sets.forEach((set) => {
           if (set.startTime && matchesDay(set) && matchesTime(set)) {
             allSets.push({
               ...set,
               stageName: stage.name,
+              stageColor: stageData?.color || undefined,
             });
           }
         });
@@ -85,7 +92,7 @@ export function ListSchedule() {
     // Group sets by start time
     const timeGroups = new Map<
       string,
-      (ScheduleSet & { stageName: string })[]
+      (ScheduleSet & { stageName: string; stageColor?: string })[]
     >();
 
     allSets.forEach((set) => {
@@ -107,7 +114,13 @@ export function ListSchedule() {
       .sort((a, b) => a.time.getTime() - b.time.getTime());
 
     return slots;
-  }, [scheduleDays, selectedDay, selectedTime, selectedStages]);
+  }, [
+    scheduleDays,
+    selectedDay,
+    selectedTime,
+    selectedStages,
+    stagesQuery.data,
+  ]);
 
   if (loading || setsLoading) {
     return (

@@ -5,7 +5,7 @@ import type { ScheduleSet } from "@/hooks/useScheduleData";
 
 interface TimeSlot {
   time: Date;
-  sets: (ScheduleSet & { stageName: string })[];
+  sets: (ScheduleSet & { stageName: string; stageColor?: string })[];
 }
 
 interface TimeSlotGroupProps {
