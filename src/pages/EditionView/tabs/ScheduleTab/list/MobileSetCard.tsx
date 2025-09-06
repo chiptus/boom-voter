@@ -1,12 +1,13 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Link } from "react-router-dom";
-import { Clock, MapPin } from "lucide-react";
+import { Clock } from "lucide-react";
 import { format, differenceInMinutes } from "date-fns";
 import { VoteButtons } from "../VoteButtons";
+import { StageBadge } from "@/components/StageBadge";
 import type { ScheduleSet } from "@/hooks/useScheduleData";
 
 interface MobileSetCardProps {
-  set: ScheduleSet & { stageName: string };
+  set: ScheduleSet & { stageName: string; stageColor?: string };
 }
 
 export function MobileSetCard({ set }: MobileSetCardProps) {
@@ -30,10 +31,11 @@ export function MobileSetCard({ set }: MobileSetCardProps) {
 
         {/* Stage and duration info */}
         <div className="flex items-center gap-4 mb-3 text-sm text-purple-200">
-          <div className="flex items-center gap-1">
-            <MapPin className="h-3 w-3" />
-            <span>{set.stageName}</span>
-          </div>
+          <StageBadge
+            stageName={set.stageName}
+            stageColor={set.stageColor}
+            size="sm"
+          />
 
           {duration && (
             <div className="flex items-center gap-1">
