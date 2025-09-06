@@ -1,6 +1,7 @@
 import { differenceInMinutes } from "date-fns";
 import type { ScheduleSet, ScheduleDay } from "@/hooks/useScheduleData";
 import type { Stage } from "@/hooks/queries/stages/types";
+import { sortStagesByOrder } from "@/lib/stageUtils";
 
 export interface HorizontalTimelineSet extends ScheduleSet {
   horizontalPosition?: {
@@ -104,8 +105,8 @@ export function calculateTimelineData(
   });
 
   // Create unified stages array - stages will be sorted by stage_order then by name
-  const unifiedStages = Object.entries(allStageGroups)
-    .map(([stageName, sets]) => {
+  const unifiedStagesUnsorted = Object.entries(allStageGroups).map(
+    ([stageName, sets]) => {
       const stage = stages.find((s) => s.name === stageName);
       return {
         name: stageName,
@@ -115,27 +116,10 @@ export function calculateTimelineData(
           return a.startTime.getTime() - b.startTime.getTime();
         }),
       };
-    })
-    .sort((a, b) => {
-      const stageA = stages.find((s) => s.name === a.name);
-      const stageB = stages.find((s) => s.name === b.name);
-      const orderA = stageA?.stage_order ?? 0;
-      const orderB = stageB?.stage_order ?? 0;
+    },
+  );
 
-      // Stages with order > 0 come first, sorted by order
-      // Stages with order 0 come last, sorted by name
-      if (orderA > 0 && orderB > 0) {
-        return orderA - orderB;
-      }
-      if (orderA > 0 && orderB === 0) {
-        return -1; // A comes before B
-      }
-      if (orderA === 0 && orderB > 0) {
-        return 1; // B comes before A
-      }
-      // Both are 0, sort by name
-      return a.name.localeCompare(b.name);
-    });
+  const unifiedStages = sortStagesByOrder(unifiedStagesUnsorted, stages);
 
   return {
     timeSlots,
@@ -251,8 +235,8 @@ export function calculateVerticalTimelineData(
     });
   });
 
-  const unifiedStages = Object.entries(allStageGroups)
-    .map(([stageName, sets]) => {
+  const unifiedStagesUnsorted = Object.entries(allStageGroups).map(
+    ([stageName, sets]) => {
       const stage = stages.find((s) => s.name === stageName);
       return {
         name: stageName,
@@ -262,27 +246,14 @@ export function calculateVerticalTimelineData(
           return a.startTime.getTime() - b.startTime.getTime();
         }),
       };
-    })
-    .sort((a, b) => {
-      const stageA = stages.find((s) => s.name === a.name);
-      const stageB = stages.find((s) => s.name === b.name);
-      const orderA = stageA?.stage_order ?? 0;
-      const orderB = stageB?.stage_order ?? 0;
+    },
+  );
 
-      // Stages with order > 0 come first, sorted by order
-      // Stages with order 0 come last, sorted by name
-      if (orderA > 0 && orderB > 0) {
-        return orderA - orderB;
-      }
-      if (orderA > 0 && orderB === 0) {
-        return -1; // A comes before B
-      }
-      if (orderA === 0 && orderB > 0) {
-        return 1; // B comes before A
-      }
-      // Both are 0, sort by name
-      return a.name.localeCompare(b.name);
-    });
+  const unifiedStages = sortStagesByOrder(
+    unifiedStagesUnsorted,
+    stages,
+    (stage) => stage.name,
+  );
 
   return {
     timeSlots,
