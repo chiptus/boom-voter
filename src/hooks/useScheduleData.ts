@@ -14,6 +14,7 @@ export interface ScheduleDay {
 export interface ScheduleStage {
   id: string;
   name: string;
+  stage_order: number;
   sets: ScheduleSet[];
 }
 
@@ -128,22 +129,19 @@ export function useScheduleData(
             return {
               id: stageId,
               name: stage?.name,
+              stage_order: stage?.stage_order,
               sets: stageSets.sort((a, b) => {
                 if (!a.startTime || !b.startTime) return 0;
                 return a.startTime.getTime() - b.startTime.getTime();
               }),
-            };
+            } satisfies ScheduleStage;
           })
           .filter((v: ScheduleStage | null): v is ScheduleStage => !!v);
 
         return {
           date: dateKey,
           displayDate: format(date, "EEEE, MMM d"),
-          stages: sortStagesByOrder(scheduleStages, stages, (stage) => {
-            // Find the matching stage by id to get the name
-            const stageData = stages.find((s) => s.id === stage.id);
-            return stageData?.name || stage.name;
-          }),
+          stages: sortStagesByOrder(scheduleStages),
         };
       });
 

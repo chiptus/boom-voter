@@ -111,6 +111,7 @@ export function calculateTimelineData(
       return {
         name: stageName,
         color: stage?.color || undefined,
+        stage_order: stage?.stage_order || 0,
         sets: sets.sort((a, b) => {
           if (!a.startTime || !b.startTime) return 0;
           return a.startTime.getTime() - b.startTime.getTime();
@@ -119,7 +120,7 @@ export function calculateTimelineData(
     },
   );
 
-  const unifiedStages = sortStagesByOrder(unifiedStagesUnsorted, stages);
+  const unifiedStages = sortStagesByOrder(unifiedStagesUnsorted);
 
   return {
     timeSlots,
@@ -241,6 +242,7 @@ export function calculateVerticalTimelineData(
       return {
         name: stageName,
         color: stage?.color || undefined,
+        stage_order: stage?.stage_order || 0,
         sets: sets.sort((a, b) => {
           if (!a.startTime || !b.startTime) return 0;
           return a.startTime.getTime() - b.startTime.getTime();
@@ -249,11 +251,7 @@ export function calculateVerticalTimelineData(
     },
   );
 
-  const unifiedStages = sortStagesByOrder(
-    unifiedStagesUnsorted,
-    stages,
-    (stage) => stage.name,
-  );
+  const unifiedStages = sortStagesByOrder(unifiedStagesUnsorted);
 
   return {
     timeSlots,
