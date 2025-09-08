@@ -25,6 +25,7 @@ export default defineConfig(({ mode }) => ({
           {
             urlPattern: /^https:\/\/qssmaz.*\.supabase\.co\/rest\/v1\//,
             handler: "StaleWhileRevalidate",
+            method: "GET",
             options: {
               cacheName: "supabase-api-cache",
               expiration: {

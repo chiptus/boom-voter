@@ -30,8 +30,10 @@ export function useUpdateStageMutation() {
       stageId: string;
       stageData: { name: string; stage_order?: number; color?: string };
     }) => updateStage(stageId, stageData),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: stagesKeys.all });
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({
+        queryKey: stagesKeys.all,
+      });
       toast({
         title: "Success",
         description: "Stage updated successfully",

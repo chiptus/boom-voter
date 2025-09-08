@@ -29,8 +29,10 @@ export function useCreateStageMutation() {
 
   return useMutation({
     mutationFn: createStage,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: stagesKeys.all });
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({
+        queryKey: stagesKeys.all,
+      });
       toast({
         title: "Success",
         description: "Stage created successfully",

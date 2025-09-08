@@ -18,8 +18,10 @@ export function useDeleteStageMutation() {
 
   return useMutation({
     mutationFn: deleteStage,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: stagesKeys.all });
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({
+        queryKey: stagesKeys.all,
+      });
       toast({
         title: "Success",
         description: "Stage deleted successfully",
