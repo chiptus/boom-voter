@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { DEFAULT_STAGE_COLOR } from "@/lib/constants/stages";
 
 export interface StageFormData {
   name: string;
@@ -38,7 +39,7 @@ export function StageForm({
     defaultValues: {
       name: initialData?.name || "",
       stage_order: initialData?.stage_order || 0,
-      color: initialData?.color || "#6b7280",
+      color: initialData?.color || DEFAULT_STAGE_COLOR,
     },
   });
 
@@ -109,10 +110,10 @@ export function StageForm({
             {...register("color", {
               pattern: {
                 value: /^#[0-9A-Fa-f]{6}$/,
-                message: "Color must be a valid hex code (e.g., #6b7280)",
+                message: `Color must be a valid hex code (e.g., ${DEFAULT_STAGE_COLOR})`,
               },
             })}
-            placeholder="#6b7280"
+            placeholder={DEFAULT_STAGE_COLOR}
             className="flex-1"
           />
         </div>

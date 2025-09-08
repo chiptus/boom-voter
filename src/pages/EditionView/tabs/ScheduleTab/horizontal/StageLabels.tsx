@@ -1,3 +1,5 @@
+import { DEFAULT_STAGE_COLOR } from "@/lib/constants/stages";
+
 interface StageLabelsProps {
   stages: Array<{ name: string; color?: string }>;
 }
@@ -10,7 +12,7 @@ export function StageLabels({ stages }: StageLabelsProps) {
           <div
             className="text-sm font-medium text-white px-2 py-1 rounded"
             style={{
-              backgroundColor: stage.color || "#6b7280",
+              backgroundColor: stage.color || DEFAULT_STAGE_COLOR,
             }}
           >
             {stage.name}

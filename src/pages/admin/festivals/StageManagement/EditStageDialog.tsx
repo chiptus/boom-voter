@@ -8,6 +8,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { StageForm, StageFormData } from "./StageForm";
+import { DEFAULT_STAGE_COLOR } from "@/lib/constants/stages";
 
 interface EditStageDialogProps {
   stage: Stage | null;
@@ -51,7 +52,7 @@ export function EditStageDialog({
           initialData={{
             name: stage.name,
             stage_order: stage.stage_order || 0,
-            color: stage.color || "#6b7280",
+            color: stage.color || DEFAULT_STAGE_COLOR,
           }}
           onSubmit={handleSubmit}
           onCancel={onClose}

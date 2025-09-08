@@ -9,6 +9,7 @@ import {
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Edit2, Trash2 } from "lucide-react";
+import { DEFAULT_STAGE_COLOR } from "@/lib/constants/stages";
 
 interface StagesTableProps {
   stages: Stage[];
@@ -38,9 +39,11 @@ export function StagesTable({ stages, onEdit, onDelete }: StagesTableProps) {
                 <div className="flex items-center gap-2">
                   <div
                     className="w-4 h-4 rounded border"
-                    style={{ backgroundColor: stage.color || "#6b7280" }}
+                    style={{
+                      backgroundColor: stage.color || DEFAULT_STAGE_COLOR,
+                    }}
                   />
-                  {stage.color || "#6b7280"}
+                  {stage.color || DEFAULT_STAGE_COLOR}
                 </div>
               </TableCell>
               <TableCell>
