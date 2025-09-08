@@ -2,106 +2,34 @@ import { useState } from "react";
 import { useOutletContext } from "react-router-dom";
 import { useStagesByEditionQuery } from "@/hooks/queries/stages/useStagesByEdition";
 import { FestivalEdition } from "@/hooks/queries/festivals/editions/types";
-import { useCreateStageMutation } from "@/hooks/queries/stages/useCreateStage";
-import { useUpdateStageMutation } from "@/hooks/queries/stages/useUpdateStage";
 import { useDeleteStageMutation } from "@/hooks/queries/stages/useDeleteStage";
 import { Stage } from "@/hooks/queries/stages/types";
-import { useToast } from "@/hooks/use-toast";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
-import { Label } from "@/components/ui/label";
-import { Loader2, Plus, Edit2, Trash2, MapPin, Upload } from "lucide-react";
+import { Loader2, MapPin, Upload } from "lucide-react";
 import { CSVImportDialog } from "./CSVImportDialog";
-
-interface StageFormData {
-  name: string;
-}
+import { StagesTable } from "./StageManagement/StagesTable";
+import { CreateStageDialog } from "./StageManagement/CreateStageDialog";
+import { EditStageDialog } from "./StageManagement/EditStageDialog";
 
 interface StageManagementProps {}
 
 export function StageManagement(_props: StageManagementProps) {
-  // All hooks must be at the top level
   const { edition } = useOutletContext<{ edition: FestivalEdition }>();
   const { data: stages = [], isLoading } = useStagesByEditionQuery(edition.id);
-  const createStageMutation = useCreateStageMutation();
-  const updateStageMutation = useUpdateStageMutation();
   const deleteStageMutation = useDeleteStageMutation();
-  const { toast } = useToast();
 
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingStage, setEditingStage] = useState<Stage | null>(null);
-  const [formData, setFormData] = useState<StageFormData>({
-    name: "",
-  });
-  const [isSubmitting, setIsSubmitting] = useState(false);
-
-  function resetForm() {
-    setFormData({
-      name: "",
-    });
-    setEditingStage(null);
-  }
-
-  function handleCreate() {
-    resetForm();
-    setIsDialogOpen(true);
-  }
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
 
   function handleEdit(stage: Stage) {
-    setFormData({
-      name: stage.name,
-    });
     setEditingStage(stage);
-    setIsDialogOpen(true);
+    setIsEditDialogOpen(true);
   }
 
-  async function handleSubmit(e: React.FormEvent) {
-    e.preventDefault();
-    if (!formData.name.trim()) {
-      toast({
-        title: "Error",
-        description: "Stage name is required",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    setIsSubmitting(true);
-    try {
-      if (editingStage) {
-        await updateStageMutation.mutateAsync({
-          stageId: editingStage.id,
-          stageData: formData,
-        });
-      } else {
-        await createStageMutation.mutateAsync({
-          ...formData,
-          festival_edition_id: edition.id,
-        });
-      }
-
-      setIsDialogOpen(false);
-      resetForm();
-    } finally {
-      setIsSubmitting(false);
-    }
+  function handleCloseEditDialog() {
+    setIsEditDialogOpen(false);
+    setEditingStage(null);
   }
 
   async function handleDelete(stage: Stage) {
@@ -147,111 +75,22 @@ export function StageManagement(_props: StageManagementProps) {
                 Import CSV
               </Button>
             </CSVImportDialog>
-            <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-              <DialogTrigger asChild>
-                <Button
-                  onClick={handleCreate}
-                  className="bg-purple-600 hover:bg-purple-700"
-                >
-                  <Plus className="h-4 w-4 mr-2" />
-                  Add Stage
-                </Button>
-              </DialogTrigger>
-              <DialogContent>
-                <DialogHeader>
-                  <DialogTitle>
-                    {editingStage ? "Edit Stage" : "Create New Stage"}
-                  </DialogTitle>
-                  <DialogDescription>
-                    {editingStage
-                      ? "Update the stage name and details."
-                      : "Create a new stage where artists will perform."}
-                  </DialogDescription>
-                </DialogHeader>
-                <form onSubmit={handleSubmit} className="space-y-4">
-                  <div>
-                    <Label htmlFor="name">Stage Name</Label>
-                    <Input
-                      id="name"
-                      value={formData.name}
-                      onChange={(e) =>
-                        setFormData({ ...formData, name: e.target.value })
-                      }
-                      placeholder="e.g., Dance Temple, Sacred Ground"
-                      required
-                    />
-                  </div>
-                  <div className="flex justify-end gap-2">
-                    <Button
-                      type="button"
-                      variant="outline"
-                      onClick={() => setIsDialogOpen(false)}
-                      disabled={isSubmitting}
-                    >
-                      Cancel
-                    </Button>
-                    <Button type="submit" disabled={isSubmitting}>
-                      {isSubmitting && (
-                        <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                      )}
-                      {editingStage ? "Update" : "Create"}
-                    </Button>
-                  </div>
-                </form>
-              </DialogContent>
-            </Dialog>
+            <CreateStageDialog editionId={edition.id} />
           </div>
         </CardTitle>
       </CardHeader>
       <CardContent>
-        <div className="rounded-md border">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Stage Name</TableHead>
+        <StagesTable
+          stages={filteredStages}
+          onEdit={handleEdit}
+          onDelete={handleDelete}
+        />
 
-                <TableHead>Created</TableHead>
-                <TableHead className="w-20">Actions</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {filteredStages.map((stage) => (
-                <TableRow key={stage.id}>
-                  <TableCell className="font-medium">{stage.name}</TableCell>
-
-                  <TableCell>
-                    {new Date(stage.created_at).toLocaleDateString()}
-                  </TableCell>
-                  <TableCell>
-                    <div className="flex gap-2">
-                      <Button
-                        size="sm"
-                        variant="ghost"
-                        onClick={() => handleEdit(stage)}
-                      >
-                        <Edit2 className="h-4 w-4" />
-                      </Button>
-                      <Button
-                        size="sm"
-                        variant="ghost"
-                        onClick={() => handleDelete(stage)}
-                        className="text-destructive hover:text-destructive"
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-
-          {filteredStages.length === 0 && (
-            <div className="text-center py-8 text-muted-foreground">
-              No stages found for the selected edition.
-            </div>
-          )}
-        </div>
+        <EditStageDialog
+          stage={editingStage}
+          isOpen={isEditDialogOpen}
+          onClose={handleCloseEditDialog}
+        />
       </CardContent>
     </Card>
   );

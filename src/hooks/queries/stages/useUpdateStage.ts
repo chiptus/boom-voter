@@ -3,7 +3,10 @@ import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { stagesKeys } from "./types";
 
-async function updateStage(stageId: string, stageData: { name: string }) {
+async function updateStage(
+  stageId: string,
+  stageData: { name: string; stage_order?: number; color?: string },
+) {
   const { data, error } = await supabase
     .from("stages")
     .update(stageData)
@@ -25,10 +28,12 @@ export function useUpdateStageMutation() {
       stageData,
     }: {
       stageId: string;
-      stageData: { name: string };
+      stageData: { name: string; stage_order?: number; color?: string };
     }) => updateStage(stageId, stageData),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: stagesKeys.all });
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({
+        queryKey: stagesKeys.all,
+      });
       toast({
         title: "Success",
         description: "Stage updated successfully",

@@ -1,6 +1,7 @@
-import { MapPin, Clock } from "lucide-react";
+import { Clock } from "lucide-react";
 import { formatTimeRange } from "@/lib/timeUtils";
 import { GenreBadge } from "@/components/GenreBadge";
+import { StageBadge } from "@/components/StageBadge";
 import { useFestivalSet } from "../FestivalSetContext";
 import { useStageQuery } from "@/hooks/queries/stages/useStageQuery";
 
@@ -39,10 +40,11 @@ export function SetMetadata() {
       {/* Stage and Time Information */}
       <div className="flex flex-wrap gap-2 items-center">
         {stageQuery.data && (
-          <div className="flex items-center gap-1 text-purple-200 text-xs">
-            <MapPin className="h-3 w-3" />
-            <span>{stageQuery.data.name}</span>
-          </div>
+          <StageBadge
+            stageName={stageQuery.data.name}
+            stageColor={stageQuery.data.color || undefined}
+            size="sm"
+          />
         )}
         {timeRangeFormatted && (
           <div className="flex items-center gap-1 text-sm text-purple-200">

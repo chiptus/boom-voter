@@ -1,6 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Stage, stagesKeys } from "./types";
+import { sortStagesByOrder } from "@/lib/stageUtils";
 
 async function fetchStagesByEdition(editionId: string): Promise<Stage[]> {
   const { data, error } = await supabase
@@ -14,7 +15,8 @@ async function fetchStagesByEdition(editionId: string): Promise<Stage[]> {
     throw new Error("Failed to load stages for edition");
   }
 
-  return data || [];
+  // Apply custom sorting using shared utility
+  return sortStagesByOrder(data || []);
 }
 
 export function useStagesByEditionQuery(editionId: string | undefined) {

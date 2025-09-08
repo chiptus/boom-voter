@@ -21,30 +21,6 @@ export default defineConfig(({ mode }) => ({
       workbox: {
         globPatterns: ["**/*.{js,css,html,ico,png,svg,webp,woff,woff2}"],
         navigateFallback: "/index.html",
-        runtimeCaching: [
-          {
-            urlPattern: /^https:\/\/qssmaz.*\.supabase\.co\/rest\/v1\//,
-            handler: "StaleWhileRevalidate",
-            options: {
-              cacheName: "supabase-api-cache",
-              expiration: {
-                maxEntries: 1000,
-                maxAgeSeconds: 60 * 60 * 24, // 24 hours
-              },
-            },
-          },
-          {
-            urlPattern: /^https:\/\/.*\.(png|jpg|jpeg|svg|gif|webp)$/,
-            handler: "CacheFirst",
-            options: {
-              cacheName: "images-cache",
-              expiration: {
-                maxEntries: 500,
-                maxAgeSeconds: 60 * 60 * 24 * 30, // 30 days
-              },
-            },
-          },
-        ],
       },
       includeAssets: [
         "favicon.svg",
