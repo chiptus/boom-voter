@@ -8,9 +8,9 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Loader2, MapPin, Upload } from "lucide-react";
 import { CSVImportDialog } from "./CSVImportDialog";
-import { StagesTable } from "@/components/Admin/StageManagement/StagesTable";
-import { CreateStageDialog } from "@/components/Admin/StageManagement/CreateStageDialog";
-import { EditStageDialog } from "@/components/Admin/StageManagement/EditStageDialog";
+import { StagesTable } from "./StageManagement/StagesTable";
+import { CreateStageDialog } from "./StageManagement/CreateStageDialog";
+import { EditStageDialog } from "./StageManagement/EditStageDialog";
 
 interface StageManagementProps {}
 
