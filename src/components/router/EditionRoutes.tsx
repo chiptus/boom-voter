@@ -1,6 +1,7 @@
 import { Navigate, Route } from "react-router-dom";
 import EditionView from "@/pages/EditionView/EditionView";
 import { SetDetails } from "@/pages/SetDetails";
+import { ExploreSetPage } from "@/pages/ExploreSetPage/ExploreSetPage";
 
 // Tab components
 import { ArtistsTab } from "@/pages/EditionView/tabs/ArtistsTab/ArtistsTab";
@@ -28,6 +29,10 @@ export function createEditionRoutes({
     ? () => <WrapperComponent component={SetDetails} />
     : SetDetails;
 
+  const ExploreComponent = WrapperComponent
+    ? () => <WrapperComponent component={ExploreSetPage} />
+    : ExploreSetPage;
+
   return [
     <Route key="main" path={basePath} element={<EditionComponent />}>
       {/* Nested tab routes */}
@@ -46,6 +51,11 @@ export function createEditionRoutes({
       key="sets"
       path={`${basePath}/sets/:setSlug`}
       element={<SetDetailsComponent />}
+    />,
+    <Route
+      key="explore"
+      path={`${basePath}/explore`}
+      element={<ExploreComponent />}
     />,
   ];
 }
