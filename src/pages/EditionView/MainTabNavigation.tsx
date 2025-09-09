@@ -1,15 +1,27 @@
 import { cn } from "@/lib/utils";
-import { Calendar, List, Map, Info } from "lucide-react";
+import { Calendar, List, Map, Info, Heart } from "lucide-react";
 import { NavLink } from "react-router-dom";
 import { useFestivalEdition } from "@/contexts/FestivalEditionContext";
 
-export type MainTab = "sets" | "schedule" | "map" | "info" | "social";
+export type MainTab =
+  | "sets"
+  | "schedule"
+  | "map"
+  | "info"
+  | "social"
+  | "explore";
 
 const TAB_CONFIG = {
   sets: {
     icon: List,
     label: "Vote",
     shortLabel: "Vote",
+    disabled: false,
+  },
+  explore: {
+    icon: Heart,
+    label: "Explore",
+    shortLabel: "Explore",
     disabled: false,
   },
   schedule: {
