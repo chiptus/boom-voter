@@ -34,6 +34,10 @@ export function ExploreSetPage() {
 
   const [currentIndex, setCurrentIndex] = useState(0);
   const [direction, setDirection] = useState<"left" | "right" | null>(null);
+  const [dragFeedback, setDragFeedback] = useState<{
+    direction: "left" | "right" | null;
+    intensity: number;
+  }>({ direction: null, intensity: 0 });
 
   const currentSet = explorableSets[currentIndex];
   const isLastSet = currentIndex >= explorableSets.length - 1;
@@ -77,6 +81,13 @@ export function ExploreSetPage() {
     }
   }
 
+  function handleDragUpdate(
+    direction: "left" | "right" | null,
+    intensity: number,
+  ) {
+    setDragFeedback({ direction, intensity });
+  }
+
   function handleSkip() {
     setDirection("left");
     setTimeout(() => {
@@ -115,7 +126,7 @@ export function ExploreSetPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-purple-900 to-black">
+    <div className="relative min-h-screen bg-gradient-to-b from-purple-900 to-black">
       {/* Header */}
       <div className="relative z-10 p-4 flex items-center justify-between">
         <Button
@@ -170,7 +181,11 @@ export function ExploreSetPage() {
                 }}
                 className="absolute inset-0"
               >
-                <SetExploreCard set={currentSet} onSwipe={handleSwipe} />
+                <SetExploreCard
+                  set={currentSet}
+                  onSwipe={handleSwipe}
+                  onDragUpdate={handleDragUpdate}
+                />
               </motion.div>
             )}
           </AnimatePresence>
@@ -186,12 +201,13 @@ export function ExploreSetPage() {
 
       {/* Voting Actions */}
       {currentSet && user && (
-        <div className="fixed bottom-8 left-0 right-0 z-20">
+        <div className="absolute bottom-8 left-0 right-0 z-20">
           <VotingActions
             setId={currentSet.id}
             userId={user.id}
             onVote={handleVote}
             onSkip={handleSkip}
+            dragFeedback={dragFeedback}
           />
         </div>
       )}

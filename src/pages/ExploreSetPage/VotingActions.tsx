@@ -9,6 +9,10 @@ interface VotingActionsProps {
   userId: string;
   onVote: (voteType: number) => void;
   onSkip: () => void;
+  dragFeedback?: {
+    direction: "left" | "right" | null;
+    intensity: number;
+  };
 }
 
 export function VotingActions({
@@ -16,6 +20,7 @@ export function VotingActions({
   userId,
   onVote,
   onSkip,
+  dragFeedback,
 }: VotingActionsProps) {
   const voteMutation = useVote();
   const { data: userVotes = {} } = useUserVotes(userId);
@@ -44,14 +49,31 @@ export function VotingActions({
   const InterestedIcon = interestedConfig.icon;
   const MustGoIcon = mustGoConfig.icon;
 
+  // Calculate highlight intensity based on drag feedback
+  const isLeftDrag = dragFeedback?.direction === "left";
+  const isRightDrag = dragFeedback?.direction === "right";
+  const intensity = dragFeedback?.intensity || 0;
+
   return (
     <div className="flex items-center justify-center space-x-6 px-4">
       {/* Won't Go */}
-      <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}>
+      <motion.div
+        whileHover={{ scale: 1.1 }}
+        whileTap={{ scale: 0.9 }}
+        animate={{
+          scale: isLeftDrag ? 1 + intensity * 0.3 : 1,
+          opacity: isRightDrag ? 0.5 : 1,
+        }}
+        transition={{ duration: 0.1 }}
+      >
         <Button
           size="lg"
           variant="outline"
-          className="h-16 w-16 rounded-full border-gray-500 hover:bg-gray-500 hover:border-gray-500 text-gray-500 hover:text-white"
+          className={`h-16 w-16 rounded-full transition-all duration-100 ${
+            isLeftDrag
+              ? `bg-gray-500 border-gray-500 text-white shadow-lg`
+              : "border-gray-500 hover:bg-gray-500 hover:border-gray-500 text-gray-500 hover:text-white"
+          }`}
           onClick={() => handleVote(wontGoConfig.value)}
           disabled={voteMutation.isPending}
         >
@@ -70,21 +92,15 @@ export function VotingActions({
         </Button>
       </motion.div>
 
-      {/* Interested */}
-      <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}>
-        <Button
-          size="lg"
-          variant="outline"
-          className="h-16 w-16 rounded-full border-blue-500 hover:bg-blue-500 hover:border-blue-500 text-blue-500 hover:text-white"
-          onClick={() => handleVote(interestedConfig.value)}
-          disabled={voteMutation.isPending}
-        >
-          <InterestedIcon className="h-6 w-6" />
-        </Button>
-      </motion.div>
-
       {/* Must Go */}
-      <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}>
+      <motion.div
+        whileHover={{ scale: 1.1 }}
+        whileTap={{ scale: 0.9 }}
+        animate={{
+          opacity: isLeftDrag || isRightDrag ? 0.5 : 1,
+        }}
+        transition={{ duration: 0.1 }}
+      >
         <Button
           size="lg"
           variant="outline"
@@ -93,6 +109,31 @@ export function VotingActions({
           disabled={voteMutation.isPending}
         >
           <MustGoIcon className="h-6 w-6" />
+        </Button>
+      </motion.div>
+
+      {/* Interested */}
+      <motion.div
+        whileHover={{ scale: 1.1 }}
+        whileTap={{ scale: 0.9 }}
+        animate={{
+          scale: isRightDrag ? 1 + intensity * 0.3 : 1,
+          opacity: isLeftDrag ? 0.5 : 1,
+        }}
+        transition={{ duration: 0.1 }}
+      >
+        <Button
+          size="lg"
+          variant="outline"
+          className={`h-16 w-16 rounded-full transition-all duration-100 ${
+            isRightDrag
+              ? `bg-blue-500 border-blue-500 text-white shadow-lg`
+              : "border-blue-500 hover:bg-blue-500 hover:border-blue-500 text-blue-500 hover:text-white"
+          }`}
+          onClick={() => handleVote(interestedConfig.value)}
+          disabled={voteMutation.isPending}
+        >
+          <InterestedIcon className="h-6 w-6" />
         </Button>
       </motion.div>
     </div>

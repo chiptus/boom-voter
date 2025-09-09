@@ -11,9 +11,18 @@ interface SetExploreCardProps {
   set: FestivalSet;
   onSwipe?: (direction: "left" | "right") => void;
   onTap?: () => void;
+  onDragUpdate?: (
+    direction: "left" | "right" | null,
+    intensity: number,
+  ) => void;
 }
 
-export function SetExploreCard({ set, onSwipe, onTap }: SetExploreCardProps) {
+export function SetExploreCard({
+  set,
+  onSwipe,
+  onTap,
+  onDragUpdate,
+}: SetExploreCardProps) {
   const stageQuery = useStageQuery(set.stage_id);
   const [imageLoaded, setImageLoaded] = useState(false);
 
@@ -21,6 +30,9 @@ export function SetExploreCard({ set, onSwipe, onTap }: SetExploreCardProps) {
     _event: MouseEvent | TouchEvent | PointerEvent,
     info: PanInfo,
   ) {
+    // Reset drag feedback
+    onDragUpdate?.(null, 0);
+
     const swipeThreshold = 100;
     const velocityThreshold = 500;
 
@@ -33,6 +45,23 @@ export function SetExploreCard({ set, onSwipe, onTap }: SetExploreCardProps) {
       } else {
         onSwipe?.("left");
       }
+    }
+  }
+
+  function handleDrag(
+    _event: MouseEvent | TouchEvent | PointerEvent,
+    info: PanInfo,
+  ) {
+    const dragDistance = Math.abs(info.offset.x);
+    const maxDistance = 150; // Max distance for full intensity
+    const intensity = Math.min(dragDistance / maxDistance, 1);
+
+    if (dragDistance > 10) {
+      // Minimum drag threshold
+      const direction = info.offset.x > 0 ? "right" : "left";
+      onDragUpdate?.(direction, intensity);
+    } else {
+      onDragUpdate?.(null, 0);
     }
   }
 
@@ -70,6 +99,7 @@ export function SetExploreCard({ set, onSwipe, onTap }: SetExploreCardProps) {
       drag="x"
       dragConstraints={{ left: 0, right: 0 }}
       dragElastic={0.7}
+      onDrag={handleDrag}
       onDragEnd={handleDragEnd}
       onClick={onTap}
       transition={{ duration: 0.2 }}
