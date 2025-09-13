@@ -36,35 +36,55 @@ serve(async (req) => {
         id, 
         name, 
         soundcloud_url, 
-        image_url,
-        soundcloud:soundcloud(last_sync)
+        image_url
       `,
       )
-      .not("soundcloud_url", "is", null)
-      .or(
-        "soundcloud.last_sync.is.null,soundcloud.last_sync.lt." +
-          new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString() +
-          ",soundcloud.is.null",
-      )
-      .order("soundcloud.last_sync", { ascending: true, nullsFirst: true });
+      .not("soundcloud_url", "is", null);
 
     if (fetchError) {
-      console.error("Error fetching artists:", fetchError);
+      console.error("Error fetching artists:", { fetchError });
       throw new Error("Failed to fetch artists");
     }
 
-    const artistCount = artists?.length || 0;
+    const { data: soundcloudData, error: scError } = await supabase
+      .from("soundcloud")
+      .select("*")
+      .or(
+        `last_sync.is.null,last_sync.lt.${new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString()}`,
+      )
+      .order("last_sync", { ascending: true, nullsFirst: true })
+
+      .in("artist_id", artists?.map((a) => a.id) || []);
+
+    if (scError) {
+      console.error("Error fetching soundcloud data:", scError);
+      throw new Error("Failed to fetch soundcloud data for SoundCloud sync");
+    }
+
+    const artistCount = soundcloudData?.length || 0;
     console.log(`Found ${artistCount} artists to sync`);
 
+    const artistsToProcess =
+      soundcloudData
+        ?.map((sc) => {
+          const artist = artists?.find((a) => a.id === sc.artist_id);
+          return artist
+            ? {
+                id: artist.id,
+                name: artist.name,
+                soundcloud_url: artist.soundcloud_url!,
+              }
+            : null;
+        })
+        .filter(
+          (a): a is { id: string; name: string; soundcloud_url: string } =>
+            a !== null,
+        ) || [];
+
     // Use EdgeRuntime.waitUntil to ensure background job completes
-    if (typeof EdgeRuntime !== "undefined" && EdgeRuntime.waitUntil) {
-      EdgeRuntime.waitUntil(processSoundCloudArtists(supabase, artists || []));
-    } else {
-      // Fallback: run in background without waitUntil
-      processSoundCloudArtists(supabase, artists || []).catch((error) => {
-        console.error("Background processing failed:", error);
-      });
-    }
+    EdgeRuntime.waitUntil(
+      processSoundCloudArtists(supabase, artistsToProcess || []),
+    );
 
     // Return immediately with job started confirmation
     return new Response(

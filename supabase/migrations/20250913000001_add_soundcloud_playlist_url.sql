@@ -2,7 +2,6 @@
 CREATE TABLE public.soundcloud (
     id uuid DEFAULT gen_random_uuid() PRIMARY KEY,
     artist_id uuid NOT NULL REFERENCES public.artists(id) ON DELETE CASCADE,
-    soundcloud_url text NOT NULL,
     soundcloud_id bigint,
     username text,
     display_name text,
@@ -59,5 +58,5 @@ WHERE soundcloud_url IS NOT NULL
 ON CONFLICT (artist_id) DO NOTHING;
 
 -- Remove old columns from artists table (commented out for safety - uncomment after migration is verified)
--- ALTER TABLE public.artists DROP COLUMN IF EXISTS soundcloud_followers;
--- ALTER TABLE public.artists DROP COLUMN IF EXISTS last_soundcloud_sync;
+ALTER TABLE public.artists DROP COLUMN IF EXISTS soundcloud_followers;
+ALTER TABLE public.artists DROP COLUMN IF EXISTS last_soundcloud_sync;

@@ -36,7 +36,7 @@ export type SyncResults = {
 
 export async function processSoundCloudArtists(
   supabase: SupabaseClient,
-  artists: Artist[],
+  artists: { soundcloud_url: string; id: string; name: string }[],
 ): Promise<SyncResults> {
   const results: SyncResults = {
     processed: 0,
@@ -167,7 +167,7 @@ export async function processSoundCloudArtists(
 }
 
 async function processArtistData(
-  artist: Artist,
+  artist: { id: string; name: string },
   soundcloudUrl: string,
 ): Promise<UpdateData> {
   console.log(`Processing data for ${artist.name} from SoundCloud API...`);
@@ -207,10 +207,7 @@ async function processArtistData(
     }
 
     // Update artist image if we have a better one
-    if (
-      artistData.user.avatar_url &&
-      (!artist.image_url || artistData.user.avatar_url.includes("t500x500"))
-    ) {
+    if (artistData.user.avatar_url) {
       // Try to get higher resolution image
       let highResUrl = artistData.user.avatar_url;
       if (highResUrl.includes("large.jpg")) {

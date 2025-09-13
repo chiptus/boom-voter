@@ -26,7 +26,10 @@ export function SoundCloudSyncButton({ className }: SoundCloudSyncButtonProps) {
       ) : (
         <Music className="h-3 w-3 mr-1" />
       )}
-      {syncMutation.isPending ? "Syncing..." : "Sync SoundCloud"}
+
+      <span className="hidden md:block">
+        {syncMutation.isPending ? "Syncing..." : "Sync SoundCloud"}
+      </span>
     </Button>
   );
 }

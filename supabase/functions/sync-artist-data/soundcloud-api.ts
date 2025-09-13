@@ -10,8 +10,8 @@ import type {
   SoundCloudUser,
 } from "../_shared/soundcloud-api/schemas.ts";
 
-const SOUNDCLOUD_CLIENT_ID = Deno.env.get("SOUNDCLOUD_CLIENT_ID");
-const SOUNDCLOUD_CLIENT_SECRET = Deno.env.get("SOUNDCLOUD_CLIENT_SECRET");
+const SOUNDCLOUD_CLIENT_ID = Deno.env.get("SOUNDCLOUD_CLIENT_ID")!;
+const SOUNDCLOUD_CLIENT_SECRET = Deno.env.get("SOUNDCLOUD_CLIENT_SECRET")!;
 
 if (!SOUNDCLOUD_CLIENT_ID || !SOUNDCLOUD_CLIENT_SECRET) {
   throw new Error("SoundCloud API credentials not configured");
@@ -29,8 +29,8 @@ export async function getArtistDataFromAPI(
     console.log(`Getting artist data for: ${soundcloudUrl}`);
 
     const accessToken = await getSoundCloudAccessToken(
-      SOUNDCLOUD_CLIENT_ID!,
-      SOUNDCLOUD_CLIENT_SECRET!,
+      SOUNDCLOUD_CLIENT_ID,
+      SOUNDCLOUD_CLIENT_SECRET,
     );
 
     // Resolve the URL to get user info
