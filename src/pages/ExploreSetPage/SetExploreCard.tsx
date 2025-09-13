@@ -184,6 +184,40 @@ export function SetExploreCard({
                     {primaryArtist.description}
                   </p>
                 )}
+
+                {/* SoundCloud Badge */}
+                <div className="flex justify-center mt-2">
+                  {primaryArtist?.soundcloud_url ? (
+                    <a
+                      href={primaryArtist.soundcloud_url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-1 px-2 py-1 rounded-full bg-orange-500/20 border border-orange-400/30 text-orange-300 hover:bg-orange-500/30 transition-colors text-xs"
+                      onClick={(e) => e.stopPropagation()} // Prevent card tap
+                    >
+                      <svg
+                        className="w-3 h-3"
+                        viewBox="0 0 24 24"
+                        fill="currentColor"
+                      >
+                        <path d="M12 2C6.477 2 2 6.477 2 12s4.477 10 10 10 10-4.477 10-10S17.523 2 12 2zm-4 13.5c-.276 0-.5-.224-.5-.5s.224-.5.5-.5.5.224.5.5-.224.5-.5.5zm1-2c-.276 0-.5-.224-.5-.5s.224-.5.5-.5.5.224.5.5-.224.5-.5.5zm1-2c-.276 0-.5-.224-.5-.5s.224-.5.5-.5.5.224.5.5-.224.5-.5.5zm1-2c-.276 0-.5-.224-.5-.5s.224-.5.5-.5.5.224.5.5-.224.5-.5.5zm2 6c-.276 0-.5-.224-.5-.5V9c0-.276.224-.5.5-.5s.5.224.5.5v6c0 .276-.224.5-.5.5zm2-1c-.276 0-.5-.224-.5-.5V8c0-.276.224-.5.5-.5s.5.224.5.5v8c0 .276-.224.5-.5.5z" />
+                      </svg>
+                      SoundCloud
+                    </a>
+                  ) : (
+                    <div className="inline-flex items-center gap-1 px-2 py-1 rounded-full bg-gray-600/20 border border-gray-500/30 text-gray-400 text-xs">
+                      <svg
+                        className="w-3 h-3"
+                        viewBox="0 0 24 24"
+                        fill="currentColor"
+                        opacity="0.4"
+                      >
+                        <path d="M12 2C6.477 2 2 6.477 2 12s4.477 10 10 10 10-4.477 10-10S17.523 2 12 2zm-4 13.5c-.276 0-.5-.224-.5-.5s.224-.5.5-.5.5.224.5.5-.224.5-.5.5zm1-2c-.276 0-.5-.224-.5-.5s.224-.5.5-.5.5.224.5.5-.224.5-.5.5zm1-2c-.276 0-.5-.224-.5-.5s.224-.5.5-.5.5.224.5.5-.224.5-.5.5zm1-2c-.276 0-.5-.224-.5-.5s.224-.5.5-.5.5.224.5.5-.224.5-.5.5zm2 6c-.276 0-.5-.224-.5-.5V9c0-.276.224-.5.5-.5s.5.224.5.5v6c0 .276-.224.5-.5.5zm2-1c-.276 0-.5-.224-.5-.5V8c0-.276.224-.5.5-.5s.5.224.5.5v8c0 .276-.224.5-.5.5z" />
+                      </svg>
+                      No SoundCloud
+                    </div>
+                  )}
+                </div>
               </div>
 
               {/* Supporting Artists */}
