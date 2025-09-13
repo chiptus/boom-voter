@@ -28,18 +28,25 @@ serve(async (req) => {
 
     console.log("Starting SoundCloud artist data sync...");
 
-    // Get count of artists that need syncing, prioritizing those with null last_soundcloud_sync
+    // Get artists with SoundCloud URLs that need syncing
     const { data: artists, error: fetchError } = await supabase
       .from("artists")
       .select(
-        "id, name, soundcloud_url, image_url, last_soundcloud_sync, soundcloud_followers, soundcloud_playlist_url",
+        `
+        id, 
+        name, 
+        soundcloud_url, 
+        image_url,
+        soundcloud:soundcloud(last_sync)
+      `,
       )
       .not("soundcloud_url", "is", null)
       .or(
-        "last_soundcloud_sync.is.null,last_soundcloud_sync.lt." +
-          new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString(),
+        "soundcloud.last_sync.is.null,soundcloud.last_sync.lt." +
+          new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString() +
+          ",soundcloud.is.null",
       )
-      .order("last_soundcloud_sync", { ascending: true, nullsFirst: true });
+      .order("soundcloud.last_sync", { ascending: true, nullsFirst: true });
 
     if (fetchError) {
       console.error("Error fetching artists:", fetchError);
