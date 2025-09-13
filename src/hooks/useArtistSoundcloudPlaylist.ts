@@ -116,17 +116,11 @@ export function useArtistSoundcloudPlaylist({
   soundcloudUrl,
   enabled = true,
 }: UseArtistSoundcloudPlaylistOptions) {
-  console.log("[useArtistSoundcloudPlaylist] Hook called with:", {
-    soundcloudUrl,
-    enabled,
-  });
-
   return useQuery({
     queryKey: ["soundcloud-playlist", soundcloudUrl],
     queryFn: () => fetchArtistPlaylist(soundcloudUrl),
     enabled: enabled && Boolean(soundcloudUrl),
     retry(failureCount, error) {
-      console.log(error);
       if (isSoundCloudError(error)) {
         return false;
       }
