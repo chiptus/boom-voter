@@ -49,9 +49,10 @@ export const SoundCloudPlaylistSchema = z.object({
 
 export const SoundCloudTokenResponseSchema = z.object({
   access_token: z.string(),
-  token_type: z.string().optional(),
-  expires_in: z.number().optional(),
-  scope: z.string().optional(),
+  token_type: z.string(),
+  expires_in: z.number(),
+  scope: z.string(),
+  refresh_token: z.string(),
 });
 
 export const SoundCloudErrorResponseSchema = z.object({

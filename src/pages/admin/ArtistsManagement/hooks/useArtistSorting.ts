@@ -1,15 +1,17 @@
 import { useState, useMemo } from "react";
 import type { Artist } from "@/hooks/queries/artists/useArtists";
 
+export type SortingKey = keyof Omit<Artist, "artist_music_genres"> | "genres";
+
 export type SortConfig = {
-  key: keyof Artist | "genres";
+  key: SortingKey;
   direction: "asc" | "desc";
 } | null;
 
 export function useArtistSorting() {
   const [sortConfig, setSortConfig] = useState<SortConfig>(null);
 
-  function handleSort(key: keyof Artist | "genres") {
+  function handleSort(key: SortingKey) {
     setSortConfig((current) => {
       if (current?.key === key) {
         return current.direction === "asc" ? { key, direction: "desc" } : null;
@@ -40,8 +42,8 @@ export function useArtistSorting() {
           aValue = a.artist_music_genres?.length || 0;
           bValue = b.artist_music_genres?.length || 0;
         } else {
-          aValue = a[sortConfig.key];
-          bValue = b[sortConfig.key];
+          aValue = a[sortConfig.key] || null;
+          bValue = b[sortConfig.key] || null;
         }
 
         // Handle null/undefined values

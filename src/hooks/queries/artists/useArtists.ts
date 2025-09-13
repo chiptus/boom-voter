@@ -4,6 +4,7 @@ import type { Database } from "@/integrations/supabase/types";
 
 export type Artist = Database["public"]["Tables"]["artists"]["Row"] & {
   artist_music_genres: { music_genre_id: string }[] | null;
+  soundcloud_followers?: number;
 };
 
 // Query key factory
@@ -34,7 +35,27 @@ async function fetchArtists(): Promise<Artist[]> {
     throw new Error("Failed to fetch artists");
   }
 
-  return data || [];
+  const { data: soundcloudData, error: soundcloudError } = await supabase
+    .from("soundcloud")
+    .select("artist_id, followers_count");
+
+  if (soundcloudError) {
+    console.error("Error fetching soundcloud data:", soundcloudError);
+    throw new Error("Failed to fetch soundcloud data");
+  }
+
+  const soundcloudMap = new Map(
+    soundcloudData?.map((sc) => [sc.artist_id, sc.followers_count]) || [],
+  );
+
+  return (
+    data.map((artist) => {
+      return {
+        ...artist,
+        soundcloud_followers: soundcloudMap.get(artist.id) || 0,
+      };
+    }) || []
+  );
 }
 
 // Hook
