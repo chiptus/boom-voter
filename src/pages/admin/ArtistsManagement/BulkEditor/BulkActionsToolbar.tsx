@@ -2,6 +2,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { CheckSquare, Square } from "lucide-react";
 import { ArchiveButton } from "../components/ArchiveButton";
+import { SoundCloudSyncButton } from "../components/SoundCloudSyncButton";
 
 interface BulkActionsToolbarProps {
   selectedCount: number;
@@ -38,6 +39,8 @@ export function BulkActionsToolbar({
           </Button>
         </>
       )}
+
+      <SoundCloudSyncButton />
 
       <Button variant="outline" size="sm" onClick={onSelectAll}>
         {allSelected ? (

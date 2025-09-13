@@ -7,16 +7,22 @@ export type Artist = {
   name: string;
   soundcloud_url?: string;
   image_url?: string;
-  last_soundcloud_sync?: string;
-  soundcloud_followers?: number;
-  soundcloud_playlist_url?: string;
 };
 
 export type UpdateData = {
-  last_soundcloud_sync: string;
-  soundcloud_followers?: number;
+  // Artist table updates
   image_url?: string;
-  soundcloud_playlist_url?: string;
+
+  // SoundCloud table data
+  artist_id: string;
+  soundcloud_url: string;
+  soundcloud_id?: number;
+  username?: string;
+  display_name?: string;
+  followers_count?: number;
+  playlist_url?: string;
+  playlist_title?: string;
+  last_sync: string;
 };
 
 export type SyncResults = {
@@ -69,24 +75,56 @@ export async function processSoundCloudArtists(
 
       const updateData = await processArtistData(artist, soundcloudUrl);
 
-      const { error: updateError } = await supabase
-        .from("artists")
-        .update(updateData)
-        .eq("id", artist.id);
+      // Upsert SoundCloud data
+      const { error: soundCloudError } = await supabase
+        .from("soundcloud")
+        .upsert(
+          {
+            artist_id: artist.id,
+            username: updateData.username || null,
+            display_name: updateData.display_name || null,
+            followers_count: updateData.followers_count || 0,
+            playlist_url: updateData.playlist_url || null,
+            playlist_title: updateData.playlist_title || null,
+            soundcloud_url: updateData.soundcloud_url,
+            last_sync: updateData.last_sync,
+          },
+          {
+            onConflict: "artist_id",
+            ignoreDuplicates: false,
+          },
+        );
 
-      if (updateError) {
-        console.error(`Error updating ${artist.name}:`, updateError);
+      if (soundCloudError) {
+        console.error(
+          `Error updating SoundCloud data for ${artist.name}:`,
+          soundCloudError,
+        );
         results.failed++;
         results.errors.push(
-          `Update error for ${artist.name}: ${updateError.message}`,
+          `SoundCloud update error for ${artist.name}: ${soundCloudError.message}`,
         );
-        throw new Error(
-          `Failed to update artist ${artist.name}: ${updateError.message}`,
-        );
-      } else {
-        results.updated++;
-        console.log(`Successfully updated ${artist.name}`);
+        continue; // Continue with next artist instead of throwing
       }
+
+      // Update artist data if needed (e.g., image_url)
+      if (updateData.image_url) {
+        const { error: artistUpdateError } = await supabase
+          .from("artists")
+          .update({ image_url: updateData.image_url })
+          .eq("id", artist.id);
+
+        if (artistUpdateError) {
+          console.warn(
+            `Warning: Failed to update artist data for ${artist.name}:`,
+            artistUpdateError,
+          );
+          // Don't fail the sync for artist update errors
+        }
+      }
+
+      results.updated++;
+      console.log(`Successfully updated ${artist.name}`);
 
       // Rate limiting - be respectful to APIs
       await new Promise((resolve) => setTimeout(resolve, 2000));
@@ -135,16 +173,32 @@ async function processArtistData(
   console.log(`Processing data for ${artist.name} from SoundCloud API...`);
 
   const updateData: UpdateData = {
-    last_soundcloud_sync: new Date().toISOString(),
+    artist_id: artist.id,
+    soundcloud_url: soundcloudUrl,
+    last_sync: new Date().toISOString(),
   };
 
   try {
     // Get all artist data from SoundCloud API
     const artistData = await getArtistDataFromAPI(soundcloudUrl);
 
-    // Update playlist URL if found
+    // Update SoundCloud user data
+    updateData.soundcloud_id = artistData.user.id;
+    updateData.username = artistData.user.username;
+    updateData.display_name =
+      artistData.user.display_name ||
+      artistData.user.full_name ||
+      artistData.user.username;
+    updateData.followers_count = artistData.user.followers_count || 0;
+
+    console.log(
+      `Updated user data for ${artist.name}: ${updateData.followers_count} followers`,
+    );
+
+    // Update playlist data if found
     if (artistData.topPlaylist && artistData.topPlaylist.permalink_url) {
-      updateData.soundcloud_playlist_url = artistData.topPlaylist.permalink_url;
+      updateData.playlist_url = artistData.topPlaylist.permalink_url;
+      updateData.playlist_title = artistData.topPlaylist.title;
       console.log(
         `Found playlist for ${artist.name}: ${artistData.topPlaylist.title}`,
       );
@@ -152,18 +206,7 @@ async function processArtistData(
       console.log(`No playlist found for ${artist.name}`);
     }
 
-    // Update followers count from user data
-    if (
-      artistData.user.followers_count !== undefined &&
-      artistData.user.followers_count > 0
-    ) {
-      updateData.soundcloud_followers = artistData.user.followers_count;
-      console.log(
-        `Updated followers for ${artist.name}: ${artistData.user.followers_count}`,
-      );
-    }
-
-    // Update avatar image from user data
+    // Update artist image if we have a better one
     if (
       artistData.user.avatar_url &&
       (!artist.image_url || artistData.user.avatar_url.includes("t500x500"))
@@ -179,10 +222,9 @@ async function processArtistData(
       updateData.image_url = highResUrl;
       console.log(`Updated image for ${artist.name}`);
     }
+    return updateData;
   } catch (apiError) {
     console.error(`SoundCloud API failed for ${artist.name}:`, apiError);
     throw apiError;
   }
-
-  return updateData;
 }
