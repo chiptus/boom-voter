@@ -183,6 +183,7 @@ export function ExploreSetPage() {
               >
                 <SetExploreCard
                   set={currentSet}
+                  isFront
                   onSwipe={handleSwipe}
                   onDragUpdate={handleDragUpdate}
                 />
