@@ -1,5 +1,8 @@
 import { Music } from "lucide-react";
-import { useArtistSoundcloudPlaylist } from "@/hooks/useArtistSoundcloudPlaylist";
+import {
+  useArtistSoundcloudPlaylist,
+  isSoundCloudError,
+} from "@/hooks/useArtistSoundcloudPlaylist";
 
 interface SetAudioPlayerProps {
   soundcloudUrl: string;
@@ -16,10 +19,28 @@ export function SetAudioPlayer({
   });
 
   if (playlistQuery.error || !soundcloudUrl || !playlistQuery.data) {
+    // Show different messages based on error code
+    let errorMessage = "Audio unavailable";
+    if (isSoundCloudError(playlistQuery.error)) {
+      switch (playlistQuery.error.code) {
+        case "CONTENT_NOT_FOUND":
+          errorMessage = "Content not found";
+          break;
+        case "ACCESS_DENIED":
+          errorMessage = "Access denied";
+          break;
+        case "SERVICE_CONFIG_ERROR":
+          errorMessage = "Service unavailable";
+          break;
+        default:
+          errorMessage = "Audio unavailable";
+      }
+    }
+
     return (
       <div className="flex items-center gap-2 bg-black/50 backdrop-blur-sm rounded-lg p-2 opacity-50">
         <Music className="h-4 w-4 text-white/60" />
-        <span className="text-xs text-white/60">Audio unavailable</span>
+        <span className="text-xs text-white/60">{errorMessage}</span>
       </div>
     );
   }

@@ -1,5 +1,22 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { FunctionsHttpError } from "@supabase/supabase-js";
+
+// Enhanced error class that includes error codes
+export class SoundCloudError extends Error {
+  public readonly code: string;
+
+  constructor(message: string, code: string = "UNKNOWN_ERROR") {
+    super(message);
+    this.name = "SoundCloudError";
+    this.code = code;
+  }
+}
+
+// Type guard for SoundCloudError
+export function isSoundCloudError(error: unknown): error is SoundCloudError {
+  return error instanceof SoundCloudError;
+}
 
 // SoundCloud API response types
 interface SoundCloudUser {
@@ -53,7 +70,37 @@ async function fetchArtistPlaylist(
 
   if (error) {
     console.error("[fetchArtistPlaylist] Edge function error:", error);
-    throw new Error(error.message || "Failed to fetch playlist");
+
+    // Handle FunctionsHttpError to get the actual error details
+    if (!(error instanceof FunctionsHttpError)) {
+      throw error;
+    }
+
+    let soundcloudError: SoundCloudError | null = null;
+    try {
+      const errorDetails = await error.context.json();
+      console.error(
+        "[fetchArtistPlaylist] Function returned error:",
+        errorDetails,
+      );
+
+      // Use the specific error message and code from our edge function
+      const message =
+        errorDetails.error || "Failed to fetch SoundCloud playlist";
+      const errorCode = errorDetails.code || "UNKNOWN_ERROR";
+
+      soundcloudError = new SoundCloudError(message, errorCode);
+    } catch (parseError) {
+      console.error(
+        "[fetchArtistPlaylist] Failed to parse error response:",
+        parseError,
+      );
+      throw new Error("Failed to fetch SoundCloud playlist");
+    }
+
+    if (soundcloudError) {
+      throw soundcloudError;
+    }
   }
 
   if (!data?.playlist) {
@@ -78,5 +125,12 @@ export function useArtistSoundcloudPlaylist({
     queryKey: ["soundcloud-playlist", soundcloudUrl],
     queryFn: () => fetchArtistPlaylist(soundcloudUrl),
     enabled: enabled && Boolean(soundcloudUrl),
+    retry(failureCount, error) {
+      console.log(error);
+      if (isSoundCloudError(error)) {
+        return false;
+      }
+      return failureCount < 2;
+    },
   });
 }
