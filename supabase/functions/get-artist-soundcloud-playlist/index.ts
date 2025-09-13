@@ -1,14 +1,17 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
-import { SoundCloudUserSchema } from "./schemas.ts";
-import { getSoundCloudAccessToken } from "./auth.ts";
-import { fetchSoundCloudAPI } from "./api.ts";
+import { SoundCloudUserSchema } from "../_shared/soundcloud-api/schemas.ts";
+import { getSoundCloudAccessToken } from "../_shared/soundcloud-api/auth.ts";
+import { fetchSoundCloudAPI } from "../_shared/soundcloud-api/api.ts";
 import {
   getArtistPlaylists,
   getArtistTracks,
   createVirtualPlaylistFromTracks,
   selectBestPlaylist,
-} from "./playlist.ts";
-import { getErrorContext, determineErrorResponse } from "./errors.ts";
+} from "../_shared/soundcloud-api/playlist.ts";
+import {
+  getErrorContext,
+  determineErrorResponse,
+} from "../_shared/soundcloud-api/errors.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
