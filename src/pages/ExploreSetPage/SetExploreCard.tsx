@@ -6,9 +6,11 @@ import { motion, PanInfo } from "framer-motion";
 import { useState } from "react";
 import { StageBadge } from "@/components/StageBadge";
 import { useStageQuery } from "@/hooks/queries/stages/useStageQuery";
+import { SetAudioPlayer } from "./SetAudioPlayer";
 
 interface SetExploreCardProps {
   set: FestivalSet;
+  isFront?: boolean;
   onSwipe?: (direction: "left" | "right") => void;
   onTap?: () => void;
   onDragUpdate?: (
@@ -19,12 +21,14 @@ interface SetExploreCardProps {
 
 export function SetExploreCard({
   set,
+  isFront,
   onSwipe,
   onTap,
   onDragUpdate,
 }: SetExploreCardProps) {
   const stageQuery = useStageQuery(set.stage_id);
   const [imageLoaded, setImageLoaded] = useState(false);
+  const [isDragging, setIsDragging] = useState(false);
 
   function handleDragEnd(
     _event: MouseEvent | TouchEvent | PointerEvent,
@@ -32,6 +36,7 @@ export function SetExploreCard({
   ) {
     // Reset drag feedback
     onDragUpdate?.(null, 0);
+    setIsDragging(false);
 
     const swipeThreshold = 100;
     const velocityThreshold = 500;
@@ -59,8 +64,10 @@ export function SetExploreCard({
     if (dragDistance > 10) {
       // Minimum drag threshold
       const direction = info.offset.x > 0 ? "right" : "left";
+      setIsDragging(true);
       onDragUpdate?.(direction, intensity);
     } else {
+      setIsDragging(false);
       onDragUpdate?.(null, 0);
     }
   }
@@ -207,6 +214,16 @@ export function SetExploreCard({
                 </div>
               )}
             </div>
+
+            {/* Audio Player */}
+            {primaryArtist?.soundcloud_url && isFront && (
+              <div className="flex justify-center">
+                <SetAudioPlayer
+                  soundcloudUrl={primaryArtist.soundcloud_url}
+                  isActive={!isDragging}
+                />
+              </div>
+            )}
 
             {/* Footer */}
             <div className="text-center">
