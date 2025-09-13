@@ -1,14 +1,13 @@
 import { TableHeader, TableRow, TableHead } from "@/components/ui/table";
 import { Checkbox } from "@/components/ui/checkbox";
-import type { Artist } from "@/hooks/queries/artists/useArtists";
-import type { SortConfig } from "../hooks/useArtistSorting";
+import type { SortConfig, SortingKey } from "../hooks/useArtistSorting";
 
 interface BulkEditorTableHeaderProps {
   selectedCount: number;
   totalCount: number;
   onSelectAll: () => void;
   sortConfig: SortConfig;
-  onSort: (key: keyof Artist | "genres") => void;
+  onSort: (key: SortingKey) => void;
 }
 
 export function BulkEditorTableHeader({
@@ -18,7 +17,7 @@ export function BulkEditorTableHeader({
   sortConfig,
   onSort,
 }: BulkEditorTableHeaderProps) {
-  function getSortIndicator(key: keyof Artist | "genres") {
+  function getSortIndicator(key: SortingKey) {
     if (sortConfig?.key !== key) return null;
     return sortConfig.direction === "asc" ? " ↑" : " ↓";
   }

@@ -1,6 +1,6 @@
 import { Table, TableBody } from "@/components/ui/table";
 import type { Artist } from "@/hooks/queries/artists/useArtists";
-import type { SortConfig } from "../hooks/useArtistSorting";
+import type { SortConfig, SortingKey } from "../hooks/useArtistSorting";
 import { BulkEditorTableHeader } from "./BulkEditorTableHeader";
 import { BulkEditorTableRow } from "./BulkEditorTableRow";
 
@@ -9,7 +9,7 @@ interface BulkEditorTableProps {
   selectedIds: Set<string>;
   sortConfig: SortConfig;
   searchTerm: string;
-  onSort: (key: keyof Artist | "genres") => void;
+  onSort: (key: SortingKey) => void;
   onSelectAll: () => void;
   onSelectArtist: (artistId: string, isSelected: boolean) => void;
 }
