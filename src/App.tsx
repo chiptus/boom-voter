@@ -2,6 +2,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { BrowserRouter } from "react-router-dom";
+import { HelmetProvider } from "react-helmet-async";
 import { CookieConsentBanner } from "@/components/layout/legal/CookieConsentBanner";
 import { OfflineIndicator } from "@/components/ui/OfflineIndicator";
 import {
@@ -25,24 +26,26 @@ function App() {
   }, []);
 
   return (
-    <TooltipProvider>
-      <Toaster />
-      <Sonner />
-      <CookieConsentBanner />
-      <BrowserRouter
-        future={{
-          v7_startTransition: true,
-          v7_relativeSplatPath: true,
-        }}
-      >
-        <AuthProvider>
-          <FestivalEditionProvider>
-            <AppRoutes subdomainInfo={subdomainInfo} />
-          </FestivalEditionProvider>
-        </AuthProvider>
-      </BrowserRouter>
-      <OfflineIndicator />
-    </TooltipProvider>
+    <HelmetProvider>
+      <TooltipProvider>
+        <Toaster />
+        <Sonner />
+        <CookieConsentBanner />
+        <BrowserRouter
+          future={{
+            v7_startTransition: true,
+            v7_relativeSplatPath: true,
+          }}
+        >
+          <AuthProvider>
+            <FestivalEditionProvider>
+              <AppRoutes subdomainInfo={subdomainInfo} />
+            </FestivalEditionProvider>
+          </AuthProvider>
+        </BrowserRouter>
+        <OfflineIndicator />
+      </TooltipProvider>
+    </HelmetProvider>
   );
 }
 

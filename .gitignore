@@ -36,3 +36,5 @@ supabase/.temp
 supabase/.branches
 .vercel
 dev-dist
+
+dump.sql

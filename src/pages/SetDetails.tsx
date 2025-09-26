@@ -13,11 +13,12 @@ import { useSetBySlugQuery } from "@/hooks/queries/sets/useSetBySlug";
 import { useFestivalEdition } from "@/contexts/FestivalEditionContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { useVoteCount } from "@/hooks/useVoteCount";
+import { PageTitle } from "@/components/PageTitle/PageTitle";
 
 export function SetDetails() {
   const { user } = useAuth();
   const { setSlug } = useParams<{ setSlug: string }>();
-  const { edition } = useFestivalEdition();
+  const { edition, festival } = useFestivalEdition();
   const { state: urlState } = useUrlState();
   const setQuery = useSetBySlugQuery({
     slug: setSlug,
@@ -25,6 +26,8 @@ export function SetDetails() {
   });
 
   const { getVoteCount } = useVoteCount(setQuery.data);
+
+  const setTitle = setQuery.data?.name;
 
   const netVoteScore = 2 * getVoteCount(2) + getVoteCount(1) - getVoteCount(-1);
 
@@ -40,51 +43,54 @@ export function SetDetails() {
   const primaryArtist = currentSet.artists[0];
 
   return (
-    <div className="min-h-screen bg-app-gradient">
-      <div className="container mx-auto px-4 py-8">
-        <AppHeader showBackButton backLabel="Back to Artists" />
+    <>
+      <PageTitle title={setTitle} prefix={festival?.name} />
+      <div className="min-h-screen bg-app-gradient">
+        <div className="container mx-auto px-4 py-8">
+          <AppHeader showBackButton backLabel="Back to Artists" />
 
-        {/* Set Header */}
-        {isMultiArtistSet ? (
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
-            {/* Mixed Image for Multi-Artist Sets */}
-            <MixedArtistImage
-              artists={currentSet.artists}
-              setName={currentSet.name}
-              className="aspect-square rounded-lg"
-            />
+          {/* Set Header */}
+          {isMultiArtistSet ? (
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
+              {/* Mixed Image for Multi-Artist Sets */}
+              <MixedArtistImage
+                artists={currentSet.artists}
+                setName={currentSet.name}
+                className="aspect-square rounded-lg"
+              />
 
-            <MultiArtistSetInfoCard
-              set={currentSet}
-              netVoteScore={netVoteScore}
-              use24Hour={urlState.use24Hour}
-            />
+              <MultiArtistSetInfoCard
+                set={currentSet}
+                netVoteScore={netVoteScore}
+                use24Hour={urlState.use24Hour}
+              />
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
+              <ArtistImageCard
+                imageUrl={primaryArtist.image_url}
+                artistName={currentSet.name}
+              />
+
+              <SetInfoCard
+                set={currentSet}
+                netVoteScore={netVoteScore}
+                use24Hour={urlState.use24Hour}
+              />
+            </div>
+          )}
+
+          {/* Set Group Voting Section */}
+          <div className="mb-8">
+            <SetGroupVoting setId={currentSet.id} />
           </div>
-        ) : (
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
-            <ArtistImageCard
-              imageUrl={primaryArtist.image_url}
-              artistName={currentSet.name}
-            />
 
-            <SetInfoCard
-              set={currentSet}
-              netVoteScore={netVoteScore}
-              use24Hour={urlState.use24Hour}
-            />
+          {/* Set Notes Section */}
+          <div className="mb-8">
+            <SetNotes setId={currentSet.id} userId={user?.id || null} />
           </div>
-        )}
-
-        {/* Set Group Voting Section */}
-        <div className="mb-8">
-          <SetGroupVoting setId={currentSet.id} />
-        </div>
-
-        {/* Set Notes Section */}
-        <div className="mb-8">
-          <SetNotes setId={currentSet.id} userId={user?.id || null} />
         </div>
       </div>
-    </div>
+    </>
   );
 }

@@ -1,5 +1,6 @@
 import { useFestivalEdition } from "@/contexts/FestivalEditionContext";
 import { useFestivalInfoQuery } from "@/hooks/queries/festival-info/useFestivalInfo";
+import { PageTitle } from "@/components/PageTitle/PageTitle";
 
 function extractFacebookPageId(url: string): string | null {
   // Extract Facebook page ID/username from various Facebook URL formats
@@ -27,9 +28,12 @@ export function SocialTab() {
 
   if (isLoading || !festivalInfo) {
     return (
-      <div className="text-center text-purple-300 py-12">
-        <p>Loading social feeds...</p>
-      </div>
+      <>
+        <PageTitle title="Social" prefix={festival?.name} />
+        <div className="text-center text-purple-300 py-12">
+          <p>Loading social feeds...</p>
+        </div>
+      </>
     );
   }
 
@@ -42,13 +46,21 @@ export function SocialTab() {
 
   if (!facebookPageId && !instagramUsername) {
     return (
-      <div className="text-center text-purple-300 py-12">
-        <p>Social feeds not available yet.</p>
-      </div>
+      <>
+        <PageTitle title="Social" prefix={festival?.name} />
+        <div className="text-center text-purple-300 py-12">
+          <p>Social feeds not available yet.</p>
+        </div>
+      </>
     );
   }
 
-  return <>Unavailable</>;
+  return (
+    <>
+      <PageTitle title="Social" prefix={festival?.name} />
+      <>Unavailable</>
+    </>
+  );
 
   // return (
   //   <div className="space-y-8">

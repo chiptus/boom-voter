@@ -1,5 +1,6 @@
 import { useFestivalEdition } from "@/contexts/FestivalEditionContext";
 import { useFestivalInfoQuery } from "@/hooks/queries/festival-info/useFestivalInfo";
+import { PageTitle } from "@/components/PageTitle/PageTitle";
 import { EditionTitle } from "./InfoTab/EditionTitle";
 import { InfoText } from "./InfoTab/InfoText";
 import { CustomLinks } from "./InfoTab/CustomLinks";
@@ -11,6 +12,7 @@ import { useCustomLinksQuery } from "@/hooks/queries/custom-links/useCustomLinks
 export function InfoTab() {
   const { edition, festival } = useFestivalEdition();
   const { data: festivalInfo, isLoading } = useFestivalInfoQuery(festival?.id);
+
   const customLinksQuery = useCustomLinksQuery(festival?.id || "");
   if (isLoading) {
     return <LoadingInfo />;
@@ -24,28 +26,31 @@ export function InfoTab() {
     customLinks.length === 0;
 
   return (
-    <div className="space-y-8">
-      <EditionTitle name={edition?.name} />
+    <>
+      <PageTitle title="Info" prefix={festival?.name} />
+      <div className="space-y-8">
+        <EditionTitle name={edition?.name} />
 
-      {festivalInfo?.info_text && (
-        <InfoText infoText={festivalInfo.info_text} />
-      )}
+        {festivalInfo?.info_text && (
+          <InfoText infoText={festivalInfo.info_text} />
+        )}
 
-      {customLinks.length > 0 && <CustomLinks links={customLinks} />}
+        {customLinks.length > 0 && <CustomLinks links={customLinks} />}
 
-      {festivalInfo?.facebook_url ? (
-        <SocialLinkItem
-          link={{ title: "Facebook", url: festivalInfo.facebook_url }}
-        />
-      ) : null}
+        {festivalInfo?.facebook_url ? (
+          <SocialLinkItem
+            link={{ title: "Facebook", url: festivalInfo.facebook_url }}
+          />
+        ) : null}
 
-      {festivalInfo?.instagram_url ? (
-        <SocialLinkItem
-          link={{ title: "Instagram", url: festivalInfo.instagram_url }}
-        />
-      ) : null}
+        {festivalInfo?.instagram_url ? (
+          <SocialLinkItem
+            link={{ title: "Instagram", url: festivalInfo.instagram_url }}
+          />
+        ) : null}
 
-      {noInfoAvailable && <NoInfo />}
-    </div>
+        {noInfoAvailable && <NoInfo />}
+      </div>
+    </>
   );
 }
