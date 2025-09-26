@@ -124,5 +124,6 @@
     "*.{json,css,scss,md}": [
       "prettier --write"
     ]
-  }
+  },
+  "packageManager": "pnpm@10.12.4"
 }
