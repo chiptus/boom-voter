@@ -3,6 +3,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { EditableField } from "./shared/EditableField";
 import { EditContainer } from "./shared/EditContainer";
 import { useFestivalInfoMutation } from "@/hooks/queries/festival-info/useFestivalInfoMutation";
+import { parseMarkdown } from "@/lib/markdown";
+import { getTextAlignmentClasses } from "@/lib/textAlignment";
 
 interface FestivalInfoFieldProps {
   festivalId: string;
@@ -31,8 +33,8 @@ export function FestivalInfoField({
     >
       {infoText ? (
         <div
-          className="prose prose-sm max-w-none"
-          dangerouslySetInnerHTML={{ __html: infoText }}
+          className={`prose prose-sm max-w-none ${getTextAlignmentClasses(infoText)}`}
+          dangerouslySetInnerHTML={{ __html: parseMarkdown(infoText) }}
         />
       ) : (
         <p className="text-muted-foreground italic">No description</p>
@@ -71,7 +73,7 @@ function InfoFieldForm({
     >
       <Textarea
         {...form.register("infoText")}
-        placeholder="Enter festival information (HTML supported)"
+        placeholder="Enter festival information (Markdown supported)"
         rows={8}
         onKeyDown={handleKeyDown}
       />
