@@ -12,7 +12,7 @@ This directory contains end-to-end tests for the Boom Voter application using Pl
 1. **Node.js 18+** installed
 2. **Supabase CLI** installed globally:
    ```bash
-   npm install -g supabase
+   ppnpm install -g supabase
    ```
 
 ### Setup
@@ -20,24 +20,24 @@ This directory contains end-to-end tests for the Boom Voter application using Pl
 1. **Install dependencies:**
 
    ```bash
-   npm install
+   pnpm install
    ```
 
 2. **Setup local Supabase test environment:**
 
    ```bash
-   npm run test:setup
+   pnpm run test:setup
    ```
 
 3. **Setup test data:**
 
    ```bash
-   npm run test:data
+   pnpm run test:data
    ```
 
 4. **Run tests:**
    ```bash
-   npm run test:e2e
+   pnpm run test:e2e
    ```
 
 ## 📁 Directory Structure
@@ -57,15 +57,15 @@ tests/
 
 ## 🧪 Available Test Commands
 
-| Command                   | Description                                |
-| ------------------------- | ------------------------------------------ |
-| `npm run test:e2e`        | Run all tests in headless mode             |
-| `npm run test:e2e:ui`     | Run tests with Playwright UI               |
-| `npm run test:e2e:headed` | Run tests in headed mode (visible browser) |
-| `npm run test:e2e:debug`  | Run tests in debug mode                    |
-| `npm run test:e2e:report` | Open test report                           |
-| `npm run test:setup`      | Setup local Supabase environment           |
-| `npm run test:data`       | Setup test data in local Supabase          |
+| Command                    | Description                                |
+| -------------------------- | ------------------------------------------ |
+| `pnpm run test:e2e`        | Run all tests in headless mode             |
+| `pnpm run test:e2e:ui`     | Run tests with Playwright UI               |
+| `pnpm run test:e2e:headed` | Run tests in headed mode (visible browser) |
+| `pnpm run test:e2e:debug`  | Run tests in debug mode                    |
+| `pnpm run test:e2e:report` | Open test report                           |
+| `pnpm run test:setup`      | Setup local Supabase environment           |
+| `pnpm run test:data`       | Setup test data in local Supabase          |
 
 ## 🔧 Configuration
 
@@ -172,7 +172,7 @@ await testHelpers.takeScreenshot("test-name");
 After running tests, view the interactive report:
 
 ```bash
-npm run test:e2e:report
+pnpm run test:e2e:report
 ```
 
 ### Report Features
@@ -190,7 +190,7 @@ npm run test:e2e:report
 Run tests in debug mode to step through them:
 
 ```bash
-npm run test:e2e:debug
+pnpm run test:e2e:debug
 ```
 
 ### UI Mode
@@ -198,7 +198,7 @@ npm run test:e2e:debug
 Use Playwright's UI for interactive debugging:
 
 ```bash
-npm run test:e2e:ui
+pnpm run test:e2e:ui
 ```
 
 ### Screenshots

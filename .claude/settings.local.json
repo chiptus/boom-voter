@@ -1,17 +1,17 @@
 {
   "permissions": {
     "allow": [
-      "Bash(npm run build:*)",
-      "Bash(npm run test:e2e:*)",
+      "Bash(pnpm run build:*)",
+      "Bash(pnpm run test:e2e:*)",
       "Bash(rm:*)",
-      "Bash(npm run lint)",
+      "Bash(pnpm run lint)",
       "Bash(grep:*)",
       "Bash(find:*)",
       "Bash(npx tsc:*)",
-      "Bash(npm run typecheck:*)",
-      "Bash(npm install:*)",
+      "Bash(pnpm run typecheck:*)",
+      "Bash(pnpm install:*)",
       "Bash(git add:*)",
-      "Bash(npm run lint:*)",
+      "Bash(pnpm run lint:*)",
       "Bash(mv:*)",
       "mcp__ide__getDiagnostics",
       "Bash(git checkout:*)",
