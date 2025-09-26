@@ -7,7 +7,7 @@ echo "🚀 Setting up local Supabase environment..."
 # Check if Supabase CLI is installed
 if ! command -v supabase &> /dev/null; then
     echo "❌ Supabase CLI not found. Please install it first:"
-    echo "   npm install -g supabase"
+    echo "   pnpm install -g supabase"
     exit 1
 fi
 

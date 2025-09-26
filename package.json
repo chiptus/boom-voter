@@ -106,7 +106,6 @@
     "husky": "^9.1.7",
     "jsdom": "^27.0.0",
     "lint-staged": "^16.1.4",
-    "lovable-tagger": "^1.1.7",
     "oxlint": "^1.11.1",
     "postcss": "^8.4.47",
     "prettier": "^3.6.2",
@@ -125,5 +124,6 @@
     "*.{json,css,scss,md}": [
       "prettier --write"
     ]
-  }
+  },
+  "packageManager": "pnpm@10.12.4"
 }

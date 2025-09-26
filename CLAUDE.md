@@ -6,21 +6,24 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ### Development
 
-- `npm run dev` - Start development server on port 8080 (DO NOT RUN - user always has dev server running)
-- `npm run build` - Production build
-- `npm run build:dev` - Development build
-- `npm run lint` - Run oxlint
-- `npm run preview` - Preview production build
+- `pnpm run dev` - Start development server on port 8080 (DO NOT RUN - user always has dev server running)
+- `pnpm run build` - Production build
+- `pnpm run build:dev` - Development build
+- `pnpm run lint` - Run oxlint
+- `pnpm run preview` - Preview production build
 
 ### Testing
 
-- `npm run test:e2e` - Run Playwright end-to-end tests
-- `npm run test:e2e:ui` - Run tests with Playwright UI
-- `npm run test:e2e:headed` - Run tests in headed mode
-- `npm run test:e2e:debug` - Debug tests
-- `npm run test:e2e:report` - Show test report
-- `npm run test:setup` - Setup test environment
-- `npm run test:setup:full` - Setup full local Supabase
+- `pnpm test` - Run Vitest unit tests
+- `pnpm run test:ui` - Run unit tests with UI
+- `pnpm run test:coverage` - Run unit tests with coverage
+- `pnpm run test:e2e` - Run Playwright end-to-end tests
+- `pnpm run test:e2e:ui` - Run tests with Playwright UI
+- `pnpm run test:e2e:headed` - Run tests in headed mode
+- `pnpm run test:e2e:debug` - Debug tests
+- `pnpm run test:e2e:report` - Show test report
+- `pnpm run test:setup` - Setup test environment
+- `pnpm run test:setup:full` - Setup full local Supabase
 
 ## Architecture Overview
 
