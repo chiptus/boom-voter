@@ -27,7 +27,8 @@ async function fetchDuplicateArtists(): Promise<DuplicateGroup[]> {
 
   const nameCounts = duplicateNames.reduce(
     (acc, artist) => {
-      acc[artist.name] = (acc[artist.name] || 0) + 1;
+      acc[artist.name.toLocaleLowerCase()] =
+        (acc[artist.name.toLocaleLowerCase()] || 0) + 1;
       return acc;
     },
     {} as Record<string, number>,
@@ -52,7 +53,7 @@ async function fetchDuplicateArtists(): Promise<DuplicateGroup[]> {
         artist_music_genres (music_genre_id)
       `,
       )
-      .eq("name", name)
+      .ilike("name", name)
       .eq("archived", false)
       .order("created_at", { ascending: false });
 

@@ -108,9 +108,19 @@ export function toDatetimeLocal(isoString: string | null): string {
 
 // Helper function to convert local datetime-local to UTC ISO string
 export function toISOString(datetimeLocal: string): string {
-  if (!datetimeLocal) return "";
-  const localDate = new Date(datetimeLocal);
-  const userTimeZone = getUserTimeZone();
-  const utcDate = fromZonedTime(localDate, userTimeZone);
+  return convertLocalTimeToUTC(datetimeLocal, getUserTimeZone()) || "";
+}
+
+// Helper function to convert local time string to UTC for database storage (used in CSV imports)
+export function convertLocalTimeToUTC(
+  timeString: string | undefined,
+  timezone: string,
+): string | null {
+  if (!timeString) return null;
+
+  // Parse the time string and interpret it as being in the specified timezone
+  // First create a date object assuming the time is in the target timezone
+  const utcDate = fromZonedTime(timeString, timezone);
+
   return utcDate.toISOString();
 }

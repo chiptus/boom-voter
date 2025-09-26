@@ -9,26 +9,33 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Progress } from "@/components/ui/progress";
+import { Upload, Loader2 } from "lucide-react";
+import { useQueryClient } from "@tanstack/react-query";
+import { importStages } from "@/services/csv/stageImporter";
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { Upload, FileText, Loader2 } from "lucide-react";
-import {
-  importStages,
   importSets,
+  importSetsWithConflictResolution,
+} from "@/services/csv/setImporter";
+import {
   parseStagesCSV,
   parseSetsCSV,
-  type ImportResult,
-} from "@/services/csvImportService";
-import { useQueryClient } from "@tanstack/react-query";
+  extractArtistCandidatesFromSets,
+  type SetImportData,
+} from "@/services/csv/csvParser";
+import type { ImportResult } from "@/services/csv/types";
+import { detectImportConflicts } from "@/services/csv/conflictDetector";
+import { useArtistsQuery } from "@/hooks/queries/artists/useArtists";
+import { ImportConflictResolver } from "@/pages/admin/festivals/CSVImportDialog/ImportConflictResolver/ImportConflictResolver";
+import type {
+  ImportConflict,
+  ConflictResolution,
+  ImportCandidate,
+} from "@/services/csv/conflictDetector";
+
+import { StagesTabContent } from "./StagesTabContent";
+import { SetsTabContent } from "./SetsTabContent";
+import { ImportProgress } from "./ImportProgress";
 
 interface CSVImportDialogProps {
   editionId: string;
@@ -47,8 +54,18 @@ export function CSVImportDialog({
   const [setsFile, setSetsFile] = useState<File | null>(null);
   const [timezone, setTimezone] = useState("Europe/Lisbon");
   const [progress, setProgress] = useState({ current: 0, total: 0, label: "" });
+
+  // Conflict resolution state
+  const [showConflictResolver, setShowConflictResolver] = useState(false);
+  const [pendingImport, setPendingImport] = useState<{
+    setsData: SetImportData[];
+    conflicts: ImportConflict[];
+    candidates: ImportCandidate[];
+  } | null>(null);
+
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const artistsQuery = useArtistsQuery();
 
   function handleFileChange(
     event: React.ChangeEvent<HTMLInputElement>,
@@ -89,11 +106,20 @@ export function CSVImportDialog({
       return;
     }
 
+    if (!artistsQuery.data) {
+      toast({
+        title: "Artists data not loaded",
+        description: "Please wait for artists data to load",
+        variant: "destructive",
+      });
+      return;
+    }
+
     setIsImporting(true);
     const results: ImportResult[] = [];
 
     try {
-      // Import stages first
+      // Import stages first (no conflict detection needed)
       if (stagesFile) {
         setProgress({ current: 0, total: 0, label: "Importing stages..." });
         const stagesContent = await readFileAsText(stagesFile);
@@ -113,25 +139,46 @@ export function CSVImportDialog({
         results.push(stagesResult);
       }
 
-      // Then import sets (which reference stages)
+      // Check for conflicts in sets data
       if (setsFile) {
-        setProgress({ current: 0, total: 0, label: "Importing sets..." });
+        setProgress({
+          current: 0,
+          total: 0,
+          label: "Analyzing sets for conflicts...",
+        });
         const setsContent = await readFileAsText(setsFile);
         const setsData = parseSetsCSV(setsContent);
 
-        const setsResult = await importSets(
-          setsData,
-          editionId,
-          timezone,
-          (current, total) => {
-            setProgress({
-              current,
-              total,
-              label: `Importing sets (${current}/${total})...`,
-            });
-          },
-        );
-        results.push(setsResult);
+        // Extract artist candidates from CSV
+        const candidates = extractArtistCandidatesFromSets(setsData);
+        const conflicts = detectImportConflicts(candidates, artistsQuery.data);
+
+        if (conflicts.length > 0) {
+          // Show conflict resolver
+          setPendingImport({
+            setsData,
+            conflicts,
+            candidates,
+          });
+          setShowConflictResolver(true);
+          setIsImporting(false);
+          return;
+        } else {
+          // No conflicts, proceed with import
+          const setsResult = await importSets(
+            setsData,
+            editionId,
+            timezone,
+            (current, total) => {
+              setProgress({
+                current,
+                total,
+                label: `Importing sets (${current}/${total})...`,
+              });
+            },
+          );
+          results.push(setsResult);
+        }
       }
 
       // Show results
@@ -147,6 +194,7 @@ export function CSVImportDialog({
         // Refresh data
         queryClient.invalidateQueries({ queryKey: ["stages"] });
         queryClient.invalidateQueries({ queryKey: ["sets"] });
+        queryClient.invalidateQueries({ queryKey: ["artists"] });
 
         // Reset form
         setStagesFile(null);
@@ -172,6 +220,73 @@ export function CSVImportDialog({
     }
   }
 
+  async function handleResolveConflicts(
+    resolutions: Map<number, ConflictResolution>,
+    candidatesWithoutConflicts: ImportCandidate[],
+  ) {
+    if (!pendingImport) return;
+
+    setIsImporting(true);
+    setShowConflictResolver(false);
+
+    try {
+      const setsResult = await importSetsWithConflictResolution(
+        pendingImport.setsData,
+        editionId,
+        resolutions,
+        pendingImport.conflicts,
+        candidatesWithoutConflicts,
+        timezone,
+        (current, total) => {
+          setProgress({
+            current,
+            total,
+            label: `Importing sets (${current}/${total})...`,
+          });
+        },
+      );
+
+      if (setsResult.success) {
+        toast({
+          title: "Import successful",
+          description: setsResult.message,
+        });
+
+        // Refresh data
+        queryClient.invalidateQueries({ queryKey: ["stages"] });
+        queryClient.invalidateQueries({ queryKey: ["sets"] });
+        queryClient.invalidateQueries({ queryKey: ["artists"] });
+
+        // Reset form
+        setStagesFile(null);
+        setSetsFile(null);
+        setProgress({ current: 0, total: 0, label: "" });
+        setPendingImport(null);
+        setIsOpen(false);
+      } else {
+        toast({
+          title: "Import failed",
+          description: setsResult.message,
+          variant: "destructive",
+        });
+      }
+    } catch (error) {
+      toast({
+        title: "Import failed",
+        description: error instanceof Error ? error.message : "Unknown error",
+        variant: "destructive",
+      });
+    } finally {
+      setIsImporting(false);
+      setProgress({ current: 0, total: 0, label: "" });
+    }
+  }
+
+  function handleCancelConflictResolution() {
+    setShowConflictResolver(false);
+    setPendingImport(null);
+  }
+
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>{children}</DialogTrigger>
@@ -191,103 +306,23 @@ export function CSVImportDialog({
           </TabsList>
 
           <TabsContent value="stages" className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="stages-file">Stages CSV</Label>
-              <div className="flex items-center gap-2">
-                <Input
-                  id="stages-file"
-                  type="file"
-                  accept=".csv"
-                  onChange={(e) => handleFileChange(e, "stages")}
-                  className="file:mr-2 file:px-4 file:py-2 file:rounded file:border-0 file:text-sm file:font-medium file:bg-primary file:text-primary-foreground hover:file:bg-primary/90"
-                />
-                {stagesFile && (
-                  <div className="flex items-center gap-1 text-sm text-muted-foreground">
-                    <FileText size={16} />
-                    {stagesFile.name}
-                  </div>
-                )}
-              </div>
-              <p className="text-sm text-muted-foreground">
-                Expected columns: name
-              </p>
-            </div>
+            <StagesTabContent
+              stagesFile={stagesFile}
+              onStagesFileChange={(e) => handleFileChange(e, "stages")}
+            />
           </TabsContent>
 
           <TabsContent value="sets" className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="sets-file">Sets CSV</Label>
-              <div className="flex items-center gap-2">
-                <Input
-                  id="sets-file"
-                  type="file"
-                  accept=".csv"
-                  onChange={(e) => handleFileChange(e, "sets")}
-                  className="file:mr-2 file:px-4 file:py-2 file:rounded file:border-0 file:text-sm file:font-medium file:bg-primary file:text-primary-foreground hover:file:bg-primary/90"
-                />
-                {setsFile && (
-                  <div className="flex items-center gap-1 text-sm text-muted-foreground">
-                    <FileText size={16} />
-                    {setsFile.name}
-                  </div>
-                )}
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="timezone-select">Timezone</Label>
-                <Select value={timezone} onValueChange={setTimezone}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select timezone" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="Europe/Lisbon">Europe/Lisbon</SelectItem>
-                    <SelectItem value="Europe/Madrid">Europe/Madrid</SelectItem>
-                    <SelectItem value="Europe/London">Europe/London</SelectItem>
-                    <SelectItem value="America/New_York">
-                      America/New_York
-                    </SelectItem>
-                    <SelectItem value="America/Los_Angeles">
-                      America/Los_Angeles
-                    </SelectItem>
-                    <SelectItem value="UTC">UTC</SelectItem>
-                  </SelectContent>
-                </Select>
-                <p className="text-xs text-muted-foreground">
-                  Select the timezone that the CSV times are in
-                </p>
-              </div>
-              <p className="text-sm text-muted-foreground">
-                Expected columns: artist_names, stage_name, name (optional),
-                time_start (optional), time_end (optional), description
-                (optional)
-              </p>
-              <div className="mt-2 text-xs text-muted-foreground space-y-1">
-                <p>
-                  • <strong>artist_names</strong>: Comma-separated artist names
-                  (e.g., "Shpongle,Ott" or just "Shpongle")
-                </p>
-                <p>
-                  • <strong>name</strong>: Optional set name. If empty, will
-                  auto-generate from artists
-                </p>
-                <p>
-                  • Artists will be created automatically if they don't exist
-                </p>
-              </div>
-            </div>
+            <SetsTabContent
+              setsFile={setsFile}
+              timezone={timezone}
+              onSetsFileChange={(e) => handleFileChange(e, "sets")}
+              onTimezoneChange={setTimezone}
+            />
           </TabsContent>
         </Tabs>
 
-        {isImporting && progress.total > 0 && (
-          <div className="space-y-2">
-            <div className="flex justify-between text-sm">
-              <span>{progress.label}</span>
-              <span>
-                {Math.round((progress.current / progress.total) * 100)}%
-              </span>
-            </div>
-            <Progress value={(progress.current / progress.total) * 100} />
-          </div>
-        )}
+        <ImportProgress progress={progress} isImporting={isImporting} />
 
         <div className="flex justify-end gap-2 pt-4">
           <Button variant="outline" onClick={() => setIsOpen(false)}>
@@ -311,6 +346,21 @@ export function CSVImportDialog({
           </Button>
         </div>
       </DialogContent>
+
+      {showConflictResolver && pendingImport && (
+        <ImportConflictResolver
+          conflicts={pendingImport.conflicts}
+          candidatesWithoutConflicts={pendingImport.candidates.filter(
+            (candidate) =>
+              !pendingImport.conflicts.some(
+                (conflict) => conflict.candidate === candidate,
+              ),
+          )}
+          onResolve={handleResolveConflicts}
+          onCancel={handleCancelConflictResolution}
+          isProcessing={isImporting}
+        />
+      )}
     </Dialog>
   );
 }

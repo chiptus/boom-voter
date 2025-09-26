@@ -3,7 +3,7 @@ import { useOutletContext } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Loader2, Plus, Music, Upload } from "lucide-react";
-import { CSVImportDialog } from "../CSVImportDialog";
+import { CSVImportDialog } from "../CSVImportDialog/CSVImportDialog";
 import { FestivalSet } from "@/hooks/queries/sets/useSets";
 import { useSetsQuery } from "@/hooks/queries/sets/useSets";
 import { FestivalEdition } from "@/hooks/queries/festivals/editions/types";

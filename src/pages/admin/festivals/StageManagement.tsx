@@ -7,7 +7,7 @@ import { Stage } from "@/hooks/queries/stages/types";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Loader2, MapPin, Upload } from "lucide-react";
-import { CSVImportDialog } from "./CSVImportDialog";
+import { CSVImportDialog } from "./CSVImportDialog/CSVImportDialog";
 import { StagesTable } from "./StageManagement/StagesTable";
 import { CreateStageDialog } from "./StageManagement/CreateStageDialog";
 import { EditStageDialog } from "./StageManagement/EditStageDialog";
