@@ -28,7 +28,10 @@ export function ExploreSetPage() {
   const explorableSets = useMemo(() => {
     return allSets.filter(
       (set) =>
-        set.artists && set.artists.length > 0 && set.name && set.time_start,
+        set.artists &&
+        set.artists.length > 0 &&
+        set.name &&
+        set.artists[0].soundcloud_url,
     );
   }, [allSets]);
 

@@ -27,8 +27,8 @@ export const SoundCloudTrackSchema = z.object({
   stream_url: z.string().optional(),
   duration: z.number(),
   artwork_url: z.string().nullable().optional(),
-  likes_count: z.number().optional(),
-  playback_count: z.number().optional(),
+  likes_count: z.number().optional().nullable(),
+  playback_count: z.number().optional().nullable(),
   created_at: z.string(),
   user: SoundCloudUserSchema.optional(),
 });
