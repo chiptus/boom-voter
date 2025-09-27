@@ -2,6 +2,7 @@ import { CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Grid3X3, Plus, Copy } from "lucide-react";
 import { Link } from "react-router-dom";
+import { SoundCloudSyncButton } from "./SoundCloudSyncButton";
 
 interface BulkEditorHeaderProps {
   onAddArtist: () => void;
@@ -13,9 +14,11 @@ export function BulkEditorHeader({ onAddArtist }: BulkEditorHeaderProps) {
       <CardTitle className="flex items-center justify-between">
         <div className="flex items-center gap-3">
           <Grid3X3 className="h-5 w-5 text-blue-600" />
-          <span>Artists Management</span>
+          <span>Artists</span>
         </div>
         <div className="flex items-center gap-2">
+          <SoundCloudSyncButton />
+
           <Link to="/admin/artists/duplicates">
             <Button
               variant="outline"

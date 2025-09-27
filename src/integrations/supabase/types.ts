@@ -159,10 +159,8 @@ export type Database = {
           estimated_date: string | null;
           id: string;
           image_url: string | null;
-          last_soundcloud_sync: string | null;
           name: string;
           slug: string;
-          soundcloud_followers: number | null;
           soundcloud_url: string | null;
           spotify_url: string | null;
           stage: string | null;
@@ -178,10 +176,8 @@ export type Database = {
           estimated_date?: string | null;
           id?: string;
           image_url?: string | null;
-          last_soundcloud_sync?: string | null;
           name: string;
           slug: string;
-          soundcloud_followers?: number | null;
           soundcloud_url?: string | null;
           spotify_url?: string | null;
           stage?: string | null;
@@ -197,10 +193,8 @@ export type Database = {
           estimated_date?: string | null;
           id?: string;
           image_url?: string | null;
-          last_soundcloud_sync?: string | null;
           name?: string;
           slug?: string;
-          soundcloud_followers?: number | null;
           soundcloud_url?: string | null;
           spotify_url?: string | null;
           stage?: string | null;
@@ -633,6 +627,59 @@ export type Database = {
             columns: ["stage_id"];
             isOneToOne: false;
             referencedRelation: "stages";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      soundcloud: {
+        Row: {
+          artist_id: string;
+          created_at: string | null;
+          display_name: string | null;
+          followers_count: number | null;
+          id: string;
+          last_sync: string | null;
+          playlist_title: string | null;
+          playlist_url: string | null;
+          soundcloud_id: number | null;
+          soundcloud_url: string;
+          updated_at: string | null;
+          username: string | null;
+        };
+        Insert: {
+          artist_id: string;
+          created_at?: string | null;
+          display_name?: string | null;
+          followers_count?: number | null;
+          id?: string;
+          last_sync?: string | null;
+          playlist_title?: string | null;
+          playlist_url?: string | null;
+          soundcloud_id?: number | null;
+          soundcloud_url: string;
+          updated_at?: string | null;
+          username?: string | null;
+        };
+        Update: {
+          artist_id?: string;
+          created_at?: string | null;
+          display_name?: string | null;
+          followers_count?: number | null;
+          id?: string;
+          last_sync?: string | null;
+          playlist_title?: string | null;
+          playlist_url?: string | null;
+          soundcloud_id?: number | null;
+          soundcloud_url?: string;
+          updated_at?: string | null;
+          username?: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "soundcloud_artist_id_fkey";
+            columns: ["artist_id"];
+            isOneToOne: true;
+            referencedRelation: "artists";
             referencedColumns: ["id"];
           },
         ];

@@ -1,5 +1,6 @@
 import {
   CalendarIcon,
+  HeartIcon,
   InfoIcon,
   ListIcon,
   MapIcon,
@@ -21,6 +22,13 @@ export const config: TabConfig[] = [
     label: "Schedule",
     shortLabel: "Schedule",
     enabled: true,
+  },
+  {
+    icon: HeartIcon,
+    label: "Explore",
+    shortLabel: "Explore",
+    enabled: true,
+    key: "explore",
   },
   {
     key: "map",

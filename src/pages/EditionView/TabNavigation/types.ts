@@ -1,7 +1,13 @@
 import { FestivalInfo } from "@/hooks/queries/festival-info/useFestivalInfo";
 import { LucideIcon } from "lucide-react";
 
-export type MainTab = "sets" | "schedule" | "map" | "info" | "social";
+export type MainTab =
+  | "sets"
+  | "schedule"
+  | "map"
+  | "info"
+  | "social"
+  | "explore";
 
 export type TabConfig = {
   key: MainTab;
