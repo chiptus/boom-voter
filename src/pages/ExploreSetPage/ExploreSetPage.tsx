@@ -8,8 +8,8 @@ import { VotingSection } from "./components/VotingSection";
 import { useAuth } from "@/contexts/AuthContext";
 import { useVote } from "@/hooks/queries/voting/useVote";
 import { useUserVotes } from "@/hooks/queries/voting/useUserVotes";
-import { useSetsByEditionQuery } from "@/hooks/queries/sets/useSetsByEdition";
-import { useMemo, useState } from "react";
+import { useState } from "react";
+import { useExplorableSets } from "./useExplorableSets";
 
 export function ExploreSetPage() {
   const { edition, basePath } = useFestivalEdition();
@@ -18,21 +18,10 @@ export function ExploreSetPage() {
   const voteMutation = useVote();
   const { data: userVotes = {} } = useUserVotes(user?.id || "");
 
-  // Fetch edition and sets data
-  const { data: allSets = [], isLoading: setsLoading } = useSetsByEditionQuery(
-    edition?.id,
-  );
-
-  // Filter to sets with artists and valid data
-  const explorableSets = useMemo(() => {
-    return allSets.filter(
-      (set) =>
-        set.artists &&
-        set.artists.length > 0 &&
-        set.name &&
-        set.artists[0].soundcloud_url,
-    );
-  }, [allSets]);
+  const explorableSetsQuery = useExplorableSets({
+    editionId: edition?.id,
+    userVotes,
+  });
 
   const [currentIndex, setCurrentIndex] = useState(0);
   const [direction, setDirection] = useState<"left" | "right" | null>(null);
@@ -41,6 +30,7 @@ export function ExploreSetPage() {
     intensity: number;
   }>({ direction: null, intensity: 0 });
 
+  const explorableSets = explorableSetsQuery.data || [];
   const currentSet = explorableSets[currentIndex];
   const isLastSet = currentIndex >= explorableSets.length - 1;
 
@@ -107,7 +97,7 @@ export function ExploreSetPage() {
     }, 300);
   }
 
-  if (setsLoading) {
+  if (explorableSetsQuery.isLoading) {
     return <LoadingState />;
   }
 
@@ -115,7 +105,7 @@ export function ExploreSetPage() {
   const nextSet = !isLastSet ? explorableSets[currentIndex + 1] : undefined;
 
   if (!edition || totalSets === 0) {
-    return <EmptyState onGoBack={() => navigate(-1)} />;
+    return <EmptyState basePath={basePath} />;
   }
 
   return (
