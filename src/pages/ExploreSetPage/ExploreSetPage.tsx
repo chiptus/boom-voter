@@ -15,7 +15,7 @@ import { useUserVotes } from "@/hooks/queries/voting/useUserVotes";
 export function ExploreSetPage() {
   const { edition } = useFestivalEdition();
   const navigate = useNavigate();
-  const { user } = useAuth();
+  const { user, showAuthDialog } = useAuth();
   const voteMutation = useVote();
   const { data: userVotes = {} } = useUserVotes(user?.id || "");
 
@@ -46,7 +46,12 @@ export function ExploreSetPage() {
   const isLastSet = currentIndex >= explorableSets.length - 1;
 
   async function handleVote(voteType: number) {
-    if (!currentSet || !user) return;
+    if (!currentSet) return;
+
+    if (!user) {
+      showAuthDialog();
+      return;
+    }
 
     const existingVote = userVotes[currentSet.id];
 
@@ -65,7 +70,7 @@ export function ExploreSetPage() {
       setTimeout(() => {
         if (isLastSet) {
           // Navigate back or show completion screen
-          navigate(-1);
+          navigate("/sets");
         } else {
           setCurrentIndex((prev) => prev + 1);
           setDirection(null);
@@ -133,7 +138,7 @@ export function ExploreSetPage() {
       {/* Header */}
       <div className="relative z-10 p-4 flex items-center justify-between">
         <Button
-          onClick={() => navigate(-1)}
+          onClick={() => navigate("/sets")}
           variant="ghost"
           size="sm"
           className="text-white hover:bg-white/20"
@@ -204,11 +209,9 @@ export function ExploreSetPage() {
       </div>
 
       {/* Voting Actions */}
-      {currentSet && user && (
+      {currentSet && (
         <div className="absolute bottom-8 left-0 right-0 z-20">
           <VotingActions
-            setId={currentSet.id}
-            userId={user.id}
             onVote={handleVote}
             onSkip={handleSkip}
             dragFeedback={dragFeedback}
