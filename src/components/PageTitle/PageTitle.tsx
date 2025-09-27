@@ -4,23 +4,6 @@ const DEFAULT_TITLE = "UpLine";
 const TITLE_SEPARATOR = " - ";
 
 /**
- * Utility function to build title from parts
- */
-export function buildTitle(title?: string, prefix?: string): string {
-  const parts = [DEFAULT_TITLE];
-
-  if (title) {
-    parts.unshift(title);
-  }
-
-  if (prefix) {
-    parts.unshift(prefix);
-  }
-
-  return parts.join(TITLE_SEPARATOR);
-}
-
-/**
  * Component to set the page title and meta tags using Helmet
  */
 interface PageTitleProps {
@@ -31,7 +14,6 @@ interface PageTitleProps {
 
 export function PageTitle({ title, prefix, description }: PageTitleProps) {
   const fullTitle = buildTitle(title, prefix);
-
   return (
     <Helmet>
       <title>{fullTitle}</title>
@@ -42,4 +24,45 @@ export function PageTitle({ title, prefix, description }: PageTitleProps) {
       {description && <meta name="twitter:description" content={description} />}
     </Helmet>
   );
+}
+
+/**
+ * Get environment prefix based on current hostname
+ */
+function getEnvironmentPrefix(): string | undefined {
+  if (typeof window === "undefined") return undefined;
+
+  const hostname = window.location.hostname;
+
+  if (hostname === "localhost" || hostname === "127.0.0.1") {
+    return "LOCAL";
+  }
+
+  if (!hostname.includes("getupline.com")) {
+    return "DEV";
+  }
+
+  return undefined;
+}
+
+/**
+ * Utility function to build title from parts
+ */
+function buildTitle(title?: string, prefix?: string): string {
+  const parts = [DEFAULT_TITLE];
+
+  if (title) {
+    parts.unshift(title);
+  }
+
+  if (prefix) {
+    parts.unshift(prefix);
+  }
+
+  const envPrefix = getEnvironmentPrefix();
+  if (envPrefix) {
+    parts.unshift(envPrefix);
+  }
+
+  return parts.join(TITLE_SEPARATOR);
 }
