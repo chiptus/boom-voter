@@ -55,13 +55,13 @@ export function BulkEditorTableRow({
         <TextCell
           value={artist.name}
           required
-          onSave={() => onSave("name", artist.name)}
+          onSave={(value) => value && onSave("name", value)}
         />
       </TableCell>
       <TableCell>
         <TextareaCell
           value={artist.description}
-          onSave={() => onSave("description", artist.description)}
+          onSave={(value) => onSave("description", value)}
         />
       </TableCell>
       <TableCell>

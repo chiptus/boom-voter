@@ -86,7 +86,6 @@ export async function processSoundCloudArtists(
             followers_count: updateData.followers_count || 0,
             playlist_url: updateData.playlist_url || null,
             playlist_title: updateData.playlist_title || null,
-            soundcloud_url: updateData.soundcloud_url,
             last_sync: updateData.last_sync,
           },
           {

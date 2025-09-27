@@ -125,13 +125,15 @@ export function useUpdateArtistMutation() {
 
   return useMutation({
     mutationFn: updateArtist,
-    onSuccess: (data) => {
-      queryClient.invalidateQueries({
-        queryKey: artistsKeys.all,
-      });
-      queryClient.invalidateQueries({
-        queryKey: artistsKeys.detail(data.id),
-      });
+    onSuccess: async (data) => {
+      await Promise.all([
+        queryClient.invalidateQueries({
+          queryKey: artistsKeys.all,
+        }),
+        queryClient.invalidateQueries({
+          queryKey: artistsKeys.detail(data.id),
+        }),
+      ]);
 
       toast({
         title: "Success",
