@@ -100,3 +100,51 @@ export async function deleteFestivalLogo(logoUrl: string): Promise<void> {
     await deleteFile(path);
   }
 }
+
+/**
+ * Upload an artist logo
+ */
+export async function uploadArtistLogo(
+  file: File,
+  artistId: string,
+): Promise<UploadResult> {
+  const fileExt = file.name.split(".").pop();
+  const fileName = `${artistId}-logo.${fileExt}`;
+  const filePath = `artist-logos/${fileName}`;
+
+  const { error } = await supabase.storage
+    .from(BUCKET_NAME)
+    .upload(filePath, file, {
+      cacheControl: "3600",
+      upsert: true, // Allow overwriting existing files
+    });
+
+  if (error) {
+    throw new Error(`Upload failed: ${error.message}`);
+  }
+
+  const {
+    data: { publicUrl },
+  } = supabase.storage.from(BUCKET_NAME).getPublicUrl(filePath);
+
+  return {
+    url: publicUrl,
+    path: filePath,
+  };
+}
+
+/**
+ * Delete an artist logo
+ */
+export async function deleteArtistLogo(logoUrl: string): Promise<void> {
+  // Extract path from URL
+  const url = new URL(logoUrl);
+  const pathMatch = url.pathname.match(
+    /\/storage\/v1\/object\/public\/festival-assets\/(.+)$/,
+  );
+
+  if (pathMatch) {
+    const path = pathMatch[1];
+    await deleteFile(path);
+  }
+}

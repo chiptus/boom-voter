@@ -33,6 +33,12 @@ export function BulkEditorTableHeader({
         </TableHead>
         <TableHead
           className="cursor-pointer hover:bg-gray-50 min-w-48"
+          onClick={() => onSort("image_url")}
+        >
+          Image/Logo{getSortIndicator("image_url")}
+        </TableHead>
+        <TableHead
+          className="cursor-pointer hover:bg-gray-50 min-w-48"
           onClick={() => onSort("name")}
         >
           Name{getSortIndicator("name")}
@@ -61,6 +67,7 @@ export function BulkEditorTableHeader({
         >
           SoundCloud URL{getSortIndicator("soundcloud_url")}
         </TableHead>
+
         <TableHead
           className="cursor-pointer hover:bg-gray-50"
           onClick={() => onSort("created_at")}

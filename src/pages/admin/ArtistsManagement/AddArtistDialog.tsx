@@ -25,7 +25,11 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useUserPermissionsQuery } from "@/hooks/queries/auth/useUserPermissions";
 import { useGenresQuery } from "@/hooks/queries/genres/useGenres";
 import { useCreateArtistMutation } from "@/hooks/queries/artists/useCreateArtist";
+import { useUpdateArtistMutation } from "@/hooks/queries/artists/useUpdateArtist";
 import { GenreMultiSelect } from "./GenreMultiSelect";
+import { FileUpload } from "@/components/ui/file-upload";
+import { uploadArtistLogo } from "@/services/storage";
+import { useState } from "react";
 
 // Form validation schema
 const artistFormSchema = z.object({
@@ -55,10 +59,12 @@ export function AddArtistDialog({
     useUserPermissionsQuery(user?.id, "edit_artists");
 
   const { toast } = useToast();
+  const [logoFile, setLogoFile] = useState<File | null>(null);
 
   // React Query hooks
   const { data: genres = [], isLoading: isLoadingGenres } = useGenresQuery();
   const createArtistMutation = useCreateArtistMutation();
+  const updateArtistMutation = useUpdateArtistMutation();
 
   // Form setup
   const form = useForm<ArtistFormData>({
@@ -97,23 +103,46 @@ export function AddArtistDialog({
       return;
     }
 
-    createArtistMutation.mutate(
-      {
+    try {
+      // Determine the image URL - prioritize uploaded file over URL input
+      let imageUrl = data.imageUrl || null;
+
+      // Upload image if a file is selected
+      if (logoFile) {
+        try {
+          // Create a temporary ID for upload (will be replaced when artist is created)
+          const tempId = Date.now().toString();
+          const uploadResult = await uploadArtistLogo(logoFile, tempId);
+          imageUrl = uploadResult.url;
+        } catch (uploadError) {
+          console.error("Image upload failed:", uploadError);
+          toast({
+            title: "Warning",
+            description: "Image upload failed, using URL instead",
+            variant: "destructive",
+          });
+        }
+      }
+
+      // Create the artist with the final image URL
+      const artistData = {
         name: data.name,
         description: data.description || "",
         genre_ids: data.genre_ids || [],
         added_by: user.id,
         spotify_url: data.spotifyUrl || null,
         soundcloud_url: data.soundcloudUrl || null,
-        image_url: data.imageUrl || null,
-      },
-      {
-        onSuccess() {
-          form.reset();
-          onSuccess();
-        },
-      },
-    );
+        image_url: imageUrl,
+      };
+
+      await createArtistMutation.mutateAsync(artistData);
+
+      form.reset();
+      setLogoFile(null);
+      onSuccess();
+    } catch (error) {
+      console.error("Failed to create artist:", error);
+    }
   }
 
   return (
@@ -223,30 +252,24 @@ export function AddArtistDialog({
               )}
             />
 
-            <FormField
-              control={form.control}
-              name="imageUrl"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Image URL (Optional)</FormLabel>
-                  <FormControl>
-                    <Input
-                      type="url"
-                      placeholder="https://example.com/image.jpg"
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
+            <FileUpload
+              onFileSelect={setLogoFile}
+              currentImageUrl={null}
+              accept="image/*"
+              maxSize={5}
+              disabled={createArtistMutation.isPending}
             />
 
             <Button
               type="submit"
               className="w-full"
-              disabled={createArtistMutation.isPending || isLoadingGenres}
+              disabled={
+                createArtistMutation.isPending ||
+                updateArtistMutation.isPending ||
+                isLoadingGenres
+              }
             >
-              {createArtistMutation.isPending
+              {createArtistMutation.isPending || updateArtistMutation.isPending
                 ? "Adding artist..."
                 : "Add Artist"}
             </Button>

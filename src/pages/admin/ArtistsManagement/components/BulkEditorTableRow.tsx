@@ -5,6 +5,7 @@ import { TextCell } from "../BulkEditor/TextCell";
 import { TextareaCell } from "../BulkEditor/TextareaCell";
 import { UrlCell } from "../BulkEditor/UrlCell";
 import { GenresCell } from "../BulkEditor/GenresCell";
+import { ImageCell } from "../BulkEditor/ImageCell";
 import {
   UpdateArtistUpdates,
   useUpdateArtistMutation,
@@ -43,6 +44,14 @@ export function BulkEditorTableRow({
         />
       </TableCell>
       <TableCell>
+        <ImageCell
+          value={artist.image_url}
+          artistSlug={artist.slug}
+          artistName={artist.name}
+          onSave={(value) => onSave("image_url", value)}
+        />
+      </TableCell>
+      <TableCell>
         <TextCell
           value={artist.name}
           required
@@ -75,6 +84,7 @@ export function BulkEditorTableRow({
           onSave={(value) => onSave("soundcloud_url", value)}
         />
       </TableCell>
+
       <TableCell>
         <span className="text-xs text-muted-foreground">
           {new Date(artist.created_at).toLocaleDateString()}
