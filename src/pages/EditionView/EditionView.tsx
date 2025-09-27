@@ -1,5 +1,5 @@
 import { AppHeader } from "@/components/layout/AppHeader";
-import { MainTabNavigation } from "./MainTabNavigation";
+import { MainTabNavigation } from "./TabNavigation/TabNavigation";
 import ErrorBoundary from "@/components/ErrorBoundary";
 import { useFestivalEdition } from "@/contexts/FestivalEditionContext";
 import { Outlet } from "react-router-dom";

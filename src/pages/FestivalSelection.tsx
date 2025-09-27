@@ -16,6 +16,7 @@ import {
 } from "@/lib/subdomain";
 import { Link } from "react-router-dom";
 import { useCustomLinksQuery } from "@/hooks/queries/custom-links/useCustomLinks";
+import { PageTitle } from "@/components/PageTitle/PageTitle";
 
 export default function FestivalSelection() {
   const { data: availableFestivals = [], isLoading: festivalsLoading } =
@@ -50,11 +51,8 @@ export default function FestivalSelection() {
     return (
       <div className="min-h-screen bg-app-gradient">
         <div className="container mx-auto px-4 py-8">
-          <AppHeader
-            title="UpLine"
-            subtitle="Collaborative Festival Voting"
-            description="No festivals are currently available for voting."
-          />
+          <PageTitle title="Select Festival" />
+          <AppHeader title="UpLine" />
 
           <div className="flex items-center justify-center mt-16">
             <Card className="w-full max-w-md bg-white/10 border-purple-400/30">
@@ -105,7 +103,10 @@ function FestivalCard({ festival }: { festival: Festival }) {
   const websiteUrl = customLinksQuery.data?.[0]?.url;
 
   return (
-    <Link className="block cursor-pointer" to={`/festivals/${festival.slug}`}>
+    <Link
+      className="block cursor-pointer max-w-[90vw] w-full"
+      to={`/festivals/${festival.slug}`}
+    >
       <Card className="bg-white/10 border-purple-400/30 hover:bg-white/15 transition-all duration-300 cursor-pointer group">
         <CardHeader>
           <div className="flex items-start justify-between">
