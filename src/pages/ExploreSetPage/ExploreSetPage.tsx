@@ -1,19 +1,18 @@
 import { useNavigate } from "react-router-dom";
-import { useSetsByEditionQuery } from "@/hooks/queries/sets/useSetsByEdition";
-import { useState, useMemo } from "react";
-import { Button } from "@/components/ui/button";
-import { ArrowLeft, Info } from "lucide-react";
-import { useAuth } from "@/contexts/AuthContext";
-import { SetExploreCard } from "./SetExploreCard";
-import { ExplorationProgress } from "./ExplorationProgress";
-import { VotingActions } from "./VotingActions";
-import { motion, AnimatePresence } from "framer-motion";
 import { useFestivalEdition } from "@/contexts/FestivalEditionContext";
+import { LoadingState } from "./components/LoadingState";
+import { EmptyState } from "./components/EmptyState";
+import { ExplorePageHeader } from "./components/ExplorePageHeader";
+import { CardStackContainer } from "./components/CardStackContainer";
+import { VotingSection } from "./components/VotingSection";
+import { useAuth } from "@/contexts/AuthContext";
 import { useVote } from "@/hooks/queries/voting/useVote";
 import { useUserVotes } from "@/hooks/queries/voting/useUserVotes";
+import { useSetsByEditionQuery } from "@/hooks/queries/sets/useSetsByEdition";
+import { useMemo, useState } from "react";
 
 export function ExploreSetPage() {
-  const { edition } = useFestivalEdition();
+  const { edition, basePath } = useFestivalEdition();
   const navigate = useNavigate();
   const { user, showAuthDialog } = useAuth();
   const voteMutation = useVote();
@@ -70,7 +69,7 @@ export function ExploreSetPage() {
       setTimeout(() => {
         if (isLastSet) {
           // Navigate back or show completion screen
-          navigate("/sets");
+          navigate(`${basePath}/sets`);
         } else {
           setCurrentIndex((prev) => prev + 1);
           setDirection(null);
@@ -109,115 +108,43 @@ export function ExploreSetPage() {
   }
 
   if (setsLoading) {
-    return (
-      <div className="min-h-screen bg-gradient-to-b from-purple-900 to-black flex items-center justify-center">
-        <div className="text-white text-xl">Loading sets...</div>
-      </div>
-    );
+    return <LoadingState />;
   }
 
-  if (!edition || explorableSets.length === 0) {
-    return (
-      <div className="min-h-screen bg-gradient-to-b from-purple-900 to-black flex flex-col items-center justify-center p-4">
-        <div className="text-white text-center">
-          <h1 className="text-2xl font-bold mb-4">No Sets Available</h1>
-          <p className="mb-6">
-            There are no sets to explore for this festival edition.
-          </p>
-          <Button onClick={() => navigate(-1)} variant="outline">
-            <ArrowLeft className="h-4 w-4 mr-2" />
-            Go Back
-          </Button>
-        </div>
-      </div>
-    );
+  const totalSets = explorableSets.length;
+  const nextSet = !isLastSet ? explorableSets[currentIndex + 1] : undefined;
+
+  if (!edition || totalSets === 0) {
+    return <EmptyState onGoBack={() => navigate(-1)} />;
   }
 
   return (
     <div className="relative min-h-screen bg-gradient-to-b from-purple-900 to-black">
       {/* Header */}
-      <div className="relative z-10 p-4 flex items-center justify-between">
-        <Button
-          onClick={() => navigate("/sets")}
-          variant="ghost"
-          size="sm"
-          className="text-white hover:bg-white/20"
-        >
-          <ArrowLeft className="h-4 w-4 mr-2" />
-          Back
-        </Button>
-
-        <div className="text-center text-white">
-          <h1 className="font-semibold">{edition.name}</h1>
-          <ExplorationProgress
-            current={currentIndex + 1}
-            total={explorableSets.length}
-          />
-        </div>
-
-        <Button
-          variant="ghost"
-          size="sm"
-          className="text-white hover:bg-white/20"
-        >
-          <Info className="h-4 w-4" />
-        </Button>
-      </div>
+      <ExplorePageHeader
+        basePath={basePath}
+        editionName={edition.name}
+        currentIndex={currentIndex}
+        totalSets={totalSets}
+      />
 
       {/* Card Stack */}
-      <div className="relative flex-1 px-4 pb-32">
-        <div className="relative h-[60vh] max-w-sm mx-auto">
-          <AnimatePresence mode="wait">
-            {currentSet && (
-              <motion.div
-                key={currentSet.id}
-                initial={{
-                  scale: 0.8,
-                  opacity: 0,
-                  rotateY: direction === "left" ? -90 : 90,
-                }}
-                animate={{ scale: 1, opacity: 1, rotateY: 0 }}
-                exit={{
-                  scale: 0.8,
-                  opacity: 0,
-                  x: direction === "left" ? -300 : 300,
-                  rotateZ: direction === "left" ? -30 : 30,
-                }}
-                transition={{
-                  duration: 0.3,
-                  ease: "easeOut",
-                }}
-                className="absolute inset-0"
-              >
-                <SetExploreCard
-                  set={currentSet}
-                  isFront
-                  onSwipe={handleSwipe}
-                  onDragUpdate={handleDragUpdate}
-                />
-              </motion.div>
-            )}
-          </AnimatePresence>
-
-          {/* Preview next card */}
-          {!isLastSet && explorableSets[currentIndex + 1] && (
-            <div className="absolute inset-0 -z-10 scale-95 opacity-50">
-              <SetExploreCard set={explorableSets[currentIndex + 1]} />
-            </div>
-          )}
-        </div>
-      </div>
+      <CardStackContainer
+        currentSet={currentSet}
+        nextSet={nextSet}
+        direction={direction}
+        onSwipe={handleSwipe}
+        onDragUpdate={handleDragUpdate}
+        isLastSet={isLastSet}
+      />
 
       {/* Voting Actions */}
-      {currentSet && (
-        <div className="absolute bottom-8 left-0 right-0 z-20">
-          <VotingActions
-            onVote={handleVote}
-            onSkip={handleSkip}
-            dragFeedback={dragFeedback}
-          />
-        </div>
-      )}
+      <VotingSection
+        currentSet={currentSet}
+        onVote={handleVote}
+        onSkip={handleSkip}
+        dragFeedback={dragFeedback}
+      />
     </div>
   );
 }

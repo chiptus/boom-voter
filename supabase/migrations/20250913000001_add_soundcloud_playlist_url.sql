@@ -13,9 +13,7 @@ CREATE TABLE public.soundcloud (
     updated_at timestamp with time zone DEFAULT now(),
     
     -- Ensure one SoundCloud record per artist
-    CONSTRAINT soundcloud_artist_unique UNIQUE(artist_id),
-    -- Ensure unique SoundCloud URLs
-    CONSTRAINT soundcloud_url_unique UNIQUE(soundcloud_url)
+    CONSTRAINT soundcloud_artist_unique UNIQUE(artist_id)
 );
 
 -- Enable RLS
@@ -47,10 +45,9 @@ CREATE TRIGGER update_soundcloud_updated_at
     FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
 -- Migrate existing SoundCloud data from artists table
-INSERT INTO public.soundcloud (artist_id, soundcloud_url, followers_count, last_sync)
+INSERT INTO public.soundcloud (artist_id, followers_count, last_sync)
 SELECT 
     id as artist_id,
-    soundcloud_url,
     soundcloud_followers,
     last_soundcloud_sync
 FROM public.artists 
