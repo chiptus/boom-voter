@@ -1,5 +1,6 @@
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, Link } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
+import { Link } from "react-router-dom";
 
 interface EmptyStateProps {
   basePath: string;
@@ -13,12 +14,12 @@ export function EmptyState({ basePath }: EmptyStateProps) {
         <p className="mb-6">
           You have explored all available sets in this edition
         </p>
-        <Link to={basePath}>
-          <Button asChild variant="outline">
+        <Button asChild variant="outline">
+          <Link to={basePath}>
             <ArrowLeft className="h-4 w-4 mr-2" />
             Go Back
-          </Button>
-        </Link>
+          </Link>
+        </Button>
       </div>
     </div>
   );
