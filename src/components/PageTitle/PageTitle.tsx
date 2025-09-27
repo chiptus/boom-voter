@@ -35,11 +35,11 @@ function getEnvironmentPrefix(): string | undefined {
   const hostname = window.location.hostname;
 
   if (hostname === "localhost" || hostname === "127.0.0.1") {
-    return "LOCAL";
+    return "DEV";
   }
 
   if (!hostname.includes("getupline.com")) {
-    return "DEV";
+    return "STAG";
   }
 
   return undefined;
